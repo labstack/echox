@@ -17,8 +17,8 @@ func main() {
 	e.Use(middleware.Static("public"))
 
 	// JSONP
-	e.Get("/jsonp", echo.HandlerFunc(func(c echo.Context) error {
-		callback := c.Query("callback")
+	e.Get("/jsonp", func(c echo.Context) error {
+		callback := c.QueryParam("callback")
 		var content struct {
 			Response  string    `json:"response"`
 			Timestamp time.Time `json:"timestamp"`
@@ -28,7 +28,7 @@ func main() {
 		content.Timestamp = time.Now().UTC()
 		content.Random = rand.Intn(1000)
 		return c.JSONP(http.StatusOK, callback, &content)
-	}))
+	})
 
 	// Start server
 	e.Run(standard.New(":1323"))

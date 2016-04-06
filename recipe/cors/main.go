@@ -13,10 +13,8 @@ var (
 	users = []string{"Joe", "Veer", "Zion"}
 )
 
-func getUsers() echo.HandlerFunc {
-	return func(c echo.Context) error {
-		return c.JSON(http.StatusOK, users)
-	}
+func getUsers(c echo.Context) error {
+	return c.JSON(http.StatusOK, users)
 }
 
 func main() {
@@ -29,6 +27,6 @@ func main() {
 		AllowedOrigins: []string{"http://localhost"},
 	}).Handler))
 
-	e.Get("/api/users", getUsers())
+	e.Get("/api/users", getUsers)
 	e.Run(standard.New(":1323"))
 }

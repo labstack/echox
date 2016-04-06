@@ -12,9 +12,9 @@ import (
 func main() {
 	// Setup
 	e := echo.New()
-	e.Get("/", echo.HandlerFunc(func(c echo.Context) error {
+	e.Get("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Sue sews rose on slow joe crows nose")
-	}))
+	})
 	std := standard.New(":1323")
 	std.SetHandler(e)
 	graceful.ListenAndServe(std.Server, 5*time.Second)

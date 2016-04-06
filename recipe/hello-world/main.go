@@ -8,13 +8,6 @@ import (
 	"github.com/labstack/echo/middleware"
 )
 
-// Handler
-func hello() echo.HandlerFunc {
-	return func(c echo.Context) error {
-		return c.String(http.StatusOK, "Hello, World!\n")
-	}
-}
-
 func main() {
 	// Echo instance
 	e := echo.New()
@@ -23,8 +16,10 @@ func main() {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
-	// Routes
-	e.Get("/", hello())
+	// Route => handler
+	e.Get("/", func(c echo.Context) error {
+		return c.String(http.StatusOK, "Hello, World!\n")
+	})
 
 	// Start server
 	e.Run(standard.New(":1323"))

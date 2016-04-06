@@ -6,13 +6,11 @@ menu:
     weight: 3
 ---
 
-### HTTP error handler
+### HTTP Error Handler
 
-`Echo#SetHTTPErrorHandler(h HTTPErrorHandler)`
+`Echo#SetHTTPErrorHandler(h HTTPErrorHandler)` registers a custom `Echo#HTTPErrorHandler`.
 
-Registers a custom `Echo#HTTPErrorHandler`.
-
-Default handler rules:
+Default HTTP error handler rules:
 
 - If error is of type `Echo#HTTPError` it sends HTTP response with status code `HTTPError.Code`
 and message `HTTPError.Message`.
@@ -21,86 +19,58 @@ and message `HTTPError.Message`.
 
 ### Debug
 
-`Echo#SetDebug(on bool)`
+`Echo#SetDebug(on bool)` enable/disable debug mode.
 
-Enable/disable debug mode.
+### Log Prefix
 
-### Log prefix
+`Echo#SetLogPrefix(prefix string)` sets the prefix for the logger. Default value
+is `echo`.
 
-`Echo#SetLogPrefix(prefix string)`
+### Log Output
 
-SetLogPrefix sets the prefix for the logger. Default value is `echo`.
-
-### Log output
-
-`Echo#SetLogOutput(w io.Writer)`
-
-SetLogOutput sets the output destination for the logger. Default value is `os.Stdout`
+`Echo#SetLogOutput(w io.Writer)` sets the output destination for the logger. Default
+value is `os.Stdout`
 
 To completely disable logs use `Echo#SetLogOutput(io.Discard)`
 
-### Log level
+### Log Level
 
 `Echo#SetLogLevel(l log.Level)`
 
-SetLogLevel sets the log level for the logger. Default value is `log.FATAL`.
+SetLogLevel sets the log level for the logger. Default value is `log.ERROR`.
 
-### Engine
+### HTTP Engine
 
-#### Standard HTTP server
+Echo currently supports standard and [fasthttp](https://github.com/valyala/fasthttp)
+server engines. Echo utilizes interfaces to abstract the internal implementation
+of these servers so you can seamlessly switch from one engine to another based on
+your preference.
 
-```go
-e.Run(standard.New(":1323"))
-```
+#### Running a standard HTTP server
 
-##### From TLS
+`e.Run(standard.New(":1323"))`
 
-```go
-e.Run(standard.NewFromTLS(":1323", "<certfile>", "<keyfile>"))
-```
+#### Running a fasthttp server
 
-##### From config
+`e.Run(fasthttp.New(":1323"))`
 
-```go
-e.Run(standard.NewFromConfig(&Config{}))
-```
+#### Running a server from TLS configuration
 
-#### FastHTTP server
+`e.Run(<engine>.NewFromTLS(":1323", "<certfile>", "<keyfile>"))`
 
-```go
-e.Run(fasthttp.New(":1323"))
-```
+#### Running a server from engine configuration
 
-##### From TLS
-
-```go
-e.Run(fasthttp.NewFromTLS(":1323", "<certfile>", "<keyfile>"))
-```
-
-
-##### From config
-```go
-e.Run(fasthttp.NewFromConfig(&Config{}))
-```
+`e.Run(<engine>.NewFromConfig(<config>))`
 
 #### Configuration
 
-##### `Address`
-
-Address to bind.
-
-##### `TLSCertfile`
-
-TLS certificate file path
-
-##### `TLSKeyfile`
-
-TLS key file path
-
-##### `ReadTimeout`
-
-HTTP read timeout
-
-##### `WriteTimeout`
-
-HTTP write timeout
+```go
+Config struct {
+  Address      string        // TCP address to listen on.
+  Listener     net.Listener  // Custom `net.Listener`. If set, server accepts connections on it.
+  TLSCertfile  string        // TLS certificate file path.
+  TLSKeyfile   string        // TLS key file path.
+  ReadTimeout  time.Duration // Maximum duration before timing out read of the request.
+  WriteTimeout time.Duration // Maximum duration before timing out write of the response.
+}
+```

@@ -9,10 +9,8 @@ import (
 )
 
 // Handler
-func hello() echo.HandlerFunc {
-	return func(c echo.Context) error {
-		return c.String(http.StatusOK, "Hello, World!\n")
-	}
+func hello(c echo.Context) error {
+	return c.String(http.StatusOK, "Hello, World!\n")
 }
 
 func main() {
@@ -43,7 +41,7 @@ func main() {
 	e.Use(middleware.Gzip())
 
 	// Routes
-	e.Get("/", hello())
+	e.Get("/", hello)
 
 	// Start server
 	e.Run(standard.New(":1323"))

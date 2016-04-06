@@ -25,44 +25,37 @@ var (
 // Handlers
 //----------
 
-func createUser() echo.HandlerFunc {
-	return func(c echo.Context) error {
-		u := &user{
-			ID: seq,
-		}
-		if err := c.Bind(u); err != nil {
-			return err
-		}
-		users[u.ID] = u
-		seq++
-		return c.JSON(http.StatusCreated, u)
+func createUser(c echo.Context) error {
+	u := &user{
+		ID: seq,
 	}
+	if err := c.Bind(u); err != nil {
+		return err
+	}
+	users[u.ID] = u
+	seq++
+	return c.JSON(http.StatusCreated, u)
 }
 
-func getUser() echo.HandlerFunc {
-	return func(c echo.Context) error {
-		id, _ := strconv.Atoi(c.Param("id"))
-		return c.JSON(http.StatusOK, users[id])
-	}
+func getUser(c echo.Context) error {
+	id, _ := strconv.Atoi(c.Param("id"))
+	return c.JSON(http.StatusOK, users[id])
 }
 
-func updateUser() echo.HandlerFunc {
-	return func(c echo.Context) error {
-		u := new(user)
-		if err := c.Bind(u); err != nil {
-			return err
-		}
-		id, _ := strconv.Atoi(c.Param("id"))
-		users[id].Name = u.Name
-		return c.JSON(http.StatusOK, users[id])
+func updateUser(c echo.Context) error {
+	u := new(user)
+	if err := c.Bind(u); err != nil {
+		return err
 	}
+	id, _ := strconv.Atoi(c.Param("id"))
+	users[id].Name = u.Name
+	return c.JSON(http.StatusOK, users[id])
 }
-func deleteUser() echo.HandlerFunc {
-	return func(c echo.Context) error {
-		id, _ := strconv.Atoi(c.Param("id"))
-		delete(users, id)
-		return c.NoContent(http.StatusNoContent)
-	}
+
+func deleteUser(c echo.Context) error {
+	id, _ := strconv.Atoi(c.Param("id"))
+	delete(users, id)
+	return c.NoContent(http.StatusNoContent)
 }
 
 func main() {
@@ -73,10 +66,10 @@ func main() {
 	e.Use(middleware.Recover())
 
 	// Routes
-	e.Post("/users", createUser())
-	e.Get("/users/:id", getUser())
-	e.Patch("/users/:id", updateUser())
-	e.Delete("/users/:id", deleteUser())
+	e.Post("/users", createUser)
+	e.Get("/users/:id", getUser)
+	e.Patch("/users/:id", updateUser)
+	e.Delete("/users/:id", deleteUser)
 
 	// Start server
 	e.Run(standard.New(":1323"))

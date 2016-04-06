@@ -1,17 +1,13 @@
 <aside class="menu">
-    <div>
-        {{ range .Site.Menus.side }}
-            {{ if .HasChildren }}
-                <h4>
-                    {{ .Pre }}
-                    {{ .Name }}
-                </h4>
-                {{ range .Children }}
-                    <a href="{{ .URL }}">
-                        {{ .Name }}
-                    </a>
-                {{ end }}
-            {{ end }}
-        {{ end }}
-    </div>
+  <div>
+    {{ range .Site.Menus.side }}
+      <h4>
+        {{ .Pre }}
+        {{ .Name }}
+      </h4>
+      {{ range .Children }}
+        <a href="{{ .URL }}">{{ .Name }}</a>
+      {{ end }}
+    {{ end }}
+  </div>
 </aside>

@@ -37,34 +37,25 @@ func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Con
 // Handlers
 //----------
 
-func welcome() echo.HandlerFunc {
-	return func(c echo.Context) error {
-		panic("welcome")
-		return c.Render(http.StatusOK, "welcome", "Joe")
-	}
+func welcome(c echo.Context) error {
+	return c.Render(http.StatusOK, "welcome", "Joe")
 }
 
-func createUser() echo.HandlerFunc {
-	return func(c echo.Context) error {
-		u := new(user)
-		if err := c.Bind(u); err != nil {
-			return err
-		}
-		users[u.ID] = *u
-		return c.JSON(http.StatusCreated, u)
+func createUser(c echo.Context) error {
+	u := new(user)
+	if err := c.Bind(u); err != nil {
+		return err
 	}
+	users[u.ID] = *u
+	return c.JSON(http.StatusCreated, u)
 }
 
-func getUsers() echo.HandlerFunc {
-	return func(c echo.Context) error {
-		return c.JSON(http.StatusOK, users)
-	}
+func getUsers(c echo.Context) error {
+	return c.JSON(http.StatusOK, users)
 }
 
-func getUser() echo.HandlerFunc {
-	return func(c echo.Context) error {
-		return c.JSON(http.StatusOK, users[c.P(0)])
-	}
+func getUser(c echo.Context) error {
+	return c.JSON(http.StatusOK, users[c.P(0)])
 }
 
 func main() {
@@ -94,9 +85,9 @@ func main() {
 	// Routes
 	//--------
 
-	e.Post("/users", createUser())
-	e.Get("/users", getUsers())
-	e.Get("/users/:id", getUser())
+	e.Post("/users", createUser)
+	e.Get("/users", getUsers)
+	e.Get("/users/:id", getUser)
 
 	//-----------
 	// Templates
@@ -107,7 +98,7 @@ func main() {
 		templates: template.Must(template.ParseFiles("public/views/welcome.html")),
 	}
 	e.SetRenderer(t)
-	e.Get("/welcome", welcome())
+	e.Get("/welcome", welcome)
 
 	//-------
 	// Group

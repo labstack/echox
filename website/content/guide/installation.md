@@ -11,13 +11,13 @@ Echo is developed and tested using Go `1.5.x` and `1.6.x`
 #### Install the latest stable version of Echo via `go get`
 
 ```sh
-$ go get github.com/labstack/echo
+$ go get github.com/labstack/echo/...
 ```
 
-#### Update
+#### To update Echo
 
 ```sh
-$ go get -u github.com/labstack/echo
+$ go get -u github.com/labstack/echo/...
 ```
 
 #### [Migrating from v1](/guide/migrating)

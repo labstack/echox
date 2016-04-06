@@ -32,9 +32,9 @@ func init() {
 	g := e.Group("/users")
 	g.Use(standard.WrapMiddleware(cors.Default().Handler))
 
-	g.Post("", echo.HandlerFunc(createUser))
-	g.Get("", echo.HandlerFunc(getUsers))
-	g.Get("/:id", echo.HandlerFunc(getUser))
+	g.Post("", createUser)
+	g.Get("", getUsers)
+	g.Get("/:id", getUser)
 }
 
 func createUser(c echo.Context) error {

@@ -1,5 +1,5 @@
 ---
-title: Request
+title: HTTP Request
 menu:
   side:
     parent: guide
@@ -72,7 +72,7 @@ Query parameter can be retrieved by name using `Context#Query(name string)`.
 
 ```go
 e.Get("/users", func(c echo.Context) error {
-	name := c.Query("name")
+	name := c.QueryParam("name")
 	return c.String(http.StatusOK, name)
 })
 ```
@@ -83,13 +83,13 @@ $ curl -G -d "name=joe" http://localhost:1323/users
 
 ### Form parameter
 
-Form parameter can be retrieved by name using `Context#Form(name string)`.
+Form parameter can be retrieved by name using `Context#FormValue(name string)`.
 
 *Example*
 
 ```go
 e.Post("/users", func(c echo.Context) error {
-	name := c.Form("name")
+	name := c.FormValue("name")
 	return c.String(http.StatusOK, name)
 })
 ```

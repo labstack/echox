@@ -1,17 +1,21 @@
 <header class="mdl-layout__header">
-    <div class="mdl-layout__header-row">
-        <a href="{{ .Site.BaseURL }}" class="mdl-navigation__link mdl-layout-title">
-            <img src="/images/logo.svg" alt="LabStack">
-        </a>
-        <div class="mdl-layout-spacer"></div>
-        <nav class="mdl-navigation mdl-layout--large-screen-only">
-            <a href="https://github.com/labstack/echo" class="mdl-navigation__link">
-                <i class="fa fa-github fa-2x"></i>
-            </a>
-        </nav>
+  <div class="mdl-layout__header-row">
+    <a href="{{ .Site.BaseURL }}" class="mdl-navigation__link mdl-layout-title">
+      <img src="/images/logo.svg" alt="LabStack">
+    </a>
+    <div style="height: 0; width: 0; overflow:hidden;">
+      <gcse:search></gcse:search>
     </div>
+    <div class="mdl-textfield mdl-js-textfield mdl-textfield--expandable
+          mdl-textfield--floating-label mdl-textfield--align-right">
+      <label class="mdl-button mdl-js-button mdl-button--icon" for="search-box">
+        <i class="material-icons">search</i>
+      </label>
+      <div class="mdl-textfield__expandable-holder">
+        <input id="search-box" class="mdl-textfield__input" type="text" name="sample" onkeypress="search(event)">
+      </div>
+    </div>
+    <div class="mdl-layout-spacer"></div>
+    <a class="github-button" href="https://github.com/labstack/echo" data-style="mega" data-count-href="/labstack/echo/stargazers" data-count-api="/repos/labstack/echo#stargazers_count" data-count-aria-label="# stargazers on GitHub" aria-label="Star labstack/echo on GitHub">Star</a>
+  </div>
 </header>
-<div style="padding: 4px; text-align: center; background: #ff851b; color: #fff;">
-    This is Echo v2 website. If you are looking for v1 docs, they can be found <a style=
-"color: #fff;" href="https://github.com/labstack/echo/tree/v1/website/content"><b>here</b>.</a>
-</div>

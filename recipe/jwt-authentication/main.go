@@ -17,8 +17,8 @@ const (
 
 // A JSON Web Token middleware
 func JWTAuth(key string) echo.MiddlewareFunc {
-	return func(next echo.Handler) echo.Handler {
-		return echo.HandlerFunc(func(c echo.Context) error {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
 			auth := c.Request().Header().Get("Authorization")
 			l := len(Bearer)
 			he := echo.ErrUnauthorized
@@ -37,24 +37,20 @@ func JWTAuth(key string) echo.MiddlewareFunc {
 				if err == nil && t.Valid {
 					// Store token claims in echo.Context
 					c.Set("claims", t.Claims)
-					return next.Handle(c)
+					return next(c)
 				}
 			}
 			return he
-		})
+		}
 	}
 }
 
-func accessible() echo.HandlerFunc {
-	return func(c echo.Context) error {
-		return c.String(http.StatusOK, "No auth required for this route.\n")
-	}
-
+func accessible(c echo.Context) error {
+	return c.String(http.StatusOK, "No auth required for this route.\n")
 }
-func restricted() echo.HandlerFunc {
-	return func(c echo.Context) error {
-		return c.String(http.StatusOK, "Access granted with JWT.\n")
-	}
+
+func restricted(c echo.Context) error {
+	return c.String(http.StatusOK, "Access granted with JWT.\n")
 }
 
 func main() {
@@ -65,12 +61,12 @@ func main() {
 	e.Use(middleware.Logger())
 
 	// Unauthenticated route
-	e.Get("/", accessible())
+	e.Get("/", accessible)
 
 	// Restricted group
 	r := e.Group("/restricted")
 	r.Use(JWTAuth(SigningKey))
-	r.Get("", restricted())
+	r.Get("", restricted)
 
 	// Start server
 	e.Run(standard.New(":1323"))

@@ -11,14 +11,18 @@ flexible. It's based on [radix tree](http://en.wikipedia.org/wiki/Radix_tree) da
 structure which makes route lookup really fast. Router leverages [sync pool](https://golang.org/pkg/sync/#Pool)
 to reuse memory and achieve zero dynamic memory allocation with no GC overhead.
 
-Routes can be registered by specifying HTTP method, path and a handler. For example,
-code below registers a route for method `GET`, path `/hello` and a handler which sends
-`Hello!` HTTP response.
+Routes can be registered by specifying HTTP method, path and a matching handler.
+For example, code below registers a route for method `GET`, path `/hello` and a
+handler which sends `Hello, World!` HTTP response.
 
 ```go
-e.Get("/hello", func(c echo.Context) error {
-	return c.String(http.StatusOK, "Hello!")
-})
+// Handler
+func hello(c echo.Context) error {
+  	return c.String(http.StatusOK, "Hello, World!")
+}
+
+// Route
+e.Get("/hello", hello)
 ```
 
 You can use `Echo.Any(path string, h Handler)` to register a handler for all HTTP methods.

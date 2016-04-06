@@ -28,9 +28,9 @@ func main() {
 
 	hosts["api.localhost:1323"] = &Host{api}
 
-	api.Get("/", echo.HandlerFunc(func(c echo.Context) error {
+	api.Get("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "API")
-	}))
+	})
 
 	//------
 	// Blog
@@ -42,9 +42,9 @@ func main() {
 
 	hosts["blog.localhost:1323"] = &Host{blog}
 
-	blog.Get("/", echo.HandlerFunc(func(c echo.Context) error {
+	blog.Get("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Blog")
-	}))
+	})
 
 	//---------
 	// Website
@@ -56,13 +56,13 @@ func main() {
 
 	hosts["localhost:1323"] = &Host{site}
 
-	site.Get("/", echo.HandlerFunc(func(c echo.Context) error {
+	site.Get("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Website")
-	}))
+	})
 
 	// Server
 	e := echo.New()
-	e.Any("/*", echo.HandlerFunc(func(c echo.Context) (err error) {
+	e.Any("/*", func(c echo.Context) (err error) {
 		req := c.Request()
 		res := c.Response()
 		host := hosts[req.Host()]
@@ -74,6 +74,6 @@ func main() {
 		}
 
 		return
-	}))
+	})
 	e.Run(standard.New(":1323"))
 }

@@ -10,9 +10,9 @@ import (
 
 func main() {
 	e := echo.New()
-	e.Get("/", echo.HandlerFunc(func(c echo.Context) error {
+	e.Get("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Six sick bricks tick")
-	}))
+	})
 	std := standard.New(":1323")
 	std.SetHandler(e)
 	gracehttp.Serve(std.Server)

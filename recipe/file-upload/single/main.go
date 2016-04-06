@@ -12,43 +12,39 @@ import (
 	"github.com/labstack/echo/middleware"
 )
 
-func upload() echo.HandlerFunc {
-	return func(c echo.Context) error {
-		req := c.Request()
+func upload(c echo.Context) error {
+	// Read form fields
+	name := c.FormValue("name")
+	email := c.FormValue("email")
 
-		// Read form fields
-		name := c.Form("name")
-		email := c.Form("email")
+	//-----------
+	// Read file
+	//-----------
 
-		//-----------
-		// Read file
-		//-----------
-
-		// Source
-		file, err := req.FormFile("file")
-		if err != nil {
-			return err
-		}
-		src, err := file.Open()
-		if err != nil {
-			return err
-		}
-		defer src.Close()
-
-		// Destination
-		dst, err := os.Create(file.Filename)
-		if err != nil {
-			return err
-		}
-		defer dst.Close()
-
-		// Copy
-		if _, err = io.Copy(dst, src); err != nil {
-			return err
-		}
-
-		return c.HTML(http.StatusOK, fmt.Sprintf("<p>File %s uploaded successfully with fields name=%s and email=%s.</p>", file.Filename, name, email))
+	// Source
+	file, err := c.FormFile("file")
+	if err != nil {
+		return err
 	}
+	src, err := file.Open()
+	if err != nil {
+		return err
+	}
+	defer src.Close()
+
+	// Destination
+	dst, err := os.Create(file.Filename)
+	if err != nil {
+		return err
+	}
+	defer dst.Close()
+
+	// Copy
+	if _, err = io.Copy(dst, src); err != nil {
+		return err
+	}
+
+	return c.HTML(http.StatusOK, fmt.Sprintf("<p>File %s uploaded successfully with fields name=%s and email=%s.</p>", file.Filename, name, email))
 }
 
 func main() {
@@ -58,7 +54,7 @@ func main() {
 	e.Use(middleware.Recover())
 	e.Use(middleware.Static("public"))
 
-	e.Post("/upload", upload())
+	e.Post("/upload", upload)
 
 	e.Run(standard.New(":1323"))
 }

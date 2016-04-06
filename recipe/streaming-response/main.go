@@ -30,7 +30,7 @@ var (
 
 func main() {
 	e := echo.New()
-	e.Get("/", echo.HandlerFunc(func(c echo.Context) error {
+	e.Get("/", func(c echo.Context) error {
 		c.Response().Header().Set(echo.ContentType, echo.ApplicationJSON)
 		c.Response().WriteHeader(http.StatusOK)
 		for _, l := range locations {
@@ -41,6 +41,6 @@ func main() {
 			time.Sleep(1 * time.Second)
 		}
 		return nil
-	}))
+	})
 	e.Run(standard.New(":1323"))
 }
