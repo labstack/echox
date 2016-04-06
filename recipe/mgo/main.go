@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
-	
+
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/engine/standard"
 	"github.com/labstack/echo/middleware"
@@ -23,7 +23,7 @@ func getUser() echo.HandlerFunc {
 		db := getMgo(c)
 		user := User{}
 		id := bson.ObjectIdHex(c.Param("id"))
-		
+
 		err := db.C("users").FindId(id).One(&user)
 		if err != nil {
 			return echo.NewHTTPError(http.StatusInternalServerError)
@@ -39,12 +39,12 @@ func getMgo(c echo.Context) *mgo.Database {
 
 // mgo middleware
 func mgoMid(db *mgo.Database) echo.MiddlewareFunc {
-	return func(next echo.Handler) echo.Handler {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return echo.HandlerFunc(func(c echo.Context) error {
 			s := db.Session.Clone()
 			defer s.Close()
 			c.Set("mgok", s.DB(db.Name))
-			return next.Handle(c)
+			return next(c)
 		})
 	}
 }
@@ -67,7 +67,7 @@ func main() {
 	db := newMgo("localhost:27017", "dbname")
 	defer db.Session.Close()
 	e.Use(mgoMid(db))
-	
+
 	// Route for user
 	e.Get("/user/:id", getUser())
 
