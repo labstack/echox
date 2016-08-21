@@ -12,11 +12,17 @@ menu:
 - JWT authentication using HS256 algorithm.
 - JWT is retrieved from `Authorization` request header.
 
-### Server
+### Server using Map claims
 
 `server.go`
 
-{{< embed "jwt/server.go" >}}
+{{< embed "jwt/map-claims/server.go" >}}
+
+### Server using custom claims
+
+`server.go`
+
+{{< embed "jwt/custom-claims/server.go" >}}
 
 ### Client
 
@@ -56,5 +62,9 @@ Welcome Jon Snow!
 
 - [vishr](https://github.com/vishr)
 - [axdg](https://github.com/axdg)
+- [matcornic](https://github.com/matcornic)
 
-### [Source Code]({{< source "jwt" >}})
+### Source Code
+
+- [With default Map claims]({{< source "jwt/map-claims" >}})
+- [With custom claims]({{< source "jwt/custom-claims" >}})

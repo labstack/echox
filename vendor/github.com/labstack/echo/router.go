@@ -54,7 +54,7 @@ func NewRouter(e *Echo) *Router {
 func (r *Router) Add(method, path string, h HandlerFunc, e *Echo) {
 	// Validate path
 	if path == "" {
-		e.logger.Fatal("path cannot be empty")
+		panic("echo: path cannot be empty")
 	}
 	if path[0] != '/' {
 		path = "/" + path
@@ -272,10 +272,10 @@ func (n *node) findHandler(method string) HandlerFunc {
 func (n *node) checkMethodNotAllowed() HandlerFunc {
 	for _, m := range methods {
 		if h := n.findHandler(m); h != nil {
-			return methodNotAllowedHandler
+			return MethodNotAllowedHandler
 		}
 	}
-	return notFoundHandler
+	return NotFoundHandler
 }
 
 // Find lookup a handler registed for method and path. It also parses URL for path

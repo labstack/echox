@@ -5,6 +5,7 @@ import (
 	"io"
 	"io/ioutil"
 	"mime/multipart"
+	"net"
 	"net/http"
 	"strings"
 
@@ -82,6 +83,18 @@ func (r *Request) UserAgent() string {
 
 func (r *Request) RemoteAddress() string {
 	return r.request.RemoteAddr
+}
+
+func (r *Request) RealIP() string {
+	ra := r.RemoteAddress()
+	if ip := r.Header().Get("X-Forwarded-For"); ip != "" {
+		ra = ip
+	} else if ip := r.Header().Get("X-Real-IP"); ip != "" {
+		ra = ip
+	} else {
+		ra, _, _ = net.SplitHostPort(ra)
+	}
+	return ra
 }
 
 func (r *Request) Method() string {

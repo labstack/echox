@@ -11,8 +11,11 @@ import (
 )
 
 type (
-	// JWTConfig defines the config for JWT auth middleware.
+	// JWTConfig defines the config for JWT middleware.
 	JWTConfig struct {
+		// Skipper defines a function to skip middleware.
+		Skipper Skipper
+
 		// Signing key to validate token.
 		// Required.
 		SigningKey []byte `json:"signing_key"`
@@ -24,6 +27,10 @@ type (
 		// Context key to store user information from the token into context.
 		// Optional. Default value "user".
 		ContextKey string `json:"context_key"`
+
+		// Claims are extendable claims data defining token content.
+		// Optional. Default value jwt.MapClaims
+		Claims jwt.Claims
 
 		// TokenLookup is a string in the form of "<source>:<name>" that is used
 		// to extract token from the request.
@@ -49,9 +56,11 @@ const (
 var (
 	// DefaultJWTConfig is the default JWT auth middleware config.
 	DefaultJWTConfig = JWTConfig{
+		Skipper:       defaultSkipper,
 		SigningMethod: AlgorithmHS256,
 		ContextKey:    "user",
 		TokenLookup:   "header:" + echo.HeaderAuthorization,
+		Claims:        jwt.MapClaims{},
 	}
 )
 
@@ -72,6 +81,9 @@ func JWT(key []byte) echo.MiddlewareFunc {
 // See: `JWT()`.
 func JWTWithConfig(config JWTConfig) echo.MiddlewareFunc {
 	// Defaults
+	if config.Skipper == nil {
+		config.Skipper = DefaultJWTConfig.Skipper
+	}
 	if config.SigningKey == nil {
 		panic("jwt middleware requires signing key")
 	}
@@ -84,6 +96,9 @@ func JWTWithConfig(config JWTConfig) echo.MiddlewareFunc {
 	if config.TokenLookup == "" {
 		config.TokenLookup = DefaultJWTConfig.TokenLookup
 	}
+	if config.Claims == nil {
+		config.Claims = DefaultJWTConfig.Claims
+	}
 
 	// Initialize
 	parts := strings.Split(config.TokenLookup, ":")
@@ -95,11 +110,15 @@ func JWTWithConfig(config JWTConfig) echo.MiddlewareFunc {
 
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
+			if config.Skipper(c) {
+				return next(c)
+			}
+
 			auth, err := extractor(c)
 			if err != nil {
 				return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 			}
-			token, err := jwt.Parse(auth, func(t *jwt.Token) (interface{}, error) {
+			token, err := jwt.ParseWithClaims(auth, config.Claims, func(t *jwt.Token) (interface{}, error) {
 				// Check the signing method
 				if t.Method.Alg() != config.SigningMethod {
 					return nil, fmt.Errorf("unexpected jwt signing method=%v", t.Header["alg"])

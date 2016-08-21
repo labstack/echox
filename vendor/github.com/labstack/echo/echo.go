@@ -209,11 +209,11 @@ var (
 
 // Error handlers
 var (
-	notFoundHandler = func(c Context) error {
+	NotFoundHandler = func(c Context) error {
 		return ErrNotFound
 	}
 
-	methodNotAllowedHandler = func(c Context) error {
+	MethodNotAllowedHandler = func(c Context) error {
 		return ErrMethodNotAllowed
 	}
 )
@@ -230,7 +230,7 @@ func New() (e *Echo) {
 	e.SetHTTPErrorHandler(e.DefaultHTTPErrorHandler)
 	e.SetBinder(&binder{})
 	l := glog.New("echo")
-	l.SetLevel(glog.ERROR)
+	l.SetLevel(glog.OFF)
 	e.SetLogger(l)
 	return
 }
@@ -243,7 +243,7 @@ func (e *Echo) NewContext(req engine.Request, res engine.Response) Context {
 		response: res,
 		echo:     e,
 		pvalues:  make([]string, *e.maxParam),
-		handler:  notFoundHandler,
+		handler:  NotFoundHandler,
 	}
 }
 
@@ -284,7 +284,11 @@ func (e *Echo) DefaultHTTPErrorHandler(err error, c Context) {
 		msg = err.Error()
 	}
 	if !c.Response().Committed() {
-		c.String(code, msg)
+		if c.Request().Method() == HEAD { // Issue #608
+			c.NoContent(code)
+		} else {
+			c.String(code, msg)
+		}
 	}
 	e.logger.Error(err)
 }
@@ -309,10 +313,9 @@ func (e *Echo) SetRenderer(r Renderer) {
 	e.renderer = r
 }
 
-// SetDebug enable/disable debug mode.
+// SetDebug enables/disables debug mode.
 func (e *Echo) SetDebug(on bool) {
 	e.debug = on
-	e.SetLogLevel(glog.DEBUG)
 }
 
 // Debug returns debug mode (enabled or disabled).
@@ -570,9 +573,12 @@ func (e *Echo) Run(s engine.Server) {
 	s.SetHandler(e)
 	s.SetLogger(e.logger)
 	if e.Debug() {
+		e.SetLogLevel(glog.DEBUG)
 		e.logger.Debug("running in debug mode")
 	}
-	e.logger.Error(s.Start())
+	if err := s.Start(); err != nil {
+		panic(fmt.Sprintf("echo: %v", err))
+	}
 }
 
 // NewHTTPError creates a new HTTPError instance.

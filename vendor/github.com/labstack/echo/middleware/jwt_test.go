@@ -10,6 +10,18 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// jwtCustomInfo defines some custom types we're going to use within our tokens.
+type jwtCustomInfo struct {
+	Name  string `json:"name"`
+	Admin bool   `json:"admin"`
+}
+
+// jwtCustomClaims are custom claims expanding default ones.
+type jwtCustomClaims struct {
+	*jwt.StandardClaims
+	jwtCustomInfo
+}
+
 func TestJWT(t *testing.T) {
 	e := echo.New()
 	req := test.NewRequest(echo.GET, "/", nil)
@@ -47,6 +59,19 @@ func TestJWT(t *testing.T) {
 		user := c.Get("user").(*jwt.Token)
 		claims := user.Claims.(jwt.MapClaims)
 		assert.Equal(t, claims["name"], "John Doe")
+	}
+
+	// Valid JWT with custom claims
+	config = JWTConfig{
+		Claims:     &jwtCustomClaims{},
+		SigningKey: []byte("secret"),
+	}
+	h = JWTWithConfig(config)(handler)
+	if assert.NoError(t, h(c)) {
+		user := c.Get("user").(*jwt.Token)
+		claims := user.Claims.(*jwtCustomClaims)
+		assert.Equal(t, claims.Name, "John Doe")
+		assert.Equal(t, claims.Admin, true)
 	}
 
 	// Invalid Authorization header

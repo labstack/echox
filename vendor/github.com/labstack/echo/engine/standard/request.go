@@ -1,9 +1,11 @@
 package standard
 
 import (
+	"fmt"
 	"io"
 	"io/ioutil"
 	"mime/multipart"
+	"net"
 	"net/http"
 	"strings"
 
@@ -98,6 +100,19 @@ func (r *Request) RemoteAddress() string {
 	return r.RemoteAddr
 }
 
+// RealIP implements `engine.Request#RealIP` function.
+func (r *Request) RealIP() string {
+	ra := r.RemoteAddress()
+	if ip := r.Header().Get(echo.HeaderXForwardedFor); ip != "" {
+		ra = ip
+	} else if ip := r.Header().Get(echo.HeaderXRealIP); ip != "" {
+		ra = ip
+	} else {
+		ra, _, _ = net.SplitHostPort(ra)
+	}
+	return ra
+}
+
 // Method implements `engine.Request#Method` function.
 func (r *Request) Method() string {
 	return r.Request.Method
@@ -137,11 +152,11 @@ func (r *Request) FormValue(name string) string {
 func (r *Request) FormParams() map[string][]string {
 	if strings.HasPrefix(r.header.Get(echo.HeaderContentType), echo.MIMEMultipartForm) {
 		if err := r.ParseMultipartForm(defaultMemory); err != nil {
-			r.logger.Error(err)
+			panic(fmt.Sprintf("echo: %v", err))
 		}
 	} else {
 		if err := r.ParseForm(); err != nil {
-			r.logger.Error(err)
+			panic(fmt.Sprintf("echo: %v", err))
 		}
 	}
 	return map[string][]string(r.Request.Form)

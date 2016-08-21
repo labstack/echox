@@ -29,7 +29,7 @@ imports:
 - name: github.com/kardianos/osext
   version: 29ae4ffbc9a6fe9fb2bc5029050ce6996ea1d3bc
 - name: github.com/labstack/echo
-  version: fbcdf70c52c155ae9aa58e72ee0532fa2f1cad2e
+  version: 87dbea59f786100efdd7f14b60829fc161a96cd1
   subpackages:
   - engine
   - engine/standard
