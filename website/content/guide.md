@@ -179,7 +179,7 @@ request header.
 ```go
 type User struct {
 	Name  string `json:"name" xml:"name" form:"name" query:"name"`
-	Email string `json:"email" xml:"email" form:"email" query:"name"`
+	Email string `json:"email" xml:"email" form:"email" query:"email"`
 }
 
 e.POST("/users", func(c echo.Context) error {
