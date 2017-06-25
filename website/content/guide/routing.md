@@ -92,6 +92,24 @@ g.Use(middleware.BasicAuth(func(username, password string) bool {
 }))
 ```
 
+## Route naming
+
+Each of the registration methods returns a `Route` object, which can be used to name a route after the registration. For example:
+
+```go
+routeInfo := e.GET("/users/:id", func(c echo.Context) error {
+	return c.String(http.StatusOK, "/users/:id")
+})
+routeInfo.Name = "user"
+
+// or using the inline syntax
+e.GET("/users/new", func(c echo.Context) error {
+	return c.String(http.StatusOK, "/users/new")
+}).Name = "newuser"
+```
+
+Route names can be very useful when generating URIs from the templates, where you can't access the handler references or when you have multiple routes with the same handler.
+
 ## URI Building
 
 `Echo#URI(handler HandlerFunc, params ...interface{})` can be used to generate URI
@@ -109,6 +127,19 @@ h := func(c echo.Context) error {
 
 // Route
 e.GET("/users/:id", h)
+```
+
+In addition to `Echo#URI`, there is also `Echo#Reverse(name string, params ...interface{})` which is used to generate URIs based on the route name. For example a call to `Echo#Reverse("foobar", 1234)` would generate the URI `/users/1234` if the `foobar` route is registered like below:
+
+```go
+// Handler
+h := func(c echo.Context) error {
+	return c.String(http.StatusOK, "OK")
+}
+
+// Route
+e.GET("/users/:id", h).Name = "foobar"
+
 ```
 
 ## List Routes
