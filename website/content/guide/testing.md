@@ -131,7 +131,7 @@ f := make(url.Values)
 f.Set("name", "Jon Snow")
 f.Set("email", "jon@labstack.com")
 req := httptest.NewRequest(echo.POST, "/", strings.NewReader(f.Encode()))
-req.Header.Set(echo.HandlerContentType, echo.MIMEApplicationForm)
+req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationForm)
 ```
 
 ### Setting Path Params
