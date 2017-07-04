@@ -8,7 +8,7 @@ description = "Load balancing multiple Echo servers using a reverse proxy server
 
 This recipe demonstrates how you can use Nginx or Armor as a reverse proxy server and load balance between multiple Echo servers.
 
-## How to setup Nginx proxy server wth Echo?
+## How to setup Nginx proxy server with Echo?
 
 ### Step 1: Install Nginx
 

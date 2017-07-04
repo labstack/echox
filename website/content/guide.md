@@ -195,7 +195,7 @@ e.POST("/users", func(c echo.Context) error {
 
 ### Static Content
 
-Server any file from static directory for path `/static/*`.
+Serve any file from static directory for path `/static/*`.
 
 ```go
 e.Static("/static", "static")
