@@ -3,9 +3,8 @@ package main
 import (
 	"fmt"
 	"io"
-	"os"
-
 	"net/http"
+	"os"
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"

@@ -2,13 +2,10 @@ package main
 
 import (
 	"context"
-
+	"net/http"
 	"os"
 	"os/signal"
-
 	"time"
-
-	"net/http"
 
 	"github.com/labstack/echo"
 	"github.com/labstack/gommon/log"

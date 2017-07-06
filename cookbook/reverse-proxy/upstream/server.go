@@ -4,13 +4,11 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-
-	"golang.org/x/net/websocket"
-
 	"time"
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
+	"golang.org/x/net/websocket"
 )
 
 var index = `

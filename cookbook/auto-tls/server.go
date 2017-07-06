@@ -3,10 +3,9 @@ package main
 import (
 	"net/http"
 
-	"golang.org/x/crypto/acme/autocert"
-
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
+	"golang.org/x/crypto/acme/autocert"
 )
 
 func main() {

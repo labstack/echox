@@ -2,10 +2,10 @@ package main
 
 import (
 	"github.com/labstack/echo"
-	"github.com/labstack/echox/cookbook/twitter/handler"
 	"github.com/labstack/echo/middleware"
+	"github.com/labstack/echox/cookbook/twitter/handler"
 	"github.com/labstack/gommon/log"
-	mgo "gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2"
 )
 
 func main() {

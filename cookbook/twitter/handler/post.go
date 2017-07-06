@@ -6,7 +6,7 @@ import (
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echox/cookbook/twitter/model"
-	mgo "gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
 

@@ -3,9 +3,8 @@ package main
 import (
 	"fmt"
 
-	"github.com/labstack/echo"
-
 	"github.com/gorilla/websocket"
+	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 )
 
