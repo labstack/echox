@@ -12,8 +12,8 @@ Body dump middleware captures the request and response payload and calls the reg
 
 ```go
 e := echo.New()
-e.Use(middleware.BodyDump(func(c echo.Context, reqBody, resBody []byte {
-})))
+e.Use(middleware.BodyDump(func(c echo.Context, reqBody, resBody []byte) {
+}))
 ```
 
 ## Custom Configuration
