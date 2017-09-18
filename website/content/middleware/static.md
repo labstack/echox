@@ -12,7 +12,7 @@ Static middleware can be used to serve static files from the provided root direc
 
 ```go
 e := echo.New()
-e.Use(middleware.Static("/static"))
+e.Use(middleware.Static("static"))
 ```
 
 This serves static files from `static` directory. For example, a request to `/js/main.js`
