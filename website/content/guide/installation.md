@@ -23,7 +23,7 @@ $ go get -u github.com/labstack/echo/...
 
 ```sh
 $ cd <PROJECT IN $GOPATH>
-$ dep ensure github.com/labstack/echo@^3.1
+$ dep ensure -add github.com/labstack/echo@^3.1
 ```
 
 ## Using [glide](http://glide.sh)
