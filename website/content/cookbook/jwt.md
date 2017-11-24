@@ -52,7 +52,7 @@ curl localhost:1323/restricted -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR
 
 *Response*
 
-```
+```js
 Welcome Jon Snow!
 ```
 
