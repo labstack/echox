@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"sync"
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
@@ -12,14 +13,18 @@ type (
 		ID   string `json:"id"`
 		Name string `json:"name"`
 	}
+	usersMap struct {
+		sync.RWMutex
+		users map[string]user
+	}
 )
 
 var (
-	users map[string]user
+	usersStore usersMap
 )
 
 func init() {
-	users = map[string]user{
+	usersStore.users = map[string]user{
 		"1": user{
 			ID:   "1",
 			Name: "Wreck-It Ralph",
@@ -41,14 +46,20 @@ func createUser(c echo.Context) error {
 	if err := c.Bind(u); err != nil {
 		return err
 	}
-	users[u.ID] = *u
+	usersStore.Lock()
+	defer usersStore.Unlock()
+	usersStore.users[u.ID] = *u
 	return c.JSON(http.StatusCreated, u)
 }
 
 func getUsers(c echo.Context) error {
-	return c.JSON(http.StatusOK, users)
+	usersStore.RLock()
+	defer usersStore.RUnlock()
+	return c.JSON(http.StatusOK, usersStore.users)
 }
 
 func getUser(c echo.Context) error {
-	return c.JSON(http.StatusOK, users[c.Param("id")])
+	usersStore.RLock()
+	defer usersStore.RUnlock()
+	return c.JSON(http.StatusOK, usersStore.users[c.Param("id")])
 }
