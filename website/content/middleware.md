@@ -95,7 +95,7 @@ for that each middleware has an option to define a function `Skipper func(c echo
 e := echo.New()
 e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
 	Skipper: func(c echo.Context) bool {
-		if strings.HasPrefix(c.Request().Host(), "localhost") {
+		if strings.HasPrefix(c.Request().Host, "localhost") {
 			return true
 		}
 		return false
