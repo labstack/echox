@@ -14,7 +14,7 @@ JWT provides a JSON Web Token (JWT) authentication middleware.
 
 *Usage*
 
-`e.Use(middleware.JWT([]byte("secret"))`
+`e.Use(middleware.JWT([]byte("secret")))`
 
 ## Custom Configuration
 
