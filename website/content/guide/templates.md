@@ -82,7 +82,6 @@ package main
 import (
 	"html/template"
 	"io"
-	"log"
 	"net/http"
 
 	"github.com/labstack/echo"
@@ -118,6 +117,6 @@ func main() {
       })
   }).Name = "foobar"
 
-  log.Fatal(e.Start(":8000"))
+  e.Logger.Fatal(e.Start(":8000"))
 }
 ```
