@@ -16,7 +16,7 @@ Example below binds the request payload into `User` struct based on tags:
 
 ```go
 // User
-User struct {
+type User struct {
   Name  string `json:"name" form:"name" query:"name"`
   Email string `json:"email" form:"email" query:"email"`
 }
