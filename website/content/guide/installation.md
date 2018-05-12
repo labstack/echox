@@ -40,6 +40,6 @@ $ cd <PROJECT IN $GOPATH>
 $ govendor fetch github.com/labstack/echo@v3.1
 ```
 
-Echo is developed using Go `1.8.x` and tested with Go `1.7.x` and `1.8.x`.
+Echo is developed using Go `1.10.x` and tested with Go `1.9.x` and `1.10.x`.
 Echo follows [semantic versioning](http://semver.org) managed through GitHub
 releases, specific version of Echo can be installed using a [package manager](https://github.com/avelino/awesome-go#package-management).
