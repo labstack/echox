@@ -18,7 +18,7 @@ The default format for logging is JSON, which can be changed by modifying the he
 
 ### Log Header
 
-`Echo#Logger.SetOutput(io.Writer)` can be used to set the header for
+`Echo#Logger.SetHeader(io.Writer)` can be used to set the header for
 the logger. Default value:
 
 ```json
@@ -26,8 +26,11 @@ the logger. Default value:
 ```
 
 *Example*
-
 ```go
+import "github.com/labstack/gommon/log"
+
+/* ... */
+
 if l, ok := e.Logger.(*log.Logger); ok {
   l.SetHeader("${time_rfc3339} ${level}")
 }
