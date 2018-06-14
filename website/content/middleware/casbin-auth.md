@@ -26,7 +26,7 @@ description = "Casbin Auth middleware for Echo. It supports access control model
 ```go
 import (
   "github.com/casbin/casbin"
-  "github.com/labstack/echo-contrib/casbin" casbin-mw
+  casbin_mw "github.com/labstack/echo-contrib/casbin" 
 )
 ```
 
@@ -49,7 +49,7 @@ e := echo.New()
 ce := casbin.NewEnforcer("casbin_auth_model.conf", "")
 ce.AddRoleForUser("alice", "admin")
 ce.AddPolicy(...)
-e.Use(casbin-mw.MiddlewareWithConfig(casbin-mw.Config(
+e.Use(casbin_mw.MiddlewareWithConfig(casbin-mw.Config(
   Enforcer: ce,
 )))
 ```
