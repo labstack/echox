@@ -146,7 +146,7 @@ c.SetParamValues("1", "jon@labstack.com")
 ```go
 q := make(url.Values)
 q.Set("email", "jon@labstack.com")
-req := http.NewRequest(echo.POST, "/?"+q.Encode(), nil)
+req := httptest.NewRequest(echo.POST, "/?"+q.Encode(), nil)
 ```
 
 ## Testing Middleware
