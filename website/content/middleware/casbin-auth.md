@@ -19,14 +19,14 @@ description = "Casbin Auth middleware for Echo. It supports access control model
 - RESTful
 - Deny-override: both allow and deny authorizations are supported, deny overrides the allow.
 
-> Echo community contribution 
+> Echo community contribution
 
 ## Dependencies
 
 ```go
 import (
   "github.com/casbin/casbin"
-  casbin_mw "github.com/labstack/echo-contrib/casbin" 
+  casbin_mw "github.com/labstack/echo-contrib/casbin"
 )
 ```
 
