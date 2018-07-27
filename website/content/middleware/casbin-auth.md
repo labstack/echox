@@ -34,7 +34,7 @@ import (
 
 ```go
 e := echo.New()
-e.Use(casbin-mw.Middleware(casbin.NewEnforcer("casbin_auth_model.conf", "casbin_auth_policy.csv")))
+e.Use(casbin_mw.Middleware(casbin.NewEnforcer("casbin_auth_model.conf", "casbin_auth_policy.csv")))
 ```
 
 For syntax, see: [Model.md](https://github.com/casbin/casbin/blob/master/Model.md).
@@ -49,7 +49,7 @@ e := echo.New()
 ce := casbin.NewEnforcer("casbin_auth_model.conf", "")
 ce.AddRoleForUser("alice", "admin")
 ce.AddPolicy(...)
-e.Use(casbin_mw.MiddlewareWithConfig(casbin-mw.Config(
+e.Use(casbin_mw.MiddlewareWithConfig(casbin_mw.Config(
   Enforcer: ce,
 )))
 ```
