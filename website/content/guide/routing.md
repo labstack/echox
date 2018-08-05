@@ -84,11 +84,11 @@ for routes `/admin/*`.
 
 ```go
 g := e.Group("/admin")
-g.Use(middleware.BasicAuth(func(username, password string) bool {
+g.Use(middleware.BasicAuth(func(username, password string, c echo.Context) (bool, error) {
 	if username == "joe" && password == "secret" {
-		return true
+		return true, nil
 	}
-	return false
+	return false, nil
 }))
 ```
 
