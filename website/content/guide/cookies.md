@@ -6,7 +6,7 @@ description = "Handling cookie in Echo"
   parent = "guide"
 +++
 
-Cookie is a small piece of data sent from a website server and stored in the user's web
+Cookies are small pieces of data sent from a website server and stored in the user's web
 browser while browsing. Every time the user loads the website, the browser
 sends the cookies back to the server to notify the server of user's latest activity.
 Cookies were designed to be a reliable mechanism for websites to remember stateful
