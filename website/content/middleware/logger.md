@@ -15,7 +15,7 @@ Logger middleware logs the information about each HTTP request.
 *Sample Output*
 
 ```js
-{"time":"2017-01-12T08:58:07.372015644-08:00","remote_ip":"::1","host":"localhost:1323","method":"GET","uri":"/","status":200, "latency":14743,"latency_human":"14.743µs","bytes_in":0,"bytes_out":2}
+{"time":"2017-01-12T08:58:07.372015644-08:00","remote_ip":"::1","host":"localhost:1323","method":"GET","uri":"/","status":200,"error":"","latency":14743,"latency_human":"14.743µs","bytes_in":0,"bytes_out":2}
 ```
 
 ## Custom Configuration
@@ -58,6 +58,7 @@ LoggerConfig struct {
   // - referer
   // - user_agent
   // - status
+  // - error
   // - latency (In nanoseconds)
   // - latency_human (Human readable)
   // - bytes_in (Bytes received)
@@ -84,7 +85,7 @@ LoggerConfig struct {
 DefaultLoggerConfig = LoggerConfig{
   Skipper: DefaultSkipper,
   Format: `{"time":"${time_rfc3339_nano}","id":"${id}","remote_ip":"${remote_ip}","host":"${host}",` +
-    `"method":"${method}","uri":"${uri}","status":${status}, "latency":${latency},` +
+    `"method":"${method}","uri":"${uri}","status":${status},"error":"${error}","latency":${latency},` +
     `"latency_human":"${latency_human}","bytes_in":${bytes_in},` +
     `"bytes_out":${bytes_out}}` + "\n",
   Output: os.Stdout
