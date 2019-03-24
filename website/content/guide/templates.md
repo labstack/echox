@@ -59,7 +59,7 @@ Example below shows how to use Go `html/template`:
 
 In certain situations it might be useful to generate URIs from the templates. In order to do so, you need to call `Echo#Reverse` from the templates itself. Golang's `html/template` package is not the best suited for this job, but this can be done in two ways: by providing a common method on all objects passed to templates or by passing `map[string]interface{}` and augmenting this object in the custom renderer. Given the flexibility of the latter approach, here is a sample program:
 
-`template.html`
+`something.html`
 
 ```html
 <html>
