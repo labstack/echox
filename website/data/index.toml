@@ -5,7 +5,7 @@ description = "High performance, extensible, minimalist Go web framework"
   title = "Optimized Router"
   text = """
     Highly optimized HTTP router with zero dynamic memory allocation which smartly
-    prioritize routes.
+    prioritizes routes.
   """
 [[features]]
   icon = "cloud"
