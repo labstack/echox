@@ -41,7 +41,7 @@ var index = `
 			}
 		</script>
 	</body>
-	</html
+	</html>
 `
 
 func main() {
