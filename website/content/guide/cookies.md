@@ -6,15 +6,13 @@ description = "Handling cookie in Echo"
   parent = "guide"
 +++
 
-Cookie is a small piece of data sent from a website and stored in the user's web
-browser while the user is browsing. Every time the user loads the website, the browser
-sends the cookie back to the server to notify the user's previous activity.
+Cookie is a small piece of data sent from a website server and stored in the user's web
+browser while browsing. Every time the user loads the website, the browser
+sends the cookies back to the server to notify the server of user's latest activity.
 Cookies were designed to be a reliable mechanism for websites to remember stateful
-information (such as items added in the shopping cart in an online store) or to
-record the user's browsing activity (including clicking particular buttons, logging
-in, or recording which pages were visited in the past). Cookies can also store
-passwords and form content a user has previously entered, such as a credit card
-number or an address.
+information (e.g. items added to the shopping cart in an online store) or to
+record the user's browsing activity (such as clicking particular buttons, logging
+in, or user previously visited pages of the website). Cookies can also store form content a user has previously entered, such as username, credit card number, address or even password.
 
 ## Cookie Attributes
 
@@ -45,7 +43,7 @@ func writeCookie(c echo.Context) error {
 
 - Cookie is created using `new(http.Cookie)`.
 - Attributes for the cookie are set assigning to the `http.Cookie` instance public attributes.  
-- Finally `c.SetCookie(cookies)` adds a `Set-Cookie` header in HTTP response.
+- Finally `c.SetCookie(cookie)` adds a `Set-Cookie` header in HTTP response.
 
 ## Read a Cookie
 
@@ -64,7 +62,7 @@ func readCookie(c echo.Context) error {
 - Cookie is read by name using `c.Cookie("username")` from the HTTP request.
 - Cookie attributes are accessed using `Getter` function.
 
-## Read all Cookies
+## Read all the Cookies
 
 ```go
 func readAllCookies(c echo.Context) error {
@@ -72,6 +70,6 @@ func readAllCookies(c echo.Context) error {
 		fmt.Println(cookie.Name)
 		fmt.Println(cookie.Value)
 	}
-	return c.String(http.StatusOK, "read all cookie")
+	return c.String(http.StatusOK, "read all the cookies")
 }
 ```
