@@ -12,7 +12,7 @@ sends the cookies back to the server to notify the server of user's latest activ
 Cookies were designed to be a reliable mechanism for websites to remember stateful
 information (e.g. items added to the shopping cart in an online store) or to
 record the user's browsing activity (such as clicking particular buttons, logging
-in, or user previously visited pages of the website). Cookies can also store form content a user has previously entered, such as username, credit card number, address or even password.
+in, or user previously visited pages of the website). Cookies can also store form content a user has previously entered, such as username, gender, age, address, etc.
 
 ## Cookie Attributes
 
