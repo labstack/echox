@@ -32,10 +32,10 @@ func (c *CustomContext) Bar() {
 **Create a middleware to extend default context**
 
 ```go
-e.Use(func(h echo.HandlerFunc) echo.HandlerFunc {
+e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		cc := &CustomContext{c}
-		return h(cc)
+		return next(cc)
 	}
 })
 ```
