@@ -26,7 +26,7 @@ type User struct {
 // Handler
 func(c echo.Context) (err error) {
   u := new(User)
-  if err = c.Bind(u); err != nil {
+  if err = c.Bind(&u); err != nil {
     return
   }
   return c.JSON(http.StatusOK, u)
