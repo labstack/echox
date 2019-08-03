@@ -164,7 +164,7 @@ $ curl http://localhost:1323/users/Joe
 Echo doesn't have a built-in data validation capabilities, however, you can register
 a custom validator using `Echo#Validator` and leverage third-party [libraries](https://github.com/avelino/awesome-go#validation).
 
-Example below uses https://github.com/go-playground/validator framework for validation:
+Example below uses https://github.com/go-playground/validator (`v9`) framework for validation:
 
 ```go
 type (
@@ -188,10 +188,12 @@ func main() {
 	e.POST("/users", func(c echo.Context) (err error) {
 		u := new(User)
 		if err = c.Bind(u); err != nil {
-			return
+			// if binding to the struct fails
+			return c.String(http.StatusBadRequest, "error binding input data")
 		}
 		if err = c.Validate(u); err != nil {
-			return
+			// return the validation failure message as a 400
+			return c.String(http.StatusBadRequest, fmt.Sprintf("%v", err))
 		}
 		return c.JSON(http.StatusOK, u)
 	})
