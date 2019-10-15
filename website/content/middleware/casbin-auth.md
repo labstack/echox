@@ -37,7 +37,7 @@ e := echo.New()
 e.Use(casbin_mw.Middleware(casbin.NewEnforcer("casbin_auth_model.conf", "casbin_auth_policy.csv")))
 ```
 
-For syntax, see: [Model.md](https://github.com/casbin/casbin/blob/master/Model.md).
+For syntax, see: [Syntax for Models](https://casbin.org/docs/en/syntax-for-models).
 
 
 ## Custom Configuration
