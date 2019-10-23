@@ -6,7 +6,7 @@ description = "Casbin Auth middleware for Echo. It supports access control model
   parent = "middleware"
 +++
 
-[Casbin](https://github.com/casbin/casbin) is a powerful and efficient open-source access control library for Go. It provides support for enforcing authorization based on various models. By far, the access control models supported by Casbin are:
+[Casbin](https://github.com/casbin/casbin) is a powerful and efficient open-source access control library for Go. It provides support for enforcing authorization based on various models. So far, the access control models supported by Casbin are:
 
 - ACL (Access Control List)
 - ACL with superuser
