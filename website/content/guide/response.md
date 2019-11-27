@@ -245,7 +245,7 @@ used to send file as attachment with provided name.
 
 ```go
 func(c echo.Context) error {
-  return c.Attachment("<PATH_TO_YOUR_FILE>")
+  return c.Attachment("<PATH_TO_YOUR_FILE>", "<ATTACHMENT_NAME>")
 }
 ```
 
