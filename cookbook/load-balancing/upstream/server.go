@@ -28,7 +28,7 @@ var index = `
 			Hello from upstream server %s
 		</p>
 	</body>
-	</html
+	</html>
 `
 
 func main() {
