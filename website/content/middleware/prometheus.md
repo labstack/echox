@@ -10,7 +10,7 @@ Prometheus middleware generates metrics for HTTP requests.
 
 *Usage*
 
-```
+```go
 package main
 import (
     "github.com/labstack/echo/v4"
@@ -28,7 +28,7 @@ func main() {
 
 *Sample Output*
 
-```
+```bash
 curl http://localhost:1323/metrics
 
 # HELP echo_request_duration_seconds The HTTP request latencies in seconds.
@@ -55,7 +55,7 @@ echo_response_size_bytes_count 1
 
 A middleware skipper can be passed to avoid generating metrics to certain URLs:
 
-```
+```go
 package main
 import (
     "github.com/labstack/echo/v4"
