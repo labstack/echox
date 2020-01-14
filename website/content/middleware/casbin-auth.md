@@ -34,7 +34,8 @@ import (
 
 ```go
 e := echo.New()
-e.Use(casbin_mw.Middleware(casbin.NewEnforcer("casbin_auth_model.conf", "casbin_auth_policy.csv")))
+enforcer, err := casbin.NewEnforcer("casbin_auth_model.conf", "casbin_auth_policy.csv")
+e.Use(casbin_mw.Middleware(enforcer))
 ```
 
 For syntax, see: [Syntax for Models](https://casbin.org/docs/en/syntax-for-models).
