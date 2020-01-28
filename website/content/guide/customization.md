@@ -88,6 +88,23 @@ s := &http.Server{
 e.Logger.Fatal(e.StartServer(s))
 ```
 
+## Custom HTTP/2 Cleartext Server
+
+`Echo#StartH2CServer()` can be used to run a custom HTTP/2 cleartext server.
+
+*Example*
+
+```go
+import "golang.org/x/net/http2"
+
+s := &http2.Server{
+  MaxConcurrentStreams: 250,
+  MaxReadFrameSize:     1048576,
+  IdleTimeout:          10 * time.Second,
+}
+e.Logger.Fatal(e.StartH2CServer(":1323", s))
+```
+
 ## Startup Banner
 
 `Echo#HideBanner` can be used to hide the startup banner.
