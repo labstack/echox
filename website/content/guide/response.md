@@ -142,7 +142,7 @@ status code.
 ## Send XML
 
 `Context#XML(code int, i interface{})` can be used to encode a provided Go type into
-XML and send it as response with status cod.
+XML and send it as response with status code.
 
 *Example*
 

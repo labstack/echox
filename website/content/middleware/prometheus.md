@@ -28,7 +28,7 @@ func main() {
 
 *Sample Output*
 
-```sh
+```bash
 curl http://localhost:1323/metrics
 
 # HELP echo_request_duration_seconds The HTTP request latencies in seconds.

@@ -31,8 +31,10 @@ func main() {
 	e.GET("/", func(c echo.Context) error {
 		c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		c.Response().WriteHeader(http.StatusOK)
+
+		enc := json.NewEncoder(c.Response())
 		for _, l := range locations {
-			if err := json.NewEncoder(c.Response()).Encode(l); err != nil {
+			if err := enc.Encode(l); err != nil {
 				return err
 			}
 			c.Response().Flush()
