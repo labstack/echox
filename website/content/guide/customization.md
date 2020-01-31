@@ -18,7 +18,7 @@ The default format for logging is JSON, which can be changed by modifying the he
 
 ### Log Header
 
-`Echo#Logger.SetHeader(io.Writer)` can be used to set the header for
+`Echo#Logger.SetHeader(string)` can be used to set the header for
 the logger. Default value:
 
 ```json
