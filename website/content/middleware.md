@@ -17,7 +17,7 @@ every request or limiting the number of requests.
 
 Handler is processed in the end after all middleware are finished executing.
 
-Middleware registed using `Echo#Use()` is only executed for paths which are 
+Middleware registered using `Echo#Use()` is only executed for paths which are 
 registered after `Echo#Use()` has been called.
 
 ## Levels
