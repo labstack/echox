@@ -101,3 +101,5 @@ DefaultRedirectConfig = RedirectConfig{
   Code:    http.StatusMovedPermanently,
 }
 ```
+
+> Having trouble redirecting your request from HTTP to HTTPS? Please check if you are running a parallel echo server. [More info](https://forum.labstack.com/t/how-to-use-middleware-redirect/28/3)
