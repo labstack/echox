@@ -191,7 +191,7 @@ func main() {
 			return
 		}
 		if err = c.Validate(u); err != nil {
-			return
+			return c.String(http.StatusBadRequest, err.Error())
 		}
 		return c.JSON(http.StatusOK, u)
 	})
