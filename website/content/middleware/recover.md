@@ -21,12 +21,13 @@ and handles the control to the centralized
 ```go
 e := echo.New()
 e.Use(middleware.RecoverWithConfig(middleware.RecoverConfig{
-  StackSize:  1 << 10, // 1 KB
+  StackSize: 1 << 10, // 1 KB
+  LogLevel:  log.ERROR,
 }))
 ```
 
-Example above uses a `StackSize` of 1 KB and default values for `DisableStackAll`
-and `DisablePrintStack`.
+Example above uses a `StackSize` of 1 KB, `LogLevel` of error and
+default values for `DisableStackAll` and `DisablePrintStack`.
 
 ## Configuration
 
@@ -47,6 +48,10 @@ RecoverConfig struct {
   // DisablePrintStack disables printing stack trace.
   // Optional. Default value as false.
   DisablePrintStack bool `json:"disable_print_stack"`
+
+  // LogLevel is log level to printing stack trace.
+  // Optional. Default value 0 (Print).
+  LogLevel log.Lvl
 }
 ```
 
@@ -58,5 +63,6 @@ DefaultRecoverConfig = RecoverConfig{
   StackSize:         4 << 10, // 4 KB
   DisableStackAll:   false,
   DisablePrintStack: false,
+  LogLevel:          0,
 }
 ```
