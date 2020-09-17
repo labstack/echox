@@ -174,7 +174,7 @@ type (
 	}
 
 	CustomValidator struct {
-		validator *validator.Validate
+		Validator *validator.Validate
 	}
 )
 
@@ -184,7 +184,7 @@ func (cv *CustomValidator) Validate(i interface{}) error {
 
 func main() {
 	e := echo.New()
-	e.Validator = &CustomValidator{validator: validator.New()}
+	e.Validator = &CustomValidator{Validator: validator.New()}
 	e.POST("/users", func(c echo.Context) (err error) {
 		u := new(User)
 		if err = c.Bind(u); err != nil {
