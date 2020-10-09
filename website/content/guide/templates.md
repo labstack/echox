@@ -112,7 +112,7 @@ func main() {
 
   // Named route "foobar"
   e.GET("/something", func(c echo.Context) error {
-      return c.Render(http.StatusOK, "something.html", map[string]interface{}{
+      return c.Render(http.StatusOK, "template.html", map[string]interface{}{
           "name": "Dolly!",
       })
   }).Name = "foobar"
