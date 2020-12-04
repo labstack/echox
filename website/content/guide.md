@@ -14,7 +14,7 @@ type = "guide"
 ### Installation
 
 ```sh
-$ go get github.com/labstack/echo/v4
+$ go get github.com/labstack/echo
 ```
 
 ### Hello, World!
@@ -27,7 +27,7 @@ package main
 import (
 	"net/http"
 	
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo"
 )
 
 func main() {
