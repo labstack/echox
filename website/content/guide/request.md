@@ -169,8 +169,8 @@ Example below uses https://github.com/go-playground/validator framework for vali
 ```go
 type (
 	User struct {
-		Name  string `json:"name" validate:"required"`
-		Email string `json:"email" validate:"required,email"`
+		Name  string `validate:"required" json:"name"`
+		Email string `validate:"required,email" json:"email"`
 	}
 
 	CustomValidator struct {
