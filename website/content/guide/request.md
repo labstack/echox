@@ -179,7 +179,7 @@ type (
 )
 
 func (cv *CustomValidator) Validate(i interface{}) error {
-	return echo.NewHTTPError(http.StatusInternalServerError, cv.validator.Struct(i).Error())
+	return cv.validator.Struct(i)
 }
 
 func main() {
@@ -187,10 +187,10 @@ func main() {
 	e.Validator = &CustomValidator{validator: validator.New()}
 	e.POST("/users", func(c echo.Context) (err error) {
 		u := new(User)
-		if err = c.Bind(u); err != nil {
+		if err := c.Bind(u); err != nil {
 			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 		}
-		if err = c.Validate(u); err != nil {
+		if err := c.Validate(u); err != nil {
 			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 		}
 		return c.JSON(http.StatusOK, u)
