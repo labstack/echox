@@ -79,7 +79,7 @@ func (h *handler) checkEmail(next echo.HandlerFunc) echo.HandlerFunc {
 			echo.NewHTTPError(http.StatusBadRequest, "invalid email address")
 		}
 		c.Set("validEmail", true)
-		return nil
+		return next(c)
 	}
 }
 ```
