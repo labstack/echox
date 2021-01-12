@@ -28,6 +28,11 @@ Handler below retrieves user by id from the database. If user is not found it re
 - On success `200 - OK`
 - On error `404 - Not Found` if user is not found otherwise `500 - Internal Server Error`
 
+### CheckEmail
+
+- On invalid email `400 - BadRequest`
+- On valid email `nil`
+
 `handler.go`
 
 ```go
@@ -35,6 +40,7 @@ package handler
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/labstack/echo/v4"
 )
@@ -64,6 +70,17 @@ func (h *handler) getUser(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusNotFound, "user not found")
 	}
 	return c.JSON(http.StatusOK, user)
+}
+
+func (h *handler) checkEmail(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		email := c.Param("email")
+		if !strings.Contains(email, "@") {
+			echo.NewHTTPError(http.StatusBadRequest, "invalid email address")
+		}
+		c.Set("validEmail", true)
+		return nil
+	}
 }
 ```
 
@@ -153,6 +170,63 @@ req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
 
 ## Testing Middleware
 
-*TBD*
+`handler_test.go`
 
-For now you can look into built-in middleware [test cases](https://github.com/labstack/echo/tree/master/middleware).
+```go
+package handler
+
+import (
+	"net/http"
+	"net/http/httptest"
+	"strings"
+	"testing"
+
+	"github.com/labstack/echo/v4"
+	"github.com/stretchr/testify/assert"
+)
+
+func TestCheckEmail(t *testing.T) {
+    var tcs = []struct{
+        email string
+        err string
+    }{
+        {
+            email: "valid@email.com",
+            err: "",
+        },
+        {
+            email: "invalid",
+            err: "invalid email address",
+        },
+    }
+
+    for _, tc := range tcs {
+        e := echo.New()
+        req := httptest.NewRequest(http.MethodGet, "/", nil)
+        rec := httptest.NewRecorder()
+        c := e.NewContext(req, rec)
+        c.SetParamNames("email")
+        c.SetParamValues(tc.email)
+        h := &handler{mockDB}
+
+        // Check that "validEmail" was properly set.
+        var next = h.checkEmail(func(ec echo.Context) error {
+            var e = ec.Get("validEmail")
+            var email, ok = e.(bool)
+            assert.True(t, ok)
+            assert.Equal(t, email, tc.email)
+
+            return nil
+        })
+
+        err := next(c)
+        if tc.err == "" {
+			assert.EqualError(t, err, tc.err)
+        } else {
+            assert.Nil(t, err)
+        }
+    }
+}
+```
+
+For additional examples, check the built-in middleware [test cases](https://github.com/labstack/echo/tree/master/middleware).
