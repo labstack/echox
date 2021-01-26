@@ -13,7 +13,7 @@ type = "guide"
 
 ### Installation
 
-**Make sure your project folder is OUTSIDE of the $GOPATH/src directory structure**
+Make sure your project folder is OUTSIDE of the $GOPATH/src directory structure
 
 ```sh
 $ mkdir myapp && cd myapp
