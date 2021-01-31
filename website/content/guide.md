@@ -17,6 +17,12 @@ type = "guide"
 $ go get github.com/labstack/echo/v4
 ```
 
+If you are working with a Go v1.14 or earlier use:
+
+```sh
+$ GO111MODULE=on go get github.com/labstack/echo/v4
+```
+
 ### Hello, World!
 
 Create `server.go`
