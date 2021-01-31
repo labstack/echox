@@ -14,7 +14,7 @@ type = "guide"
 ### Installation
 
 ```sh
-$ go get github.com/labstack/echo/v4
+$ go get github.com/labstack/echo
 ```
 
 If you are working with a Go v1.14 or earlier use:
@@ -33,7 +33,7 @@ package main
 import (
 	"net/http"
 	
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo"
 )
 
 func main() {
