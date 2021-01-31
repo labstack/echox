@@ -20,7 +20,7 @@ $ go get github.com/labstack/echo
 If you are working with a Go v1.14 or earlier use:
 
 ```sh
-$ GO111MODULE=on go get github.com/labstack/echo/v4
+$ GO111MODULE=on go get github.com/labstack/echo
 ```
 
 ### Hello, World!
