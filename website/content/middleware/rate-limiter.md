@@ -1,26 +1,27 @@
 +++
-title = "Rate Limiter middleware"
+title = "Rate Limiter Middleware"
 description = "Rate limiter middleware for Echo"
 [menu.main]
-  name = "Rate limiter"
+  name = "Rate Limiter"
   parent = "middleware"
 +++
 
-RateLimiter provides a Rate Limiter middleware for limiting amount of requests to the server from a particular IP or id within a time period
+`RateLimiter` provides a Rate Limiter middleware for limiting the amount of requests to the server from a particular IP or id within a time period.
 
-By default, it stores an in-memory map of users. There are quite a few notable limitations of the in-memory implementation:  
-- If your app receives above 100 parallel requests at once then this might not be the best option
-- Does not play well with a large number of identifiers (>= 16k) 
+By default an in-memory store is used for keeping track of requests. The default in-memory implementation is focused on correctness and
+may not be the best option for a high number of concurrent requests or a large number of different identifiers (>16k).
 
-*Usage:*  
-For example this will allow a max of 20 requests/sec (uses in-memory):
+### Usage
+
+To add a rate limit to your application simply add the `RateLimiter` middlware. 
+The example below will limit the application to 20 requests/sec using the default in-memory store:
+
 ```go
 e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(20)))
 ```
 
 ## Custom Configuration
 
-*Usage*
 ```go
 config := middleware.RateLimiterConfig{
     Skipper: DefaultSkipper,
@@ -41,7 +42,8 @@ config := middleware.RateLimiterConfig{
 
 e.Use(middleware.RateLimiterWithConfig(config))
 ```
-NB: If you need to use a different store, just create one that implements the `Allow` method and pass it to RateLimiterConfig and you're good to go!
+
+Note: If you need to implement your own store, be sure to implement the RateLimiterStore interface and pass it to RateLimiterConfig and you're good to go!
 
 ## Configuration
 
@@ -60,7 +62,7 @@ type RateLimiterConfig struct {
 }
 ```
 
-*Default Configuration*
+### Default Configuration
 
 ```go
 // DefaultRateLimiterConfig defines default values for RateLimiterConfig
@@ -86,10 +88,9 @@ var DefaultRateLimiterConfig = RateLimiterConfig{
 	},
 }
 ```
-*Errors*
+### Errors
 
 ```go
-// errors
 var (
 	// ErrRateLimitExceeded denotes an error raised when rate limit is exceeded
 	ErrRateLimitExceeded = echo.NewHTTPError(http.StatusTooManyRequests, "rate limit exceeded")
@@ -97,5 +98,3 @@ var (
 	ErrExtractorError = echo.NewHTTPError(http.StatusForbidden, "error while extracting identifier")
 )
 ```
-
-## [Example](/cookbook/jwt)
