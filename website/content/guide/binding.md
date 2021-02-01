@@ -78,8 +78,7 @@ type User struct {
 ```
 
 ```go
-// Handler
-func(c echo.Context) (err error) {
+e.POST("/users", func(c echo.Context) (err error) {
   u := new(User)
   if err = c.Bind(u); err != nil {
     return
@@ -174,6 +173,7 @@ Types that are supported:
 * duration
 * BindUnmarshaler() interface
 * UnixTime() - converts unix time (integer) to time.Time
+* UnixTimeNano() - converts unix time with nano second precision (integer) to time.Time
 * CustomFunc() - callback function for your custom conversion logic
 
 For every supported type there are following methods:
