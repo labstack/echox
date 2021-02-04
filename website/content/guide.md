@@ -13,18 +13,21 @@ type = "guide"
 
 ### Installation
 
-Make sure your project folder is OUTSIDE of the $GOPATH/src directory structure
+To install Echo Go v1.13 or higher is required. Go v1.12 has limited support and some middlewares will not be available.
+Make sure your project folder is outside your `$GOPATH`.
+
 ```sh
 $ mkdir myapp && cd myapp
 $ go mod init myapp
 $ go get github.com/labstack/echo/v4
 ```
 
-If you are working with a Go v1.14 or earlier use:
+If you are working with Go v1.14 or earlier use:
 
 ```sh
 $ GO111MODULE=on go get github.com/labstack/echo/v4
 ```
+
 
 ### Hello, World!
 
