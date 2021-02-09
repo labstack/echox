@@ -48,7 +48,7 @@ e.Pre(middleware.RewriteWithConfig(middleware.RewriteConfig{}))
 
     // RegexRules defines the URL path rewrite rules using regexp.Rexexp with captures
     // Every capture group in the values can be retrieved by index e.g. $1, $2 and so on.
-    RegexRules map[*regexp.Regexp]string `yaml:"regex_rules"`
+    RegexRules map[*regexp.Regexp]string
   }
 ```
 
