@@ -22,8 +22,8 @@ func main() {
 
 	// Start server
 	go func() {
-		if err := e.Start(":1323"); err != nil {
-			e.Logger.Info("shutting down the server")
+		if err := e.Start(":1323"); err != nil && err != http.ErrServerClosed {
+			e.Logger.Fatal("shutting down the server")
 		}
 	}()
 
