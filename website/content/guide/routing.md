@@ -92,6 +92,8 @@ g.Use(middleware.BasicAuth(func(username, password string, c echo.Context) (bool
 }))
 ```
 
+> Be aware of double slashes! For example group `/users/` and GET route `/:id` will create `/users//:id` route.
+
 ## Route Naming
 
 Each of the registration methods returns a `Route` object, which can be used to name a route after the registration. For example:
