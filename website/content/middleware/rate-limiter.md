@@ -24,7 +24,7 @@ e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(20)))
 
 ```go
 config := middleware.RateLimiterConfig{
-    Skipper: DefaultSkipper,
+    Skipper: middleware.DefaultSkipper,
     Store: middleware.NewRateLimiterMemoryStore(
         middleware.RateLimiterMemoryStoreConfig{Rate: 10, Burst: 30, ExpiresIn: 3 * time.Minute}
     )
