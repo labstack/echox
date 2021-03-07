@@ -11,7 +11,7 @@
           <article class="content">
             <section>
               {{ $url := replace .Permalink (printf "%s" .Site.BaseURL) "" }}
-              {{ $.Scratch.Add "path" .Site.BaseURL }}
+              {{ $.Scratch.Add "path" (printf "%s" .Site.BaseURL) }}
               <ul class="breadcrumb">
                 <!-- <li><a href="/">home</a></li> -->
                 {{ range $index, $element := split $url "/" }}
