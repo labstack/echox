@@ -1,7 +1,6 @@
 name: publish to gh-pages
 
 on:
-  repository_dispatch:
   push:
     branches:
       - master
