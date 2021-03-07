@@ -14,6 +14,3 @@ description = "Hello world recipe for Echo"
 
 ## [Source Code]({{< source "hello-world" >}})
 
-## Maintainers
-
-- [vishr](https://github.com/vishr)

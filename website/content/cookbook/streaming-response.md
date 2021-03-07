@@ -33,6 +33,3 @@ $ curl localhost:1323
 
 ## [Source Code]({{< source "streaming-response" >}})
 
-## Maintainers
-
-- [vishr](https://github.com/vishr)

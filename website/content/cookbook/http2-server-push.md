@@ -66,6 +66,3 @@ Path: /
 
 {{< embed "http2-server-push/server.go" >}}
 
-## Maintainers
-
-- [vishr](https://github.com/vishr)

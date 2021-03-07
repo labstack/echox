@@ -52,6 +52,3 @@ Hello, Server!
 
 ## [Source Code]({{< source "websocket" >}})
 
-## Maintainers
-
-- [vishr](https://github.com/vishr)

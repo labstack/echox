@@ -12,6 +12,3 @@ description = "Timeout recipe for Echo"
 
 ## [Source Code]({{< source "timeouts" >}})
 
-## Maintainers
-
-- [ilijamt](https://github.com/ilijamt)

@@ -58,8 +58,3 @@ Welcome Jon Snow!
 
 ## [Source Code]({{< source "jwt" >}})
 
-## Maintainers
-
-- [vishr](https://github.com/vishr)
-- [axdg](https://github.com/axdg)
-- [matcornic](https://github.com/matcornic)

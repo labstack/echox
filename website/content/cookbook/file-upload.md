@@ -39,6 +39,3 @@ description = "File upload recipe for Echo"
 - [single]({{< source "file-upload/single" >}})
 - [multiple]({{< source "file-upload/multiple" >}})
 
-## Maintainers
-
-- [vishr](https://github.com/vishr)

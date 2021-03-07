@@ -42,6 +42,3 @@ Server:Echo/3.0
 
 ## [Source Code]({{< source "middleware" >}})
 
-## Maintainers
-
-- [vishr](https://github.com/vishr)

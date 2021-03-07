@@ -79,6 +79,3 @@ curl -X DELETE localhost:1323/users/1
 
 ## [Source Code]({{< source "crud" >}})
 
-## Maintainers
-
-- [vishr](https://github.com/vishr)

@@ -130,6 +130,3 @@ but is outside the scope of this example.
 
 ## [Source Code]({{< source "google-app-engine" >}})
 
-## Maintainers
-
-- [CaptainCodeman](https://github.com/CaptainCodeman)

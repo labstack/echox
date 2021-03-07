@@ -201,6 +201,3 @@ curl \
 
 ## [Source Code]({{< source "twitter" >}})
 
-## Maintainers
-
-- [vishr](https://github.com/vishr)

@@ -20,7 +20,10 @@ jobs:
         run: go get github.com/gohugoio/hugo
 
       - name: Build static pages
-        run: cd website && hugo -D --baseURL https://aldas.github.io/echox/
+        run: |
+          export BASE_URL=https://$(echo $GITHUB_REPOSITORY | cut -f1 -d"/").github.io/echox/
+          cd website
+          hugo -D --baseURL $BASE_URL
 
       - name: Publish to gh-pages branch
         uses: peaceiris/actions-gh-pages@v3

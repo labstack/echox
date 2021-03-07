@@ -66,6 +66,3 @@ Create a file `/etc/armor/config.yaml` with the following content:
 
 {{< embed "load-balancing/upstream/server.go" >}}
 
-## Maintainers
-
-- [vishr](https://github.com/vishr)

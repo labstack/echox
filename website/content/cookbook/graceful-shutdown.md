@@ -27,9 +27,3 @@ description = "Graceful shutdown recipe for Echo"
 {{< embed "graceful-shutdown/graceful/server.go" >}}
 
 ## [Source Code]({{< source "graceful-shutdown" >}})
-
-## Maintainers
-
-- [mertenvg](https://github.com/mertenvg)
-- [apaganobeleno](https://github.com/apaganobeleno)
-- [vishr](https://github.com/vishr)

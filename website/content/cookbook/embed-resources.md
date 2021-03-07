@@ -22,7 +22,3 @@ description = "Embed resources recipe for Echo"
 
 ## [Source Code]({{< source "embed" >}})
 
-## Maintainers
-
-- [caarlos0](https://github.com/caarlos0)
-- [maddie](https://github.com/maddie)

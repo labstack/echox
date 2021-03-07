@@ -12,7 +12,3 @@ description = "Subdomains recipe for Echo"
 
 ## [Source Code]({{< source "subdomains" >}})
 
-## Maintainers
-
-- [axdg](https://github.com/axdg)
-- [vishr](https://github.com/vishr)

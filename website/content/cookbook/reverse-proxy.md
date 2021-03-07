@@ -84,6 +84,3 @@ Hello from upstream server server2!
 
 {{< embed "reverse-proxy/server.go" >}}
 
-## Maintainers
-
-- [vishr](https://github.com/vishr)
