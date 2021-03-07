@@ -1,0 +1,30 @@
+name: publish to gh-pages
+
+on:
+  repository_dispatch:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: "1.16"
+
+      - name: Install Hugo
+        run: go get github.com/gohugoio/hugo.git
+
+      - name: Build static pages
+        run: cd website && hugo -D
+
+      - name: Publish to gh-pages branch
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./website/public
