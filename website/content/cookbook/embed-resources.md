@@ -14,6 +14,14 @@ description = "Embed resources recipe for Echo"
 
 ## [Source Code]({{< source "embed-resources" >}})
 
+## With go 1.16 embed feature
+
+`server.go`
+
+{{< embed "embed/server.go" >}}
+
+## [Source Code]({{< source "embed" >}})
+
 ## Maintainers
 
 - [caarlos0](https://github.com/caarlos0)

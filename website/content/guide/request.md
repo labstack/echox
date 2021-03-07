@@ -96,7 +96,10 @@ type (
 )
 
 func (cv *CustomValidator) Validate(i interface{}) error {
-  return echo.NewHTTPError(http.StatusInternalServerError, cv.validator.Struct(i).Error())
+  if err := cv.validator.Struct(i); err != nil {
+    return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+  }
+  return nil
 }
 
 func main() {

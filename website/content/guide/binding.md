@@ -23,7 +23,7 @@ In the struct definitions each field can be tagged to restrict binding to specif
 
 ```go
 type User struct {
-  ID string `path:"id" query:"id" form:"id" json:"id" xml:"id"`
+  ID string `param:"id" query:"id" form:"id" json:"id" xml:"id"`
 }
 ```
 
