@@ -51,7 +51,7 @@ Example below shows how to use Go `html/template`:
 
     ```go
     func Hello(c echo.Context) error {
-    	return c.Render(http.StatusOK, "hello.html", "World")
+    	return c.Render(http.StatusOK, "hello", "World")
     }
     ```
 
