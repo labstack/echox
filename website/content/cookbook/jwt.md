@@ -22,6 +22,12 @@ description = "JWT recipe for Echo"
 
 {{< embed "jwt/custom-claims/server.go" >}}
 
+## Server using a user-defined KeyFunc
+
+`server.go`
+
+{{< embed "jwt/user-defined-keyfunc/server.go" >}}
+
 ## Client
 
 `curl`

@@ -34,11 +34,32 @@ JWTConfig struct {
   // Skipper defines a function to skip middleware.
   Skipper Skipper
 
+  // BeforeFunc defines a function which is executed just before the middleware.
+  BeforeFunc BeforeFunc
+
+  // SuccessHandler defines a function which is executed for a valid token.
+  SuccessHandler JWTSuccessHandler
+
+  // ErrorHandler defines a function which is executed for an invalid token.
+  // It may be used to define a custom JWT error.
+  ErrorHandler JWTErrorHandler
+
+  // ErrorHandlerWithContext is almost identical to ErrorHandler, but it's passed the current context.
+  ErrorHandlerWithContext JWTErrorHandlerWithContext
+
   // Signing key to validate token.
-  // Required.
+  // This is one of the three options to provide a token validation key.
+  // The order of precedence is a user-defined KeyFunc, SigningKeys and SigningKey.
+  // Required if neither user-defined KeyFunc nor SigningKeys is provided.
   SigningKey interface{}
 
-  // Signing method, used to check token signing method.
+  // Map of signing keys to validate token with kid field usage.
+  // This is one of the three options to provide a token validation key.
+  // The order of precedence is a user-defined KeyFunc, SigningKeys and SigningKey.
+  // Required if neither user-defined KeyFunc nor SigningKey is provided.
+  SigningKeys map[string]interface{}
+
+  // Signing method used to check the token's signing algorithm.
   // Optional. Default value HS256.
   SigningMethod string
 
@@ -56,12 +77,25 @@ JWTConfig struct {
   // Possible values:
   // - "header:<name>"
   // - "query:<name>"
+  // - "param:<name>"
   // - "cookie:<name>"
+  // - "form:<name>"
   TokenLookup string
 
   // AuthScheme to be used in the Authorization header.
   // Optional. Default value "Bearer".
   AuthScheme string
+
+  // KeyFunc defines a user-defined function that supplies the public key for a token validation.
+  // The function shall take care of verifying the signing algorithm and selecting the proper key.
+  // A user-defined KeyFunc can be useful if tokens are issued by an external party.
+  //
+  // When a user-defined KeyFunc is provided, SigningKey, SigningKeys, and SigningMethod are ignored.
+  // This is one of the three options to provide a token validation key.
+  // The order of precedence is a user-defined KeyFunc, SigningKeys and SigningKey.
+  // Required if neither SigningKeys nor SigningKey is provided.
+  // Default to an internal implementation verifying the signing algorithm and selecting the proper key.
+  KeyFunc jwt.Keyfunc
 }
 ```
 
