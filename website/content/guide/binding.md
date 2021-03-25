@@ -18,8 +18,8 @@ In the struct definitions each field can be tagged to restrict binding to specif
 * `query` - source is request query parameters.
 * `param` - source is route path parameter.
 * `form` - source is form. Values are taken from query and request body. Uses Go standard library form parsing.
-* `json` - source is request body. Uses Go [json](https://golang.org/pkg/encoding/json/) package fo unmarshalling.
-* `xml` - source is request body. Uses Go [xml](https://golang.org/pkg/encoding/xml/) package fo unmarshalling.
+* `json` - source is request body. Uses Go [json](https://golang.org/pkg/encoding/json/) package for unmarshalling.
+* `xml` - source is request body. Uses Go [xml](https://golang.org/pkg/encoding/xml/) package for unmarshalling.
 
 ```go
 type User struct {
