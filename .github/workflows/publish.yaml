@@ -21,7 +21,7 @@ jobs:
 
       - name: Build static pages
         run: |
-          export BASE_URL=https://echo.labstack.com/
+          export BASE_URL=https://$(echo $GITHUB_REPOSITORY | cut -f1 -d"/").github.io/echox/
           cd website
           hugo -D --baseURL $BASE_URL
 
