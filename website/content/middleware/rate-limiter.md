@@ -26,8 +26,8 @@ e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(20)))
 config := middleware.RateLimiterConfig{
     Skipper: middleware.DefaultSkipper,
     Store: middleware.NewRateLimiterMemoryStore(
-        middleware.RateLimiterMemoryStoreConfig{Rate: 10, Burst: 30, ExpiresIn: 3 * time.Minute}
-    )
+        middleware.RateLimiterMemoryStoreConfig{Rate: 10, Burst: 30, ExpiresIn: 3 * time.Minute},
+    ),
     IdentifierExtractor: func(ctx echo.Context) (string, error) {
         id := ctx.RealIP()
         return id, nil
