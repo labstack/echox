@@ -27,7 +27,7 @@ type User struct {
 }
 ```
 
-Request data is binded to the struct in given order:
+Request data is bound to the struct in given order:
 
 1. Path parameters
 2. Query parameters (only for GET/DELETE methods)
@@ -37,11 +37,11 @@ Notes:
 
 * For `query`, `param`, `form` **only** fields **with** tags are bound.
 * For `json` and `xml` can bind to *public* fields without tags but this is by their standard library implementation.
-* Each step can overwrite binded fields from the previous step. This means if your json request has query param
+* Each step can overwrite bound fields from the previous step. This means if your json request has query param
   `&name=query` and body is `{"name": "body"}` then the result will be `User{Name: "body"}`.
-* To avoid security flaws try to avoid passing binded structs directly to other methods if
+* To avoid security flaws try to avoid passing bound structs directly to other methods if
   these structs contain fields that should not be bindable. It is advisable to have separate struct for binding and map it
-  explicitly to your business struct. Consider what will happen if your binded struct has public
+  explicitly to your business struct. Consider what will happen if your bound struct has public
   field `IsAdmin bool` and request body would contain `{IsAdmin: true, Name: "hacker"}`.
 * When binding forms take note that Echo implementation uses standard library form parsing which parses form data 
   from BOTH URL and BODY if content type is not MIMEMultipartForm. See documentation for [non-MIMEMultipartForm](https://golang.org/pkg/net/http/#Request.ParseForm)
@@ -83,7 +83,7 @@ e.POST("/users", func(c echo.Context) (err error) {
   if err = c.Bind(u); err != nil {
     return
   }
-  // To avoid security flaws try to avoid passing binded structs directly to other methods 
+  // To avoid security flaws try to avoid passing bound structs directly to other methods 
   // if these structs contain fields that should not be bindable. 
   user := UserDTO{
     Name: u.Name,
