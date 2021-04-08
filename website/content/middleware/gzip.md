@@ -44,3 +44,18 @@ DefaultGzipConfig = GzipConfig{
   Level:   -1,
 }
 ```
+
+### Middleware Skipper
+
+A middleware skipper can be passed to avoid gzip to certain URLs:
+
+*Usage*
+
+```go
+e := echo.New()
+e.Use(middleware.GzipWithConfig(middleware.GzipConfig{
+  Skipper: func(c echo.Context) bool {
+    return strings.Contains(c.Path(), "metrics") // Change "metrics" for your own path
+  },
+}))
+```
