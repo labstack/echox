@@ -39,6 +39,7 @@ method=GET, uri=/, status=200
 ## Configuration
 
 ```go
+// LoggerConfig defines the config for Logger middleware.
 LoggerConfig struct {
   // Skipper defines a function to skip middleware.
   Skipper Skipper
@@ -49,12 +50,14 @@ LoggerConfig struct {
   // - time_unix_nano
   // - time_rfc3339
   // - time_rfc3339_nano
+  // - time_custom
   // - id (Request ID)
   // - remote_ip
   // - uri
   // - host
   // - method
   // - path
+  // - protocol
   // - referer
   // - user_agent
   // - status
@@ -66,14 +69,16 @@ LoggerConfig struct {
   // - header:<NAME>
   // - query:<NAME>
   // - form:<NAME>
-  // - cookie:<NAME>
   //
   // Example "${remote_ip} ${status}"
   //
   // Optional. Default value DefaultLoggerConfig.Format.
-  Format string `json:"format"`
+  Format string `yaml:"format"`
 
-  // Output is a writer where logs are written.
+  // Optional. Default value DefaultLoggerConfig.CustomTimeFormat.
+  CustomTimeFormat string `yaml:"custom_time_format"`
+
+  // Output is a writer where logs in JSON format are written.
   // Optional. Default value os.Stdout.
   Output io.Writer
 }
@@ -84,10 +89,10 @@ LoggerConfig struct {
 ```go
 DefaultLoggerConfig = LoggerConfig{
   Skipper: DefaultSkipper,
-  Format: `{"time":"${time_rfc3339_nano}","id":"${id}","remote_ip":"${remote_ip}","host":"${host}",` +
-    `"method":"${method}","uri":"${uri}","status":${status},"error":"${error}","latency":${latency},` +
-    `"latency_human":"${latency_human}","bytes_in":${bytes_in},` +
-    `"bytes_out":${bytes_out}}` + "\n",
-  Output: os.Stdout
+  Format: `{"time":"${time_rfc3339_nano}","id":"${id}","remote_ip":"${remote_ip}",` +
+    `"host":"${host}","method":"${method}","uri":"${uri}","user_agent":"${user_agent}",` +
+    `"status":${status},"error":"${error}","latency":${latency},"latency_human":"${latency_human}"` +
+    `,"bytes_in":${bytes_in},"bytes_out":${bytes_out}}` + "\n",
+  CustomTimeFormat: "2006-01-02 15:04:05.00000",
 }
 ```
