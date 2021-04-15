@@ -47,7 +47,8 @@ KeyAuthConfig struct {
   // Possible values:
   // - "header:<name>"
   // - "query:<name>"
-  KeyLookup string `json:"key_lookup"`
+  // - "form:<name>"
+  KeyLookup string `yaml:"key_lookup"`
 
   // AuthScheme to be used in the Authorization header.
   // Optional. Default value "Bearer".
@@ -56,6 +57,10 @@ KeyAuthConfig struct {
   // Validator is a function to validate key.
   // Required.
   Validator KeyAuthValidator
+
+  // ErrorHandler defines a function which is executed for an invalid key.
+  // It may be used to define a custom error.
+  ErrorHandler KeyAuthErrorHandler
 }
 ```
 
