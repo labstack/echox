@@ -81,7 +81,7 @@ type User struct {
 e.POST("/users", func(c echo.Context) (err error) {
   u := new(User)
   if err = c.Bind(u); err != nil {
-    return
+    return err
   }
   // To avoid security flaws try to avoid passing bound structs directly to other methods 
   // if these structs contain fields that should not be bindable. 
