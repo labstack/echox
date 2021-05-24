@@ -95,7 +95,7 @@ e.POST("/users", func(c echo.Context) (err error) {
   user := UserDTO{
     Name: u.Name,
     Email: u.Email,
-    IsAdmin: false // because you could accidentally expose fields that should not be bind
+    IsAdmin: false // because you could accidentally expose fields that should not be bound
   }
   executeSomeBusinessLogic(user)
   
