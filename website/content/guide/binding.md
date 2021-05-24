@@ -17,13 +17,14 @@ In the struct definitions each field can be tagged to restrict binding to specif
 
 * `query` - source is request query parameters.
 * `param` - source is route path parameter.
+* `header` - source is header parameter.
 * `form` - source is form. Values are taken from query and request body. Uses Go standard library form parsing.
 * `json` - source is request body. Uses Go [json](https://golang.org/pkg/encoding/json/) package for unmarshalling.
 * `xml` - source is request body. Uses Go [xml](https://golang.org/pkg/encoding/xml/) package for unmarshalling.
 
 ```go
 type User struct {
-  ID string `param:"id" query:"id" form:"id" json:"id" xml:"id"`
+  ID string `param:"id" query:"id" header:"id" form:"id" json:"id" xml:"id"`
 }
 ```
 
@@ -35,7 +36,7 @@ Request data is bound to the struct in given order:
 
 Notes:
 
-* For `query`, `param`, `form` **only** fields **with** tags are bound.
+* For `query`, `param`, `header`, `form` **only** fields **with** tags are bound.
 * For `json` and `xml` can bind to *public* fields without tags but this is by their standard library implementation.
 * Each step can overwrite bound fields from the previous step. This means if your json request has query param
   `&name=query` and body is `{"name": "body"}` then the result will be `User{Name: "body"}`.
@@ -61,6 +62,12 @@ Notes:
 * To bind data only from path parameters use following code
   ```go
   if err := (&DefaultBinder{}).BindPathParams(c, &payload); err != nil {
+    return err
+  }
+  ```
+* To bind data only from header parameters use following code
+  ```go
+  if err := (&DefaultBinder{}).BindHeaders(c, &payload); err != nil {
     return err
   }
   ```
