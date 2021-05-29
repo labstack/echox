@@ -42,6 +42,8 @@ e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
 
 > This middleware should be registered before any other middleware.
 
+> The custom context cannot be defined in a middleware before the router ran (Pre)
+
 **Use in handler**
 
 ```go
