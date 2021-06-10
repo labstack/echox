@@ -14,17 +14,19 @@ require (
 	github.com/facebookgo/stack v0.0.0-20160209184415-751773369052 // indirect
 	github.com/facebookgo/stats v0.0.0-20151006221625-1b76add642e4 // indirect
 	github.com/facebookgo/subset v0.0.0-20200203212716-c811ad88dec4 // indirect
+	github.com/go-playground/validator/v10 v10.6.1
 	github.com/golang/protobuf v1.2.0 // indirect
 	github.com/gorilla/websocket v1.3.0
 	github.com/kardianos/osext v0.0.0-20170510131534-ae77be60afb1 // indirect
-	github.com/labstack/echo/v4 v4.2.0
+	github.com/labstack/echo/v4 v4.3.0
 	github.com/labstack/gommon v0.3.0
-	github.com/stretchr/testify v1.7.0 // indirect
+	github.com/lestrrat-go/jwx v1.2.1
+	github.com/mattn/go-isatty v0.0.13 // indirect
 	github.com/tylerb/graceful v1.2.15
-	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a
-	golang.org/x/net v0.0.0-20200822124328-c89045814202
+	golang.org/x/crypto v0.0.0-20210513164829-c07d793c2f9a
+	golang.org/x/net v0.0.0-20210610132358-84b48f89b13b
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
-	golang.org/x/text v0.3.5 // indirect
+	golang.org/x/sys v0.0.0-20210608053332-aa57babbf139 // indirect
 	google.golang.org/appengine v1.1.0
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/mgo.v2 v2.0.0-20180705113604-9856a29383ce
