@@ -10,34 +10,33 @@ weight = 1
 ## Prerequisites
 
 - [Install](https://golang.org/doc/install) Go
-- [Set](https://golang.org/doc/code.html#GOPATH) GOPATH
 
 ## Using [go get](https://golang.org/cmd/go/#hdr-Download_and_install_packages_and_dependencies)
 
 ```sh
 $ cd <PROJECT IN $GOPATH>
-$ go get -u github.com/labstack/echo/...
+$ go get -u github.com/labstack/echo/v4
 ```
 
 ## Using [dep](https://github.com/golang/dep)
 
 ```sh
 $ cd <PROJECT IN $GOPATH>
-$ dep ensure -add github.com/labstack/echo@^3.1
+$ dep ensure -add github.com/labstack/echo@^4.3
 ```
 
 ## Using [glide](http://glide.sh)
 
 ```sh
 $ cd <PROJECT IN $GOPATH>
-$ glide get github.com/labstack/echo#~3.1
+$ glide get github.com/labstack/echo#~4.3
 ```
 
 ## Using [govendor](https://github.com/kardianos/govendor)
 
 ```sh
 $ cd <PROJECT IN $GOPATH>
-$ govendor fetch github.com/labstack/echo@v3.1
+$ govendor fetch github.com/labstack/echo@v4.3
 ```
 
 Echo follows [semantic versioning](http://semver.org) managed through GitHub

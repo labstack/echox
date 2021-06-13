@@ -12,6 +12,16 @@
             <section>
               {{ $url := replace .Permalink (printf "%s" .Site.BaseURL) "" }}
               {{ $.Scratch.Add "path" (printf "%s" .Site.BaseURL) }}
+                <style>
+                    .hanchor {
+                        font-size: 80%;
+                        visibility: hidden;
+                        color: silver;
+                    }
+                    h1:hover a, h2:hover a, h3:hover a, h4:hover a {
+                        visibility: visible;
+                    }
+                </style>
               <ul class="breadcrumb">
                 <!-- <li><a href="/">home</a></li> -->
                 {{ range $index, $element := split $url "/" }}
@@ -23,7 +33,7 @@
                 {{ end }}
               </ul>
               <h1>{{ .Title }}</h1>
-              {{ .Content }}
+                {{ .Content | replaceRE  "(<h[1-9] id=\"([^\"]+)\".+)(</h[1-9]+>)" `${1}<a href="#${2}" class="hanchor" ariaLabel="Anchor"> 🔗</a> ${3}` | safeHTML }}
             </section>
             <footer>
               Caught a mistake?

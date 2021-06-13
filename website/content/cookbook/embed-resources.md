@@ -6,14 +6,6 @@ description = "Embed resources recipe for Echo"
   parent = "cookbook"
 +++
 
-## With go.rice
-
-`server.go`
-
-{{< embed "embed-resources/server.go" >}}
-
-## [Source Code]({{< source "embed-resources" >}})
-
 ## With go 1.16 embed feature
 
 `server.go`
@@ -22,3 +14,10 @@ description = "Embed resources recipe for Echo"
 
 ## [Source Code]({{< source "embed" >}})
 
+## With go.rice
+
+`server.go`
+
+{{< embed "embed-resources/server.go" >}}
+
+## [Source Code]({{< source "embed-resources" >}})

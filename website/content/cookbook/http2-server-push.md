@@ -40,10 +40,26 @@ e.GET("/", func(c echo.Context) (err error) {
 
 If `http.Pusher` is supported, web assets are pushed; otherwise, client makes separate requests to get them.
 
-### Step 4: Configure TLS server using `cert.pem` and `key.pem`
+### Step 4: Start TLS server using `cert.pem` and `key.pem`
 
 ```go
-e.StartTLS(":1323", "cert.pem", "key.pem")
+if err := e.StartTLS(":1323", "cert.pem", "key.pem"); err != http.ErrServerClosed {
+  log.Fatal(err)
+}
+```
+or use customized HTTP server with your own TLSConfig
+```go
+s := http.Server{
+  Addr:    ":8443",
+  Handler: e, // set Echo as handler
+  TLSConfig: &tls.Config{
+    //Certificates: nil, // <-- s.ListenAndServeTLS will populate this field
+  },
+  //ReadTimeout: 30 * time.Second, // use custom timeouts
+}
+if err := s.ListenAndServeTLS("cert.pem", "key.pem"); err != http.ErrServerClosed {
+  log.Fatal(err)
+}
 ```
 
 ### Step 5: Start the server and browse to https://localhost:1323
