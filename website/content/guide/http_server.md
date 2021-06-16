@@ -16,7 +16,7 @@ Echo provides following convenience methods to start HTTP server with Echo as a 
 
 ## HTTP Server
 
-`Echo.Start` is convenience method that starts http server with Echo serving requests on port 8080.
+`Echo.Start` is convenience method that starts http server with Echo serving requests.
 ```go
 func main() {
   e := echo.New()
@@ -28,7 +28,7 @@ func main() {
 }
 ```
 
-Following is equivalent to `Echo.Start`
+Following is equivalent to `Echo.Start` previous example
 ```go
 func main() {
   e := echo.New()
@@ -47,7 +47,7 @@ func main() {
 
 ## HTTPS Server
 
-`Echo.StartTLS` is convenience method that starts HTTPS server with Echo serving requests on port 8443 and uses 
+`Echo.StartTLS` is convenience method that starts HTTPS server with Echo serving requests on given address and uses 
 `server.crt` and `server.key` as TLS certificate pair.
 ```go
 func main() {
@@ -60,7 +60,7 @@ func main() {
 }
 ```
 
-Following is equivalent to `Echo.StartTLS`
+Following is equivalent to `Echo.StartTLS` previous example
 ```go
 func main() {
   e := echo.New()
@@ -86,7 +86,7 @@ See [Auto TLS Recipe](/cooobook/auto-tls#server)
 
 ## HTTP/2 Cleartext Server (HTTP2 over HTTP)
 
-`Echo.StartH2CServer` is convenience method that starts a custom HTTP/2 cleartext server on port 8080
+`Echo.StartH2CServer` is convenience method that starts a custom HTTP/2 cleartext server on given address
 ```go
 func main() {
   e := echo.New()
@@ -103,7 +103,7 @@ func main() {
 }
 ```
 
-Following is equivalent to `Echo.StartH2CServer`
+Following is equivalent to `Echo.StartH2CServer` previous example
 ```go
 func main() {
   e := echo.New()
