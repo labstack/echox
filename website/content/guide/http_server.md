@@ -82,7 +82,7 @@ func main() {
 
 ## Auto TLS Server with Let’s Encrypt
 
-See [Auto TLS Recipe](/cooobook/auto-tls#server)
+See [Auto TLS Recipe](/cookbook/auto-tls#server)
 
 ## HTTP/2 Cleartext Server (HTTP2 over HTTP)
 
