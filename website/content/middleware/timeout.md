@@ -20,7 +20,7 @@ Timeout middleware is used to timeout at a long running operation within a prede
 e := echo.New()
 e.Use(middleware.TimeoutWithConfig(middleware.TimeoutConfig{
   Skipper: Skipper,
-  ErrorHandler: func(err error, e echo.Context) error {
+  OnTimeoutRouteErrorHandler: func(err error, e echo.Context) error {
       // you can handle your error here, the returning error will be 
       // passed down the middleware chain
       return err
@@ -36,20 +36,15 @@ e.Use(middleware.TimeoutWithConfig(middleware.TimeoutConfig{
 TimeoutConfig struct {
     // Skipper defines a function to skip middleware.
     Skipper Skipper
-    // ErrorHandler defines a function which is executed for a timeout
-    // It can be used to define a custom timeout error
-    ErrorHandler TimeoutErrorHandlerWithContext
+    // ErrorMessage is written to response on timeout in addition to http.StatusServiceUnavailable (503) status code
+    // It can be used to define a custom timeout error message
+    ErrorMessage string
+    // OnTimeoutRouteErrorHandler is an error handler that is executed for error that was returned
+    // from wrapped route after OnTimeoutRouteErrorHandler func(err error, c echo.Context)
+    OnTimeoutRouteErrorHandler func(err error, c echo.Context)
     // Timeout configures a timeout for the middleware, defaults to 0 for no timeout
     Timeout time.Duration
 }
-```
-
-*TimeoutErrorHandlerWithContext* is responsible for handling the errors when a timeout happens
-```go
-// TimeoutErrorHandlerWithContext is an error handler that is used 
-// with the timeout middleware so we can handle the error 
-// as we see fit
-TimeoutErrorHandlerWithContext func(error, echo.Context) error
 ```
 
 *Default Configuration*
@@ -58,6 +53,6 @@ TimeoutErrorHandlerWithContext func(error, echo.Context) error
 DefaultTimeoutConfig = TimeoutConfig{
     Skipper:      DefaultSkipper,
     Timeout:      0,
-    ErrorHandler: nil,
+    ErrorMessage: "",
 }
 ```
