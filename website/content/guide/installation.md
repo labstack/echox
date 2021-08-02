@@ -22,21 +22,21 @@ $ go get -u github.com/labstack/echo/v4
 
 ```sh
 $ cd <PROJECT IN $GOPATH>
-$ dep ensure -add github.com/labstack/echo@^4.3
+$ dep ensure -add github.com/labstack/echo@^4
 ```
 
 ## Using [glide](http://glide.sh)
 
 ```sh
 $ cd <PROJECT IN $GOPATH>
-$ glide get github.com/labstack/echo#~4.3
+$ glide get github.com/labstack/echo#~4
 ```
 
 ## Using [govendor](https://github.com/kardianos/govendor)
 
 ```sh
 $ cd <PROJECT IN $GOPATH>
-$ govendor fetch github.com/labstack/echo@v4.3
+$ govendor fetch github.com/labstack/echo@v4
 ```
 
 Echo follows [semantic versioning](http://semver.org) managed through GitHub

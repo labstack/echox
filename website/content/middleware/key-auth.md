@@ -47,6 +47,7 @@ KeyAuthConfig struct {
   // Possible values:
   // - "header:<name>"
   // - "query:<name>"
+  // - "cookie:<name>"
   // - "form:<name>"
   KeyLookup string `yaml:"key_lookup"`
 

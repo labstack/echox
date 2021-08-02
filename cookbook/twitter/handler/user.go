@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echox/cookbook/twitter/model"
 	"gopkg.in/mgo.v2"

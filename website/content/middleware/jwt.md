@@ -29,18 +29,16 @@ e.Use(middleware.JWTWithConfig(middleware.JWTConfig{
 
 *Usage with different JWT library/repository*
 
-> Note: To be backwards compatible Echo still uses the currently unmaintained JWT implementation `dgrijalva/jwt-go`, which has known potential security risks. We strongly recommend using a maintained fork like https://github.com/golang-jwt/jwt.
-
-```go
-// Use maintained fork (https://github.com/golang-jwt/jwt) instead of `dgrijalva/jwt-go`
-// At this moment: go get github.com/golang-jwt/jwt@v3.2.1
-import (
-  "github.com/golang-jwt/jwt"
-)
-```
-
 To use a different JWT library you need to implement a custom `JWTConfig.ParseTokenFunc` function:
 ```go
+import (
+"github.com/golang-jwt/jwt" // in this example we use `golang-jwt/jwt` as JWT implementation
+)
+
+...
+...
+...
+
 signingKey := []byte("secret")
 
 config := middleware.JWTConfig{

@@ -7,14 +7,11 @@ description = "JWT recipe for Echo"
   parent = "cookbook"
 +++
 
+[JWT middleware](/middleware/jwt) configuration can be found [here](/middleware/jwt#configuration).
+
+This is cookbook for:
 - JWT authentication using HS256 algorithm.
 - JWT is retrieved from `Authorization` request header.
-
-## Server using Map claims
-
-`server.go`
-
-{{< embed "jwt/map-claims/server.go" >}}
 
 ## Server using custom claims
 
