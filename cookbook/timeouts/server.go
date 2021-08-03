@@ -12,16 +12,16 @@ func main() {
 	// Echo instance
 	e := echo.New()
 
-	// Middleware
-	e.Use(middleware.TimeoutWithConfig(middleware.TimeoutConfig{
-		Timeout: 5 * time.Second,
-	}))
-
-	// Route => handler
-	e.GET("/", func(c echo.Context) error {
+	// Handler with timeout middleware
+	handlerFunc := func(c echo.Context) error {
 		time.Sleep(10 * time.Second)
 		return c.String(http.StatusOK, "Hello, World!\n")
+	}
+	middlewareFunc := middleware.TimeoutWithConfig(middleware.TimeoutConfig{
+		Timeout:      30 * time.Second,
+		ErrorMessage: "my custom error message",
 	})
+	e.GET("/", handlerFunc, middlewareFunc)
 
 	// Start server
 	e.Logger.Fatal(e.Start(":1323"))
