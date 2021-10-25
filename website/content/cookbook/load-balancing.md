@@ -1,12 +1,12 @@
 +++
 title = "Load Balancing Recipe"
-description = "Load balancing multiple Echo servers using a reverse proxy server like Nginx, Armor."
+description = "Load balancing multiple Echo servers using a reverse proxy server like Nginx, HaProxy."
 [menu.main]
   name = "Load Balancing"
   parent = "cookbook"
 +++
 
-This recipe demonstrates how you can use Nginx or Armor as a reverse proxy server and load balance between multiple Echo servers.
+This recipe demonstrates how you can use Nginx as a reverse proxy server and load balance between multiple Echo servers.
 
 ## How to setup Nginx proxy server with Echo?
 
@@ -39,26 +39,6 @@ You should see a webpage being served from "server 1" or "server 2".
 ```sh
 Hello from upstream server server1
 ```
-
-## How to setup Armor proxy server with Echo?
-
-### Step 1: Install Armor
-
-https://armor.labstack.com/guide
-
-### Step 2: Configure Armor
-
-Create a file `/etc/armor/config.yaml` with the following content:
-
-{{< embed "load-balancing/armor.yaml" >}}
-
-### Step 3: Start Armor
-
-`armor -c /etc/armor/config.yaml`
-
-> Change address and hosts per your need.
-
-### Step 4 & 5: Follow Nginx recipe
 
 ## [Source Code]({{< source "load-balancing" >}})
 
