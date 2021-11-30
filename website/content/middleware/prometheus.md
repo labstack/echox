@@ -62,7 +62,7 @@ import (
     "github.com/labstack/echo-contrib/prometheus"
 )
 
-// urlSkipper ignores metrics route on some middleware
+// urlSkipper middleware ignores metrics on some route
 func urlSkipper(c echo.Context) bool {
 	if strings.HasPrefix(c.Path(), "/testurl") {
 		return true
