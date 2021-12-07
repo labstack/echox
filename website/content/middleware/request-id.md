@@ -34,6 +34,9 @@ RequestIDConfig struct {
   // Generator defines a function to generate an ID.
   // Optional. Default value random.String(32).
   Generator func() string
+
+  // TargetHeader defines what header to look for to populate the id
+  TargetHeader string
 }
 ```
 
@@ -43,6 +46,7 @@ RequestIDConfig struct {
 DefaultRequestIDConfig = RequestIDConfig{
   Skipper:   DefaultSkipper,
   Generator: generator,
+  TargetHeader: echo.HeaderXRequestID,
 }
 ```
 
