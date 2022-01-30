@@ -1,8 +1,8 @@
 +++
-title = "Migration"
-description = "Migration"
+title = "Upgrading to V4"
+description = "Upgrading to V4"
 [menu.main]
-  name = "Migration"
+  name = "Upgrading to V4"
   parent = "guide"
 +++
 

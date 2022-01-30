@@ -9,4 +9,3 @@ type = "cookbook"
   identifier = "cookbook"
 +++
 
-<script>location = '/cookbook/hello-world';</script>

@@ -1,0 +1,162 @@
+@font-face {
+    font-family: icomoon;
+    src: url(../fonts/icomoon.ttf?ho7y2) format('truetype'), url(../fonts/icomoon.woff?ho7y2) format('woff'), url(../fonts/icomoon.svg?ho7y2#icomoon) format('svg');
+    font-weight: 400;
+    font-style: normal
+}
+
+[class*=" icon-"], [class^=icon-] {
+    font-family: icomoon !important;
+    speak: none;
+    font-style: normal;
+    font-weight: 400;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale
+}
+
+.icon-cloud:before {
+    content: "\e64a"
+}
+
+.icon-cloud-sync:before {
+    content: "\e655"
+}
+
+.icon-cloud-check:before {
+    content: "\e659"
+}
+
+.icon-database:before {
+    content: "\e65d"
+}
+
+.icon-database-upload:before {
+    content: "\e664"
+}
+
+.icon-database-download:before {
+    content: "\e665"
+}
+
+.icon-lock:before {
+    content: "\e66b"
+}
+
+.icon-envelope:before {
+    content: "\e696"
+}
+
+.icon-hdd:before {
+    content: "\e6ab"
+}
+
+.icon-folder-search:before {
+    content: "\e6bb"
+}
+
+.icon-folder-plus:before {
+    content: "\e6bc"
+}
+
+.icon-clipboard-down:before {
+    content: "\e6cd"
+}
+
+.icon-license2:before {
+    content: "\e6dc"
+}
+
+.icon-medal-empty:before {
+    content: "\e6dd"
+}
+
+.icon-medal-first:before {
+    content: "\e6de"
+}
+
+.icon-headphones:before {
+    content: "\e6ef"
+}
+
+.icon-equalizer:before {
+    content: "\e6f2"
+}
+
+.icon-book2:before {
+    content: "\e714"
+}
+
+.icon-profile:before {
+    content: "\e71b"
+}
+
+.icon-map-marker:before {
+    content: "\e77a"
+}
+
+.icon-laptop-phone:before {
+    content: "\e7ae"
+}
+
+.icon-desktop:before {
+    content: "\e7af"
+}
+
+.icon-chip:before {
+    content: "\e7d3"
+}
+
+.icon-heart-pulse:before {
+    content: "\e7e8"
+}
+
+.icon-speed-medium:before {
+    content: "\e835"
+}
+
+.icon-speed-fast:before {
+    content: "\e836"
+}
+
+.icon-rocket:before {
+    content: "\e837"
+}
+
+.icon-cube:before {
+    content: "\e874"
+}
+
+.icon-network:before {
+    content: "\e886"
+}
+
+.icon-smile:before {
+    content: "\e88a"
+}
+
+.icon-code:before {
+    content: "\e90b"
+}
+
+.icon-magnifier:before {
+    content: "\e922"
+}
+
+.icon-find-replace:before {
+    content: "\e924"
+}
+
+.icon-backward-circle:before {
+    content: "\e966"
+}
+
+.icon-forward-circle:before {
+    content: "\e96e"
+}
+
+.icon-funnel:before {
+    content: "\e97c"
+}

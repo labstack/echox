@@ -1,31 +1,44 @@
 <nav class="sidenav2">
-  <div class="w3-container">
-    <ul class="menu-top menu-l1 hide-large">
-      <li><a href="https://github.com/labstack/echo/discussions">Forum</a></li>
-    </ul>
-    {{ $currentNode := . }}
-    <ul class="menu-l1">
-      {{ range .Site.Menus.main }}
-      <a{{ if $currentNode.IsMenuCurrent "main" . }} class="active"{{ end }} href="{{ substr .URL 0 -1 }}">{{ .Pre }} {{ .Name }}</a>
-      <ul class="menu-l2">
-        {{ range .Children }}
-        <li>
-          <a{{ if $currentNode.IsMenuCurrent "main" . }} class="active"{{ end }} href="{{ substr .URL 0 -1 }}">
-            {{ .Pre }} {{ .Name }}
-          </a>
-          <ul class="menu-l3">
-            {{ range .Children }}
-            <li>
-              <a{{ if $currentNode.IsMenuCurrent "main" . }} class="active"{{ end }} href="{{ substr .URL 0 -1 }}">
-                {{ .Name }}
-              </a>
-            </li>
+    <div class="w3-container">
+        <ul class="menu-top menu-l1 hide-large">
+            <li><a href="https://github.com/labstack/echo/discussions">Forum</a></li>
+        </ul>
+
+        <select id="version-select" class="version-select">
+            <option {{ if eq .Section "v5" }}selected{{ end }} value="/v5/guide">V5-alpha</option>
+            <option {{ if ne .Section "v5" }}selected{{ end }} value="/guide">V4 (current)</option>
+        </select>
+
+        {{ $currentNode := . }}
+        <ul class="menu-l1">
+            {{ $currentMenu := .Site.Menus.main }}
+            {{ if eq .Section "v5" }}
+                {{ $currentMenu = .Site.Menus.v5_main }}
             {{ end }}
-          </ul>
-        </li>
-        {{ end }}
-      </ul>
-      {{ end }}
-    </ul>
-  </div>
+            {{ range $currentMenu }}
+            <a{{ if $currentNode.IsMenuCurrent "main" . }} class="active"{{ end }} href="{{ substr .URL 0 -1 }}">
+                {{ .Pre }} {{ .Name }}</a>
+            <ul class="menu-l2">
+                {{ range .Children }}
+                <li>
+                    <a{{ if $currentNode.IsMenuCurrent "main" . }} class="active"{{ end }}
+                                                                   href="{{ substr .URL 0 -1 }}">
+                        {{ .Pre }} {{ .Name }}
+                    </a>
+                    <ul class="menu-l3">
+                        {{ range .Children }}
+                        <li>
+                            <a{{ if $currentNode.IsMenuCurrent "main" . }} class="active"{{ end }}
+                                                                           href="{{ substr .URL 0 -1 }}">
+                                {{ .Name }}
+                            </a>
+                        </li>
+                        {{ end }}
+                    </ul>
+                </li>
+                {{ end }}
+            </ul>
+            {{ end }}
+        </ul>
+    </div>
 </nav>

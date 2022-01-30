@@ -1,56 +1,67 @@
 {{ partial "head.html" . }}
 <body class="docs">
-	{{ partial "topnav.html" . }}
-  <div class="w3-content">
+{{ partial "topnav.html" . }}
+<div class="w3-content">
     {{ partial "sidenav.html" . }}
     <div class="main">
-      {{ partial "ad.html" . }}
-      <div class="w3-row-padding">
-        <div class="w3-col s12 m10 l10">
-          {{ partial "notice.html" }}
-          <article class="content">
-            <section>
-              {{ $url := replace .Permalink (printf "%s" .Site.BaseURL) "" }}
-              {{ $.Scratch.Add "path" (printf "%s" .Site.BaseURL) }}
-                <style>
-                    .hanchor {
-                        font-size: 80%;
-                        visibility: hidden;
-                        color: silver;
-                    }
-                    h1:hover a, h2:hover a, h3:hover a, h4:hover a {
-                        visibility: visible;
-                    }
-                </style>
-              <ul class="breadcrumb">
-                <!-- <li><a href="/">home</a></li> -->
-                {{ range $index, $element := split $url "/" }}
-                {{ $.Scratch.Add "path" $element }}
-                {{ if ne $element "" }}
-                <li><a href='{{ $.Scratch.Get "path" }}'>{{ . }}</a></li>
-                {{ $.Scratch.Add "path" "/" }}
-                {{ end }}
-                {{ end }}
-              </ul>
-              <h1>{{ .Title }}</h1>
-                {{ .Content | replaceRE  "(<h[1-9] id=\"([^\"]+)\".+)(</h[1-9]+>)" `${1}<a href="#${2}" class="hanchor" ariaLabel="Anchor"> 🔗</a> ${3}` | safeHTML }}
-            </section>
-            <footer>
-              Caught a mistake?
-              <a 
-                href="https://github.com/labstack/echox/blob/master/website/content/{{ .File.Path }}">
-                <i class="far fa-edit"></i> Edit this page on GitHub!
-              </a>
-              <hr>
-              <h2>
-                <a href="https://github.com/labstack/echo/discussions">Forum</a> ✧
-              </h2>
-            </footer>
-          </article>
+        <div class="w3-row-padding">
+            <div class="w3-col s12 m10 l10">
+                <article class="content">
+                    <section>
+                        {{ $url := replace .Permalink (printf "%s" .Site.BaseURL) "" }}
+                        {{ $.Scratch.Add "path" (printf "%s" .Site.BaseURL) }}
+                        <style>
+                            .hanchor {
+                                font-size: 80%;
+                                visibility: hidden;
+                                color: silver;
+                            }
+
+                            h1:hover a, h2:hover a, h3:hover a, h4:hover a {
+                                visibility: visible;
+                            }
+                        </style>
+
+                        {{ if eq .Section "v5" }}
+                        <blockquote class="warning">
+                            Version 5 is still in alpha stage. Visit our
+                            <a href="https://github.com/labstack/echo/discussions/2000">Github discussions page</a> for details and feedback.
+                        </blockquote>
+                        {{ end }}
+
+                        <ul class="breadcrumb">
+                            <!-- <li><a href="/">home</a></li> -->
+                            {{ range $index, $element := split .RelPermalink "/" }}
+                            {{ $.Scratch.Add "path" $element }}
+                            {{ if ne $element "" }}
+                            <li><a href='{{ $.Scratch.Get "path" }}'>{{ . }}</a></li>
+                            {{ $.Scratch.Add "path" "/" }}
+                            {{ end }}
+                            {{ end }}
+                        </ul>
+                        <h1>{{ .Title }}</h1>
+
+
+                        {{.TableOfContents}}
+
+                        {{ .Content | replaceRE  "(<h[1-9] id=\"([^\"]+)\".+)(</h[1-9]+>)" `${1}<a href="#${2}" class="hanchor" ariaLabel="Anchor"> 🔗</a> ${3}` | safeHTML }}
+                    </section>
+                    <footer>
+                        Caught a mistake?
+                        <a
+                                href="https://github.com/labstack/echox/blob/master/website/content/{{ .File.Path }}">
+                            <i class="far fa-edit"></i> Edit this page on GitHub!
+                        </a>
+                        <hr>
+                        <h2>
+                            <a href="https://github.com/labstack/echo/discussions">Forum</a> ✧
+                        </h2>
+                    </footer>
+                </article>
+            </div>
         </div>
-      </div>
-	    {{ partial "footer.html" . }}
+        {{ partial "footer.html" . }}
     </div>
-  </div>
+</div>
 </body>
 </html>
