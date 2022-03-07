@@ -127,9 +127,11 @@ curl -X GET http://localhost:1323/users\?name\=Joe\&email\=joe@labstack.com
 
 ## Fast binding with dedicated helpers
 
-For binding data found in a request a handful of helper functions are provided. This will allow binding of query parameters, path parameters or data found in the body like forms or JSON data.
+For binding data found in a request a handful of helper functions are provided. This will allow binding of query parameters,
+path parameters or form data found in the body.
 
-Following functions provide a handful of methods for binding to Go native types from request query or path parameters. These binders offer a fluent syntax and can be chained to configure, execute binding and handle errors. 
+Following functions provide a handful of methods for binding to Go native types from request query or path parameters. 
+These binders offer a fluent syntax and can be chained to configure, execute binding and handle errors. 
 
 * `echo.QueryParamsBinder(c)` - binds query parameters (source URL)
 * `echo.PathParamsBinder(c)` - binds path parameters (source URL)
