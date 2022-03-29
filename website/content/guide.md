@@ -121,7 +121,7 @@ func save(c echo.Context) error {
 Run the following command:
 
 ```sh
-$ curl -F "name=Joe Smith" -F "email=joe@labstack.com" http://localhost:1323/save
+$ curl -d "name=Joe Smith" -d "email=joe@labstack.com" http://localhost:1323/save
 // => name:Joe Smith, email:joe@labstack.com
 ```
 
