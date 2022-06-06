@@ -29,6 +29,8 @@ e.Use(middleware.JWTWithConfig(middleware.JWTConfig{
 
 *Usage with different JWT library/repository*
 
+This middleware uses the `github.com/golang-jwt/jwt` library.
+
 To use a different JWT library you need to implement a custom `JWTConfig.ParseTokenFunc` function:
 ```go
 import (
