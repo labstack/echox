@@ -36,6 +36,23 @@ Example above uses a `Format` which logs request method and request URI.
 method=GET, uri=/, status=200
 ```
 
+## Skipper
+
+*Usage*
+
+```go
+e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
+  Skipper: func(c echo.Context) bool {
+    if c.Path() == "/ping" {
+      return true
+    }
+
+    return false
+  },
+}))
+```
+You can skip the log of specific route like as above example.
+
 ## Configuration
 
 ```go
