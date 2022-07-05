@@ -47,6 +47,8 @@ LoggerConfig struct {
   // Tags to construct the logger format.
   //
   // - time_unix
+  // - time_unix_milli
+  // - time_unix_micro
   // - time_unix_nano
   // - time_rfc3339
   // - time_rfc3339_nano
