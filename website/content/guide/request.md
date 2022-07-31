@@ -71,10 +71,6 @@ e.GET("/users/:name", func(c echo.Context) error {
 curl http://localhost:1323/users/Joe
 ```
 
-Note that when registering the same path for multiple methods, the path parameter
-name needs to be the same.  All paths will be registered using the name from the
-first path.
-
 ### Binding Data
 
 Also binding of request data to native Go structs and variables is supported.
