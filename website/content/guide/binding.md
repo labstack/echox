@@ -6,70 +6,95 @@ description = "Binding request data"
   parent = "guide"
 +++
 
-## Bind Using Struct Tags
-
-Echo provides the following methods to bind data from different sources to Go Structs using the `Context#Bind(i interface{})` method:
+Parsing request data is a crucial part of a web application.  In Echo this is done with a process called _binding_. This is done with information passed by the client in the following parts of an HTTP request:
 
 * URL Path parameter
 * URL Query parameter
-* Request body
 * Header
+* Request body
 
-The default binder supports decoding the following data types specified by the `Content-Type` header:
+## Binding with Struct Tags
+
+The default binder is accessed through the `Context#Bind(i interface{})` method. It uses Go struct tags to infer from which source(s) data should be loaded.
+
+In this example a struct type `User` tells the binder to bind the query string parameter `id` to its string field `ID`:
+
+```go
+type User struct {
+  ID string `query:"id"`
+}
+```
+
+### Data Sources
+
+Echo supports the following tags specifying data sources:
+
+* `query` - query parameter
+* `param` - path parameter (also called route)
+* `header` - header parameter
+* `json` - request body. Uses builtin Go [json](https://golang.org/pkg/encoding/json/) package for unmarshalling.
+* `xml` - request body. Uses builtin Go [xml](https://golang.org/pkg/encoding/xml/) package for unmarshalling.
+* `form` - form data. Values are taken from query and request body. Uses Go standard library form parsing.
+
+### Data Types
+
+When decoding the request body, the following data types are supported as specified by the `Content-Type` header:
 
 * `application/json`
 * `application/xml`
 * `application/x-www-form-urlencoded`
 
-In the struct definition, tags are used to specify binding from specific sources:
+When binding path parameter, query parameter, header, or form data, tags must be explicitly set on each struct field. However, JSON and XML binding is done on the struct field name if the tag is omitted. This is according to the behaviour of [Go's json package](https://pkg.go.dev/encoding/json#Unmarshal).
 
-* `query` - query parameter
-* `param` - route path parameter
-* `header` - header parameter
-* `form` - form data. Values are taken from query and request body. Uses Go standard library form parsing.
-* `json` - request body. Uses builtin Go [json](https://golang.org/pkg/encoding/json/) package for unmarshalling.
-* `xml` - request body. Uses builtin Go [xml](https://golang.org/pkg/encoding/xml/) package for unmarshalling.
+For form data, Echo uses Go standard library form parsing. This parses form data from both the request URL and body if content type is not `MIMEMultipartForm`. See documentation for [non-MIMEMultipartForm](https://golang.org/pkg/net/http/#Request.ParseForm)and [MIMEMultipartForm](https://golang.org/pkg/net/http/#Request.ParseMultipartForm)
 
-```go
-type User struct {
-  ID string `param:"id" query:"id" header:"id" form:"id" json:"id" xml:"id"`
-}
-```
+### Multiple Sources
 
-When multiple sources are specified, request data is bound in the given order:
+It is possible to specify multiple sources on the same field. In this case request data is bound in this order:
 
 1. Path parameters
 2. Query parameters (only for GET/DELETE methods)
 3. Request body
 
-Notes:
+```go
+type User struct {
+  ID string `param:"id" query:"id" form:"id" json:"id" xml:"id"`
+}
+```
 
-* For `query`, `param`, `header`, and `form` **only** fields **with** tags are bound.
-* For `json` and `xml` binding works with either the struct field name or its tag. This is according to the behaviour of [Go's standard json.Unmarshal method](https://pkg.go.dev/encoding/json#Unmarshal).
-* Each step can overwrite bound fields from the previous step. This means if your json request contains the query param `name=query` and body `{"name": "body"}` then the result will be `User{Name: "body"}`.
-* For `form`, note that Echo uses Go standard library form parsing. This parses form data from both the request URL and body if content type is not `MIMEMultipartForm`. See documentation for [non-MIMEMultipartForm](https://golang.org/pkg/net/http/#Request.ParseForm)and [MIMEMultipartForm](https://golang.org/pkg/net/http/#Request.ParseMultipartForm)
-* To avoid security flaws avoid passing bound structs directly to other methods if these structs contain fields that should not be bindable. It is advisable to have a separate struct for binding and map it explicitly to your business struct. Consider what will happen if your bound struct has an Exported field `IsAdmin bool` and the request body contains `{IsAdmin: true, Name: "hacker"}`.
-* It is also possible to bind data directly from a specific source:
+Note that binding at each stage will overwrite data bound in a previous stage. This means if your JSON request contains the query param `name=query` and body `{"name": "body"}` then the result will be `User{Name: "body"}`.
+
+### Direct Source
+
+It is also possible to bind data directly from a specific source:
   
-  Request body:
-  ```go
-  err := (&DefaultBinder{}).BindBody(c, &payload)
-  ```
+Request body:
+```go
+err := (&DefaultBinder{}).BindBody(c, &payload)
+```
 
-  Query parameters:
-  ```go
-  err := (&DefaultBinder{}).BindQueryParams(c, &payload)
-  ```
+Query parameters:
+```go
+err := (&DefaultBinder{}).BindQueryParams(c, &payload)
+```
 
-  Path parameters:
-  ```go
-  err := (&DefaultBinder{}).BindPathParams(c, &payload)
-  ```
+Path parameters:
+```go
+err := (&DefaultBinder{}).BindPathParams(c, &payload)
+```
 
-  Header parameters:
-  ```go
-  err := (&DefaultBinder{}).BindHeaders(c, &payload)
-  ```
+Header parameters:
+```go
+err := (&DefaultBinder{}).BindHeaders(c, &payload)
+```
+
+Note that headers is not one of the included sources with `Context#Bind`. The only way to bind header data is by calling `BindHeaders` directly.
+
+### Security
+
+To keep your application secure, avoid passing bound structs directly to other methods if these structs contain fields that should not be bindable. It is advisable to have a separate struct for binding and map it explicitly to your business struct.
+
+Consider what will happen if your bound struct has an Exported field `IsAdmin bool` and the request body contains `{IsAdmin: true, Name: "hacker"}`.
 
 ### Example
 
@@ -79,6 +104,12 @@ In this example we define a `User` struct type with field tags to bind from `jso
 type User struct {
   Name  string `json:"name" form:"name" query:"name"`
   Email string `json:"email" form:"email" query:"email"`
+}
+
+type UserDTO struct {
+  Name  string
+  Email string
+  IsAdmin: bool
 }
 ```
 
@@ -90,13 +121,14 @@ e.POST("/users", func(c echo.Context) (err error) {
   if err = c.Bind(u); err != nil {
     return
   }
-  // To avoid security flaws try to avoid passing bound structs directly to other 
-  // methods if these structs contain fields that should not be bindable. 
+
+  // Load into separate struct for security
   user := UserDTO{
     Name: u.Name,
     Email: u.Email,
-    IsAdmin: false // because you could accidentally expose fields that should not be bound
+    IsAdmin: false // avoids exposing field that should not be bound
   }
+
   executeSomeBusinessLogic(user)
   
   return c.JSON(http.StatusOK, u)
@@ -122,10 +154,10 @@ curl -X POST http://localhost:1323/users \
 #### Query Parameters
 
 ```sh
-curl -X GET http://localhost:1323/users\?name\=Joe\&email\=joe@labstack.com
+curl -X GET 'http://localhost:1323/users?name=Joe&email=joe@labstack.com'
 ```
 
-## Fast binding with Dedicated Helpers
+## Fast Binding with Dedicated Helpers
 
 Echo provides a handful of helper functions for binding request data. Binding of query parameters, path parameters, and form data found in the body are supported.
 
@@ -160,26 +192,28 @@ err := echo.QueryParamsBinder(c).
 
 ### Supported Data Types
 
-* bool
-* float32
-* float64
-* int
-* int8
-* int16
-* int32
-* int64
-* uint
-* uint8/byte (does not support `bytes()`. Use BindUnmarshaler/CustomFunc to convert value from base64 etc to []byte{})
-* uint16
-* uint32
-* uint64
-* string
-* time
-* duration
-* BindUnmarshaler() interface
-* UnixTime() - converts unix time (integer) to time.Time
-* UnixTimeNano() - converts unix time with nano second precision (integer) to time.Time
-* CustomFunc() - callback function for your custom conversion logic
+| Data Type           | Notes |
+| ------------------- | ----- |
+| `bool`              |       |
+| `float32`           |       |
+| `float64`           |       |
+| `int`               |       |
+| `int8`              |       |
+| `int16`             |       |
+| `int32`             |       |
+| `int64`             |       |
+| `uint`              |       |
+| `uint8/byte`        | Does not support `bytes()`. Use `BindUnmarshaler`/`CustomFunc` to convert value from base64 etc to `[]byte{}`.|
+| `uint16`            |       |
+| `uint32`            |       |
+| `uint64`            |       |
+| `string`            |       |
+| `time`              |       |
+| `duration`          |       |
+| `BindUnmarshaler()` | interface |
+| `UnixTime()`        | converts unix time (integer) to `time.Time` |
+| `UnixTimeNano()`    | converts unix time with nano second precision (integer) to `time.Time` |
+| `CustomFunc()`      | callback function for your custom conversion logic |
 
 Each supported type has the following methods:
 
