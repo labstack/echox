@@ -13,15 +13,23 @@ Parsing request data is a crucial part of a web application.  In Echo this is do
 * Header
 * Request body
 
-## Binding with Struct Tags
+Echo provides different ways to perform binding, each described in the sections below.
 
-The default binder is accessed through the `Context#Bind(i interface{})` method. It uses Go struct tags to infer from which source(s) data should be loaded.
+## Struct Tag Binding
+
+With struct binding you define a Go struct with tags specifying the data source and corresponding key. In your request handler you simply call `Context#Bind(i interface{})` with a pointer to your struct. The tags tell the binder everything it needs to know to load data from the request.
 
 In this example a struct type `User` tells the binder to bind the query string parameter `id` to its string field `ID`:
 
 ```go
 type User struct {
   ID string `query:"id"`
+}
+
+// in the handler for /users?id=<userID>
+var user User
+err := c.Bind(&user); if err != nil {
+    return c.String(http.StatusBadRequest, "bad request")
 }
 ```
 
@@ -119,7 +127,7 @@ And a handler at the POST `/users` route binds request data to the struct:
 e.POST("/users", func(c echo.Context) (err error) {
   u := new(User)
   if err = c.Bind(u); err != nil {
-    return
+    return c.String(http.StatusBadRequest, "bad request")
   }
 
   // Load into separate struct for security
@@ -132,7 +140,7 @@ e.POST("/users", func(c echo.Context) (err error) {
   executeSomeBusinessLogic(user)
   
   return c.JSON(http.StatusOK, u)
-}
+})
 ```
 
 #### JSON Data
@@ -157,22 +165,22 @@ curl -X POST http://localhost:1323/users \
 curl -X GET 'http://localhost:1323/users?name=Joe&email=joe@labstack.com'
 ```
 
-## Fast Binding with Dedicated Helpers
+## Fluent Binding
 
-Echo provides a handful of helper functions for binding request data. Binding of query parameters, path parameters, and form data found in the body are supported.
+Echo provides an interface to bind explicit data types from a specified source. It uses method chaining, also known as a [Fluent Interface](https://en.wikipedia.org/wiki/Fluent_interface).
 
-The following functions provide a handful of methods for binding to Go data type. These binders offer a fluent syntax and can be chained to configure & execute binding, and handle errors. 
+The following methods provide a handful of methods for binding to Go data type. These binders offer a fluent syntax and can be chained to configure & execute binding, and handle errors. 
 
 * `echo.QueryParamsBinder(c)` - binds query parameters (source URL)
 * `echo.PathParamsBinder(c)` - binds path parameters (source URL)
 * `echo.FormFieldBinder(c)` - binds form fields (source URL + body). See also [Request.ParseForm](https://golang.org/pkg/net/http/#Request.ParseForm).
 
-A binder is usually completed by `BindError()` or `BindErrors()` which returns errors if binding has failed.
-With `FailFast()` the binder can be configured to stop binding on the first error or continue exsecuting 
-the binder call chain. Fail fast is enabled by default and should be disabled when using `BindErrors()`.
+### Error Handling 
+A binder is usually completed by calling `BindError()` or `BindErrors()`. If any errors have occurred, `BindError()` returns the first error encountered, while`BindErrors()` returns all bind errors. Any errors stored in the binder are also reset.
 
-`BindError()` returns the first bind error encountered and resets all errors in its binder.
-`BindErrors()` returns all bind errors and resets errors in its binder.
+With `FailFast(true)` the binder can be configured to stop binding on the first error, or with `FailFast(false)` execute the entire binder call chain. Fail fast is enabled by default and should be disabled when using `BindErrors()`.
+
+### Example
 
 ```go
 // url =  "/api/search?active=true&id=1&id=2&id=3&length=25"
@@ -224,7 +232,7 @@ Each supported type has the following methods:
 
 For certain slice types `BindWithDelimiter("param", &dest, ",")` supports splitting parameter values before type conversion is done. For example binding an integer slice from the URL `/api/search?id=1,2,3&id=1` will result in `[]int64{1,2,3,1}`.
 
-## Custom Binder
+## Custom Binding
 
 A custom binder can be registered using `Echo#Binder`.
 
