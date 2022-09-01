@@ -218,9 +218,12 @@ err := echo.QueryParamsBinder(c).
 | `string`            |       |
 | `time`              |       |
 | `duration`          |       |
-| `BindUnmarshaler()` | interface |
-| `UnixTime()`        | converts unix time (integer) to `time.Time` |
-| `UnixTimeNano()`    | converts unix time with nano second precision (integer) to `time.Time` |
+| `BindUnmarshaler()` | binds to a type implementing BindUnmarshaler interface |
+| `TextUnmarshaler()` | binds to a type implementing encoding.TextUnmarshaler interface |
+| `JsonUnmarshaler()` | binds to a type implementing json.Unmarshaler interface |
+| `UnixTime()`        | converts Unix time (integer) to `time.Time` |
+| `UnixTimeMilli()`   | converts Unix time with millisecond precision (integer) to `time.Time` |
+| `UnixTimeNano()`    | converts Unix time with nanosecond precision (integer) to `time.Time` |
 | `CustomFunc()`      | callback function for your custom conversion logic |
 
 Each supported type has the following methods:
