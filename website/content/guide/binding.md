@@ -115,9 +115,9 @@ type User struct {
 }
 
 type UserDTO struct {
-  Name  string
-  Email string
-  IsAdmin: bool
+  Name    string
+  Email   string
+  IsAdmin bool
 }
 ```
 
