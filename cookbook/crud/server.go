@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 	"strconv"
+	"sync"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -18,6 +19,7 @@ type (
 var (
 	users = map[int]*user{}
 	seq   = 1
+	lock  = sync.Mutex{}
 )
 
 //----------
@@ -25,6 +27,8 @@ var (
 //----------
 
 func createUser(c echo.Context) error {
+	lock.Lock()
+	defer lock.Unlock()
 	u := &user{
 		ID: seq,
 	}
@@ -37,11 +41,15 @@ func createUser(c echo.Context) error {
 }
 
 func getUser(c echo.Context) error {
+	lock.Lock()
+	defer lock.Unlock()
 	id, _ := strconv.Atoi(c.Param("id"))
 	return c.JSON(http.StatusOK, users[id])
 }
 
 func updateUser(c echo.Context) error {
+	lock.Lock()
+	defer lock.Unlock()
 	u := new(user)
 	if err := c.Bind(u); err != nil {
 		return err
@@ -52,12 +60,16 @@ func updateUser(c echo.Context) error {
 }
 
 func deleteUser(c echo.Context) error {
+	lock.Lock()
+	defer lock.Unlock()
 	id, _ := strconv.Atoi(c.Param("id"))
 	delete(users, id)
 	return c.NoContent(http.StatusNoContent)
 }
 
 func getAllUsers(c echo.Context) error {
+	lock.Lock()
+	defer lock.Unlock()
 	return c.JSON(http.StatusOK, users)
 }
 
