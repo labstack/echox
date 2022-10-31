@@ -5,7 +5,7 @@ go 1.17
 require (
 	github.com/GeertJohan/go.rice v0.0.0-20170420135705-c02ca9a983da
 	github.com/golang-jwt/jwt v3.2.2+incompatible
-	github.com/gorilla/websocket v1.3.0
+	github.com/gorilla/websocket v1.4.1
 	github.com/labstack/echo/v4 v4.9.0
 	github.com/labstack/gommon v0.3.1
 	github.com/lestrrat-go/jwx v1.2.1
