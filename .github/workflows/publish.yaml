@@ -17,7 +17,7 @@ jobs:
           go-version: "1.19"
 
       - name: Install Hugo
-        run: go get github.com/gohugoio/hugo@v0.94.2
+        run: go install github.com/gohugoio/hugo@v0.94.2
 
       - name: Build static pages
         run: |
