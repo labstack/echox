@@ -4,12 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	echojwt "github.com/labstack/echo-jwt/v4"
 	"net/http"
 
-	jwt "github.com/golang-jwt/jwt"
-	echo "github.com/labstack/echo/v4"
-	middleware "github.com/labstack/echo/v4/middleware"
-	jwk "github.com/lestrrat-go/jwx/jwk"
+	"github.com/golang-jwt/jwt/v4"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+	"github.com/lestrrat-go/jwx/jwk"
 )
 
 func getKey(token *jwt.Token) (interface{}, error) {
@@ -68,10 +69,10 @@ func main() {
 	// Restricted group
 	r := e.Group("/restricted")
 	{
-		config := middleware.JWTConfig{
+		config := echojwt.Config{
 			KeyFunc: getKey,
 		}
-		r.Use(middleware.JWTWithConfig(config))
+		r.Use(echojwt.WithConfig(config))
 		r.GET("", restricted)
 	}
 

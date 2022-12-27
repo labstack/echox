@@ -1,12 +1,12 @@
 package main
 
 import (
-	"net/http"
-	"time"
-
-	"github.com/golang-jwt/jwt"
+	"github.com/golang-jwt/jwt/v4"
+	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"net/http"
+	"time"
 )
 
 // jwtCustomClaims are custom claims extending default ones.
@@ -14,7 +14,7 @@ import (
 type jwtCustomClaims struct {
 	Name  string `json:"name"`
 	Admin bool   `json:"admin"`
-	jwt.StandardClaims
+	jwt.RegisteredClaims
 }
 
 func login(c echo.Context) error {
@@ -30,8 +30,8 @@ func login(c echo.Context) error {
 	claims := &jwtCustomClaims{
 		"Jon Snow",
 		true,
-		jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(time.Hour * 72).Unix(),
+		jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 72)),
 		},
 	}
 
@@ -77,11 +77,13 @@ func main() {
 	r := e.Group("/restricted")
 
 	// Configure middleware with the custom claims type
-	config := middleware.JWTConfig{
-		Claims:     &jwtCustomClaims{},
+	config := echojwt.Config{
+		NewClaimsFunc: func(c echo.Context) jwt.Claims {
+			return new(jwtCustomClaims)
+		},
 		SigningKey: []byte("secret"),
 	}
-	r.Use(middleware.JWTWithConfig(config))
+	r.Use(echojwt.WithConfig(config))
 	r.GET("", restricted)
 
 	e.Logger.Fatal(e.Start(":1323"))
