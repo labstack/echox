@@ -32,6 +32,9 @@ default values for `DisableStackAll` and `DisablePrintStack`.
 ## Configuration
 
 ```go
+// LogErrorFunc defines a function for custom logging in the middleware.
+LogErrorFunc func(c echo.Context, err error, stack []byte) error
+
 RecoverConfig struct {
   // Skipper defines a function to skip middleware.
   Skipper Skipper
@@ -52,6 +55,10 @@ RecoverConfig struct {
   // LogLevel is log level to printing stack trace.
   // Optional. Default value 0 (Print).
   LogLevel log.Lvl
+
+  // LogErrorFunc defines a function for custom logging in the middleware.
+  // If it's set you don't need to provide LogLevel for config.
+  LogErrorFunc LogErrorFunc
 }
 ```
 
@@ -64,5 +71,6 @@ DefaultRecoverConfig = RecoverConfig{
   DisableStackAll:   false,
   DisablePrintStack: false,
   LogLevel:          0,
+  LogErrorFunc:      nil,
 }
 ```
