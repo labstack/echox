@@ -57,6 +57,7 @@ CSRFConfig struct {
   // - "header:<name>"
   // - "form:<name>"
   // - "query:<name>"
+  // - "cookie:<name>"
   TokenLookup string `json:"token_lookup"`
 
   // Context key to store generated CSRF token into context.
@@ -101,3 +102,16 @@ DefaultCSRFConfig = CSRFConfig{
   CookieMaxAge: 86400,
 }
 ```
+
+
+*Example Configuration that reads token from Cookie*
+
+```go
+middleware.CSRFWithConfig(middleware.CSRFConfig{
+	TokenLookup:    "cookie:_csrf",
+	CookiePath:     "/",
+	CookieDomain:   "example.com",
+	CookieSecure:   true,
+	CookieHTTPOnly: true,
+	CookieSameSite: http.SameSiteStrictMode,
+})
