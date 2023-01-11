@@ -55,7 +55,7 @@ if l, ok := e.Logger.(*log.Logger); ok {
 `Echo#Logger.SetOutput(io.Writer)` can be used to set the output destination for
 the logger. Default value is `os.Stdout`
 
-To completely disable logs use `Echo#Logger.SetOutput(ioutil.Discard)` or `Echo#Logger.SetLevel(log.OFF)`
+To completely disable logs use `Echo#Logger.SetOutput(io.Discard)` or `Echo#Logger.SetLevel(log.OFF)`
 
 ### Log Level
 

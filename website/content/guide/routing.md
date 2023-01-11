@@ -173,7 +173,7 @@ data, err := json.MarshalIndent(e.Routes(), "", "  ")
 if err != nil {
 	return err
 }
-ioutil.WriteFile("routes.json", data, 0644)
+os.WriteFile("routes.json", data, 0644)
 ```
 
 `routes.json`
