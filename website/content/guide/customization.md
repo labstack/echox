@@ -119,6 +119,12 @@ on request payload.
 
 [Learn more](/guide/request/#custom-binder)
 
+## Custom JSON Serializer
+
+`Echo#JSONSerializer` can be used to register a custom JSON serializer.
+
+Have a look at `DefaultJSONSerializer` on [json.go](https://github.com/labstack/echo/blob/master/json.go).
+
 ## Renderer
 
 `Echo#Renderer` can be used to register a renderer for template rendering.
