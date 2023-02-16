@@ -54,3 +54,53 @@ e.GET("/", func(c echo.Context) error {
 	return cc.String(200, "OK")
 })
 ```
+
+## A Note on Concurrency
+
+`Context` should not be accessed concurrently. It has functions that are dangerous to execute from multiple goroutines. For example have a look at [Request](https://github.com/labstack/echo/blob/0ce73028d0815e0ecec80964cc2da42d98fafa33/context.go#L231) and [SetRequest](https://github.com/labstack/echo/blob/0ce73028d0815e0ecec80964cc2da42d98fafa33/context.go#L235).
+
+If you would like to see for yourself, add the route below to your code and compile with race detector enabled: `go build -race`. Then send an HTTP request to it, and see what happens.
+
+```go
+func(c echo.Context) error {
+	go func() {
+		for i := 0; i < 100; i++ {
+			r := c.Request()
+			r, _ = http.NewRequest("GET", "/", nil)
+			c.SetRequest(r)
+		}
+	}()
+
+	for i := 0; i < 100; i++ {
+		r := c.Request()
+		r, _ = http.NewRequest("GET", "/", nil)
+		c.SetRequest(r)
+	}
+	return nil
+}
+```
+
+### Solutions
+
+#### Use a channel
+
+```go
+func(c echo.Context) error {
+	ca := make(chan string)
+	r := c.Request()
+	method := r.Method
+
+	go func() {
+		// This function must not touch the Context.
+
+		fmt.Printf("Method: %s\n", method)
+
+		// Do some long running operations...
+
+		ca <- "Hey!"
+	}()
+
+	result := <-ca
+	return c.String(http.StatusOK, "Result: "+result)
+}
+```
