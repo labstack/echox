@@ -56,3 +56,8 @@ description = "High performance, extensible, minimalist Go web framework"
   logo = "images/microcms.png"
   title = "microCMS"
   url = "https://microcms.co.jp"
+
+[[sponsors]]
+  logo = "images/doit.png"
+  title = "DoiT"
+  url = "https://doit.com"
