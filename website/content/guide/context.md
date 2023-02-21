@@ -62,17 +62,17 @@ e.GET("/", func(c echo.Context) error {
 1. `Context` has functions that are dangerous to execute from multiple goroutines. Therefore, only one goroutine should access it.
 2. Echo uses a pool to create `Context`'s. When the request handling finishes, Echo returns the `Context` to the pool.
 
-See issue [1908](https://github.com/labstack/echo/issues/1908) for a "cautionary tale" caused by this reason.
+See issue [1908](https://github.com/labstack/echo/issues/1908) for a "cautionary tale" caused by this reason. Concurrency is complicated. Beware of this pitfall when working with goroutines.
 
 ### Solutions
 
 #### Use a channel
 
-A better design is to use a channel:
+A better design might be to use a channel:
 
 ```go
 func(c echo.Context) error {
-	ca := make(chan string)
+	ca := make(chan string, 1) // To prevent this channel from blocking, size is set to 1.
 	r := c.Request()
 	method := r.Method
 
@@ -86,7 +86,12 @@ func(c echo.Context) error {
 		ca <- "Hey!"
 	}()
 
-	result := <-ca
-	return c.String(http.StatusOK, "Result: "+result)
+	select {
+	case result := <-ca:
+		return c.String(http.StatusOK, "Result: "+result)
+	case <-c.Request().Context().Done(): // Check context.
+		// If it reaches here, this means that context was canceled (a timeout was reached, etc.).
+		return nil
+	}
 }
 ```
