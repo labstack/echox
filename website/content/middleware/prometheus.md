@@ -121,7 +121,7 @@ func (m *Metrics) IncCustomCnt(labelOne, labelTwo string) {
 
 func (m *Metrics) ObserveCustomDur(labelOne, labelTwo string, d time.Duration) {
 	labels := prom.Labels{"label_one": labelOne, "label_two": labelTwo}
-	m.customCnt.MetricCollector.(*prom.HistogramVec).With(labels).Observe(d.Seconds())
+	m.customDur.MetricCollector.(*prom.HistogramVec).With(labels).Observe(d.Seconds())
 }
 
 func main() {
