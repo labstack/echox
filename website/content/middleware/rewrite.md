@@ -67,10 +67,10 @@ Normal capture groups can be defined using `()` and referenced by index (`$1`, `
 
 ```go
   e.Pre(RewriteWithConfig(RewriteConfig{
-    Rewrite: map[string]string{
+    Rules: map[string]string{
       "^/v1/*": "/v2/$1",
     },
-    RegexRewrite: map[*regexp.Regexp]string{
+    RegexRules: map[*regexp.Regexp]string{
       regexp.MustCompile("^/foo/([0-9].*)"):  "/num/$1",
       regexp.MustCompile("^/bar/(.+?)/(.*)"): "/baz/$2/$1",
     },
