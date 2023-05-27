@@ -6,30 +6,83 @@ description = "Prometheus metrics middleware for Echo"
   parent = "middleware"
 +++
 
-Prometheus middleware generates metrics for HTTP requests.
+Prometheus middleware generates metrics for HTTP requests. 
 
-*Usage*
+There are 2 versions of Prometheus middleware:
 
+* latest (recommended) https://github.com/labstack/echo-contrib/blob/master/echoprometheus.go
+* old (deprecated) https://github.com/labstack/echo-contrib/blob/master/prometheus/prometheus.go)
+
+Migration guide from old to newer middleware can found [here](https://github.com/labstack/echo-contrib/blob/master/echoprometheus/README.md).
+
+
+## Usage
+
+* Add needed module `go get -u github.com/labstack/echo-contrib`
+* Add Prometheus middleware and metrics serving route
+    ```go
+    e := echo.New()
+    e.Use(echoprometheus.NewMiddleware("myapp")) // adds middleware to gather metrics
+    e.GET("/metrics", echoprometheus.NewHandler()) // adds route to serve gathered metrics
+    ```
+
+## Examples:
+
+Example: serve metric from the same server as where metrics is gathered
 ```go
 package main
-import (
-    "github.com/labstack/echo/v4"
-    "github.com/labstack/echo-contrib/prometheus"
-)
-func main() {
-    e := echo.New()
-    // Enable metrics middleware
-    p := prometheus.NewPrometheus("echo", nil)
-    p.Use(e)
 
-    e.Logger.Fatal(e.Start(":1323"))
+import (
+	"errors"
+	"github.com/labstack/echo-contrib/echoprometheus"
+	"github.com/labstack/echo/v4"
+	"log"
+	"net/http"
+)
+
+func main() {
+	e := echo.New()
+	e.Use(echoprometheus.NewMiddleware("myapp")) // adds middleware to gather metrics
+	e.GET("/metrics", echoprometheus.NewHandler()) // adds route to serve gathered metrics
+	
+	e.GET("/hello", func(c echo.Context) error {
+		return c.String(http.StatusOK, "hello")
+	})
+
+	if err := e.Start(":8080"); err != nil && !errors.Is(err, http.ErrServerClosed) {
+		log.Fatal(err)
+	}
 }
 ```
 
-*Sample Output*
+Example: serve metrics on a separate port:
+```go
+func main() {
+	app := echo.New() // this Echo instance will serve route on port 8080
+	app.Use(echoprometheus.NewMiddleware("myapp")) // adds middleware to gather metrics
+
+	go func() {
+		metrics := echo.New() // this Echo will run on separate port 8081
+		metrics.GET("/metrics", echoprometheus.NewHandler()) // adds route to serve gathered metrics
+		if err := metrics.Start(":8081"); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			log.Fatal(err)
+		}
+	}()
+
+	app.GET("/hello", func(c echo.Context) error {
+		return c.String(http.StatusOK, "hello")
+	})
+
+	if err := app.Start(":8080"); err != nil && !errors.Is(err, http.ErrServerClosed) {
+		log.Fatal(err)
+	}
+}
+```
+
+*Sample Output (for first example)*
 
 ```bash
-curl http://localhost:1323/metrics
+curl http://localhost:8080/metrics
 
 # HELP echo_request_duration_seconds The HTTP request latencies in seconds.
 # TYPE echo_request_duration_seconds summary
@@ -54,93 +107,83 @@ echo_response_size_bytes_count 1
 ### Serving custom Prometheus Metrics
 *Usage*
 
-When creating a new Prometheus middleware, you can pass down a list of extra []*Metric array you can use.
-
+Using custom metrics with Prometheus default registry:
 ```go
 package main
 
 import (
-	"time"
-
-	"github.com/labstack/echo-contrib/prometheus"
+	"errors"
+	"github.com/labstack/echo-contrib/echoprometheus"
 	"github.com/labstack/echo/v4"
-	prom "github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus"
+	"log"
+	"net/http"
 )
-
-const cKeyMetrics = "custom_metrics"
-
-// See the NewMetrics func for proper descriptions and prometheus names!
-// In case you add a metric here later, make sure to include it in the
-// MetricsList method or you'll going to have a bad time.
-type Metrics struct {
-	customCnt *prometheus.Metric
-	customDur *prometheus.Metric
-}
-
-// Needed by echo-contrib so echo can register and collect these metrics
-func (m *Metrics) MetricList() []*prometheus.Metric {
-	return []*prometheus.Metric{
-		// ADD EVERY METRIC HERE!
-		m.customCnt,
-		m.customDur,
-	}
-}
-
-// Creates and populates a new Metrics struct
-// This is where all the prometheus metrics, names and labels are specified
-func NewMetrics() *Metrics {
-	return &Metrics{
-		customCnt: &prometheus.Metric{
-			Name:        "custom_total",
-			Description: "Custom counter events.",
-			Type:        "counter_vec",
-			Args:        []string{"label_one", "label_two"},
-		},
-		customDur: &prometheus.Metric{
-			Name:        "custom_duration_seconds",
-			Description: "Custom duration observations.",
-			Type:        "histogram_vec",
-			Args:        []string{"label_one", "label_two"},
-			Buckets:     prom.DefBuckets, // or your Buckets
-		},
-	}
-}
-
-// This will push your metrics object into every request context for later use
-func (m *Metrics) AddCustomMetricsMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
-	return func(c echo.Context) error {
-		c.Set(cKeyMetrics, m)
-		return next(c)
-	}
-}
-
-func (m *Metrics) IncCustomCnt(labelOne, labelTwo string) {
-	labels := prom.Labels{"label_one": labelOne, "label_two": labelTwo}
-	m.customCnt.MetricCollector.(*prom.CounterVec).With(labels).Inc()
-}
-
-func (m *Metrics) ObserveCustomDur(labelOne, labelTwo string, d time.Duration) {
-	labels := prom.Labels{"label_one": labelOne, "label_two": labelTwo}
-	m.customDur.MetricCollector.(*prom.HistogramVec).With(labels).Observe(d.Seconds())
-}
 
 func main() {
 	e := echo.New()
-	m := NewMetrics()
 
-	// Enable metrics middleware
-	p := prometheus.NewPrometheus("echo", nil, m.MetricList())
-	p.Use(e)
+	customCounter := prometheus.NewCounter( // create new counter metric. This is replacement for `prometheus.Metric` struct
+		prometheus.CounterOpts{
+			Name: "custom_requests_total",
+			Help: "How many HTTP requests processed, partitioned by status code and HTTP method.",
+		},
+	)
+	if err := prometheus.Register(customCounter); err != nil { // register your new counter metric with default metrics registry
+		log.Fatal(err)
+	}
 
-	e.Use(m.AddCustomMetricsMiddleware)
+	e.Use(echoprometheus.NewMiddlewareWithConfig(echoprometheus.MiddlewareConfig{
+		AfterNext: func(c echo.Context, err error) {
+			customCounter.Inc() // use our custom metric in middleware. after every request increment the counter
+		},
+	}))
+	e.GET("/metrics", echoprometheus.NewHandler()) // register route for getting gathered metrics
 
-	e.GET("/custom", func(c echo.Context) error {
-		metrics := c.Get(cKeyMetrics).(*Metrics)
-		metrics.IncCustomCnt("any", "value")
-		return nil
-	})
+	if err := e.Start(":8080"); err != nil && !errors.Is(err, http.ErrServerClosed) {
+		log.Fatal(err)
+	}
+}
+```
 
-	e.Logger.Fatal(e.Start(":1323"))
+or create your own registry and register custom metrics with that:
+```go
+package main
+
+import (
+	"errors"
+	"github.com/labstack/echo-contrib/echoprometheus"
+	"github.com/labstack/echo/v4"
+	"github.com/prometheus/client_golang/prometheus"
+	"log"
+	"net/http"
+)
+
+func main() {
+	e := echo.New()
+
+	customRegistry := prometheus.NewRegistry() // create custom registry for your custom metrics
+	customCounter := prometheus.NewCounter(    // create new counter metric. This is replacement for `prometheus.Metric` struct
+		prometheus.CounterOpts{
+			Name: "custom_requests_total",
+			Help: "How many HTTP requests processed, partitioned by status code and HTTP method.",
+		},
+	)
+	if err := customRegistry.Register(customCounter); err != nil { // register your new counter metric with metrics registry
+		log.Fatal(err)
+	}
+
+	e.Use(echoprometheus.NewMiddlewareWithConfig(echoprometheus.MiddlewareConfig{
+		AfterNext: func(c echo.Context, err error) {
+			customCounter.Inc() // use our custom metric in middleware. after every request increment the counter
+		},
+		Registerer: customRegistry, // use our custom registry instead of default Prometheus registry
+	}))
+	e.GET("/metrics", echoprometheus.NewHandlerWithConfig(echoprometheus.HandlerConfig{Gatherer: customRegistry})) // register route for getting gathered metrics data from our custom Registry
+
+	if err := e.Start(":8080"); err != nil && !errors.Is(err, http.ErrServerClosed) {
+		log.Fatal(err)
+	}
 }
 ```
 
@@ -151,64 +194,94 @@ A middleware skipper can be passed to avoid generating metrics to certain URLs:
 
 ```go
 package main
+
 import (
-    "github.com/labstack/echo/v4"
-    "github.com/labstack/echo-contrib/prometheus"
+	"errors"
+	"github.com/labstack/echo-contrib/echoprometheus"
+	"github.com/labstack/echo/v4"
+	"log"
+	"net/http"
+	"strings"
 )
 
-// urlSkipper middleware ignores metrics on some route
-func urlSkipper(c echo.Context) bool {
-	if strings.HasPrefix(c.Path(), "/testurl") {
-		return true
-	}
-	return false
-}
-
 func main() {
-    e := echo.New()
-    // Enable metrics middleware
-    p := prometheus.NewPrometheus("echo", urlSkipper)
-    p.Use(e)
+	e := echo.New()
 
-    e.Logger.Fatal(e.Start(":1323"))
+	mwConfig := echoprometheus.MiddlewareConfig{
+		Skipper: func(c echo.Context) bool {
+			return strings.HasPrefix(c.Path(), "/testurl")
+		}, // does not gather metrics metrics on routes starting with `/testurl`
+	}
+	e.Use(echoprometheus.NewMiddlewareWithConfig(mwConfig)) // adds middleware to gather metrics
+
+	e.GET("/metrics", echoprometheus.NewHandler()) // adds route to serve gathered metrics
+
+	e.GET("/", func(c echo.Context) error {
+		return c.String(http.StatusOK, "Hello, World!")
+	})
+
+	if err := e.Start(":8080"); err != nil && !errors.Is(err, http.ErrServerClosed) {
+		log.Fatal(err)
+	}
 }
 ```
+
 ## Complex scenarios
-Serve /metrics endpoint separately from main server
+
+Example: modify default `echoprometheus` metrics definitions
 ```go
 package main
 
 import (
-	"net/http"
-
-	"github.com/labstack/echo-contrib/prometheus"
+	"errors"
+	"github.com/labstack/echo-contrib/echoprometheus"
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
+	"github.com/prometheus/client_golang/prometheus"
+	"log"
+	"net/http"
 )
 
 func main() {
-	// Setup Main Server
-	echoMainServer := echo.New()
-	echoMainServer.HideBanner = true
-	echoMainServer.Use(middleware.Logger())
-	echoMainServer.GET("/", hello)
+	e := echo.New()
 
-	// Create Prometheus server and Middleware
-	echoPrometheus := echo.New()
-	echoPrometheus.HideBanner = true
-	prom := prometheus.NewPrometheus("echo", nil)
+	e.Use(echoprometheus.NewMiddlewareWithConfig(echoprometheus.MiddlewareConfig{
+		// labels of default metrics can be modified or added with `LabelFuncs` function
+		LabelFuncs: map[string]echoprometheus.LabelValueFunc{
+			"scheme": func(c echo.Context, err error) string { // additional custom label
+				return c.Scheme()
+			},
+			"host": func(c echo.Context, err error) string { // overrides default 'host' label value
+				return "y_" + c.Request().Host
+			},
+		},
+		// The `echoprometheus` middleware registers the following metrics by default:
+		// - Histogram: request_duration_seconds
+		// - Histogram: response_size_bytes
+		// - Histogram: request_size_bytes
+		// - Counter: requests_total
+		// which can be modified with `HistogramOptsFunc` and `CounterOptsFunc` functions
+		HistogramOptsFunc: func(opts prometheus.HistogramOpts) prometheus.HistogramOpts {
+			if opts.Name == "request_duration_seconds" {
+				opts.Buckets = []float64{1000.0, 10_000.0, 100_000.0, 1_000_000.0} // 1KB ,10KB, 100KB, 1MB
+			}
+			return opts
+		},
+		CounterOptsFunc: func(opts prometheus.CounterOpts) prometheus.CounterOpts {
+			if opts.Name == "requests_total" {
+				opts.ConstLabels = prometheus.Labels{"my_const": "123"}
+			}
+			return opts
+		},
+	})) // adds middleware to gather metrics
 
-	// Scrape metrics from Main Server
-	echoMainServer.Use(prom.HandlerFunc)
-	// Setup metrics endpoint at another server
-	prom.SetMetricsPath(echoPrometheus)
+	e.GET("/metrics", echoprometheus.NewHandler()) // adds route to serve gathered metrics
 
-	go func() { echoPrometheus.Logger.Fatal(echoPrometheus.Start(":9360")) }()
+	e.GET("/hello", func(c echo.Context) error {
+		return c.String(http.StatusOK, "hello")
+	})
 
-	echoMainServer.Logger.Fatal(echoMainServer.Start(":8080"))
-}
-
-func hello(c echo.Context) error {
-	return c.String(http.StatusOK, "Hello, World!")
+	if err := e.Start(":8080"); err != nil && !errors.Is(err, http.ErrServerClosed) {
+		log.Fatal(err)
+	}
 }
 ```
