@@ -38,7 +38,7 @@ e.IPExtractor = echo.ExtractIPDirect()
 
 ## Case 2. With proxies using `X-Forwarded-For` header
 
-[`X-Forwared-For` (XFF)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For) is the popular header to relay clients' IP addresses.
+[`X-Forwarded-For` (XFF)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For) is the popular header to relay clients' IP addresses.
 At each hop on the proxies, they append the request IP address at the end of the header.
 
 Following example diagram illustrates this behavior.
