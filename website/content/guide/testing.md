@@ -86,7 +86,8 @@ var (
 	mockDB = map[string]*User{
 		"jon@labstack.com": &User{"Jon Snow", "jon@labstack.com"},
 	}
-	userJSON = `{"name":"Jon Snow","email":"jon@labstack.com"}`
+	userJSON = `{"name":"Jon Snow","email":"jon@labstack.com"}
+`
 )
 
 func TestCreateUser(t *testing.T) {
