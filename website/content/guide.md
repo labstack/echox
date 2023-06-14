@@ -204,6 +204,14 @@ e.POST("/users", func(c echo.Context) error {
 })
 ```
 
+Run the following command.
+```sh
+$ curl -X POST http://localhost:1323/users \
+  -H 'Content-Type: application/json' \
+  -d '{"name":"Joe","email":"joe@invalid-domain"}'
+{"message":"Key: 'User.Email' Error:Field validation for 'Email' failed on the 'email' tag"}
+```
+
 ### Static Content
 
 Serve any file from static directory for path `/static/*`.
