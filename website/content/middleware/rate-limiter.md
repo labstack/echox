@@ -13,12 +13,14 @@ may not be the best option for a high number of concurrent requests or a large n
 
 ### Usage
 
-To add a rate limit to your application simply add the `RateLimiter` middlware. 
+To add a rate limit to your application simply add the `RateLimiter` middleware.
 The example below will limit the application to 20 requests/sec using the default in-memory store:
 
 ```go
 e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(20)))
 ```
+
+Note: if the provided rate is a float number, Burst will be treated as the rounded down value of the rate.
 
 ## Custom Configuration
 
