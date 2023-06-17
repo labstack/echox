@@ -128,5 +128,7 @@ switching between AppEngine provided service such as Datastore and alternative s
 such as MongoDB. A combination of go interfaces and build constraints can make this fairly straightforward
 but is outside the scope of this example.  
 
-## [Source Code]({{< source "google-app-engine" >}})
+## Source Code
+
+[See]({{< source "google-app-engine" >}})
 

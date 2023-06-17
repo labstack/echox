@@ -14,4 +14,6 @@ description = "Graceful shutdown recipe for Echo"
 
 > Requires go1.8+
 
-## [Source Code]({{< source "graceful-shutdown" >}})
+## Source Code
+
+[See]({{< source "graceful-shutdown" >}})

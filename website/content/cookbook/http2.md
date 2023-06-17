@@ -69,7 +69,9 @@ Method: GET
 Path: /
 ```
 
-## [Source Code]({{< source "http2" >}})
+## Source Code
+
+[See]({{< source "http2" >}})
 
 `server.go`
 

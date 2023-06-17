@@ -74,7 +74,9 @@ Hello from upstream server server2!
 Hello from upstream server server2!
 ```
 
-## [Source Code]({{< source "reverse-proxy" >}})
+## Source Code
+
+[See]({{< source "reverse-proxy" >}})
 
 `upstream/server.go`
 

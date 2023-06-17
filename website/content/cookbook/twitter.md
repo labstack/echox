@@ -199,5 +199,7 @@ curl \
 ]
 ```
 
-## [Source Code]({{< source "twitter" >}})
+## Source Code
+
+[See]({{< source "twitter" >}})
 

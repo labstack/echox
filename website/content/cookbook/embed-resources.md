@@ -12,7 +12,9 @@ description = "Embed resources recipe for Echo"
 
 {{< embed "embed/server.go" >}}
 
-## [Source Code]({{< source "embed" >}})
+## Source Code
+
+[See]({{< source "embed" >}})
 
 ## With go.rice
 
@@ -20,4 +22,6 @@ description = "Embed resources recipe for Echo"
 
 {{< embed "embed-resources/server.go" >}}
 
-## [Source Code]({{< source "embed-resources" >}})
+## Source Code
+
+[See]({{< source "embed-resources" >}})

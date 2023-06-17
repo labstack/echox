@@ -10,5 +10,7 @@ description = "Timeout recipe for Echo"
 
 {{< embed "timeouts/server.go" >}}
 
-## [Source Code]({{< source "timeouts" >}})
+## Source Code
+
+[See]({{< source "timeouts" >}})
 

@@ -19,4 +19,6 @@ description = "CORS recipe for Echo"
 
 {{< embed "cors/origin-func/server.go" >}}
 
-## [Source Code]({{< source "cors" >}})
+## Source Code
+
+[See]({{< source "cors" >}})

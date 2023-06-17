@@ -8,7 +8,9 @@ description = "Serving static files in Echo"
 
 Images, JavaScript, CSS, PDF, Fonts and so on...
 
-## [Using Static Middleware]({{< ref "middleware/static.md">}})
+## Using Static Middleware
+
+[See]({{< ref "middleware/static.md">}})
 
 ## Using `Echo#Static()`
 

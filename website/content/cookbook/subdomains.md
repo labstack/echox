@@ -10,5 +10,6 @@ description = "Subdomains recipe for Echo"
 
 {{< embed "subdomains/server.go" >}}
 
-## [Source Code]({{< source "subdomains" >}})
+## Source Code
 
+[See]({{< source "subdomains" >}})

@@ -40,7 +40,9 @@ You should see a webpage being served from "server 1" or "server 2".
 Hello from upstream server server1
 ```
 
-## [Source Code]({{< source "load-balancing" >}})
+## Source Code
+
+[See]({{< source "load-balancing" >}})
 
 `upstream/server.go`
 

@@ -59,5 +59,7 @@ curl localhost:1323/restricted -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR
 Welcome Jon Snow!
 ```
 
-## [Source Code]({{< source "jwt" >}})
+## Source Code
+
+[See]({{< source "jwt" >}})
 

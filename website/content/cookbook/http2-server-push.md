@@ -72,7 +72,9 @@ Method: GET
 Path: /
 ```
 
-## [Source Code]({{< source "http2-server-push" >}})
+## Source Code
+
+[See]({{< source "http2-server-push" >}})
 
 `index.html`
 

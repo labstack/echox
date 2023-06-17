@@ -23,4 +23,6 @@ message with TLS enabled on the website.
 
 {{< embed "auto-tls/server.go" >}}
 
-## [Source Code]({{< source "auto-tls" >}})
+## Source Code
+
+[See]({{< source "auto-tls" >}})

@@ -12,5 +12,6 @@ description = "Hello world recipe for Echo"
 
 {{< embed "hello-world/server.go" >}}
 
-## [Source Code]({{< source "hello-world" >}})
+## Source Code
 
+[See]({{< source "hello-world" >}})
