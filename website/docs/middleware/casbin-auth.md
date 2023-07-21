@@ -46,7 +46,7 @@ enforcer, err := casbin.NewEnforcer("casbin_auth_model.conf", "casbin_auth_polic
 e.Use(casbin_mw.Middleware(enforcer))
 ```
 
-For syntax, see: [Syntax for Models](https://casbin.org/docs/en/syntax-for-models).
+For syntax, see: [Syntax for Models](https://casbin.org/docs/syntax-for-models).
 
 
 ## Custom Configuration
