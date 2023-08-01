@@ -126,7 +126,7 @@ And a handler at the POST `/users` route binds request data to the struct:
 ```go
 e.POST("/users", func(c echo.Context) (err error) {
   u := new(User)
-  if err = c.Bind(u); err != nil {
+  if err := c.Bind(u); err != nil {
     return c.String(http.StatusBadRequest, "bad request")
   }
 
