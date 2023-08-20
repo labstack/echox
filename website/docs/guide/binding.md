@@ -193,7 +193,7 @@ length := int64(50) // default length is 50
 // creates query params binder that stops binding at first error
 err := echo.QueryParamsBinder(c).
   Int64("length", &length).
-  Int64s("ids", &opts.IDs).
+  Int64s("id", &opts.IDs).
   Bool("active", &opts.Active).
   BindError() // returns first binding error
 ```
