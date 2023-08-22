@@ -80,7 +80,7 @@ e.IPExtractor = echo.ExtractIPFromXFFHeader(
      echo.TrustLoopback(false), // e.g. ipv4 start with 127. 
      echo.TrustLinkLocal(false), // e.g. ipv4 start with 169.254
      echo.TrustPrivateNet(false), // e.g. ipv4 start with 10. or 192.168
-     echo.TrustIPRange(echo.lbIPRange),
+     echo.TrustIPRange(lbIPRange),
 )
 ```
 
