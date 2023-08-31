@@ -52,5 +52,26 @@ BasicAuthConfig struct {
 ```go
 DefaultBasicAuthConfig = BasicAuthConfig{
 	Skipper: DefaultSkipper,
+        Realm:   defaultRealm,
 }
+```
+
+*Example*
+
+```go
+e := echo.New()
+
+basicAuthConfig := middleware.BasicAuthConfig{
+    Skipper: middleware.DefaultSkipper,
+    Validator: func(username, password string, c echo.Context) (bool, error) {
+        if subtle.ConstantTimeCompare([]byte(username), []byte("joe")) == 1 &&
+        subtle.ConstantTimeCompare([]byte(password), []byte("secret")) == 1 {
+            return true, nil
+        }
+        return false, nil
+    },
+    Realm: "Restricted", // equivalent to middleware.defaultRealm
+}
+
+e.Use(middleware.BasicAuthWithConfig(basicAuthConfig))
 ```
