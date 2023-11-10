@@ -106,7 +106,7 @@ DefaultLoggerConfig = LoggerConfig{
 }
 ```
 
-# New RequestLogger middleware (customizable Function)
+## New RequestLogger middleware (customizable Function)
 
 RequestLogger middleware allows developer fully to customize what is logged and how it is logged and is more suitable
 for usage with 3rd party (structured logging) libraries.
