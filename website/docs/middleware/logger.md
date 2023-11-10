@@ -11,7 +11,7 @@ Echo has 2 different logger middlewares:
 - Older string template based logger [`Logger`](https://github.com/labstack/echo/blob/master/middleware/logger.go) - easy to start with but has limited capabilities
 - Newer customizable function based logger [`RequestLogger`](https://github.com/labstack/echo/blob/master/middleware/request_logger.go) - allows developer fully to customize what is logged and how it is logged. Suitable for usage with 3rd party logger libraries.
 
-## String Template
+## Old Logger middleware (string template)
 
 ## Usage
 
@@ -106,7 +106,7 @@ DefaultLoggerConfig = LoggerConfig{
 }
 ```
 
-## Customizable Function
+# New RequestLogger middleware (customizable Function)
 
 RequestLogger middleware allows developer fully to customize what is logged and how it is logged and is more suitable
 for usage with 3rd party (structured logging) libraries.
@@ -129,6 +129,32 @@ e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
 		fmt.Printf("REQUEST: uri: %v, status: %v, custom-value: %v\n", v.URI, v.Status, value)
 		return nil
 	},
+}))
+```
+
+Example for slog (https://pkg.go.dev/log/slog)
+```go
+logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
+    LogStatus:   true,
+    LogURI:      true,
+    LogError:    true,
+    HandleError: true, // forwards error to the global error handler, so it can decide appropriate status code
+    LogValuesFunc: func(c echo.Context, v middleware.RequestLoggerValues) error {
+        if v.Error == nil {
+            logger.LogAttrs(context.Background(), slog.LevelInfo, "REQUEST",
+                slog.String("uri", v.URI),
+                slog.Int("status", v.Status),
+            )
+        } else {
+            logger.LogAttrs(context.Background(), slog.LevelError, "REQUEST_ERROR",
+                slog.String("uri", v.URI),
+                slog.Int("status", v.Status),
+                slog.String("err", v.Error.Error()),
+            )
+        }
+        return nil
+    },
 }))
 ```
 
