@@ -11,7 +11,7 @@ Echo has 2 different logger middlewares:
 - Older string template based logger [`Logger`](https://github.com/labstack/echo/blob/master/middleware/logger.go) - easy to start with but has limited capabilities
 - Newer customizable function based logger [`RequestLogger`](https://github.com/labstack/echo/blob/master/middleware/request_logger.go) - allows developer fully to customize what is logged and how it is logged. Suitable for usage with 3rd party logger libraries.
 
-## Old Logger middleware (string template)
+## Old Logger middleware
 
 ## Usage
 
@@ -106,7 +106,7 @@ DefaultLoggerConfig = LoggerConfig{
 }
 ```
 
-## New RequestLogger middleware (customizable Function)
+# New RequestLogger middleware
 
 RequestLogger middleware allows developer fully to customize what is logged and how it is logged and is more suitable
 for usage with 3rd party (structured logging) libraries.
