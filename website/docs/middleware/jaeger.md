@@ -173,5 +173,5 @@ func main() {
 
 ## References
 
-- Opentracing Library: <https://github.com/opentracing/opentracing-go>
-- Jaeger configuration: <https://github.com/jaegertracing/jaeger-client-go#environment-variables>
+- [https://github.com/opentracing/opentracing-go](Opentracing Library)
+- [https://github.com/jaegertracing/jaeger-client-go#environment-variables](Jaeger configuration)
