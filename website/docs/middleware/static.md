@@ -32,7 +32,7 @@ This serves static files from `static` directory and enables directory browsing.
 
 Default behavior when using with non root URL paths is to append the URL path to the filesystem path. 
 
-#### Example
+#### Example 1
 
 ```go
 group := root.Group("somepath")
@@ -45,6 +45,33 @@ group.Use(middleware.Static(filepath.Join("filesystempath")))
 To turn off this behavior set the `IgnoreBase` config param to `true`.
 
 :::
+
+
+#### Example 2
+
+Serve SPA assets from embbeded filesystem
+```go
+//go:embed web
+var webAssets embed.FS
+
+func main() {
+	e := echo.New()
+
+	e.Use(middleware.StaticWithConfig(middleware.StaticConfig{
+		HTML5:      true,
+		Root:       "web", // because files are located in `web` directory in `webAssets` fs
+		Filesystem: http.FS(webAssets),
+	}))
+	api := e.Group("/api")
+	api.GET("/users", func(c echo.Context) error {
+		return c.String(http.StatusOK, "users")
+	})
+
+	if err := e.Start(":8080"); err != nil && !errors.Is(err, http.ErrServerClosed) {
+		log.Fatal(err)
+	}
+}
+```
 
 ## Configuration
 
@@ -75,6 +102,10 @@ StaticConfig struct {
   // the filesystem path is not doubled
   // Optional. Default value false.
   IgnoreBase bool `yaml:"ignoreBase"`
+
+  // Filesystem provides access to the static content.
+  // Optional. Defaults to http.Dir(config.Root)
+  Filesystem http.FileSystem `yaml:"-"`
 }
 ```
 
