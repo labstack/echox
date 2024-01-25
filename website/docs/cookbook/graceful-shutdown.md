@@ -12,6 +12,6 @@ https://github.com/labstack/echox/blob/master/cookbook/graceful-shutdown/server.
 
 :::note
 
-Requires go1.8+
+Requires go1.16+
 
 :::
