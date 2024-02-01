@@ -136,3 +136,23 @@ curl -X POST http://localhost:1323/users \
   -d '{"name":"Joe","email":"joe@invalid-domain"}'
 {"message":"Key: 'User.Email' Error:Field validation for 'Email' failed on the 'email' tag"}
 ```
+
+### Binding Multiple Instances of the Same Query Parameter to a Slice
+
+The following unit test demonstrates how to verify the binding of multiple instances of the "tags" parameter to a slice.
+
+```sh
+func TestBindSlices(t *testing.T) {
+  e := New()
+  req := httptest.NewRequest(GET, "/search?tags=golang&tags=web&tags=echo", nil)
+  rec := httptest.NewRecorder()
+  c := e.NewContext(req, rec)
+  result := struct {
+    Tags []string `query:"tags"`
+  }{}
+  err := c.Bind(&result)
+  if assert.NoError(t, err) {
+    assert.Equal(t, []string{"golang", "web", "echo"}, result.Tags)
+  }
+}
+```
