@@ -14,7 +14,7 @@ Prometheus middleware generates metrics for HTTP requests.
 
 There are 2 versions of Prometheus middleware:
 
-- latest (recommended) https://github.com/labstack/echo-contrib/blob/master/echoprometheus.go
+- latest (recommended) https://github.com/labstack/echo-contrib/blob/master/echoprometheus/prometheus.go
 - old (deprecated) https://github.com/labstack/echo-contrib/blob/master/prometheus/prometheus.go)
 
 Migration guide from old to newer middleware can found [here](https://github.com/labstack/echo-contrib/blob/master/echoprometheus/README.md).
