@@ -10,9 +10,9 @@ require (
 	github.com/labstack/echo-jwt/v4 v4.2.0
 	github.com/labstack/echo/v4 v4.11.4
 	github.com/labstack/gommon v0.4.2
-	github.com/lestrrat-go/jwx v1.2.28
-	golang.org/x/crypto v0.18.0
-	golang.org/x/net v0.20.0
+	github.com/lestrrat-go/jwx v1.2.29
+	golang.org/x/crypto v0.21.0
+	golang.org/x/net v0.21.0
 	google.golang.org/appengine v1.6.8
 	gopkg.in/mgo.v2 v2.0.0-20190816093944-a6b53ec6cb22
 )
@@ -35,7 +35,7 @@ require (
 	github.com/rogpeppe/go-internal v1.10.0 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
-	golang.org/x/sys v0.16.0 // indirect
+	golang.org/x/sys v0.18.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
 	google.golang.org/protobuf v1.32.0 // indirect
