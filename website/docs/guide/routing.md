@@ -30,7 +30,7 @@ If you want to register it for some methods use `Echo.Match(methods []string, pa
 Echo defines handler function as `func(echo.Context) error` where `echo.Context` primarily
 holds HTTP request and response interfaces.
 
-## Match-any
+## Match-any / wildcard
 
 Matches zero or more characters in the path. For example, pattern `/users/*` will
 match:
@@ -39,6 +39,13 @@ match:
 - `/users/1`
 - `/users/1/files/1`
 - `/users/anything...`
+
+:::caution
+
+There can be only one effective match-any parameter in route. When route is added with multiple match-any
+`/v1/*/images/*`. The router matches always the first `*` till the end of requst URL i.e. it works as `/v1/*`.
+
+:::
 
 ## Path Matching Order
 
