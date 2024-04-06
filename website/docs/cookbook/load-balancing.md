@@ -32,7 +32,7 @@ Create a file `/etc/nginx/sites-enabled/localhost` with the following content:
 https://github.com/labstack/echox/blob/master/cookbook/load-balancing/nginx.conf
 ```
 
-::: info
+:::info
 
 Change listen, server_name, access_log per your need.
 
