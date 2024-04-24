@@ -14,13 +14,13 @@ broadcasting logic see https://github.com/r3labs/sse library.
 ### Server
 
 ```go reference
-https: //github.com/labstack/echox/blob/master/cookbook/sse/simple/server.go
+https://github.com/labstack/echox/blob/master/cookbook/sse/simple/server.go
 ```
 
 ### Event structure and Marshal method
 
-```html reference
-https://github.com/labstack/echox/blob/master/cookbook/sse/simple/serversideevent.go
+```go reference
+https://github.com/labstack/echox/blob/master/cookbook/sse/simple/serversentevent.go
 ```
 
 ### HTML serving SSE
@@ -34,7 +34,7 @@ https://github.com/labstack/echox/blob/master/cookbook/sse/simple/index.html
 ### Server
 
 ```go reference
-https: //github.com/labstack/echox/blob/master/cookbook/sse/broadcast/server.go
+https://github.com/labstack/echox/blob/master/cookbook/sse/broadcast/server.go
 ```
 
 ### HTML serving SSE
