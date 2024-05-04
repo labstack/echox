@@ -33,7 +33,7 @@ https://github.com/labstack/echox/blob/master/cookbook/google-app-engine/app.go
 
 A separate source file contains the function to create the Echo instance and add the static
 file handlers and middleware. Note the build tag on the first line which says to use this when _not_
-bulding with appengine or appenginevm tags (which thoese platforms automatically add for us). We also
+building with appengine or appenginevm tags (which those platforms automatically add for us). We also
 have the `main()` function to start serving our app as normal. This should all be very familiar.
 
 ```go reference

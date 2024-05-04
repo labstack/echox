@@ -49,7 +49,7 @@ To turn off this behavior set the `IgnoreBase` config param to `true`.
 
 #### Example 2
 
-Serve SPA assets from embbeded filesystem
+Serve SPA assets from embedded filesystem
 ```go
 //go:embed web
 var webAssets embed.FS

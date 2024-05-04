@@ -43,7 +43,7 @@ match:
 :::caution
 
 There can be only one effective match-any parameter in route. When route is added with multiple match-any
-`/v1/*/images/*`. The router matches always the first `*` till the end of requst URL i.e. it works as `/v1/*`.
+`/v1/*/images/*`. The router matches always the first `*` till the end of request URL i.e. it works as `/v1/*`.
 
 :::
 
