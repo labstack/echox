@@ -33,6 +33,7 @@ func hello(c echo.Context) error {
 		}
 		fmt.Printf("%s\n", msg)
 	}
+	return nil
 }
 
 func main() {
