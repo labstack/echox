@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkwebsite=self.webpackChunkwebsite||[]).push([[7636],{8950:e=>{e.exports=JSON.parse('{"title":"Middleware","slug":"/category/middleware","permalink":"/docs/category/middleware","navigation":{"previous":{"title":"Testing","permalink":"/docs/testing"},"next":{"title":"Basic Auth","permalink":"/docs/middleware/basic-auth"}}}')}}]);

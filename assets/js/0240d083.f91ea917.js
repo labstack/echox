@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkwebsite=self.webpackChunkwebsite||[]).push([[4641],{4071:o=>{o.exports=JSON.parse('{"title":"Cookbook","slug":"/category/cookbook","permalink":"/docs/category/cookbook","navigation":{"previous":{"title":"Trailing Slash","permalink":"/docs/middleware/trailing-slash"},"next":{"title":"Auto TLS","permalink":"/docs/cookbook/auto-tls"}}}')}}]);
