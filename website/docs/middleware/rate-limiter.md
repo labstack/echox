@@ -15,7 +15,7 @@ To add a rate limit to your application simply add the `RateLimiter` middleware.
 The example below will limit the application to 20 requests/sec using the default in-memory store:
 
 ```go
-e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(20)))
+e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(rate.Limit(20))))
 ```
 
 :::info
@@ -30,7 +30,7 @@ If the provided rate is a float number, Burst will be treated as the rounded dow
 config := middleware.RateLimiterConfig{
     Skipper: middleware.DefaultSkipper,
     Store: middleware.NewRateLimiterMemoryStoreWithConfig(
-        middleware.RateLimiterMemoryStoreConfig{Rate: 10, Burst: 30, ExpiresIn: 3 * time.Minute},
+        middleware.RateLimiterMemoryStoreConfig{Rate: rate.Limit(10), Burst: 30, ExpiresIn: 3 * time.Minute},
     ),
     IdentifierExtractor: func(ctx echo.Context) (string, error) {
         id := ctx.RealIP()
