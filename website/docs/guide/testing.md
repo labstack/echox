@@ -101,7 +101,7 @@ func TestCreateUser(t *testing.T) {
 	// Assertions
 	if assert.NoError(t, h.createUser(c)) {
 		assert.Equal(t, http.StatusCreated, rec.Code)
-		assert.Equal(t, userJSON, rec.Body.String())
+		assert.Equal(t, userJSON, strings.TrimSpace(rec.Body.String()))
 	}
 }
 
@@ -119,7 +119,7 @@ func TestGetUser(t *testing.T) {
 	// Assertions
 	if assert.NoError(t, h.getUser(c)) {
 		assert.Equal(t, http.StatusOK, rec.Code)
-		assert.Equal(t, userJSON, rec.Body.String())
+		assert.Equal(t, userJSON, strings.TrimSpace(rec.Body.String()))
 	}
 }
 ```
