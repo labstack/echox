@@ -4,17 +4,24 @@
   padding: 2rem 0;
   width: 100%;
 }
+.featureCard {
+  height: 98%;
+}
 
+.headline {
+  display: flex;
+  align-items: center;
+}
 .featureSvg {
   height: 32px;
   width: 32px;
   margin-right: 1rem;
 }
 
-[data-theme='light'] .featureSvg {
+[data-theme="light"] .featureSvg {
   fill: #000000;
 }
 
-[data-theme='dark'] .featureSvg {
-  fill: #FFFFFF;
+[data-theme="dark"] .featureSvg {
+  fill: #ffffff;
 }
