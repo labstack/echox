@@ -58,11 +58,11 @@ Similar to form data, custom data type can be bind using `Context#QueryParam(nam
 
 ### Path Parameters
 
-Registered path parameters can be retrieved by name using `Context#Param(name string) string`.
+Registered path parameters can be retrieved by name using `Context#PathParam(name string) string`.
 
 ```go
 e.GET("/users/:name", func(c echo.Context) error {
-  name := c.Param("name")
+  name := c.PathParam("name")
   return c.String(http.StatusOK, name)
 })
 ```
