@@ -244,7 +244,7 @@ func(c echo.Context) error {
 ## Send Attachment
 
 `Context#Attachment(file, name string)` is similar to `File()` except that it is
-used to send file as attachment with provided name.
+used to send file as `Content-Disposition: attachment` with provided name.
 
 *Example*
 
@@ -257,7 +257,7 @@ func(c echo.Context) error {
 ## Send Inline
 
 `Context#Inline(file, name string)` is similar to `File()` except that it is
-used to send file as inline with provided name.
+used to send file as `Content-Disposition: inline` with provided name.
 
 *Example*
 
@@ -296,6 +296,7 @@ func(c echo.Context) error {
   if err != nil {
     return err
   }
+  defer f.Close()
   return c.Stream(http.StatusOK, "image/png", f)
 }
 ```
