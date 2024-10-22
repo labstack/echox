@@ -263,7 +263,7 @@ used to send file as `Content-Disposition: inline` with provided name.
 
 ```go
 func(c echo.Context) error {
-  return c.Inline("<PATH_TO_YOUR_FILE>")
+  return c.Inline("<PATH_TO_YOUR_FILE>", "<FILE_NAME>")
 }
 ```
 
