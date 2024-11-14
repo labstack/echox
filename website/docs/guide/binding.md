@@ -109,12 +109,12 @@ Consider what will happen if your bound struct has an Exported field `IsAdmin bo
 In this example we define a `User` struct type with field tags to bind from `json`, `form`, or `query` request data:
 
 ```go
-type User struct {
+type UserDTO struct {
   Name  string `json:"name" form:"name" query:"name"`
   Email string `json:"email" form:"email" query:"email"`
 }
 
-type UserDTO struct {
+type User struct {
   Name    string
   Email   string
   IsAdmin bool
@@ -125,13 +125,13 @@ And a handler at the POST `/users` route binds request data to the struct:
 
 ```go
 e.POST("/users", func(c echo.Context) (err error) {
-  u := new(User)
+  u := new(UserDTO)
   if err := c.Bind(u); err != nil {
     return c.String(http.StatusBadRequest, "bad request")
   }
 
   // Load into separate struct for security
-  user := UserDTO{
+  user := User{
     Name: u.Name,
     Email: u.Email,
     IsAdmin: false // avoids exposing field that should not be bound
