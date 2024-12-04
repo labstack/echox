@@ -1,10 +1,10 @@
 package handler
 
 import (
+	"github.com/golang-jwt/jwt/v5"
 	"net/http"
 	"time"
 
-	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echox/cookbook/twitter/model"
 	"gopkg.in/mgo.v2"
