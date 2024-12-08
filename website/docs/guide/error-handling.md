@@ -66,6 +66,10 @@ https://github.com/AndiDittrich/HttpErrorPages for pre-built error pages.
 
 ```go
 func customHTTPErrorHandler(err error, c echo.Context) {
+ 	if c.Response().Committed { 
+ 		return 
+ 	}
+
 	code := http.StatusInternalServerError
 	if he, ok := err.(*echo.HTTPError); ok {
 		code = he.Code
