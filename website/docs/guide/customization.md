@@ -97,7 +97,7 @@ e.Logger.Fatal(e.Start(""))
 
 ## Disable HTTP/2
 
-`Echo#DisableHTTP2` can be used disable HTTP/2 protocol.
+`Echo#DisableHTTP2` can be used to disable HTTP/2 protocol.
 
 ## Read Timeout
 
