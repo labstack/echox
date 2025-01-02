@@ -11,13 +11,6 @@ Echo has 2 different logger middlewares:
 - Older string template based logger [`Logger`](https://github.com/labstack/echo/blob/master/middleware/logger.go) - easy to start with but has limited capabilities
 - Newer customizable function based logger [`RequestLogger`](https://github.com/labstack/echo/blob/master/middleware/request_logger.go) - allows developer fully to customize what is logged and how it is logged. Suitable for usage with 3rd party logger libraries.
 
-## Dependencies
-```go
-import  "github.com/labstack/gommon/log"
-import 	"github.com/mattn/go-isatty"
-import  "github.com/valyala/fasttemplate"
-import  "github.com/labstack/gommon/color"
-```
 ## Old Logger middleware
 
 ## Usage
@@ -117,6 +110,8 @@ DefaultLoggerConfig = LoggerConfig{
 
 RequestLogger middleware allows developer fully to customize what is logged and how it is logged and is more suitable
 for usage with 3rd party (structured logging) libraries.
+
+You can quickly acquaint yourself with the values that the logger knows to extract by referring to the fields of the [`RequestLoggerConfig`](https://github.com/labstack/echo/blob/master/middleware/request_logger.go) structure below. Or click the link to view the most up-to-date details.
 ```go
 type RequestLoggerConfig struct {
 	// Skipper defines a function to skip middleware.
@@ -181,7 +176,6 @@ type RequestLoggerConfig struct {
 	// contain more than one form value with same name so slice of values is been logger for each given form value name.
 	LogFormValues []string
 
-	timeNow func() time.Time
 }
 ```
 
