@@ -1,19 +1,19 @@
 package handler
 
 import (
-	"github.com/golang-jwt/jwt/v5"
 	"net/http"
 	"time"
 
+	"github.com/golang-jwt/jwt/v5"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echox/cookbook/twitter/model"
-	"gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
+	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
 func (h *Handler) Signup(c echo.Context) (err error) {
 	// Bind
-	u := &model.User{ID: bson.NewObjectId()}
+	u := &model.User{ID: bson.NewObjectID()}
 	if err = c.Bind(u); err != nil {
 		return
 	}
@@ -24,9 +24,7 @@ func (h *Handler) Signup(c echo.Context) (err error) {
 	}
 
 	// Save user
-	db := h.DB.Clone()
-	defer db.Close()
-	if err = db.DB("twitter").C("users").Insert(u); err != nil {
+	if _, err = h.Client.Database("twitter").Collection("users").InsertOne(c.Request().Context(), u); err != nil {
 		return
 	}
 
@@ -41,14 +39,18 @@ func (h *Handler) Login(c echo.Context) (err error) {
 	}
 
 	// Find user
-	db := h.DB.Clone()
-	defer db.Close()
-	if err = db.DB("twitter").C("users").
-		Find(bson.M{"email": u.Email, "password": u.Password}).One(u); err != nil {
-		if err == mgo.ErrNotFound {
-			return &echo.HTTPError{Code: http.StatusUnauthorized, Message: "invalid email or password"}
+	cursor, err := h.Client.Database("twitter").Collection("users").
+		Find(c.Request().Context(), bson.M{"email": u.Email, "password": u.Password})
+	if err != nil {
+		return &echo.HTTPError{Code: http.StatusUnauthorized, Message: "invalid email or password"}
+	}
+	defer cursor.Close(c.Request().Context())
+	if cursor.Next(c.Request().Context()) {
+		if err = cursor.Decode(u); err != nil {
+			return err
 		}
-		return
+	} else {
+		return &echo.HTTPError{Code: http.StatusUnauthorized, Message: "invalid email or password"}
 	}
 
 	//-----
@@ -78,13 +80,14 @@ func (h *Handler) Follow(c echo.Context) (err error) {
 	id := c.Param("id")
 
 	// Add a follower to user
-	db := h.DB.Clone()
-	defer db.Close()
-	if err = db.DB("twitter").C("users").
-		UpdateId(bson.ObjectIdHex(id), bson.M{"$addToSet": bson.M{"followers": userID}}); err != nil {
-		if err == mgo.ErrNotFound {
-			return echo.ErrNotFound
-		}
+	targetUserID, err := bson.ObjectIDFromHex(id)
+	if err != nil {
+		return err
+	}
+	if _, err = h.Client.Database("twitter").
+		Collection("users").
+		UpdateOne(c.Request().Context(), bson.M{"_id": targetUserID}, bson.M{"$addToSet": bson.M{"followers": userID}}); err != nil {
+		return err
 	}
 
 	return

@@ -1,21 +1,26 @@
 package handler
 
 import (
+	"context"
 	"net/http"
 	"strconv"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echox/cookbook/twitter/model"
-	"gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
+	"go.mongodb.org/mongo-driver/v2/bson"
+	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
 func (h *Handler) CreatePost(c echo.Context) (err error) {
+	userID, err := bson.ObjectIDFromHex(userIDFromToken(c))
+	if err != nil {
+		return err
+	}
 	u := &model.User{
-		ID: bson.ObjectIdHex(userIDFromToken(c)),
+		ID: userID,
 	}
 	p := &model.Post{
-		ID:   bson.NewObjectId(),
+		ID:   bson.NewObjectID(),
 		From: u.ID.Hex(),
 	}
 	if err = c.Bind(p); err != nil {
@@ -27,19 +32,14 @@ func (h *Handler) CreatePost(c echo.Context) (err error) {
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "invalid to or message fields"}
 	}
 
-	// Find user from database
-	db := h.DB.Clone()
-	defer db.Close()
-	if err = db.DB("twitter").C("users").FindId(u.ID).One(u); err != nil {
-		if err == mgo.ErrNotFound {
-			return echo.ErrNotFound
-		}
-		return
+	// Find user from database by id
+	if err = h.Client.Database("twitter").Collection("users").FindOne(context.TODO(), bson.M{"_id": u.ID}).Decode(u); err != nil {
+		return err
 	}
 
 	// Save post in database
-	if err = db.DB("twitter").C("posts").Insert(p); err != nil {
-		return
+	if _, err = h.Client.Database("twitter").Collection("posts").InsertOne(context.TODO(), p); err != nil {
+		return err
 	}
 	return c.JSON(http.StatusCreated, p)
 }
@@ -59,15 +59,16 @@ func (h *Handler) FetchPost(c echo.Context) (err error) {
 
 	// Retrieve posts from database
 	posts := []*model.Post{}
-	db := h.DB.Clone()
-	if err = db.DB("twitter").C("posts").
-		Find(bson.M{"to": userID}).
-		Skip((page - 1) * limit).
-		Limit(limit).
-		All(&posts); err != nil {
+	cur, err := h.Client.Database("twitter").Collection("posts").
+		Find(context.TODO(), bson.M{"to": userID}, options.Find().SetSkip(int64((page-1)*limit)).SetLimit(int64(limit)))
+	if err != nil {
 		return
 	}
-	defer db.Close()
+	defer cur.Close(context.TODO())
+
+	if err = cur.All(context.TODO(), &posts); err != nil {
+		return
+	}
 
 	return c.JSON(http.StatusOK, posts)
 }
