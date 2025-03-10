@@ -16,6 +16,7 @@ func hello(c echo.Context) error {
 			err := websocket.Message.Send(ws, "Hello, Client!")
 			if err != nil {
 				c.Logger().Error(err)
+				break
 			}
 
 			// Read
@@ -23,6 +24,7 @@ func hello(c echo.Context) error {
 			err = websocket.Message.Receive(ws, &msg)
 			if err != nil {
 				c.Logger().Error(err)
+				break
 			}
 			fmt.Printf("%s\n", msg)
 		}
