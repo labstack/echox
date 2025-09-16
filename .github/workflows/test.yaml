@@ -14,7 +14,7 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         # Each major Go release is supported until there are two newer major releases. https://golang.org/doc/devel/release.html#policy
-        go: [1.20, 1.21]
+        go: ["1.20", "1.21"]
     name: ${{ matrix.os }} @ Go ${{ matrix.go }}
     runs-on: ${{ matrix.os }}
     steps:
