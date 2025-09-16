@@ -135,6 +135,9 @@ func TestResponseTime(t *testing.T) {
 }
 
 func TestCacheEffectiveness(t *testing.T) {
+	// Clear cache to ensure fresh test state
+	cache.Clear()
+
 	e := echo.New()
 	req := httptest.NewRequest(http.MethodGet, "/cached", nil)
 

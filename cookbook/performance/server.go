@@ -44,6 +44,10 @@ func (c *Cache) Set(key string, value any) {
 	c.data[key] = value
 }
 
+func (c *Cache) Clear() {
+	c.data = make(map[string]any)
+}
+
 var cache = NewCache()
 
 // Fast endpoint - minimal processing
