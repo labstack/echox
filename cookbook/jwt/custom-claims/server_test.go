@@ -156,6 +156,11 @@ func TestRestricted(t *testing.T) {
 }
 
 func TestJWTIntegration(t *testing.T) {
+	// Set consistent secret for both login and verification
+	secret := "test-secret"
+	os.Setenv("JWT_SECRET", secret)
+	defer os.Unsetenv("JWT_SECRET")
+
 	// Setup Echo server with all routes
 	e := echo.New()
 	e.HideBanner = true
@@ -165,7 +170,6 @@ func TestJWTIntegration(t *testing.T) {
 
 	// Restricted group with JWT middleware
 	r := e.Group("/restricted")
-	secret := "test-secret"
 	config := echojwt.Config{
 		NewClaimsFunc: func(c echo.Context) jwt.Claims {
 			return new(jwtCustomClaims)
