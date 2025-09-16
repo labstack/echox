@@ -14,19 +14,27 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         # Each major Go release is supported until there are two newer major releases. https://golang.org/doc/devel/release.html#policy
-        go: [1.19]
+        go: [1.20, 1.21]
     name: ${{ matrix.os }} @ Go ${{ matrix.go }}
     runs-on: ${{ matrix.os }}
     steps:
       - name: Set up Go ${{ matrix.go }}
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v4
         with:
           go-version: ${{ matrix.go }}
 
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: make deps
 
       - name: Run Tests
-        run: |
-          make test
+        run: make test
+
+      - name: Run Cookbook Tests
+        run: make test-cookbook
+
+      - name: Run Benchmarks
+        run: make benchmark
 
