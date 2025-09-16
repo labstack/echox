@@ -14,7 +14,7 @@ Echo Examples (echox) provides a comprehensive collection of practical examples 
 - **22 Complete Examples**: From basic "Hello World" to advanced features like JWT authentication, WebSocket connections, and graceful shutdown
 - **Real-World Patterns**: Practical implementations of common web development scenarios
 - **Best Practices**: Production-ready code following Echo v4 conventions
-- **Modern Go**: Examples using Go 1.21+ features and current idiomatic patterns
+- **Modern Go**: Examples using Go 1.25+ features and current idiomatic patterns
 
 ## Example Categories
 

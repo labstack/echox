@@ -1,6 +1,6 @@
 module github.com/labstack/echox
 
-go 1.21
+go 1.25.1
 
 require (
 	github.com/GeertJohan/go.rice v1.0.3
