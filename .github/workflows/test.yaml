@@ -13,8 +13,8 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        # Each major Go release is supported until there are two newer major releases. https://golang.org/doc/devel/release.html#policy
-        go: ["1.20", "1.21"]
+        # Echo supports last four Go major releases. Main Echo uses Go 1.23
+        go: ["1.21", "1.22", "1.23"]
     name: ${{ matrix.os }} @ Go ${{ matrix.go }}
     runs-on: ${{ matrix.os }}
     steps:

@@ -10,7 +10,7 @@ sidebar_position: 1
 
 ### Requirements
 
-To install Echo [Go](https://go.dev/doc/install) 1.20 or higher is required. Make sure your project folder is outside your $GOPATH and uses Go modules.
+To install Echo [Go](https://go.dev/doc/install) 1.21 or higher is required. Make sure your project folder is outside your $GOPATH and uses Go modules.
 
 ```sh
 $ mkdir myapp && cd myapp

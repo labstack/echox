@@ -59,7 +59,7 @@ Each cookbook example is a standalone Go application in its own directory under 
 - **Echo v4** (`github.com/labstack/echo/v4`) - Core web framework
 - **JWT libraries** - Multiple JWT implementations for authentication examples
 - **WebSocket** (`github.com/gorilla/websocket`) - Real-time communication
-- **Go 1.20+** - Minimum Go version requirement
+- **Go 1.21+** - Minimum Go version requirement (aligned with Echo project)
 
 ### Website Architecture
 - **Docusaurus 3.1.0** - Static site generator
