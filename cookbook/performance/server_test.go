@@ -85,18 +85,21 @@ func TestResponseTime(t *testing.T) {
 	tests := []struct {
 		name           string
 		handler        echo.HandlerFunc
+		needsWarmup    bool
 		maxDuration    time.Duration
 		description    string
 	}{
 		{
 			name:        "fast endpoint",
 			handler:     fast,
+			needsWarmup: false,
 			maxDuration: 10 * time.Millisecond,
 			description: "should respond within 10ms",
 		},
 		{
 			name:        "cached endpoint (after warmup)",
 			handler:     cached,
+			needsWarmup: true,
 			maxDuration: 50 * time.Millisecond,
 			description: "should respond quickly from cache",
 		},
@@ -107,7 +110,7 @@ func TestResponseTime(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Warm up cache if needed
-			if tt.handler == cached {
+			if tt.needsWarmup {
 				req := httptest.NewRequest(http.MethodGet, "/cached", nil)
 				rec := httptest.NewRecorder()
 				c := e.NewContext(req, rec)
