@@ -10,18 +10,12 @@ sidebar_position: 1
 
 ### Requirements
 
-To install Echo [Go](https://go.dev/doc/install) 1.13 or higher is required. Go 1.12 has limited support and some middlewares will not be available. Make sure your project folder is outside your $GOPATH.
+To install Echo [Go](https://go.dev/doc/install) 1.20 or higher is required. Make sure your project folder is outside your $GOPATH and uses Go modules.
 
 ```sh
 $ mkdir myapp && cd myapp
 $ go mod init myapp
 $ go get github.com/labstack/echo/v4
-```
-
-If you are working with Go v1.14 or earlier use:
-
-```sh
-$ GO111MODULE=on go get github.com/labstack/echo/v4
 ```
 
 ## Hello, World!
@@ -33,15 +27,25 @@ package main
 
 import (
 	"net/http"
-	
+
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 func main() {
+	// Echo instance
 	e := echo.New()
+
+	// Middleware
+	e.Use(middleware.Logger())
+	e.Use(middleware.Recover())
+
+	// Routes
 	e.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Hello, World!")
 	})
+
+	// Start server
 	e.Logger.Fatal(e.Start(":1323"))
 }
 ```
