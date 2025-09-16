@@ -1,14 +1,18 @@
 ---
-description: JWT recipe
+description: JWT authentication examples
 ---
 
-# JWT
+# JWT Authentication
+
+This cookbook demonstrates JWT (JSON Web Token) authentication patterns using Echo's JWT middleware. Examples include both basic authentication flows and advanced usage with custom claims and key functions.
+
+**Key Features:**
+- JWT authentication using HS256 algorithm
+- Token retrieval from `Authorization` request header
+- Custom claims handling
+- User-defined key functions for advanced scenarios
 
 [JWT middleware](../middleware/jwt.md) configuration can be found [here](../middleware/jwt.md#configuration).
-
-This is cookbook for:
-- JWT authentication using HS256 algorithm.
-- JWT is retrieved from `Authorization` request header.
 
 ## Server
 
