@@ -156,3 +156,19 @@ req := httptest.NewRequest(http.MethodGet, "/?"+q.Encode(), nil)
 *TBD*
 
 For now you can look into built-in middleware [test cases](https://github.com/labstack/echo/tree/master/middleware).
+
+## Testing Middleware and Handler
+
+```go
+e := echo.New()
+// ... register your middleware and handlers as normal
+
+req := httptest.NewRequest(http.MethodGet, "/api/apps", nil)
+req.Header.Set("Authorization", "Bearer " + yourToken) // e.g. if you use JWT middleware
+rec := httptest.NewRecorder()
+e.ServeHTTP(rec, req)
+
+// Assertions
+
+assert.Equal(t, http.StatusOK, rec.Code)
+```
