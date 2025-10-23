@@ -10,7 +10,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"github.com/lestrrat-go/jwx/jwk"
+	"github.com/lestrrat-go/jwx/v3/jwk"
 )
 
 func getKey(token *jwt.Token) (interface{}, error) {
@@ -37,12 +37,7 @@ func getKey(token *jwt.Token) (interface{}, error) {
 		return nil, fmt.Errorf("unable to find key %q", keyID)
 	}
 
-	var pubkey interface{}
-	if err := key.Raw(&pubkey); err != nil {
-		return nil, fmt.Errorf("Unable to get the public key. Error: %s", err.Error())
-	}
-
-	return pubkey, nil
+	return key.PublicKey()
 }
 
 func accessible(c echo.Context) error {
