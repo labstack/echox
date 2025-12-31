@@ -71,7 +71,8 @@ func customHTTPErrorHandler(err error, c echo.Context) {
  	}
 
 	code := http.StatusInternalServerError
-	if he, ok := err.(*echo.HTTPError); ok {
+	var he *echo.HTTPError
+	if errors.As(err, &he) {
 		code = he.Code
 	}
 	c.Logger().Error(err)
