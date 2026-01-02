@@ -9,11 +9,11 @@ sidebar_position: 8
 IP address plays a fundamental role in HTTP; it's used for access control, auditing, geo-based access analysis, and more.
 Echo provides a handy method [`Context#RealIP()`](https://godoc.org/github.com/labstack/echo#Context) for that.
 
-However, it is not trivial to retrieve the _real_ IP address from requests especially when you put L7 proxies before the application.
+However, it is not trivial to retrieve the _real_ IP address from requests, especially when you put L7 proxies before the application.
 In such situations, _real_ IP needs to be relayed on the HTTP layer from proxies to your app, however, you must not trust HTTP headers unconditionally.
-Otherwise you might give someone a chance of deceiving you. **A security risk!**
+Otherwise, you might give someone a chance of deceiving you. **A security risk!**
 
-To retrieve IP address reliably/securely, you must let your application be aware of the entire architecture of your infrastructrure.
+To retrieve IP address reliably/securely, you must let your application be aware of the entire architecture of your infrastructure.
 In Echo, this can be done by configuring `Echo#IPExtractor` appropriately.
 This guides show you why and how.
 
