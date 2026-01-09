@@ -4,12 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	echojwt "github.com/labstack/echo-jwt/v4"
 	"net/http"
 
+	echojwt "github.com/labstack/echo-jwt/v5"
+
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
+	"github.com/labstack/echo/v5"
+	"github.com/labstack/echo/v5/middleware"
 	"github.com/lestrrat-go/jwx/v3/jwk"
 )
 
@@ -40,12 +41,15 @@ func getKey(token *jwt.Token) (interface{}, error) {
 	return key.PublicKey()
 }
 
-func accessible(c echo.Context) error {
+func accessible(c *echo.Context) error {
 	return c.String(http.StatusOK, "Accessible")
 }
 
-func restricted(c echo.Context) error {
-	user := c.Get("user").(*jwt.Token)
+func restricted(c *echo.Context) error {
+	user, err := echo.ContextGet[*jwt.Token](c, "user")
+	if err != nil {
+		return echo.ErrUnauthorized.Wrap(err)
+	}
 	claims := user.Claims.(jwt.MapClaims)
 	name := claims["name"].(string)
 	return c.String(http.StatusOK, "Welcome "+name+"!")
@@ -55,7 +59,7 @@ func main() {
 	e := echo.New()
 
 	// Middleware
-	e.Use(middleware.Logger())
+	e.Use(middleware.RequestLogger())
 	e.Use(middleware.Recover())
 
 	// Unauthenticated route
@@ -71,5 +75,8 @@ func main() {
 		r.GET("", restricted)
 	}
 
-	e.Logger.Fatal(e.Start(":1323"))
+	sc := echo.StartConfig{Address: ":1323"}
+	if err := sc.Start(context.Background(), e); err != nil {
+		e.Logger.Error("failed to start server", "error", err)
+	}
 }

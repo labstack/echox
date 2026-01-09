@@ -1,15 +1,16 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 )
 
 func main() {
 	e := echo.New()
-	e.GET("/request", func(c echo.Context) error {
+	e.GET("/request", func(c *echo.Context) error {
 		req := c.Request()
 		format := `
 			<code>
@@ -22,5 +23,8 @@ func main() {
 		`
 		return c.HTML(http.StatusOK, fmt.Sprintf(format, req.Proto, req.Host, req.RemoteAddr, req.Method, req.URL.Path))
 	})
-	e.Logger.Fatal(e.StartTLS(":1323", "cert.pem", "key.pem"))
+	sc := echo.StartConfig{Address: ":1323"}
+	if err := sc.StartTLS(context.Background(), e, "cert.pem", "key.pem"); err != nil {
+		e.Logger.Error("failed to start server", "error", err)
+	}
 }

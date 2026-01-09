@@ -22,7 +22,10 @@ e.Use(middleware.RequestID())
     e.GET("/", func(c echo.Context) error {
         return c.String(http.StatusOK, c.Response().Header().Get(echo.HeaderXRequestID))
     })
-    e.Logger.Fatal(e.Start(":1323"))
+    	sc := echo.StartConfig{Address: ":1323"}
+	if err := sc.Start(context.Background(), e); err != nil {
+		e.Logger.Error("failed to start server", "error", err)
+	}
 ```
 
 ## Custom Configuration

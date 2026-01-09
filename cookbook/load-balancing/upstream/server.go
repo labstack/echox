@@ -1,12 +1,13 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"os"
 
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
+	"github.com/labstack/echo/v5"
+	"github.com/labstack/echo/v5/middleware"
 )
 
 var index = `
@@ -34,11 +35,17 @@ var index = `
 func main() {
 	name := os.Args[1]
 	port := os.Args[2]
+
 	e := echo.New()
 	e.Use(middleware.Recover())
-	e.Use(middleware.Logger())
-	e.GET("/", func(c echo.Context) error {
+	e.Use(middleware.RequestLogger())
+
+	e.GET("/", func(c *echo.Context) error {
 		return c.HTML(http.StatusOK, fmt.Sprintf(index, name))
 	})
-	e.Logger.Fatal(e.Start(port))
+
+	sc := echo.StartConfig{Address: port}
+	if err := sc.Start(context.Background(), e); err != nil {
+		e.Logger.Error("failed to start server", "error", err)
+	}
 }

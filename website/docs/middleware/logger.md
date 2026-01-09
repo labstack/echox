@@ -16,7 +16,7 @@ Echo has 2 different logger middlewares:
 ## Usage
 
 ```go
-e.Use(middleware.Logger())
+e.Use(middleware.RequestLogger())
 ```
 
 *Sample output*
@@ -30,7 +30,7 @@ e.Use(middleware.Logger())
 ### Usage
 
 ```go
-e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
+e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
   Format: "method=${method}, uri=${uri}, status=${status}\n",
 }))
 ```
@@ -315,7 +315,7 @@ func logValues(c echo.Context, v middleware.RequestLoggerValues) error {
     return nil
 }
 
-e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
+e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
     LogValuesFunc: logValues,
 }))
 ```

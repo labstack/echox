@@ -1,18 +1,19 @@
 package main
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/gorilla/websocket"
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
+	"github.com/labstack/echo/v5"
+	"github.com/labstack/echo/v5/middleware"
 )
 
 var (
 	upgrader = websocket.Upgrader{}
 )
 
-func hello(c echo.Context) error {
+func hello(c *echo.Context) error {
 	ws, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
 	if err != nil {
 		return err
@@ -23,13 +24,13 @@ func hello(c echo.Context) error {
 		// Write
 		err := ws.WriteMessage(websocket.TextMessage, []byte("Hello, Client!"))
 		if err != nil {
-			c.Logger().Error(err)
+			c.Logger().Error("failed to write WS message", "error", err)
 		}
 
 		// Read
 		_, msg, err := ws.ReadMessage()
 		if err != nil {
-			c.Logger().Error(err)
+			c.Logger().Error("failed to read WS message", "error", err)
 		}
 		fmt.Printf("%s\n", msg)
 	}
@@ -37,9 +38,16 @@ func hello(c echo.Context) error {
 
 func main() {
 	e := echo.New()
-	e.Use(middleware.Logger())
+
+	e.Use(middleware.RequestLogger())
 	e.Use(middleware.Recover())
+
 	e.Static("/", "../public")
+
 	e.GET("/ws", hello)
-	e.Logger.Fatal(e.Start(":1323"))
+
+	sc := echo.StartConfig{Address: ":1323"}
+	if err := sc.Start(context.Background(), e); err != nil {
+		e.Logger.Error("failed to start server", "error", err)
+	}
 }

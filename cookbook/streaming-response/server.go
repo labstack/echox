@@ -1,11 +1,12 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 	"time"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 )
 
 type (
@@ -28,7 +29,7 @@ var (
 
 func main() {
 	e := echo.New()
-	e.GET("/", func(c echo.Context) error {
+	e.GET("/", func(c *echo.Context) error {
 		c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		c.Response().WriteHeader(http.StatusOK)
 
@@ -37,10 +38,21 @@ func main() {
 			if err := enc.Encode(l); err != nil {
 				return err
 			}
-			c.Response().Flush()
-			time.Sleep(1 * time.Second)
+			if err := http.NewResponseController(c.Response()).Flush(); err != nil {
+				return err
+			}
+			select {
+			case <-c.Request().Context().Done():
+				return nil
+			case <-time.After(1 * time.Second):
+				continue
+			}
 		}
 		return nil
 	})
-	e.Logger.Fatal(e.Start(":1323"))
+
+	sc := echo.StartConfig{Address: ":1323"}
+	if err := sc.Start(context.Background(), e); err != nil {
+		e.Logger.Error("failed to start server", "error", err)
+	}
 }

@@ -1,37 +1,56 @@
 package main
 
 import (
+	"context"
 	"crypto/tls"
-	"golang.org/x/crypto/acme"
+	"errors"
+	"log/slog"
 	"net/http"
+	"os"
 
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
+	"golang.org/x/crypto/acme"
+
+	"github.com/labstack/echo/v5"
+	"github.com/labstack/echo/v5/middleware"
 	"golang.org/x/crypto/acme/autocert"
 )
 
 func main() {
 	e := echo.New()
-	// e.AutoTLSManager.HostPolicy = autocert.HostWhitelist("<DOMAIN>")
-	// Cache certificates to avoid issues with rate limits (https://letsencrypt.org/docs/rate-limits)
-	e.AutoTLSManager.Cache = autocert.DirCache("/var/www/.cache")
+	e.Logger = slog.New(slog.NewJSONHandler(os.Stdout, nil))
+
 	e.Use(middleware.Recover())
-	e.Use(middleware.Logger())
-	e.GET("/", func(c echo.Context) error {
+	e.Use(middleware.RequestLogger())
+
+	e.GET("/", func(c *echo.Context) error {
 		return c.HTML(http.StatusOK, `
 			<h1>Welcome to Echo!</h1>
 			<h3>TLS certificates automatically installed from Let's Encrypt :)</h3>
 		`)
 	})
 
-	e.Logger.Fatal(e.StartAutoTLS(":443"))
+	m := &autocert.Manager{
+		Prompt:     autocert.AcceptTOS,
+		HostPolicy: autocert.HostWhitelist("example.com", "www.example.com"),
+		// Cache certificates to avoid issues with rate limits (https://letsencrypt.org/docs/rate-limits)
+		Cache: autocert.DirCache("/var/www/.cache"),
+		// Email:   "[email protected]", // optional but recommended
+	}
+
+	sc := echo.StartConfig{
+		Address:   ":443",
+		TLSConfig: m.TLSConfig(),
+	}
+	if err := sc.Start(context.Background(), e); err != nil {
+		e.Logger.Error("failed to start server", "error", err)
+	}
 }
 
 func customHTTPServer() {
 	e := echo.New()
 	e.Use(middleware.Recover())
-	e.Use(middleware.Logger())
-	e.GET("/", func(c echo.Context) error {
+	e.Use(middleware.RequestLogger())
+	e.GET("/", func(c *echo.Context) error {
 		return c.HTML(http.StatusOK, `
 			<h1>Welcome to Echo!</h1>
 			<h3>TLS certificates automatically installed from Let's Encrypt :)</h3>
@@ -54,7 +73,7 @@ func customHTTPServer() {
 		},
 		//ReadTimeout: 30 * time.Second, // use custom timeouts
 	}
-	if err := s.ListenAndServeTLS("", ""); err != http.ErrServerClosed {
-		e.Logger.Fatal(err)
+	if err := s.ListenAndServeTLS("", ""); err != nil && !errors.Is(err, http.ErrServerClosed) {
+		e.Logger.Error("failed to start server", "error", err)
 	}
 }

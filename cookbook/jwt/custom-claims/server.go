@@ -1,12 +1,14 @@
 package main
 
 import (
-	"github.com/golang-jwt/jwt/v5"
-	echojwt "github.com/labstack/echo-jwt/v4"
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
+	"context"
 	"net/http"
 	"time"
+
+	"github.com/golang-jwt/jwt/v5"
+	echojwt "github.com/labstack/echo-jwt/v5"
+	"github.com/labstack/echo/v5"
+	"github.com/labstack/echo/v5/middleware"
 )
 
 // jwtCustomClaims are custom claims extending default ones.
@@ -17,7 +19,7 @@ type jwtCustomClaims struct {
 	jwt.RegisteredClaims
 }
 
-func login(c echo.Context) error {
+func login(c *echo.Context) error {
 	username := c.FormValue("username")
 	password := c.FormValue("password")
 
@@ -44,17 +46,20 @@ func login(c echo.Context) error {
 		return err
 	}
 
-	return c.JSON(http.StatusOK, echo.Map{
+	return c.JSON(http.StatusOK, map[string]string{
 		"token": t,
 	})
 }
 
-func accessible(c echo.Context) error {
+func accessible(c *echo.Context) error {
 	return c.String(http.StatusOK, "Accessible")
 }
 
-func restricted(c echo.Context) error {
-	user := c.Get("user").(*jwt.Token)
+func restricted(c *echo.Context) error {
+	user, err := echo.ContextGet[*jwt.Token](c, "user")
+	if err != nil {
+		return echo.ErrUnauthorized.Wrap(err)
+	}
 	claims := user.Claims.(*jwtCustomClaims)
 	name := claims.Name
 	return c.String(http.StatusOK, "Welcome "+name+"!")
@@ -64,7 +69,7 @@ func main() {
 	e := echo.New()
 
 	// Middleware
-	e.Use(middleware.Logger())
+	e.Use(middleware.RequestLogger())
 	e.Use(middleware.Recover())
 
 	// Login route
@@ -78,7 +83,7 @@ func main() {
 
 	// Configure middleware with the custom claims type
 	config := echojwt.Config{
-		NewClaimsFunc: func(c echo.Context) jwt.Claims {
+		NewClaimsFunc: func(c *echo.Context) jwt.Claims {
 			return new(jwtCustomClaims)
 		},
 		SigningKey: []byte("secret"),
@@ -86,5 +91,8 @@ func main() {
 	r.Use(echojwt.WithConfig(config))
 	r.GET("", restricted)
 
-	e.Logger.Fatal(e.Start(":1323"))
+	sc := echo.StartConfig{Address: ":1323"}
+	if err := sc.Start(context.Background(), e); err != nil {
+		e.Logger.Error("failed to start server", "error", err)
+	}
 }

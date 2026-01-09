@@ -2,21 +2,22 @@ package main
 
 import (
 	"errors"
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/labstack/echo/v5"
+	"github.com/labstack/echo/v5/middleware"
 )
 
 func main() {
 	e := echo.New()
 
-	e.Use(middleware.Logger())
+	e.Use(middleware.RequestLogger())
 	e.Use(middleware.Recover())
 	e.File("/", "./index.html")
 
-	e.GET("/sse", func(c echo.Context) error {
+	e.GET("/sse", func(c *echo.Context) error {
 		log.Printf("SSE client connected, ip: %v", c.RealIP())
 
 		w := c.Response()
@@ -38,7 +39,9 @@ func main() {
 				if err := event.MarshalTo(w); err != nil {
 					return err
 				}
-				w.Flush()
+				if err := http.NewResponseController(w).Flush(); err != nil {
+					return err
+				}
 			}
 		}
 	})

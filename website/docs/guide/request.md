@@ -126,7 +126,10 @@ func main() {
     }
     return c.JSON(http.StatusOK, u)
   })
-  e.Logger.Fatal(e.Start(":1323"))
+  	sc := echo.StartConfig{Address: ":1323"}
+	if err := sc.Start(context.Background(), e); err != nil {
+		e.Logger.Error("failed to start server", "error", err)
+	}
 }
 ```
 

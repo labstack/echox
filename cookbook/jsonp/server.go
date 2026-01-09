@@ -1,23 +1,24 @@
 package main
 
 import (
+	"context"
 	"math/rand"
 	"net/http"
 	"time"
 
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
+	"github.com/labstack/echo/v5"
+	"github.com/labstack/echo/v5/middleware"
 )
 
 func main() {
 	e := echo.New()
-	e.Use(middleware.Logger())
+	e.Use(middleware.RequestLogger())
 	e.Use(middleware.Recover())
 
 	e.Static("/", "public")
 
 	// JSONP
-	e.GET("/jsonp", func(c echo.Context) error {
+	e.GET("/jsonp", func(c *echo.Context) error {
 		callback := c.QueryParam("callback")
 		var content struct {
 			Response  string    `json:"response"`
@@ -31,5 +32,8 @@ func main() {
 	})
 
 	// Start server
-	e.Logger.Fatal(e.Start(":1323"))
+	sc := echo.StartConfig{Address: ":1323"}
+	if err := sc.Start(context.Background(), e); err != nil {
+		e.Logger.Error("failed to start server", "error", err)
+	}
 }

@@ -10,8 +10,3 @@ description: Embed resources recipe
 https://github.com/labstack/echox/blob/master/cookbook/embed/server.go
 ```
 
-## With go.rice
-
-```go reference
-https://github.com/labstack/echox/blob/master/cookbook/embed-resources/server.go
-```

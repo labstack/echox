@@ -264,7 +264,7 @@ admin.POST("/users", createUser)
 ```go
 // API v1 group with logging and CORS
 apiV1 := e.Group("/api/v1")
-apiV1.Use(middleware.Logger())
+apiV1.Use(middleware.RequestLogger())
 apiV1.Use(middleware.CORS())
 
 apiV1.GET("/users", getUsers)
@@ -272,7 +272,7 @@ apiV1.POST("/users", createUser)
 
 // API v2 group with different middleware
 apiV2 := e.Group("/api/v2")
-apiV2.Use(middleware.Logger())
+apiV2.Use(middleware.RequestLogger())
 apiV2.Use(middleware.CORS())
 apiV2.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(20)))
 
@@ -297,7 +297,7 @@ adminUsers.POST("/", createUser)
 api := e.Group("/api")
 
 // Add middleware later
-api.Use(middleware.Logger())
+api.Use(middleware.RequestLogger())
 api.Use(middleware.Recover())
 
 // Add routes
@@ -319,7 +319,7 @@ func setupRoutes(e *echo.Echo) {
 
     // API group with common middleware
     api := e.Group("/api")
-    api.Use(middleware.Logger())
+    api.Use(middleware.RequestLogger())
     api.Use(middleware.Recover())
     api.Use(middleware.CORS())
 

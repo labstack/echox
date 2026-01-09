@@ -1,16 +1,17 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"net/http"
 	"os"
 
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
+	"github.com/labstack/echo/v5"
+	"github.com/labstack/echo/v5/middleware"
 )
 
-func upload(c echo.Context) error {
+func upload(c *echo.Context) error {
 	// Read form fields
 	name := c.FormValue("name")
 	email := c.FormValue("email")
@@ -54,11 +55,14 @@ func upload(c echo.Context) error {
 func main() {
 	e := echo.New()
 
-	e.Use(middleware.Logger())
+	e.Use(middleware.RequestLogger())
 	e.Use(middleware.Recover())
 
 	e.Static("/", "public")
 	e.POST("/upload", upload)
 
-	e.Logger.Fatal(e.Start(":1323"))
+	sc := echo.StartConfig{Address: ":1323"}
+	if err := sc.Start(context.Background(), e); err != nil {
+		e.Logger.Error("failed to start server", "error", err)
+	}
 }

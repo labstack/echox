@@ -2,12 +2,12 @@ package main
 
 import (
 	"errors"
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
-	"github.com/r3labs/sse/v2"
-	"log"
 	"net/http"
 	"time"
+
+	"github.com/labstack/echo/v5"
+	"github.com/labstack/echo/v5/middleware"
+	"github.com/r3labs/sse/v2"
 )
 
 func main() {
@@ -31,17 +31,17 @@ func main() {
 		}
 	}(server)
 
-	e.Use(middleware.Logger())
+	e.Use(middleware.RequestLogger())
 	e.Use(middleware.Recover())
 	e.File("/", "./index.html")
 
 	//e.GET("/sse", echo.WrapHandler(server))
 
-	e.GET("/sse", func(c echo.Context) error { // longer variant with disconnect logic
-		log.Printf("The client is connected: %v\n", c.RealIP())
+	e.GET("/sse", func(c *echo.Context) error { // longer variant with disconnect logic
+		e.Logger.Info("New client connected", "ip", c.RealIP())
 		go func() {
 			<-c.Request().Context().Done() // Received Browser Disconnection
-			log.Printf("The client is disconnected: %v\n", c.RealIP())
+			e.Logger.Info("Client disconnected", "ip", c.RealIP())
 			return
 		}()
 
@@ -50,6 +50,6 @@ func main() {
 	})
 
 	if err := e.Start(":8080"); err != nil && !errors.Is(err, http.ErrServerClosed) {
-		log.Fatal(err)
+		e.Logger.Error("shutting down the server", "error", err)
 	}
 }
