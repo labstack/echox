@@ -1,12 +1,13 @@
 package main
 
 import (
+	"context"
 	"net/http"
 	"strconv"
 	"sync"
 
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
+	"github.com/labstack/echo/v5"
+	"github.com/labstack/echo/v5/middleware"
 )
 
 type (
@@ -26,7 +27,7 @@ var (
 // Handlers
 //----------
 
-func createUser(c echo.Context) error {
+func createUser(c *echo.Context) error {
 	lock.Lock()
 	defer lock.Unlock()
 	u := &user{
@@ -40,14 +41,14 @@ func createUser(c echo.Context) error {
 	return c.JSON(http.StatusCreated, u)
 }
 
-func getUser(c echo.Context) error {
+func getUser(c *echo.Context) error {
 	lock.Lock()
 	defer lock.Unlock()
 	id, _ := strconv.Atoi(c.Param("id"))
 	return c.JSON(http.StatusOK, users[id])
 }
 
-func updateUser(c echo.Context) error {
+func updateUser(c *echo.Context) error {
 	lock.Lock()
 	defer lock.Unlock()
 	u := new(user)
@@ -59,7 +60,7 @@ func updateUser(c echo.Context) error {
 	return c.JSON(http.StatusOK, users[id])
 }
 
-func deleteUser(c echo.Context) error {
+func deleteUser(c *echo.Context) error {
 	lock.Lock()
 	defer lock.Unlock()
 	id, _ := strconv.Atoi(c.Param("id"))
@@ -67,7 +68,7 @@ func deleteUser(c echo.Context) error {
 	return c.NoContent(http.StatusNoContent)
 }
 
-func getAllUsers(c echo.Context) error {
+func getAllUsers(c *echo.Context) error {
 	lock.Lock()
 	defer lock.Unlock()
 	return c.JSON(http.StatusOK, users)
@@ -77,7 +78,7 @@ func main() {
 	e := echo.New()
 
 	// Middleware
-	e.Use(middleware.Logger())
+	e.Use(middleware.RequestLogger())
 	e.Use(middleware.Recover())
 
 	// Routes
@@ -88,5 +89,8 @@ func main() {
 	e.DELETE("/users/:id", deleteUser)
 
 	// Start server
-	e.Logger.Fatal(e.Start(":1323"))
+	sc := echo.StartConfig{Address: ":1323"}
+	if err := sc.Start(context.Background(), e); err != nil {
+		e.Logger.Error("failed to start server", "error", err)
+	}
 }

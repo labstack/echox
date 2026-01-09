@@ -1,19 +1,20 @@
 package main
 
 import (
+	"context"
+	"errors"
 	"net/http"
-	"strconv"
 	"sync"
 	"time"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 )
 
 type (
 	Stats struct {
 		Uptime       time.Time      `json:"uptime"`
 		RequestCount uint64         `json:"requestCount"`
-		Statuses     map[string]int `json:"statuses"`
+		Statuses     map[int]uint64 `json:"statuses"`
 		mutex        sync.RWMutex
 	}
 )
@@ -21,27 +22,40 @@ type (
 func NewStats() *Stats {
 	return &Stats{
 		Uptime:   time.Now(),
-		Statuses: map[string]int{},
+		Statuses: map[int]uint64{},
 	}
 }
 
 // Process is the middleware function.
 func (s *Stats) Process(next echo.HandlerFunc) echo.HandlerFunc {
-	return func(c echo.Context) error {
-		if err := next(c); err != nil {
-			c.Error(err)
+	return func(c *echo.Context) error {
+		err := next(c)
+
+		status := http.StatusInternalServerError
+		if err != nil {
+			var sc echo.HTTPStatusCoder
+			if ok := errors.As(err, &sc); ok {
+				status = sc.StatusCode()
+			}
+		} else {
+			rw, uErr := echo.UnwrapResponse(c.Response())
+			if uErr == nil {
+				status = rw.Status
+			}
+			err = uErr
 		}
+
 		s.mutex.Lock()
 		defer s.mutex.Unlock()
 		s.RequestCount++
-		status := strconv.Itoa(c.Response().Status)
 		s.Statuses[status]++
-		return nil
+
+		return err
 	}
 }
 
 // Handle is the endpoint to get stats.
-func (s *Stats) Handle(c echo.Context) error {
+func (s *Stats) Handle(c *echo.Context) error {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
 	return c.JSON(http.StatusOK, s)
@@ -49,17 +63,14 @@ func (s *Stats) Handle(c echo.Context) error {
 
 // ServerHeader middleware adds a `Server` header to the response.
 func ServerHeader(next echo.HandlerFunc) echo.HandlerFunc {
-	return func(c echo.Context) error {
-		c.Response().Header().Set(echo.HeaderServer, "Echo/3.0")
+	return func(c *echo.Context) error {
+		c.Response().Header().Set(echo.HeaderServer, "Echo/5.0")
 		return next(c)
 	}
 }
 
 func main() {
 	e := echo.New()
-
-	// Debug mode
-	e.Debug = true
 
 	//-------------------
 	// Custom middleware
@@ -73,10 +84,13 @@ func main() {
 	e.Use(ServerHeader)
 
 	// Handler
-	e.GET("/", func(c echo.Context) error {
+	e.GET("/", func(c *echo.Context) error {
 		return c.String(http.StatusOK, "Hello, World!")
 	})
 
 	// Start server
-	e.Logger.Fatal(e.Start(":1323"))
+	sc := echo.StartConfig{Address: ":1323"}
+	if err := sc.Start(context.Background(), e); err != nil {
+		e.Logger.Error("failed to start server", "error", err)
+	}
 }

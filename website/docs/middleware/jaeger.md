@@ -26,7 +26,10 @@ func main() {
     c := jaegertracing.New(e, nil)
     defer c.Close()
 
-    e.Logger.Fatal(e.Start(":1323"))
+    	sc := echo.StartConfig{Address: ":1323"}
+	if err := sc.Start(context.Background(), e); err != nil {
+		e.Logger.Error("failed to start server", "error", err)
+	}
 }
 ```
 
@@ -99,7 +102,10 @@ func main() {
     c := jaegertracing.New(e, urlSkipper)
     defer c.Close()
 
-    e.Logger.Fatal(e.Start(":1323"))
+    	sc := echo.StartConfig{Address: ":1323"}
+	if err := sc.Start(context.Background(), e); err != nil {
+		e.Logger.Error("failed to start server", "error", err)
+	}
 }
 ```
 
@@ -128,7 +134,10 @@ func main() {
 		jaegertracing.TraceFunction(c, slowFunc, "Test String")
         return c.String(http.StatusOK, "Hello, World!")
     })
-    e.Logger.Fatal(e.Start(":1323"))
+    	sc := echo.StartConfig{Address: ":1323"}
+	if err := sc.Start(context.Background(), e); err != nil {
+		e.Logger.Error("failed to start server", "error", err)
+	}
 }
 
 // A function to be wrapped. No need to change it's arguments due to tracing
@@ -167,7 +176,10 @@ func main() {
         time.Sleep(100 * time.Millisecond)
         return c.String(http.StatusOK, "Hello, World!")
     })
-    e.Logger.Fatal(e.Start(":1323"))
+    	sc := echo.StartConfig{Address: ":1323"}
+	if err := sc.Start(context.Background(), e); err != nil {
+		e.Logger.Error("failed to start server", "error", err)
+	}
 }
 ```
 

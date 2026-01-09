@@ -1,33 +1,28 @@
 package main
 
 import (
+	"context"
 	"net/http"
 
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
-)
-
-type (
-	Host struct {
-		Echo *echo.Echo
-	}
+	"github.com/labstack/echo/v5"
+	"github.com/labstack/echo/v5/middleware"
 )
 
 func main() {
 	// Hosts
-	hosts := map[string]*Host{}
+	vHosts := make(map[string]*echo.Echo)
 
 	//-----
 	// API
 	//-----
 
 	api := echo.New()
-	api.Use(middleware.Logger())
+	api.Use(middleware.RequestLogger())
 	api.Use(middleware.Recover())
 
-	hosts["api.localhost:1323"] = &Host{api}
+	vHosts["api.localhost:1323"] = api
 
-	api.GET("/", func(c echo.Context) error {
+	api.GET("/", func(c *echo.Context) error {
 		return c.String(http.StatusOK, "API")
 	})
 
@@ -36,12 +31,12 @@ func main() {
 	//------
 
 	blog := echo.New()
-	blog.Use(middleware.Logger())
+	blog.Use(middleware.RequestLogger())
 	blog.Use(middleware.Recover())
 
-	hosts["blog.localhost:1323"] = &Host{blog}
+	vHosts["blog.localhost:1323"] = blog
 
-	blog.GET("/", func(c echo.Context) error {
+	blog.GET("/", func(c *echo.Context) error {
 		return c.String(http.StatusOK, "Blog")
 	})
 
@@ -50,29 +45,19 @@ func main() {
 	//---------
 
 	site := echo.New()
-	site.Use(middleware.Logger())
+	site.Use(middleware.RequestLogger())
 	site.Use(middleware.Recover())
 
-	hosts["localhost:1323"] = &Host{site}
+	vHosts["localhost:1323"] = site
 
-	site.GET("/", func(c echo.Context) error {
+	site.GET("/", func(c *echo.Context) error {
 		return c.String(http.StatusOK, "Website")
 	})
 
-	// Server
-	e := echo.New()
-	e.Any("/*", func(c echo.Context) (err error) {
-		req := c.Request()
-		res := c.Response()
-		host := hosts[req.Host]
+	e := echo.NewVirtualHostHandler(vHosts)
 
-		if host == nil {
-			err = echo.ErrNotFound
-		} else {
-			host.Echo.ServeHTTP(res, req)
-		}
-
-		return
-	})
-	e.Logger.Fatal(e.Start(":1323"))
+	sc := echo.StartConfig{Address: ":1323"}
+	if err := sc.Start(context.Background(), e); err != nil {
+		e.Logger.Error("failed to start server", "error", err)
+	}
 }

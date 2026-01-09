@@ -1,28 +1,27 @@
 package main
 
 import (
+	"context"
 	"fmt"
 
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
+	"github.com/labstack/echo/v5"
+	"github.com/labstack/echo/v5/middleware"
 	"golang.org/x/net/websocket"
 )
 
-func hello(c echo.Context) error {
+func hello(c *echo.Context) error {
 	websocket.Handler(func(ws *websocket.Conn) {
 		defer ws.Close()
 		for {
 			// Write
-			err := websocket.Message.Send(ws, "Hello, Client!")
-			if err != nil {
-				c.Logger().Error(err)
+			if err := websocket.Message.Send(ws, "Hello, Client!"); err != nil {
+				c.Logger().Error("failed to write WS message", "error", err)
 			}
 
 			// Read
 			msg := ""
-			err = websocket.Message.Receive(ws, &msg)
-			if err != nil {
-				c.Logger().Error(err)
+			if err := websocket.Message.Receive(ws, &msg); err != nil {
+				c.Logger().Error("failed to write WS message", "error", err)
 			}
 			fmt.Printf("%s\n", msg)
 		}
@@ -32,9 +31,15 @@ func hello(c echo.Context) error {
 
 func main() {
 	e := echo.New()
-	e.Use(middleware.Logger())
+
+	e.Use(middleware.RequestLogger())
 	e.Use(middleware.Recover())
+
 	e.Static("/", "../public")
 	e.GET("/ws", hello)
-	e.Logger.Fatal(e.Start(":1323"))
+
+	sc := echo.StartConfig{Address: ":1323"}
+	if err := sc.Start(context.Background(), e); err != nil {
+		e.Logger.Error("failed to start server", "error", err)
+	}
 }

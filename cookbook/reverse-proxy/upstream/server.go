@@ -1,13 +1,14 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"os"
 	"time"
 
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
+	"github.com/labstack/echo/v5"
+	"github.com/labstack/echo/v5/middleware"
 	"golang.org/x/net/websocket"
 )
 
@@ -48,27 +49,37 @@ func main() {
 	name := os.Args[1]
 	port := os.Args[2]
 	e := echo.New()
+
+	e.Use(middleware.RequestLogger())
 	e.Use(middleware.Recover())
-	e.Use(middleware.Logger())
-	e.GET("/", func(c echo.Context) error {
+
+	e.GET("/", func(c *echo.Context) error {
 		return c.HTML(http.StatusOK, fmt.Sprintf(index, name))
 	})
 
 	// WebSocket handler
-	e.GET("/ws", func(c echo.Context) error {
+	e.GET("/ws", func(c *echo.Context) error {
 		websocket.Handler(func(ws *websocket.Conn) {
 			defer ws.Close()
 			for {
 				// Write
 				err := websocket.Message.Send(ws, fmt.Sprintf("Hello from upstream server %s!", name))
 				if err != nil {
-					e.Logger.Error(err)
+					e.Logger.Error("failed to send message", "error", err)
 				}
-				time.Sleep(1 * time.Second)
+				select {
+				case <-ws.Request().Context().Done():
+					return
+				case <-time.After(1 * time.Second):
+					continue
+				}
 			}
 		}).ServeHTTP(c.Response(), c.Request())
 		return nil
 	})
 
-	e.Logger.Fatal(e.Start(port))
+	sc := echo.StartConfig{Address: port}
+	if err := sc.Start(context.Background(), e); err != nil {
+		e.Logger.Error("failed to start server", "error", err)
+	}
 }
