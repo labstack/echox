@@ -89,7 +89,7 @@ import (
 )
 
 // urlSkipper ignores metrics route on some middleware
-func urlSkipper(c echo.Context) bool {
+func urlSkipper(c *echo.Context) bool {
     if strings.HasPrefix(c.Path(), "/testurl") {
         return true
     }
@@ -129,7 +129,7 @@ func main() {
     // Enable tracing middleware
     c := jaegertracing.New(e, nil)
     defer c.Close()
-    e.GET("/", func(c echo.Context) error {
+    e.GET("/", func(c *echo.Context) error {
         // Wrap slowFunc on a new span to trace it's execution passing the function arguments
 		jaegertracing.TraceFunction(c, slowFunc, "Test String")
         return c.String(http.StatusOK, "Hello, World!")
@@ -165,7 +165,7 @@ func main() {
     // Enable tracing middleware
     c := jaegertracing.New(e, nil)
     defer c.Close()
-    e.GET("/", func(c echo.Context) error {
+    e.GET("/", func(c *echo.Context) error {
         // Do something before creating the child span
         time.Sleep(40 * time.Millisecond)
         sp := jaegertracing.CreateChildSpan(c, "Child span for additional processing")

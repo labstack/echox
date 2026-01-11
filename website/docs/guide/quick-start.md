@@ -10,18 +10,12 @@ sidebar_position: 1
 
 ### Requirements
 
-To install Echo [Go](https://go.dev/doc/install) 1.13 or higher is required. Go 1.12 has limited support and some middlewares will not be available. Make sure your project folder is outside your $GOPATH.
+It is recommended to use [Go](https://go.dev/doc/install) for dependency management and versioning. Echo supports at least 2 latest versions of Go.
 
 ```sh
 $ mkdir myapp && cd myapp
 $ go mod init myapp
-$ go get github.com/labstack/echo/v4
-```
-
-If you are working with Go v1.14 or earlier use:
-
-```sh
-$ GO111MODULE=on go get github.com/labstack/echo/v4
+$ go get github.com/labstack/echo/v5
 ```
 
 ## Hello, World!
@@ -33,20 +27,24 @@ package main
 
 import (
 	"net/http"
-	
-	"github.com/labstack/echo/v4"
+
+	"github.com/labstack/echo/v5"
+	"github.com/labstack/echo/v5/middleware"
 )
 
 func main() {
 	e := echo.New()
-	e.GET("/", func(c echo.Context) error {
+	e.Use(middleware.RequestLogger())
+
+	e.GET("/", func(c *echo.Context) error {
 		return c.String(http.StatusOK, "Hello, World!")
 	})
-		sc := echo.StartConfig{Address: ":1323"}
-	if err := sc.Start(context.Background(), e); err != nil {
+
+	if err := e.Start(":1323"); err != nil {
 		e.Logger.Error("failed to start server", "error", err)
 	}
 }
+
 ```
 
 Start server
@@ -71,7 +69,7 @@ e.DELETE("/users/:id", deleteUser)
 
 ```go
 // e.GET("/users/:id", getUser)
-func getUser(c echo.Context) error {
+func getUser(c *echo.Context) error {
   	// User ID from path `users/:id`
   	id := c.Param("id")
 	return c.String(http.StatusOK, id)
@@ -86,7 +84,7 @@ Browse to [http://localhost:1323/users/joe](http://localhost:1323/users/joe) and
 
 ```go
 //e.GET("/show", show)
-func show(c echo.Context) error {
+func show(c *echo.Context) error {
 	// Get team and member from the query string
 	team := c.QueryParam("team")
 	member := c.QueryParam("member")
@@ -108,7 +106,7 @@ email | joe@labstack.com
 
 ```go
 // e.POST("/save", save)
-func save(c echo.Context) error {
+func save(c *echo.Context) error {
 	// Get name and email
 	name := c.FormValue("name")
 	email := c.FormValue("email")
@@ -133,7 +131,7 @@ name | Joe Smith
 avatar | avatar
 
 ```go
-func save(c echo.Context) error {
+func save(c *echo.Context) error {
 	// Get name
 	name := c.FormValue("name")
 	// Get avatar
@@ -191,7 +189,7 @@ type User struct {
 	Email string `json:"email" xml:"email" form:"email" query:"email"`
 }
 
-e.POST("/users", func(c echo.Context) error {
+e.POST("/users", func(c *echo.Context) error {
 	u := new(User)
 	if err := c.Bind(u); err != nil {
 		return err
@@ -223,21 +221,21 @@ e.Use(middleware.Recover())
 
 // Group level middleware
 g := e.Group("/admin")
-g.Use(middleware.BasicAuth(func(username, password string, c echo.Context) (bool, error) {
-  if username == "joe" && password == "secret" {
-    return true, nil
-  }
-  return false, nil
+g.Use(middleware.BasicAuth(func(c *echo.Context, username, password string) (bool, error) {
+	if username == "joe" && password == "secret" {
+		return true, nil
+	}
+	return false, nil
 }))
 
 // Route level middleware
 track := func(next echo.HandlerFunc) echo.HandlerFunc {
-	return func(c echo.Context) error {
+	return func(c *echo.Context) error {
 		println("request to /users")
 		return next(c)
 	}
 }
-e.GET("/users", func(c echo.Context) error {
+e.GET("/users", func(c *echo.Context) error {
 	return c.String(http.StatusOK, "/users")
 }, track)
 ```

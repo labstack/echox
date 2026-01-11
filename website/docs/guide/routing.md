@@ -16,7 +16,7 @@ handler which sends `Hello, World!` HTTP response.
 
 ```go
 // Handler
-func hello(c echo.Context) error {
+func hello(c *echo.Context) error {
     return c.String(http.StatusOK, "Hello, World!")
 }
 
@@ -27,19 +27,23 @@ e.GET("/hello", hello)
 ## HTTP Methods
 
 Echo supports all standard HTTP methods. Each method follows the signature:
-`e.METHOD(path string, h HandlerFunc, middleware ...Middleware) *Route`
+`e.METHOD(path string, h HandlerFunc, middleware ...Middleware) echo.RouteInfo`
 
 ### Available HTTP Methods
 
-| Method | Signature | Description |
-|--------|-----------|-------------|
-| `GET` | `e.GET(path, handler, ...middleware)` | Retrieve data |
-| `POST` | `e.POST(path, handler, ...middleware)` | Create new resource |
-| `PUT` | `e.PUT(path, handler, ...middleware)` | Update entire resource |
-| `PATCH` | `e.PATCH(path, handler, ...middleware)` | Partial update of resource |
-| `DELETE` | `e.DELETE(path, handler, ...middleware)` | Remove resource |
-| `HEAD` | `e.HEAD(path, handler, ...middleware)` | Get headers only |
-| `OPTIONS` | `e.OPTIONS(path, handler, ...middleware)` | Get allowed methods |
+| Method | Signature | Description                                                    |
+|--------|-----------|----------------------------------------------------------------|
+| `GET` | `e.GET(path, handler, ...middleware)` | Retrieve data                                                  |
+| `POST` | `e.POST(path, handler, ...middleware)` | Create new resource                                            |
+| `PUT` | `e.PUT(path, handler, ...middleware)` | Update entire resource                                         |
+| `PATCH` | `e.PATCH(path, handler, ...middleware)` | Partial update of resource                                     |
+| `DELETE` | `e.DELETE(path, handler, ...middleware)` | Remove resource                                                |
+| `HEAD` | `e.HEAD(path, handler, ...middleware)` | Get headers only                                               |
+| `OPTIONS` | `e.OPTIONS(path, handler, ...middleware)` | Get allowed methods                                            |
+| `CONNECT` | `e.CONNECT(path, handler, ...middleware)` | Connect method                                                 |
+| `TRACE` | `e.TRACE(path, handler, ...middleware)` | Trace method                                                   |
+| `RouteNotFound` | `e.TRACE(path, handler, ...middleware)` | In case router did not found matching route (404)              |
+| `Any` | `e.TRACE(path, handler, ...middleware)` | Matches any request method. Lower priority than other handlers |
 
 ### Method Parameters
 
@@ -49,15 +53,16 @@ Echo supports all standard HTTP methods. Each method follows the signature:
 
 ### Handler Function Signature
 
-Echo defines handler functions as `func(echo.Context) error` where:
+Echo defines handler functions as `func(c *echo.Context) error` where:
 
-- **`echo.Context`**: Provides access to:
+- **`*echo.Context`**: Provides access to:
   - Request and response objects
   - Path parameters (`c.Param("id")`)
   - Query parameters (`c.QueryParam("name")`)
   - Form data (`c.FormValue("field")`)
   - JSON binding (`c.Bind(&struct{})`)
   - Response helpers (`c.JSON()`, `c.String()`, etc.)
+  - etc
 
 ### Example Usage
 
@@ -94,7 +99,7 @@ If you want to register it for some methods use `Echo.Match(methods []string, pa
 Registers a handler for all HTTP methods on a given path:
 
 ```go
-e.Any("/api/*", func(c echo.Context) error {
+e.Any("/api/*", func(c *echo.Context) error {
     return c.String(http.StatusOK, "Handles all methods")
 })
 ```
@@ -121,20 +126,30 @@ Path parameters are defined using `:paramName` syntax and can be accessed in han
 
 ```go
 // Single parameter
-e.GET("/users/:id", func(c echo.Context) error {
+e.GET("/users/:id", func(c *echo.Context) error {
     id := c.Param("id")
     return c.String(http.StatusOK, "User ID: " + id)
 })
 
+// genetic type function to convert string to int
+e.GET("/users/:id", func(c *echo.Context) error {
+    ID, err := echo.PathParam[int](c, "id")
+    //ID, err := echo.PathParamOr[int](c, "id", -1) // default value -1
+    if err != nil {
+        return err
+    }
+    return c.String(http.StatusOK, fmt.Sprintf("User ID: %d", ID))
+})
+
 // Multiple parameters
-e.GET("/users/:id/posts/:postId", func(c echo.Context) error {
+e.GET("/users/:id/posts/:postId", func(c *echo.Context) error {
     userId := c.Param("id")
     postId := c.Param("postId")
     return c.String(http.StatusOK, "User: " + userId + ", Post: " + postId)
 })
 
 // Optional parameters (using query parameters instead)
-e.GET("/users", func(c echo.Context) error {
+e.GET("/users", func(c *echo.Context) error {
     id := c.QueryParam("id") // Optional
     return c.String(http.StatusOK, "User ID: " + id)
 })
@@ -145,10 +160,15 @@ e.GET("/users", func(c echo.Context) error {
 Query parameters are accessed using `c.QueryParam("name")` and are optional by nature:
 
 ```go
-e.GET("/search", func(c echo.Context) error {
-    query := c.QueryParam("q")
-    limit := c.QueryParam("limit")
-    return c.String(http.StatusOK, "Search: " + query + ", Limit: " + limit)
+e.GET("/search", func(c *echo.Context) error {
+	query := c.QueryParam("q")
+	// typed generic function to get value other type than string
+	//limit, err := echo.QueryParam[int](c, "limit")
+	limit, err := echo.QueryParamOr[int](c, "limit", 100) // default value -1
+	if err != nil {
+		return err
+	}
+	return c.String(http.StatusOK, fmt.Sprintf("Search query: %s, Limit: %d", query, limit))
 })
 ```
 
@@ -162,10 +182,14 @@ e.GET("/search", func(c echo.Context) error {
 For POST/PUT requests with form data, use `c.FormValue("field")`:
 
 ```go
-e.POST("/users", func(c echo.Context) error {
-    name := c.FormValue("name")
-    email := c.FormValue("email")
-    return c.String(http.StatusOK, "Name: " + name + ", Email: " + email)
+e.POST("/users", func(c *echo.Context) error {
+	name := c.FormValue("name")
+	email := c.FormValue("email")
+	age, err := echo.FormValueOr[int](c, "age", -1) // default value -1
+	if err != nil {
+		return err
+	}
+	return c.String(http.StatusOK, fmt.Sprintf("Name: %s, Email: %s, Age: %d", name, email, age))
 })
 ```
 
@@ -195,15 +219,15 @@ There can be only one effective match-any parameter in route. When route is adde
 ### Example
 
 ```go
-e.GET("/users/:id", func(c echo.Context) error {
+e.GET("/users/:id", func(c *echo.Context) error {
     return c.String(http.StatusOK, "/users/:id")
 })
 
-e.GET("/users/new", func(c echo.Context) error {
+e.GET("/users/new", func(c *echo.Context) error {
     return c.String(http.StatusOK, "/users/new")
 })
 
-e.GET("/users/1/files/*", func(c echo.Context) error {
+e.GET("/users/1/files/*", func(c *echo.Context) error {
     return c.String(http.StatusOK, "/users/1/files/*")
 })
 ```
@@ -246,11 +270,12 @@ api.GET("/users/:id", getUser)
 ```go
 // Admin group with authentication
 admin := e.Group("/admin")
-admin.Use(middleware.BasicAuth(func(username, password string, c echo.Context) (bool, error) {
-    if username == "joe" && password == "secret" {
-        return true, nil
-    }
-    return false, nil
+admin.Use(middleware.BasicAuth(func(c *echo.Context, username, password string) (bool, error) {
+    // Use constant-time comparison to prevent timing attacks
+    userMatch := subtle.ConstantTimeCompare([]byte(username), []byte("joe")) == 1
+    passMatch := subtle.ConstantTimeCompare([]byte(password), []byte("secret")) == 1
+
+    return userMatch && passMatch, nil
 }))
 
 // All routes under /admin/* will require authentication
@@ -265,7 +290,7 @@ admin.POST("/users", createUser)
 // API v1 group with logging and CORS
 apiV1 := e.Group("/api/v1")
 apiV1.Use(middleware.RequestLogger())
-apiV1.Use(middleware.CORS())
+apiV1.Use(middleware.CORS("https://api.example.com"))
 
 apiV1.GET("/users", getUsers)
 apiV1.POST("/users", createUser)
@@ -273,7 +298,7 @@ apiV1.POST("/users", createUser)
 // API v2 group with different middleware
 apiV2 := e.Group("/api/v2")
 apiV2.Use(middleware.RequestLogger())
-apiV2.Use(middleware.CORS())
+apiV2.Use(middleware.CORS("https://api.example.com"))
 apiV2.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(20)))
 
 apiV2.GET("/users", getUsersV2)
@@ -321,7 +346,7 @@ func setupRoutes(e *echo.Echo) {
     api := e.Group("/api")
     api.Use(middleware.RequestLogger())
     api.Use(middleware.Recover())
-    api.Use(middleware.CORS())
+    api.Use(middleware.CORS("https://api.example.com"))
 
     // Public API routes
     api.GET("/health", healthCheck)
@@ -361,30 +386,15 @@ Each of the registration methods returns a `Route` object, which can be used to 
 ### Basic Route Naming
 
 ```go
-// Method 1: Assign name after registration
-route := e.POST("/users", createUser)
-route.Name = "create-user"
-
-// Method 2: Inline syntax
-e.GET("/users/:id", getUser).Name = "get-user"
-e.PUT("/users/:id", updateUser).Name = "update-user"
-e.DELETE("/users/:id", deleteUser).Name = "delete-user"
-```
-
-### Advanced Route Naming
-
-```go
-// Multiple parameters
-e.GET("/users/:id/posts/:postId", getPost).Name = "get-user-post"
-
-// Nested routes
-e.GET("/api/v1/users/:id", getUser).Name = "api-get-user"
-e.GET("/api/v2/users/:id", getUserV2).Name = "api-get-user-v2"
-
-// Group routes with names
-admin := e.Group("/admin")
-admin.GET("/dashboard", dashboard).Name = "admin-dashboard"
-admin.GET("/users", adminUsers).Name = "admin-users"
+_, err := e.AddRoute(echo.Route{
+	Method: http.MethodGet,
+	Path:   "/users/:id",
+	Name:   "user_details",
+	Handler: func(c *echo.Context) error {
+		return c.String(http.StatusOK, fmt.Sprintf("User ID: %s", c.Param("id")))
+	},
+	Middlewares: nil,
+})
 ```
 
 ## URI Building
@@ -393,15 +403,15 @@ Echo provides two methods for generating URIs: `Echo.URI()` and `Echo.Reverse()`
 
 ### Echo.URI() - Handler-based URI Generation
 
-`Echo.URI(handler HandlerFunc, params ...interface{})` generates URIs based on handler functions:
+`Echo.URI(handler HandlerFunc, params ...any)` generates URIs based on handler functions:
 
 ```go
 // Define handlers
-func getUser(c echo.Context) error {
+func getUser(c *echo.Context) error {
     return c.String(http.StatusOK, "User")
 }
 
-func getUserPost(c echo.Context) error {
+func getUserPost(c *echo.Context) error {
     return c.String(http.StatusOK, "User Post")
 }
 
@@ -414,39 +424,23 @@ userURI := e.URI(getUser, 123)                    // "/users/123"
 postURI := e.URI(getUserPost, 123, 456)          // "/users/123/posts/456"
 ```
 
-### Echo.Reverse() - Name-based URI Generation
+### Router.Reverse() - Name-based URI Generation
 
-`Echo.Reverse(name string, params ...interface{})` generates URIs based on route names:
-
-```go
-// Register named routes
-e.GET("/users/:id", getUser).Name = "get-user"
-e.GET("/users/:id/posts/:postId", getUserPost).Name = "get-user-post"
-e.GET("/api/v1/users/:id", getUser).Name = "api-user"
-
-// Generate URIs using names
-userURI := e.Reverse("get-user", 123)             // "/users/123"
-postURI := e.Reverse("get-user-post", 123, 456)  // "/users/123/posts/456"
-apiURI := e.Reverse("api-user", 123)             // "/api/v1/users/123"
-```
-
-### Practical Examples
+`echo.Router.Reverse(name string, params ...any)` generates URIs based on route names:
 
 ```go
-// In templates or handlers
-func generateUserLinks(userID int) map[string]string {
-    return map[string]string{
-        "profile": e.Reverse("get-user", userID),
-        "edit":    e.Reverse("update-user", userID),
-        "delete":  e.Reverse("delete-user", userID),
-    }
+route := echo.Route{
+	Method: http.MethodGet,
+	Path:   "/users/:id",
+	Name:   "user_details",
+	Handler: func(c *echo.Context) error {
+		return c.String(http.StatusOK, fmt.Sprintf("User ID: %s", c.Param("id")))
+	},
+	Middlewares: nil,
 }
+_, err := e.AddRoute(route)
 
-// In middleware for redirects
-func redirectToUser(c echo.Context) error {
-    userID := c.Param("id")
-    return c.Redirect(http.StatusFound, e.Reverse("get-user", userID))
-}
+userURI, err := e.Router().Routes().Reverse("user_details", 123) // "/users/123"
 ```
 
 ### Benefits of Route Naming
@@ -458,23 +452,23 @@ func redirectToUser(c echo.Context) error {
 
 ## List Routes
 
-`Echo#Routes() []*Route` can be used to list all registered routes in the order
+`Echo#Router#Routes() echo.Routes` can be used to list all registered routes in the order
 they are defined. Each route contains HTTP method, path and an associated handler.
 
 ### Example: Listing Routes
 
 ```go
 // Handlers
-func createUser(c echo.Context) error {
+func createUser(c *echo.Context) error {
 }
 
-func findUser(c echo.Context) error {
+func findUser(c *echo.Context) error {
 }
 
-func updateUser(c echo.Context) error {
+func updateUser(c *echo.Context) error {
 }
 
-func deleteUser(c echo.Context) error {
+func deleteUser(c *echo.Context) error {
 }
 
 // Routes
@@ -487,7 +481,7 @@ e.DELETE("/users", deleteUser)
 Using the following code you can output all the routes to a JSON file:
 
 ```go
-data, err := json.MarshalIndent(e.Routes(), "", "  ")
+data, err := json.MarshalIndent(e.Router().Routes(), "", "  ")
 if err != nil {
     return err
 }
@@ -499,24 +493,24 @@ os.WriteFile("routes.json", data, 0644)
 ```js
 [
   {
-    "method": "POST",
-    "path": "/users",
-    "name": "main.createUser"
+    "Method": "POST",
+    "Path": "/users",
+    "Name": "main.createUser"
   },
   {
-    "method": "GET",
-    "path": "/users",
-    "name": "main.findUser"
+    "Method": "GET",
+    "Path": "/users",
+    "Name": "main.findUser"
   },
   {
-    "method": "PUT",
-    "path": "/users",
-    "name": "main.updateUser"
+    "Method": "PUT",
+    "Path": "/users",
+    "Name": "main.updateUser"
   },
   {
-    "method": "DELETE",
-    "path": "/users",
-    "name": "main.deleteUser"
+    "Method": "DELETE",
+    "Path": "/users",
+    "Name": "main.deleteUser"
   }
 ]
 ```

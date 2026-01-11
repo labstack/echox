@@ -31,7 +31,7 @@ Echo uses go standard `http.Cookie` object to add/retrieve cookies from the cont
 ## Create a Cookie
 
 ```go
-func writeCookie(c echo.Context) error {
+func writeCookie(c *echo.Context) error {
 	cookie := new(http.Cookie)
 	cookie.Name = "username"
 	cookie.Value = "jon"
@@ -48,7 +48,7 @@ func writeCookie(c echo.Context) error {
 ## Read a Cookie
 
 ```go
-func readCookie(c echo.Context) error {
+func readCookie(c *echo.Context) error {
 	cookie, err := c.Cookie("username")
 	if err != nil {
 		return err
@@ -65,7 +65,7 @@ func readCookie(c echo.Context) error {
 ## Read all the Cookies
 
 ```go
-func readAllCookies(c echo.Context) error {
+func readAllCookies(c *echo.Context) error {
 	for _, cookie := range c.Cookies() {
 		fmt.Println(cookie.Name)
 		fmt.Println(cookie.Value)

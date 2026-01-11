@@ -22,7 +22,7 @@ a certificate from [CA](https://en.wikipedia.org/wiki/Certificate_authority).
 ## 2) Create a handler which simply outputs the request information to the client
 
 ```go
-e.GET("/request", func(c echo.Context) error {
+e.GET("/request", func(c *echo.Context) error {
   req := c.Request()
   format := `
     <code>

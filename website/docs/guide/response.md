@@ -14,7 +14,7 @@ code.
 *Example*
 
 ```go
-func(c echo.Context) error {
+func(c *echo.Context) error {
   return c.String(http.StatusOK, "Hello, World!")
 }
 ```
@@ -27,7 +27,7 @@ status code. If you are looking to send dynamically generate HTML see [templates
 *Example*
 
 ```go
-func(c echo.Context) error {
+func(c *echo.Context) error {
   return c.HTML(http.StatusOK, "<strong>Hello, World!</strong>")
 }
 ```
@@ -43,7 +43,7 @@ code. You may find it handy using with a template engine which outputs `[]byte`.
 
 ## Send JSON
 
-`Context#JSON(code int, i interface{})` can be used to encode a provided Go type into
+`Context#JSON(code int, i any)` can be used to encode a provided Go type into
 JSON and send it as response with status code.
 
 *Example*
@@ -56,7 +56,7 @@ type User struct {
 }
 
 // Handler
-func(c echo.Context) error {
+func(c *echo.Context) error {
   u := &User{
     Name:  "Jon",
     Email: "jon@labstack.com",
@@ -73,7 +73,7 @@ in that case you can directly stream JSON.
 *Example*
 
 ```go
-func(c echo.Context) error {
+func(c *echo.Context) error {
   u := &User{
     Name:  "Jon",
     Email: "jon@labstack.com",
@@ -86,13 +86,13 @@ func(c echo.Context) error {
 
 ### JSON Pretty
 
-`Context#JSONPretty(code int, i interface{}, indent string)` can be used to a send
+`Context#JSONPretty(code int, i any, indent string)` can be used to a send
 a JSON response which is pretty printed based on indent, which could be spaces or tabs.
 
 Example below sends a pretty print JSON indented with spaces:
 
 ```go
-func(c echo.Context) error {
+func(c *echo.Context) error {
   u := &User{
     Name:  "Jon",
     Email: "joe@labstack.com",
@@ -107,18 +107,6 @@ func(c echo.Context) error {
   "name": "Jon"
 }
 ```
-:::tip
-
-You can also use `Context#JSON()` to output a pretty printed JSON (indented with spaces)
-by appending `pretty` in the request URL query string.
-
-:::
-
-*Example*
-
-```sh
-curl http://localhost:1323/users/1?pretty
-```
 
 ### JSON Blob
 
@@ -128,7 +116,7 @@ from external source, for example, database.
 *Example*
 
 ```go
-func(c echo.Context) error {
+func(c *echo.Context) error {
   encodedJSON := []byte{} // Encoded JSON from external source
   return c.JSONBlob(http.StatusOK, encodedJSON)
 }
@@ -136,7 +124,7 @@ func(c echo.Context) error {
 
 ## Send JSONP
 
-`Context#JSONP(code int, callback string, i interface{})` can be used to encode a provided
+`Context#JSONP(code int, callback string, i any)` can be used to encode a provided
 Go type into JSON and send it as JSONP payload constructed using a callback, with
 status code.
 
@@ -144,13 +132,13 @@ status code.
 
 ## Send XML
 
-`Context#XML(code int, i interface{})` can be used to encode a provided Go type into
+`Context#XML(code int, i any)` can be used to encode a provided Go type into
 XML and send it as response with status code.
 
 *Example*
 
 ```go
-func(c echo.Context) error {
+func(c *echo.Context) error {
   u := &User{
     Name:  "Jon",
     Email: "jon@labstack.com",
@@ -167,7 +155,7 @@ in that case you can directly stream XML.
 *Example*
 
 ```go
-func(c echo.Context) error {
+func(c *echo.Context) error {
   u := &User{
     Name:  "Jon",
     Email: "jon@labstack.com",
@@ -180,13 +168,13 @@ func(c echo.Context) error {
 
 ### XML Pretty
 
-`Context#XMLPretty(code int, i interface{}, indent string)` can be used to a send
+`Context#XMLPretty(code int, i any, indent string)` can be used to a send
 an XML response which is pretty printed based on indent, which could be spaces or tabs.
 
 Example below sends a pretty print XML indented with spaces:
 
 ```go
-func(c echo.Context) error {
+func(c *echo.Context) error {
   u := &User{
     Name:  "Jon",
     Email: "joe@labstack.com",
@@ -222,7 +210,7 @@ from external source, for example, database.
 *Example*
 
 ```go
-func(c echo.Context) error {
+func(c *echo.Context) error {
   encodedXML := []byte{} // Encoded XML from external source
   return c.XMLBlob(http.StatusOK, encodedXML)
 }
@@ -236,7 +224,7 @@ It automatically sets the correct content type and handles caching gracefully.
 *Example*
 
 ```go
-func(c echo.Context) error {
+func(c *echo.Context) error {
   return c.File("<PATH_TO_YOUR_FILE>")
 }
 ```
@@ -249,7 +237,7 @@ used to send file as `Content-Disposition: attachment` with provided name.
 *Example*
 
 ```go
-func(c echo.Context) error {
+func(c *echo.Context) error {
   return c.Attachment("<PATH_TO_YOUR_FILE>", "<ATTACHMENT_NAME>")
 }
 ```
@@ -262,7 +250,7 @@ used to send file as `Content-Disposition: inline` with provided name.
 *Example*
 
 ```go
-func(c echo.Context) error {
+func(c *echo.Context) error {
   return c.Inline("<PATH_TO_YOUR_FILE>")
 }
 ```
@@ -275,7 +263,7 @@ data response with provided content type and status code.
 *Example*
 
 ```go
-func(c echo.Context) (err error) {
+func(c *echo.Context) (err error) {
   data := []byte(`0306703,0035866,NO_ACTION,06/19/2006
 	  0086003,"0005866",UPDATED,06/19/2006`)
 	return c.Blob(http.StatusOK, "text/csv", data)
@@ -291,7 +279,7 @@ code.
 *Example*
 
 ```go
-func(c echo.Context) error {
+func(c *echo.Context) error {
   f, err := os.Open("<PATH_TO_IMAGE>")
   if err != nil {
     return err
@@ -308,7 +296,7 @@ func(c echo.Context) error {
 *Example*
 
 ```go
-func(c echo.Context) error {
+func(c *echo.Context) error {
   return c.NoContent(http.StatusOK)
 }
 ```
@@ -321,7 +309,7 @@ a provided URL with status code.
 *Example*
 
 ```go
-func(c echo.Context) error {
+func(c *echo.Context) error {
   return c.Redirect(http.StatusMovedPermanently, "<URL>")
 }
 ```
@@ -330,26 +318,30 @@ func(c echo.Context) error {
 
 ### Before Response
 
-`Context#Response#Before(func())` can be used to register a function which is called just before the response is written.
+`Response#Before(func())` can be used to register a function which is called just before the response is written.
 
 ### After Response
 
-`Context#Response#After(func())` can be used to register a function which is called just
+`Response#After(func())` can be used to register a function which is called just
 after the response is written. If the "Content-Length" is unknown, none of the after
 function is executed.
 
 *Example*
 
 ```go
-func(c echo.Context) error {
-  c.Response().Before(func() {
-    println("before response")
-  })
-  c.Response().After(func() {
-    println("after response")
-  })
-  return c.NoContent(http.StatusNoContent)
-}
+e.GET("/hooks", func(c *echo.Context) error {
+	resp, err := echo.UnwrapResponse(c.Response())
+	if err != nil {
+		return err
+	}
+	resp.Before(func() {
+		println("before response")
+	})
+	resp.After(func() {
+		println("after response")
+	})
+	return c.String(http.StatusOK, "Hello, World!")
+})
 ```
 
 :::tip

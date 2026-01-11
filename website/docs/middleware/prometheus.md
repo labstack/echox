@@ -49,7 +49,7 @@ func main() {
 	e.Use(echoprometheus.NewMiddleware("myapp")) // adds middleware to gather metrics
 	e.GET("/metrics", echoprometheus.NewHandler()) // adds route to serve gathered metrics
 	
-	e.GET("/hello", func(c echo.Context) error {
+	e.GET("/hello", func(c *echo.Context) error {
 		return c.String(http.StatusOK, "hello")
 	})
 
@@ -74,7 +74,7 @@ func main() {
 		}
 	}()
 
-	app.GET("/hello", func(c echo.Context) error {
+	app.GET("/hello", func(c *echo.Context) error {
 		return c.String(http.StatusOK, "hello")
 	})
 
@@ -141,7 +141,7 @@ func main() {
 	}
 
 	e.Use(echoprometheus.NewMiddlewareWithConfig(echoprometheus.MiddlewareConfig{
-		AfterNext: func(c echo.Context, err error) {
+		AfterNext: func(c *echo.Context, err error) {
 			customCounter.Inc() // use our custom metric in middleware. after every request increment the counter
 		},
 	}))
@@ -182,7 +182,7 @@ func main() {
 	}
 
 	e.Use(echoprometheus.NewMiddlewareWithConfig(echoprometheus.MiddlewareConfig{
-		AfterNext: func(c echo.Context, err error) {
+		AfterNext: func(c *echo.Context, err error) {
 			customCounter.Inc() // use our custom metric in middleware. after every request increment the counter
 		},
 		Registerer: customRegistry, // use our custom registry instead of default Prometheus registry
@@ -217,7 +217,7 @@ func main() {
 	e := echo.New()
 
 	mwConfig := echoprometheus.MiddlewareConfig{
-		Skipper: func(c echo.Context) bool {
+		Skipper: func(c *echo.Context) bool {
 			return strings.HasPrefix(c.Path(), "/testurl")
 		}, // does not gather metrics metrics on routes starting with `/testurl`
 	}
@@ -225,7 +225,7 @@ func main() {
 
 	e.GET("/metrics", echoprometheus.NewHandler()) // adds route to serve gathered metrics
 
-	e.GET("/", func(c echo.Context) error {
+	e.GET("/", func(c *echo.Context) error {
 		return c.String(http.StatusOK, "Hello, World!")
 	})
 
@@ -257,10 +257,10 @@ func main() {
 	e.Use(echoprometheus.NewMiddlewareWithConfig(echoprometheus.MiddlewareConfig{
 		// labels of default metrics can be modified or added with `LabelFuncs` function
 		LabelFuncs: map[string]echoprometheus.LabelValueFunc{
-			"scheme": func(c echo.Context, err error) string { // additional custom label
+			"scheme": func(c *echo.Context, err error) string { // additional custom label
 				return c.Scheme()
 			},
-			"host": func(c echo.Context, err error) string { // overrides default 'host' label value
+			"host": func(c *echo.Context, err error) string { // overrides default 'host' label value
 				return "y_" + c.Request().Host
 			},
 		},
@@ -286,7 +286,7 @@ func main() {
 
 	e.GET("/metrics", echoprometheus.NewHandler()) // adds route to serve gathered metrics
 
-	e.GET("/hello", func(c echo.Context) error {
+	e.GET("/hello", func(c *echo.Context) error {
 		return c.String(http.StatusOK, "hello")
 	})
 

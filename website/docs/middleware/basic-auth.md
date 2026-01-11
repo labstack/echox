@@ -12,7 +12,7 @@ Basic auth middleware provides an HTTP basic authentication.
 ## Usage
 
 ```go
-e.Use(middleware.BasicAuth(func(username, password string, c echo.Context) (bool, error) {
+e.Use(middleware.BasicAuth(func(username, password string, c *echo.Context) (bool, error) {
 	// Be careful to use constant time comparison to prevent timing attacks
 	if subtle.ConstantTimeCompare([]byte(username), []byte("joe")) == 1 &&
 		subtle.ConstantTimeCompare([]byte(password), []byte("secret")) == 1 {

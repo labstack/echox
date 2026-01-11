@@ -17,7 +17,7 @@ For example, when basic auth middleware finds invalid credentials it returns
 
 ```go
 e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
-  return func(c echo.Context) error {
+  return func(c *echo.Context) error {
     // Extract the credentials from HTTP request header and perform a security
     // check
 
@@ -58,6 +58,26 @@ take action accordingly e.g. send notification email or log error to a centraliz
 system. You can also send customized response to the client e.g. error page or
 just a JSON response.
 
+To check if the response has been already sent to the client ("commited") you can use `echo.UnwrapResponse()`,
+```go
+if resp, uErr := echo.UnwrapResponse(c.Response()); uErr == nil {
+    if resp.Committed {
+        return // response has been already sent to the client by handler or some middleware
+    }
+}
+```
+
+To find error in an error chain that implements `echo.HTTPStatusCoder`,
+```go
+code := http.StatusInternalServerError
+var sc echo.HTTPStatusCoder
+if errors.As(err, &sc) { // find error in an error chain that implements HTTPStatusCoder
+    if tmp := sc.StatusCode(); tmp != 0 {
+        code = tmp
+    }
+}
+```
+
 ### Error Pages
 
 The following custom HTTP error handler shows how to display error pages for different
@@ -65,20 +85,30 @@ type of errors and logs the error. The name of the error page should be like `<C
 https://github.com/AndiDittrich/HttpErrorPages for pre-built error pages.
 
 ```go
-func customHTTPErrorHandler(err error, c echo.Context) {
- 	if c.Response().Committed { 
- 		return 
- 	}
+func customHTTPErrorHandler(c *echo.Context, err error) {
+	if resp, uErr := echo.UnwrapResponse(c.Response()); uErr == nil {
+		if resp.Committed {
+			return // response has been already sent to the client by handler or some middleware
+		}
+	}
 
 	code := http.StatusInternalServerError
-	var he *echo.HTTPError
-	if errors.As(err, &he) {
-		code = he.Code
+	var sc echo.HTTPStatusCoder
+	if errors.As(err, &sc) { // find error in an error chain that implements HTTPStatusCoder
+		if tmp := sc.StatusCode(); tmp != 0 {
+			code = tmp
+		}
 	}
-	c.Logger().Error(err)
-	errorPage := fmt.Sprintf("%d.html", code)
-	if err := c.File(errorPage); err != nil {
-		c.Logger().Error(err)
+
+	var cErr error
+	if c.Request().Method == http.MethodHead {
+		cErr = c.NoContent(code)
+	} else {
+		errorPage := fmt.Sprintf("%d.html", code)
+		cErr = c.File(errorPage)
+	}
+	if cErr != nil {
+		c.Logger().Error("failed to send error page to client", "error", errors.Join(err, fErr))
 	}
 }
 

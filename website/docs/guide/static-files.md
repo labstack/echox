@@ -37,6 +37,27 @@ e.Static("/", "assets")
 Example above will serve any file from the assets directory for path `/*`. For example,
 a request to `/js/main.js` will fetch and serve `assets/js/main.js` file.
 
+## Using Echo#StaticFS()
+
+Static files can be served from an `embed.FS` instance. Be sure to use `echo.MustSubFS` as embed.FS includes
+subdirectories as their own entries  and staticFS needs to server files from the correct root directory.
+
+```go
+//go:embed "assets/images"
+var images embed.FS
+
+func main() {
+	e := echo.New()
+
+	e.StaticFS("/images", echo.MustSubFS(images, "assets/images"))
+
+	sc := echo.StartConfig{Address: ":1323"}
+	if err := sc.Start(context.Background(), e); err != nil {
+		e.Logger.Error("failed to start server", "error", err)
+	}
+}
+```
+
 ## Using Echo#File()
 
 `Echo#File(path, file string)` registers a new route with path to serve a static
