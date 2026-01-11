@@ -118,10 +118,10 @@ type RequestLoggerConfig struct {
 	Skipper Skipper
 
 	// BeforeNextFunc defines a function that is called before next middleware or handler is called in chain.
-	BeforeNextFunc func(c echo.Context)
+	BeforeNextFunc func(c *echo.Context)
 	// LogValuesFunc defines a function that is called with values extracted by logger from request/response.
 	// Mandatory.
-	LogValuesFunc func(c echo.Context, v RequestLoggerValues) error
+	LogValuesFunc func(c *echo.Context, v RequestLoggerValues) error
 
 	// HandleError instructs logger to call global error handler when next middleware/handler returns an error.
 	// This is useful when you have custom error handler that can decide to use different status codes.
@@ -184,7 +184,7 @@ type RequestLoggerConfig struct {
 
 Example for naive `fmt.Printf`
 ```go
-skipper := func(c echo.Context) bool {
+skipper := func(c *echo.Context) bool {
 	// Skip health check endpoint
     return c.Request().URL.Path == "/health"
 }
@@ -192,10 +192,10 @@ e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
 	LogStatus: true,
 	LogURI:    true,
 	Skipper: skipper,
-	BeforeNextFunc: func(c echo.Context) {
+	BeforeNextFunc: func(c *echo.Context) {
 		c.Set("customValueFromContext", 42)
 	},
-	LogValuesFunc: func(c echo.Context, v middleware.RequestLoggerValues) error {
+	LogValuesFunc: func(c *echo.Context, v middleware.RequestLoggerValues) error {
 		value, _ := c.Get("customValueFromContext").(int)
 		fmt.Printf("REQUEST: uri: %v, status: %v, custom-value: %v\n", v.URI, v.Status, value)
 		return nil
@@ -217,7 +217,7 @@ e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
     LogURI:      true,
     LogError:    true,
     HandleError: true, // forwards error to the global error handler, so it can decide appropriate status code
-    LogValuesFunc: func(c echo.Context, v middleware.RequestLoggerValues) error {
+    LogValuesFunc: func(c *echo.Context, v middleware.RequestLoggerValues) error {
         if v.Error == nil {
             logger.LogAttrs(context.Background(), slog.LevelInfo, "REQUEST",
                 slog.String("uri", v.URI),
@@ -245,7 +245,7 @@ logger := zerolog.New(os.Stdout)
 e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
 	LogURI:    true,
 	LogStatus: true,
-	LogValuesFunc: func(c echo.Context, v middleware.RequestLoggerValues) error {
+	LogValuesFunc: func(c *echo.Context, v middleware.RequestLoggerValues) error {
 		logger.Info().
 			Str("URI", v.URI).
 			Int("status", v.Status).
@@ -266,7 +266,7 @@ logger, _ := zap.NewProduction()
 e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
 	LogURI:    true,
 	LogStatus: true,
-	LogValuesFunc: func(c echo.Context, v middleware.RequestLoggerValues) error {
+	LogValuesFunc: func(c *echo.Context, v middleware.RequestLoggerValues) error {
 		logger.Info("request",
 			zap.String("URI", v.URI),
 			zap.Int("status", v.Status),
@@ -287,7 +287,7 @@ log := logrus.New()
 e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
 	LogURI:    true,
 	LogStatus: true,
-	LogValuesFunc: func(c echo.Context, values middleware.RequestLoggerValues) error {
+	LogValuesFunc: func(c *echo.Context, values middleware.RequestLoggerValues) error {
 		log.WithFields(logrus.Fields{
 			"URI":   values.URI,
 			"status": values.Status,
@@ -310,7 +310,7 @@ This panic arises when the `LogValuesFunc` callback function, which is mandatory
 To address this, you must define a suitable function that adheres to the `LogValuesFunc` specifications and then assign it within the middleware configuration. Consider the following straightforward illustration:
 
 ```go
-func logValues(c echo.Context, v middleware.RequestLoggerValues) error {
+func logValues(c *echo.Context, v middleware.RequestLoggerValues) error {
     fmt.Printf("Request Method: %s, URI: %s\n", v.Method, v.URI)
     return nil
 }

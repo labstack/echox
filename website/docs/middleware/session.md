@@ -43,7 +43,7 @@ func main() {
 	e := echo.New()
 	e.Use(session.Middleware(sessions.NewCookieStore([]byte("secret"))))
 
-	e.GET("/create-session", func(c echo.Context) error {
+	e.GET("/create-session", func(c *echo.Context) error {
 		sess, err := session.Get("session", c)
 		if err != nil {
 			return err
@@ -60,7 +60,7 @@ func main() {
 		return c.NoContent(http.StatusOK)
 	})
 
-	e.GET("/read-session", func(c echo.Context) error {
+	e.GET("/read-session", func(c *echo.Context) error {
 		sess, err := session.Get("session", c)
 		if err != nil {
 			return err

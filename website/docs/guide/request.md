@@ -13,15 +13,23 @@ sidebar_position: 9
 Form data can be retrieved by name using `Context#FormValue(name string)`.
 
 ```go
-// Handler
-func(c echo.Context) error {
-  name := c.FormValue("name")
-  return c.String(http.StatusOK, name)
+	e.POST("/form", func(c *echo.Context) error {
+		name := c.FormValue("name")
+		return c.String(http.StatusOK, name)
+	})
+```
+
+For types other than `string` you can use `echo.FormValue[t]` genetic type function.
+```go
+age, err := echo.FormValue[int](c, "age")
+if err != nil {
+	return err
 }
 ```
 
+Test with:
 ```sh
-curl -X POST http://localhost:1323 -d 'name=Joe'
+curl -X POST http://localhost:1323 -d 'name=Joe&age=30'
 ```
 
 To bind a custom data type, you can implement `Echo#BindUnmarshaler` interface.
@@ -42,33 +50,46 @@ Query parameters can be retrieved by name using `Context#QueryParam(name string)
 
 ```go
 // Handler
-func(c echo.Context) error {
+func(c *echo.Context) error {
   name := c.QueryParam("name")
   return c.String(http.StatusOK, name)
 })
 ```
 
-```sh
-curl \
-  -X GET \
-  http://localhost:1323\?name\=Joe
+For types other than `string` you can use `echo.QueryParam[t]` genetic type function.
+```go
+age, err := echo.QueryParam[int](c, "age")
+if err != nil {
+	return err
+}
 ```
 
-Similar to form data, custom data type can be bind using `Context#QueryParam(name string)`.
+```sh
+curl -X GET "http://localhost:1323?name=Joe&age=30"
+```
 
 ### Path Parameters
 
 Registered path parameters can be retrieved by name using `Context#Param(name string) string`.
 
 ```go
-e.GET("/users/:name", func(c echo.Context) error {
+e.GET("/users/:name", func(c *echo.Context) error {
   name := c.Param("name")
   return c.String(http.StatusOK, name)
 })
 ```
 
+For types other than `string` you can use `echo.PathParam[t]` genetic type function.
+```go
+ID, err := echo.PathParam[int](c, "id")
+if err != nil {
+	return err
+}
+```
+
 ```sh
 curl http://localhost:1323/users/Joe
+curl http://localhost:1323/users/123
 ```
 
 ### Binding Data
@@ -87,47 +108,49 @@ Example below uses https://github.com/go-playground/validator framework for vali
 package main
 
 import (
-  "net/http"
+	"context"
+	"fmt"
+	"net/http"
 
-  "github.com/go-playground/validator"
-  "github.com/labstack/echo/v4"
-  "github.com/labstack/echo/v4/middleware"
+	"github.com/go-playground/validator/v10" // installed by `go get github.com/go-playground/validator/v10`
+	"github.com/labstack/echo/v5"
 )
 
-type (
-  User struct {
-    Name  string `json:"name" validate:"required"`
-    Email string `json:"email" validate:"required,email"`
-  }
 
-  CustomValidator struct {
-    validator *validator.Validate
-  }
-)
+type CustomValidator struct {
+	validator *validator.Validate
+}
 
-func (cv *CustomValidator) Validate(i interface{}) error {
-  if err := cv.validator.Struct(i); err != nil {
-    // Optionally, you could return the error to give each route more control over the status code
-    return echo.NewHTTPError(http.StatusBadRequest, err.Error())
-  }
-  return nil
+func (cv *CustomValidator) Validate(i any) error {
+	if err := cv.validator.Struct(i); err != nil {
+		// Optionally, you could return the error to give each route more control over the status code
+		return echo.ErrBadRequest.Wrap(err)
+	}
+	return nil
+}
+
+type User struct {
+	Name  string `json:"name" validate:"required"`
+	Email string `json:"email" validate:"required,email"`
 }
 
 func main() {
-  e := echo.New()
-  e.Validator = &CustomValidator{validator: validator.New()}
-  e.POST("/users", func(c echo.Context) (err error) {
-    u := new(User)
-    if err = c.Bind(u); err != nil {
-      return echo.NewHTTPError(http.StatusBadRequest, err.Error())
-    }
-    if err = c.Validate(u); err != nil {
-      return err
-    }
-    return c.JSON(http.StatusOK, u)
-  })
-  	sc := echo.StartConfig{Address: ":1323"}
-	if err := sc.Start(context.Background(), e); err != nil {
+	e := echo.New()
+	
+	e.Validator = &CustomValidator{validator: validator.New()}
+	
+	e.POST("/users", func(c *echo.Context) (err error) {
+		u := new(User)
+		if err = c.Bind(u); err != nil {
+			return err
+		}
+		if err = c.Validate(u); err != nil {
+			return err
+		}
+		return c.JSON(http.StatusOK, u)
+	})
+	
+	if err := e.Start(":1323"); err != nil {
 		e.Logger.Error("failed to start server", "error", err)
 	}
 }

@@ -14,7 +14,7 @@ import (
 	"github.com/lestrrat-go/jwx/v3/jwk"
 )
 
-func getKey(token *jwt.Token) (interface{}, error) {
+func getKey(token *jwt.Token) (any, error) {
 
 	// For a demonstration purpose, Google Sign-in is used.
 	// https://developers.google.com/identity/sign-in/web/backend-auth

@@ -8,22 +8,29 @@ sidebar_position: 12
 
 ## Rendering
 
-`Context#Render(code int, name string, data interface{}) error` renders a template
+`Context#Render(code int, name string, data any) error` renders a template
 with data and sends a text/html response with status code. Templates can be registered by setting `Echo.Renderer`, allowing us to use any template engine.
 
 Example below shows how to use Go `html/template`:
 
-1. Implement `echo.Renderer` interface
+1. Use default template renderer
+```go
+e.Renderer = &echo.TemplateRenderer{
+	Template: template.Must(template.New("hello").Parse("Hello, {{.}}!")),
+}
+```
 
-    ```go
-    type Template struct {
-        templates *template.Template
-    }
+or Implement `echo.Renderer` interface
 
-    func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
-    	return t.templates.ExecuteTemplate(w, name, data)
-    }
-    ```
+```go
+type Template struct {
+	templates *template.Template
+}
+
+func (t *Template) Render(c *echo.Context, w io.Writer, name string, data any) error {
+	return t.templates.ExecuteTemplate(w, name, data)
+}
+ ```
 
 2. Pre-compile templates
 
@@ -50,27 +57,27 @@ Example below shows how to use Go `html/template`:
 4. Render a template inside your handler
 
     ```go
-    func Hello(c echo.Context) error {
+    func Hello(c *echo.Context) error {
     	return c.Render(http.StatusOK, "hello", "World")
     }
     ```
 
 ## Advanced - Calling Echo from templates
 
-In certain situations it might be useful to generate URIs from the templates. In order to do so, you need to call `Echo#Reverse` from the templates itself. Golang's `html/template` package is not the best suited for this job, but this can be done in two ways: by providing a common method on all objects passed to templates or by passing `map[string]interface{}` and augmenting this object in the custom renderer. Given the flexibility of the latter approach, here is a sample program:
+In certain situations it might be useful to generate URIs from the templates. In order to do so, you need to call `Echo#Reverse` from the templates itself. Golang's `html/template` package is not the best suited for this job, but this can be done in two ways: by providing a common method on all objects passed to templates or by passing `map[string]any` and augmenting this object in the custom renderer. Given the flexibility of the latter approach, here is a sample program:
 
 `template.html`
 
 ```html
 <html>
-    <body>
-        <h1>Hello {{index . "name"}}</h1>
+<body>
+<h1>Hello {{index . "name"}}</h1>
 
-        <p>{{ with $x := index . "reverse" }}
-           {{ call $x "foobar" }} &lt;-- this will call the $x with parameter "foobar"
-           {{ end }}
-        </p>
-    </body>
+<p>{{ with $x := index . "reverse" }}
+   {{ call $x "foobar" }} <!--- this will call the $x with parameter "foobar" -->
+   {{ end }}
+</p>
+</body>
 </html>
 ```
 
@@ -84,7 +91,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 )
 
 // TemplateRenderer is a custom html/template renderer for Echo framework
@@ -93,30 +100,30 @@ type TemplateRenderer struct {
 }
 
 // Render renders a template document
-func (t *TemplateRenderer) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
+func (t *TemplateRenderer) Render(c *echo.Context, w io.Writer, name string, data any) error {
 
 	// Add global methods if data is a map
-	if viewContext, isMap := data.(map[string]interface{}); isMap {
-		viewContext["reverse"] = c.Echo().Reverse
+	if viewContext, isMap := data.(map[string]any); isMap {
+		viewContext["reverse"] = c.RouteInfo().Reverse
 	}
 
 	return t.templates.ExecuteTemplate(w, name, data)
 }
 
 func main() {
-  e := echo.New()
-  renderer := &TemplateRenderer{
-      templates: template.Must(template.ParseGlob("*.html")),
-  }
-  e.Renderer = renderer
+	e := echo.New()
+	e.Renderer = &TemplateRenderer{
+		templates: template.Must(template.ParseGlob("main/*.html")),
+	}
 
-  // Named route "foobar"
-  e.GET("/something", func(c echo.Context) error {
-      return c.Render(http.StatusOK, "template.html", map[string]interface{}{
-          "name": "Dolly!",
-      })
-  }).Name = "foobar"
+	e.GET("/something/:name", func(c *echo.Context) error {
+		return c.Render(http.StatusOK, "template.html", map[string]any{
+			"name": "Dolly!",
+		})
+	})
 
-  e.Logger.Fatal(e.Start(":8000"))
+	if err := e.Start(":1323"); err != nil {
+		e.Logger.Error("shutting down the server", "error", err)
+	}
 }
 ```

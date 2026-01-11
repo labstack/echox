@@ -17,7 +17,7 @@ Echo provides different ways to perform binding, each described in the sections 
 
 ## Struct Tag Binding
 
-With struct binding you define a Go struct with tags specifying the data source and corresponding key. In your request handler you simply call `Context#Bind(i interface{})` with a pointer to your struct. The tags tell the binder everything it needs to know to load data from the request.
+With struct binding you define a Go struct with tags specifying the data source and corresponding key. In your request handler you simply call `Context#Bind(i any)` with a pointer to your struct. The tags tell the binder everything it needs to know to load data from the request.
 
 In this example a struct type `User` tells the binder to bind the query string parameter `id` to its string field `ID`:
 
@@ -78,22 +78,22 @@ It is also possible to bind data directly from a specific source:
   
 Request body:
 ```go
-err := (&DefaultBinder{}).BindBody(c, &payload)
+err := echo.BindBody(c, &payload))
 ```
 
 Query parameters:
 ```go
-err := (&DefaultBinder{}).BindQueryParams(c, &payload)
+err := echo.BindQueryParams(c, &payload)
 ```
 
 Path parameters:
 ```go
-err := (&DefaultBinder{}).BindPathParams(c, &payload)
+err := echo.BindPathValues(c, &payload)
 ```
 
 Header parameters:
 ```go
-err := (&DefaultBinder{}).BindHeaders(c, &payload)
+err := echo.BindHeaders(c, &payload)
 ```
 
 Note that headers is not one of the included sources with `Context#Bind`. The only way to bind header data is by calling `BindHeaders` directly.
@@ -124,22 +124,22 @@ type User struct {
 And a handler at the POST `/users` route binds request data to the struct:
 
 ```go
-e.POST("/users", func(c echo.Context) (err error) {
-  u := new(UserDTO)
-  if err := c.Bind(u); err != nil {
-    return c.String(http.StatusBadRequest, "bad request")
-  }
+e.POST("/users", func(c *echo.Context) (err error) {
+	u := new(UserDTO)
+	if err := c.Bind(u); err != nil {
+		return c.String(http.StatusBadRequest, "bad request")
+	}
 
-  // Load into separate struct for security
-  user := User{
-    Name: u.Name,
-    Email: u.Email,
-    IsAdmin: false // avoids exposing field that should not be bound
-  }
+	// Load into a separate struct for security
+	user := User{
+		Name: u.Name,
+		Email: u.Email,
+		IsAdmin: false // avoids exposing field that should not be bound
+	}
 
-  executeSomeBusinessLogic(user)
-  
-  return c.JSON(http.StatusOK, u)
+	executeSomeBusinessLogic(user)
+
+	return c.JSON(http.StatusOK, u)
 })
 ```
 
@@ -172,7 +172,7 @@ Echo provides an interface to bind explicit data types from a specified source. 
 The following methods provide a handful of methods for binding to Go data type. These binders offer a fluent syntax and can be chained to configure & execute binding, and handle errors. 
 
 * `echo.QueryParamsBinder(c)` - binds query parameters (source URL)
-* `echo.PathParamsBinder(c)` - binds path parameters (source URL)
+* `echo.PathValuesBinder(c)` - binds path parameters (source URL)
 * `echo.FormFieldBinder(c)` - binds form fields (source URL + body). See also [Request.ParseForm](https://golang.org/pkg/net/http/#Request.ParseForm).
 
 ### Error Handling 
@@ -242,14 +242,13 @@ A custom binder can be registered using `Echo#Binder`.
 ```go
 type CustomBinder struct {}
 
-func (cb *CustomBinder) Bind(i interface{}, c echo.Context) (err error) {
-  // You may use default binder
-  db := new(echo.DefaultBinder)
-  if err := db.Bind(i, c); err != echo.ErrUnsupportedMediaType {
-    return
-  }
-
-  // Define your custom implementation here
-  return
+func (cb *CustomBinder) Bind(c *echo.Context, i any) (error) {
+	// You may use default binder
+	db := new(echo.DefaultBinder)
+	if err := db.Bind(c, i); err != echo.ErrUnsupportedMediaType {
+		return err
+	}
+	// Define your custom implementation here
+	return nil
 }
 ```

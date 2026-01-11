@@ -63,7 +63,7 @@ func main() {
 		Filesystem: http.FS(webAssets),
 	}))
 	api := e.Group("/api")
-	api.GET("/users", func(c echo.Context) error {
+	api.GET("/users", func(c *echo.Context) error {
 		return c.String(http.StatusOK, "users")
 	})
 

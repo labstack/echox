@@ -33,7 +33,7 @@ default values for `DisableStackAll` and `DisablePrintStack`.
 
 ```go
 // LogErrorFunc defines a function for custom logging in the middleware.
-LogErrorFunc func(c echo.Context, err error, stack []byte) error
+LogErrorFunc func(c *echo.Context, err error, stack []byte) error
 
 RecoverConfig struct {
   // Skipper defines a function to skip middleware.

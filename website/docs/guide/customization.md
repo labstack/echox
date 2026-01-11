@@ -6,108 +6,20 @@ sidebar_position: 2
 
 # Customization
 
-## Debug
-
-`Echo#Debug` can be used to enable / disable debug mode. Debug mode sets the log level
-to `DEBUG`.
-
 ## Logging
 
-The default format for logging is JSON, which can be changed by modifying the header.
+`Echo#Logger` - the default format for logging is JSON, which writes to `os.Stdout` by default.
 
-### Log Header
-
-`Echo#Logger.SetHeader(string)` can be used to set the header for
-the logger. Default value:
-
-```js
-{"time":"${time_rfc3339_nano}","level":"${level}","prefix":"${prefix}","file":"${short_file}","line":"${line}"}
-```
-
-*Example*
-```go
-import "github.com/labstack/gommon/log"
-
-/* ... */
-
-if l, ok := e.Logger.(*log.Logger); ok {
-  l.SetHeader("${time_rfc3339} ${level}")
-}
-```
-
-```sh
-2018-05-08T20:30:06-07:00 INFO info
-```
-
-#### Available Tags
-
-- `time_rfc3339`
-- `time_rfc3339_nano`
-- `level`
-- `prefix`
-- `long_file`
-- `short_file`
-- `line`
-
-### Log Output
-
-`Echo#Logger.SetOutput(io.Writer)` can be used to set the output destination for
-the logger. Default value is `os.Stdout`
-
-To completely disable logs use `Echo#Logger.SetOutput(io.Discard)` or `Echo#Logger.SetLevel(log.OFF)`
-
-### Log Level
-
-`Echo#Logger.SetLevel(log.Lvl)` can be used to set the log level for the logger.
-Default value is `ERROR`. Possible values:
-
-- `DEBUG`
-- `INFO`
-- `WARN`
-- `ERROR`
-- `OFF`
 
 ### Custom Logger
 
-Logging is implemented using `echo.Logger` interface which allows you to register
+Logging is implemented using `slog.Logger` interface which allows you to register
 a custom logger using `Echo#Logger`.
 
-## Startup Banner
-
-`Echo#HideBanner` can be used to hide the startup banner.
-
-## Listener Port
-
-`Echo#HidePort` can be used to hide the listener port message.
-
-## Custom Listener
-
-`Echo#*Listener` can be used to run a custom listener.
-
-*Example*
-
 ```go
-l, err := net.Listen("tcp", ":1323")
-if err != nil {
-  e.Logger.Fatal(err)
-}
-e.Listener = l
-e.Logger.Fatal(e.Start(""))
+e.Logger = slog.New(slog.NewJSONHandler(os.Stdout, nil))
 ```
 
-## Disable HTTP/2
-
-`Echo#DisableHTTP2` can be used to disable HTTP/2 protocol.
-
-## Read Timeout
-
-`Echo#*Server#ReadTimeout` can be used to set the maximum duration before timing out read
-of the request.
-
-## Write Timeout
-
-`Echo#*Server#WriteTimeout` can be used to set the maximum duration before timing out write
-of the response.
 
 ## Validator
 
@@ -116,11 +28,13 @@ on request payload.
 
 [Learn more](./request.md#validate-data)
 
+
 ## Custom Binder
 
 `Echo#Binder` can be used to register a custom binder for binding request payload.
 
 [Learn more](./binding#custom-binding)
+
 
 ## Custom JSON Serializer
 
@@ -128,14 +42,30 @@ on request payload.
 
 Have a look at `DefaultJSONSerializer` on [json.go](https://github.com/labstack/echo/blob/master/json.go).
 
+
 ## Renderer
 
 `Echo#Renderer` can be used to register a renderer for template rendering.
 
 [Learn more](./templates.md)
 
+
 ## HTTP Error Handler
 
 `Echo#HTTPErrorHandler` can be used to register a custom http error handler.
 
+
+## HTTP Error Handler
+
+`Echo#OnAddRoute` can be used to register a callback function that is invoked when a new route is added to the router.
+
 [Learn more](./error-handling.md)
+
+
+## IP Extractor for finding real IP address
+
+`Echo#IPExtractor` is used to retrieve IP address reliably/securely, you must let your application be aware of the entire 
+architecture of your infrastructure. In Echo, this can be done by configuring `Echo#IPExtractor` appropriately.
+
+[Learn more](./ip-address.md)
+

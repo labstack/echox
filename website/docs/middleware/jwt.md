@@ -48,7 +48,7 @@ type Config struct {
 	BeforeFunc middleware.BeforeFunc
 
 	// SuccessHandler defines a function which is executed for a valid token.
-	SuccessHandler func(c echo.Context)
+	SuccessHandler func(c *echo.Context)
 
 	// ErrorHandler defines a function which is executed when all lookups have been done and none of them passed Validator
 	// function. ErrorHandler is executed with last missing (ErrExtractionValueMissing) or an invalid key.
@@ -57,7 +57,7 @@ type Config struct {
 	// Note: when error handler swallows the error (returns nil) middleware continues handler chain execution towards handler.
 	// This is useful in cases when portion of your site/api is publicly accessible and has extra features for authorized users
 	// In that case you can use ErrorHandler to set default public JWT token value to request and continue with handler chain.
-	ErrorHandler func(c echo.Context, err error) error
+	ErrorHandler func(c *echo.Context, err error) error
 
 	// ContinueOnIgnoredError allows the next middleware/handler to be called when ErrorHandler decides to
 	// ignore the error (by returning `nil`).
@@ -74,13 +74,13 @@ type Config struct {
 	// This is one of the three options to provide a token validation key.
 	// The order of precedence is a user-defined KeyFunc, SigningKeys and SigningKey.
 	// Required if neither user-defined KeyFunc nor SigningKeys is provided.
-	SigningKey interface{}
+	SigningKey any
 
 	// Map of signing keys to validate token with kid field usage.
 	// This is one of the three options to provide a token validation key.
 	// The order of precedence is a user-defined KeyFunc, SigningKeys and SigningKey.
 	// Required if neither user-defined KeyFunc nor SigningKey is provided.
-	SigningKeys map[string]interface{}
+	SigningKeys map[string]any
 
 	// Signing method used to check the token's signing algorithm.
 	// Optional. Default value HS256.
@@ -126,12 +126,12 @@ type Config struct {
 	// ParseTokenFunc defines a user-defined function that parses token from given auth. Returns an error when token
 	// parsing fails or parsed token is invalid.
 	// Defaults to implementation using `github.com/golang-jwt/jwt` as JWT implementation library
-	ParseTokenFunc func(c echo.Context, auth string) (interface{}, error)
+	ParseTokenFunc func(c *echo.Context, auth string) (any, error)
 
 	// Claims are extendable claims data defining token content. Used by default ParseTokenFunc implementation.
 	// Not used if custom ParseTokenFunc is set.
 	// Optional. Defaults to function returning jwt.MapClaims
-	NewClaimsFunc func(c echo.Context) jwt.Claims
+	NewClaimsFunc func(c *echo.Context) jwt.Claims
 }
 ```
 

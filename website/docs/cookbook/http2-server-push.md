@@ -23,7 +23,7 @@ e.Static("/", "static")
 ### 2) Create a handler to serve index.html and push it's dependencies
 
 ```go
-e.GET("/", func(c echo.Context) (err error) {
+e.GET("/", func(c *echo.Context) (err error) {
   pusher, ok := c.Response().Writer.(http.Pusher)
   if ok {
     if err = pusher.Push("/app.css", nil); err != nil {

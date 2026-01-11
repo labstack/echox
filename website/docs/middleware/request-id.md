@@ -19,7 +19,7 @@ e.Use(middleware.RequestID())
 
     e.Use(middleware.RequestID())
 
-    e.GET("/", func(c echo.Context) error {
+    e.GET("/", func(c *echo.Context) error {
         return c.String(http.StatusOK, c.Response().Header().Get(echo.HeaderXRequestID))
     })
     	sc := echo.StartConfig{Address: ":1323"}
