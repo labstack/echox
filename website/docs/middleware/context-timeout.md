@@ -17,12 +17,12 @@ e.Use(middleware.ContextTimeout(60 * time.Second))
 
 ```go
 e.Use(middleware.ContextTimeoutWithConfig(middleware.ContextTimeoutConfig{
-    // Skipper defines a function to skip middleware.
-    Skipper:      nil,
-    // ErrorHandler is a function when error aries in middleware execution.
-    ErrorHandler: nil,
-    // Timeout configures a timeout for the middleware, defaults to 0 for no timeout
-    Timeout:      60 * time.Second,
+	// Skipper defines a function to skip middleware.
+	Skipper: nil,
+	// ErrorHandler is a function when error aries in middleware execution.
+	ErrorHandler: nil,
+	// Timeout configures a timeout for the middleware, defaults to 0 for no timeout
+	Timeout: 60 * time.Second,
 }))
 ```
 

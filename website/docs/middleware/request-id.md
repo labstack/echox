@@ -15,17 +15,19 @@ e.Use(middleware.RequestID())
 *Example*
 
 ```go
-    e := echo.New()
+func main() {
+	e := echo.New()
 
-    e.Use(middleware.RequestID())
+	e.Use(middleware.RequestID())
 
-    e.GET("/", func(c *echo.Context) error {
-        return c.String(http.StatusOK, c.Response().Header().Get(echo.HeaderXRequestID))
-    })
-    	sc := echo.StartConfig{Address: ":1323"}
-	if err := sc.Start(context.Background(), e); err != nil {
+	e.GET("/", func(c *echo.Context) error {
+		return c.String(http.StatusOK, c.Response().Header().Get(echo.HeaderXRequestID))
+	})
+
+	if err := e.Start(":8080"); err != nil {
 		e.Logger.Error("failed to start server", "error", err)
 	}
+}
 ```
 
 ## Custom Configuration
@@ -43,19 +45,20 @@ e.Use(middleware.RequestIDWithConfig(middleware.RequestIDConfig{
 ## Configuration
 
 ```go
-RequestIDConfig struct {
-    // Skipper defines a function to skip middleware.
-    Skipper Skipper
+type RequestIDConfig struct {
+	// Skipper defines a function to skip middleware.
+	Skipper Skipper
 
-    // Generator defines a function to generate an ID.
-    // Optional. Default value random.String(32).
-    Generator func() string
+	// Generator defines a function to generate an ID.
+	// Optional. Default value random.String(32).
+	Generator func() string
 
-    // RequestIDHandler defines a function which is executed for a request id.
-    RequestIDHandler func(echo.Context, string)
+	// RequestIDHandler defines a function which is executed for a request id.
+	RequestIDHandler func(c *echo.Context, requestID string)
 
-    // TargetHeader defines what header to look for to populate the id
-    TargetHeader string
+	// TargetHeader defines what header to look for to populate the id.
+	// Optional. Default value is `X-Request-Id`
+	TargetHeader string
 }
 ```
 

@@ -11,11 +11,11 @@ This recipe demonstrates how you can use Echo as a reverse proxy server and load
 ```go
 url1, err := url.Parse("http://localhost:8081")
 if err != nil {
-  e.Logger.Fatal(err)
+  e.Logger.Error("failed parse url", "error", err)
 }
 url2, err := url.Parse("http://localhost:8082")
 if err != nil {
-  e.Logger.Fatal(err)
+  e.Logger.Error("failed parse url", "error", err)
 }
 targets := []*middleware.ProxyTarget{
   {

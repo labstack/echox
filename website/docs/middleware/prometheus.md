@@ -12,12 +12,7 @@ Echo community contribution
 
 Prometheus middleware generates metrics for HTTP requests. 
 
-There are 2 versions of Prometheus middleware:
-
-- latest (recommended) https://github.com/labstack/echo-contrib/blob/master/echoprometheus/prometheus.go
-- old (deprecated) https://github.com/labstack/echo-contrib/blob/master/prometheus/prometheus.go)
-
-Migration guide from old to newer middleware can found [here](https://github.com/labstack/echo-contrib/blob/master/echoprometheus/README.md).
+https://github.com/labstack/echo-contrib/blob/master/echoprometheus/prometheus.go
 
 ## Usage
 
@@ -37,24 +32,24 @@ Serve metric from the same server as where metrics is gathered
 package main
 
 import (
-	"errors"
-	"github.com/labstack/echo-contrib/echoprometheus"
-	"github.com/labstack/echo/v4"
-	"log"
 	"net/http"
+
+	"github.com/labstack/echo-contrib/echoprometheus"
+	"github.com/labstack/echo/v5"
 )
 
 func main() {
 	e := echo.New()
-	e.Use(echoprometheus.NewMiddleware("myapp")) // adds middleware to gather metrics
+
+	e.Use(echoprometheus.NewMiddleware("myapp"))   // adds middleware to gather metrics
 	e.GET("/metrics", echoprometheus.NewHandler()) // adds route to serve gathered metrics
-	
+
 	e.GET("/hello", func(c *echo.Context) error {
 		return c.String(http.StatusOK, "hello")
 	})
 
-	if err := e.Start(":8080"); err != nil && !errors.Is(err, http.ErrServerClosed) {
-		log.Fatal(err)
+	if err := e.Start(":8080"); err != nil {
+		e.Logger.Error("failed to start server", "error", err)
 	}
 }
 ```
@@ -63,23 +58,23 @@ Serve metrics on a separate port
 
 ```go
 func main() {
-	app := echo.New() // this Echo instance will serve route on port 8080
-	app.Use(echoprometheus.NewMiddleware("myapp")) // adds middleware to gather metrics
+	e := echo.New()                              // this Echo instance will serve route on port 8080
+	e.Use(echoprometheus.NewMiddleware("myapp")) // adds middleware to gather metrics
 
 	go func() {
-		metrics := echo.New() // this Echo will run on separate port 8081
+		metrics := echo.New()                                // this Echo will run on separate port 8081
 		metrics.GET("/metrics", echoprometheus.NewHandler()) // adds route to serve gathered metrics
-		if err := metrics.Start(":8081"); err != nil && !errors.Is(err, http.ErrServerClosed) {
-			log.Fatal(err)
+		if err := metrics.Start(":8081"); err != nil {
+			e.Logger.Error("failed to start metrics server", "error", err)
 		}
 	}()
 
-	app.GET("/hello", func(c *echo.Context) error {
+	e.GET("/hello", func(c *echo.Context) error {
 		return c.String(http.StatusOK, "hello")
 	})
 
-	if err := app.Start(":8080"); err != nil && !errors.Is(err, http.ErrServerClosed) {
-		log.Fatal(err)
+	if err := e.Start(":8080"); err != nil {
+		e.Logger.Error("failed to start server", "error", err)
 	}
 }
 ```
@@ -119,16 +114,15 @@ Using custom metrics with Prometheus default registry:
 package main
 
 import (
-	"errors"
-	"github.com/labstack/echo-contrib/echoprometheus"
-	"github.com/labstack/echo/v4"
-	"github.com/prometheus/client_golang/prometheus"
 	"log"
-	"net/http"
+
+	"github.com/labstack/echo-contrib/echoprometheus"
+	"github.com/labstack/echo/v5"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 func main() {
-	e := echo.New()
+	e := echo.New() // this Echo instance will serve route on port 8080
 
 	customCounter := prometheus.NewCounter( // create new counter metric. This is replacement for `prometheus.Metric` struct
 		prometheus.CounterOpts{
@@ -147,10 +141,11 @@ func main() {
 	}))
 	e.GET("/metrics", echoprometheus.NewHandler()) // register route for getting gathered metrics
 
-	if err := e.Start(":8080"); err != nil && !errors.Is(err, http.ErrServerClosed) {
-		log.Fatal(err)
+	if err := e.Start(":8080"); err != nil {
+		e.Logger.Error("failed to start server", "error", err)
 	}
 }
+
 ```
 
 or create your own registry and register custom metrics with that:
@@ -159,16 +154,15 @@ or create your own registry and register custom metrics with that:
 package main
 
 import (
-	"errors"
-	"github.com/labstack/echo-contrib/echoprometheus"
-	"github.com/labstack/echo/v4"
-	"github.com/prometheus/client_golang/prometheus"
 	"log"
-	"net/http"
+
+	"github.com/labstack/echo-contrib/echoprometheus"
+	"github.com/labstack/echo/v5"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 func main() {
-	e := echo.New()
+	e := echo.New() // this Echo instance will serve route on port 8080
 
 	customRegistry := prometheus.NewRegistry() // create custom registry for your custom metrics
 	customCounter := prometheus.NewCounter(    // create new counter metric. This is replacement for `prometheus.Metric` struct
@@ -189,10 +183,11 @@ func main() {
 	}))
 	e.GET("/metrics", echoprometheus.NewHandlerWithConfig(echoprometheus.HandlerConfig{Gatherer: customRegistry})) // register route for getting gathered metrics data from our custom Registry
 
-	if err := e.Start(":8080"); err != nil && !errors.Is(err, http.ErrServerClosed) {
-		log.Fatal(err)
+	if err := e.Start(":8080"); err != nil {
+		e.Logger.Error("failed to start server", "error", err)
 	}
 }
+
 ```
 
 ### Skipping URL(s)
@@ -205,16 +200,15 @@ A middleware skipper can be passed to avoid generating metrics to certain URL(s)
 package main
 
 import (
-	"errors"
-	"github.com/labstack/echo-contrib/echoprometheus"
-	"github.com/labstack/echo/v4"
-	"log"
 	"net/http"
 	"strings"
+
+	"github.com/labstack/echo-contrib/echoprometheus"
+	"github.com/labstack/echo/v5"
 )
 
 func main() {
-	e := echo.New()
+	e := echo.New() // this Echo instance will serve route on port 8080
 
 	mwConfig := echoprometheus.MiddlewareConfig{
 		Skipper: func(c *echo.Context) bool {
@@ -228,11 +222,12 @@ func main() {
 	e.GET("/", func(c *echo.Context) error {
 		return c.String(http.StatusOK, "Hello, World!")
 	})
-
-	if err := e.Start(":8080"); err != nil && !errors.Is(err, http.ErrServerClosed) {
-		log.Fatal(err)
+	
+	if err := e.Start(":8080"); err != nil {
+		e.Logger.Error("failed to start server", "error", err)
 	}
 }
+
 ```
 
 ## Complex Scenarios
@@ -243,16 +238,15 @@ Example: modify default `echoprometheus` metrics definitions
 package main
 
 import (
-	"errors"
-	"github.com/labstack/echo-contrib/echoprometheus"
-	"github.com/labstack/echo/v4"
-	"github.com/prometheus/client_golang/prometheus"
-	"log"
 	"net/http"
+
+	"github.com/labstack/echo-contrib/echoprometheus"
+	"github.com/labstack/echo/v5"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 func main() {
-	e := echo.New()
+	e := echo.New() // this Echo instance will serve route on port 8080
 
 	e.Use(echoprometheus.NewMiddlewareWithConfig(echoprometheus.MiddlewareConfig{
 		// labels of default metrics can be modified or added with `LabelFuncs` function
@@ -290,8 +284,8 @@ func main() {
 		return c.String(http.StatusOK, "hello")
 	})
 
-	if err := e.Start(":8080"); err != nil && !errors.Is(err, http.ErrServerClosed) {
-		log.Fatal(err)
+	if err := e.Start(":8080"); err != nil {
+		e.Logger.Error("failed to start server", "error", err)
 	}
 }
 ```

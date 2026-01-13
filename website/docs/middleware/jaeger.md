@@ -18,7 +18,7 @@ Trace requests on Echo framework with Jaeger Tracing Middleware.
 package main
 import (
     "github.com/labstack/echo-contrib/jaegertracing"
-    "github.com/labstack/echo/v4"
+    "github.com/labstack/echo/v5"
 )
 func main() {
     e := echo.New()
@@ -26,7 +26,7 @@ func main() {
     c := jaegertracing.New(e, nil)
     defer c.Close()
 
-    	sc := echo.StartConfig{Address: ":1323"}
+	sc := echo.StartConfig{Address: ":1323"}
 	if err := sc.Start(context.Background(), e); err != nil {
 		e.Logger.Error("failed to start server", "error", err)
 	}
@@ -85,7 +85,7 @@ package main
 import (
 	"strings"
     "github.com/labstack/echo-contrib/jaegertracing"
-    "github.com/labstack/echo/v4"
+    "github.com/labstack/echo/v5"
 )
 
 // urlSkipper ignores metrics route on some middleware
@@ -102,7 +102,7 @@ func main() {
     c := jaegertracing.New(e, urlSkipper)
     defer c.Close()
 
-    	sc := echo.StartConfig{Address: ":1323"}
+	sc := echo.StartConfig{Address: ":1323"}
 	if err := sc.Start(context.Background(), e); err != nil {
 		e.Logger.Error("failed to start server", "error", err)
 	}
@@ -120,7 +120,7 @@ the duration of the invoked function. There is no need to change function argume
 package main
 import (
     "github.com/labstack/echo-contrib/jaegertracing"
-    "github.com/labstack/echo/v4"
+    "github.com/labstack/echo/v5"
     "net/http"
     "time"
 )
@@ -134,7 +134,7 @@ func main() {
 		jaegertracing.TraceFunction(c, slowFunc, "Test String")
         return c.String(http.StatusOK, "Hello, World!")
     })
-    	sc := echo.StartConfig{Address: ":1323"}
+	sc := echo.StartConfig{Address: ":1323"}
 	if err := sc.Start(context.Background(), e); err != nil {
 		e.Logger.Error("failed to start server", "error", err)
 	}
@@ -158,7 +158,7 @@ giving control on data to be appended to the span like log messages, baggages an
 package main
 import (
     "github.com/labstack/echo-contrib/jaegertracing"
-    "github.com/labstack/echo/v4"
+    "github.com/labstack/echo/v5"
 )
 func main() {
     e := echo.New()
@@ -176,7 +176,7 @@ func main() {
         time.Sleep(100 * time.Millisecond)
         return c.String(http.StatusOK, "Hello, World!")
     })
-    	sc := echo.StartConfig{Address: ":1323"}
+	sc := echo.StartConfig{Address: ":1323"}
 	if err := sc.Start(context.Background(), e); err != nil {
 		e.Logger.Error("failed to start server", "error", err)
 	}

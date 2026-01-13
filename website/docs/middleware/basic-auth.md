@@ -33,17 +33,24 @@ e.Use(middleware.BasicAuthWithConfig(middleware.BasicAuthConfig{}))
 ## Configuration
 
 ```go
-BasicAuthConfig struct {
-  // Skipper defines a function to skip middleware.
-  Skipper Skipper
+type BasicAuthConfig struct {
+	// Skipper defines a function to skip middleware.
+	Skipper Skipper
 
-  // Validator is a function to validate BasicAuth credentials.
-  // Required.
-  Validator BasicAuthValidator
+	// Validator is a function to validate BasicAuthWithConfig credentials. Note: if request contains multiple basic auth headers
+	// this function would be called once for each header until first valid result is returned
+	// Required.
+	Validator BasicAuthValidator
 
-  // Realm is a string to define realm attribute of BasicAuth.
-  // Default value "Restricted".
-  Realm string
+	// Realm is a string to define realm attribute of BasicAuthWithConfig.
+	// Default value "Restricted".
+	Realm string
+
+	// AllowedCheckLimit set how many headers are allowed to be checked. This is useful
+	// environments like corporate test environments with application proxies restricting
+	// access to environment with their own auth scheme.
+	// Defaults to 1.
+	AllowedCheckLimit uint
 }
 ```
 

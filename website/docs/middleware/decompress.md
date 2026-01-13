@@ -32,9 +32,19 @@ e.Use(middleware.DecompressWithConfig(middleware.DecompressConfig{
 ## Configuration
 
 ```go
-DecompressConfig struct {
-  // Skipper defines a function to skip middleware.
-  Skipper Skipper
+type DecompressConfig struct {
+	// Skipper defines a function to skip middleware.
+	Skipper Skipper
+
+	// GzipDecompressPool defines an interface to provide the sync.Pool used to create/store Gzip readers
+	GzipDecompressPool Decompressor
+
+	// MaxDecompressedSize limits the maximum size of decompressed request body in bytes.
+	// If the decompressed body exceeds this limit, the middleware returns HTTP 413 error.
+	// This prevents zip bomb attacks where small compressed payloads decompress to huge sizes.
+	// Default: 100 * MB (104,857,600 bytes)
+	// Set to -1 to disable limits (not recommended in production).
+	MaxDecompressedSize int64
 }
 ```
 

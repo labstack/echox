@@ -29,18 +29,20 @@ This example exposes two endpoints: `/create-session` creates new session and `/
 session if request contains session id.
 
 ```go
+package main
+
 import (
-    "errors"
-    "fmt"
-    "github.com/gorilla/sessions"
-    "github.com/labstack/echo-contrib/session"
-    "github.com/labstack/echo/v4"
-    "log"
-    "net/http"
+	"fmt"
+	"net/http"
+
+	"github.com/gorilla/sessions"
+	"github.com/labstack/echo-contrib/session"
+	"github.com/labstack/echo/v5"
 )
 
 func main() {
 	e := echo.New()
+
 	e.Use(session.Middleware(sessions.NewCookieStore([]byte("secret"))))
 
 	e.GET("/create-session", func(c *echo.Context) error {
@@ -68,10 +70,11 @@ func main() {
 		return c.String(http.StatusOK, fmt.Sprintf("foo=%v\n", sess.Values["foo"]))
 	})
 
-	if err := e.Start(":8080"); err != nil && !errors.Is(err, http.ErrServerClosed) {
-		log.Fatal(err)
+	if err := e.Start(":8080"); err != nil {
+		e.Logger.Error("failed to start server", "error", err)
 	}
 }
+
 ```
 
 ### Example usage
