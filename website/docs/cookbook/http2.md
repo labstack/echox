@@ -40,8 +40,9 @@ e.GET("/request", func(c *echo.Context) error {
 ## 3) Start TLS server using cert.pem and key.pem
 
 ```go
-if err := e.StartTLS(":1323", "cert.pem", "key.pem"); err != http.ErrServerClosed {
-  log.Fatal(err)
+sc := echo.StartConfig{Address: ":1323"}
+if err := sc.StartTLS(context.Background(), e, "cert.pem", "key.pem"); err != nil {
+	e.Logger.Error("failed to start server", "error", err)
 }
 ```
 or use customized HTTP server with your own TLSConfig

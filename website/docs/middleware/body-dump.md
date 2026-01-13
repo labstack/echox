@@ -10,7 +10,8 @@ Body dump middleware captures the request and response payload and calls the reg
 
 ```go
 e := echo.New()
-e.Use(middleware.BodyDump(func(c *echo.Context, reqBody, resBody []byte) {
+e.Use(middleware.BodyDump(func(c *echo.Context, reqBody []byte, resBody []byte, err error) {
+  // logic to handle request body and response body
 }))
 ```
 
@@ -26,13 +27,27 @@ e.Use(middleware.BodyDumpWithConfig(middleware.BodyDumpConfig{}))
 ## Configuration
 
 ```go
-BodyDumpConfig struct {
-  // Skipper defines a function to skip middleware.
-  Skipper Skipper
+type BodyDumpConfig struct {
+	// Skipper defines a function to skip middleware.
+	Skipper Skipper
 
-  // Handler receives request and response payload.
-  // Required.
-  Handler BodyDumpHandler
+	// Handler receives request, response payloads and handler error if there are any.
+	// Required.
+	Handler BodyDumpHandler
+
+	// MaxRequestBytes limits how much of the request body to dump.
+	// If the request body exceeds this limit, only the first MaxRequestBytes
+	// are dumped. The handler callback receives truncated data.
+	// Default: 5 * MB (5,242,880 bytes)
+	// Set to -1 to disable limits (not recommended in production).
+	MaxRequestBytes int64
+
+	// MaxResponseBytes limits how much of the response body to dump.
+	// If the response body exceeds this limit, only the first MaxResponseBytes
+	// are dumped. The handler callback receives truncated data.
+	// Default: 5 * MB (5,242,880 bytes)
+	// Set to -1 to disable limits (not recommended in production).
+	MaxResponseBytes int64
 }
 ```
 

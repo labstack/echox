@@ -51,7 +51,17 @@ To turn off this behavior set the `IgnoreBase` config param to `true`.
 
 Serve SPA assets from embedded filesystem
 ```go
-//go:embed web
+package main
+
+import (
+	"embed"
+	"net/http"
+
+	"github.com/labstack/echo/v5"
+	"github.com/labstack/echo/v5/middleware"
+)
+
+//go:embed assets
 var webAssets embed.FS
 
 func main() {
@@ -59,53 +69,63 @@ func main() {
 
 	e.Use(middleware.StaticWithConfig(middleware.StaticConfig{
 		HTML5:      true,
-		Root:       "web", // because files are located in `web` directory in `webAssets` fs
-		Filesystem: http.FS(webAssets),
+		Root:       "assets", // because files are located in `assets` directory in `webAssets` fs
+		Filesystem: webAssets,
 	}))
 	api := e.Group("/api")
 	api.GET("/users", func(c *echo.Context) error {
 		return c.String(http.StatusOK, "users")
 	})
 
-	if err := e.Start(":8080"); err != nil && !errors.Is(err, http.ErrServerClosed) {
-		log.Fatal(err)
+	if err := e.Start(":8080"); err != nil {
+		e.Logger.Error("failed to start server", "error", err)
 	}
 }
+
 ```
 
 ## Configuration
 
 ```go
-StaticConfig struct {
-  // Skipper defines a function to skip middleware.
-  Skipper Skipper
+type StaticConfig struct {
+	// Skipper defines a function to skip middleware.
+	Skipper Skipper
 
-  // Root directory from where the static content is served.
-  // Required.
-  Root string `json:"root"`
+	// Root directory from where the static content is served (relative to given Filesystem).
+	// `Root: "."` means root folder from Filesystem.
+	// Required.
+	Root string
 
-  // Index file for serving a directory.
-  // Optional. Default value "index.html".
-  Index string `json:"index"`
+	// Filesystem provides access to the static content.
+	// Optional. Defaults to echo.Filesystem (serves files from `.` folder where executable is started)
+	Filesystem fs.FS
 
-  // Enable HTML5 mode by forwarding all not-found requests to root so that
-  // SPA (single-page application) can handle the routing.
-  // Optional. Default value false.
-  HTML5 bool `json:"html5"`
+	// Index file for serving a directory.
+	// Optional. Default value "index.html".
+	Index string
 
-  // Enable directory browsing.
-  // Optional. Default value false.
-  Browse bool `json:"browse"`
-  
-  // Enable ignoring of the base of the URL path.
-  // Example: when assigning a static middleware to a non root path group,
-  // the filesystem path is not doubled
-  // Optional. Default value false.
-  IgnoreBase bool `yaml:"ignoreBase"`
+	// Enable HTML5 mode by forwarding all not-found requests to root so that
+	// SPA (single-page application) can handle the routing.
+	// Optional. Default value false.
+	HTML5 bool
 
-  // Filesystem provides access to the static content.
-  // Optional. Defaults to http.Dir(config.Root)
-  Filesystem http.FileSystem `yaml:"-"`
+	// Enable directory browsing.
+	// Optional. Default value false.
+	Browse bool
+
+	// Enable ignoring of the base of the URL path.
+	// Example: when assigning a static middleware to a non root path group,
+	// the filesystem path is not doubled
+	// Optional. Default value false.
+	IgnoreBase bool
+
+	// DisablePathUnescaping disables path parameter (param: *) unescaping. This is useful when router is set to unescape
+	// all parameter and doing it again in this middleware would corrupt filename that is requested.
+	DisablePathUnescaping bool
+
+	// DirectoryListTemplate is template to list directory contents
+	// Optional. Default to `directoryListHTMLTemplate` constant below.
+	DirectoryListTemplate string
 }
 ```
 

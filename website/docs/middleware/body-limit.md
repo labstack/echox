@@ -9,14 +9,13 @@ size exceeds the configured limit, it sends "413 - Request Entity Too Large"
 response. The body limit is determined based on both `Content-Length` request
 header and actual content read, which makes it super secure.
 
-Limit can be specified as `4x` or `4xB`, where x is one of the multiple from K, M,
-G, T or P.
+Limit is specified as bytes
 
 ## Usage
 
 ```go
 e := echo.New()
-e.Use(middleware.BodyLimit("2M"))
+e.Use(middleware.BodyLimit(2_097_152)) // 2MB
 ```
 
 ## Custom Configuration
@@ -31,13 +30,12 @@ e.Use(middleware.BodyLimitWithConfig(middleware.BodyLimitConfig{}))
 ## Configuration
 
 ```go
-BodyLimitConfig struct {
-  // Skipper defines a function to skip middleware.
-  Skipper Skipper
+type BodyLimitConfig struct {
+	// Skipper defines a function to skip middleware.
+	Skipper Skipper
 
-  // Maximum allowed size for a request body, it can be specified
-  // as `4x` or `4xB`, where x is one of the multiple from K, M, G, T or P.
-  Limit string `json:"limit"`
+	// LimitBytes is maximum allowed size in bytes for a request body
+	LimitBytes int64
 }
 ```
 

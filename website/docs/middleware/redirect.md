@@ -87,7 +87,7 @@ RedirectConfig struct {
 
   // Status code to be used when redirecting the request.
   // Optional. Default value http.StatusMovedPermanently.
-  Code int `json:"code"`
+  Code int
 }
 ```
 

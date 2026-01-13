@@ -15,7 +15,7 @@ Basic middleware behavior:
 ## Dependencies
 
 ```go
-import "github.com/labstack/echo-jwt/v4"
+import "github.com/labstack/echo-jwt/v5"
 ```
 
 ## Usage
@@ -48,7 +48,9 @@ type Config struct {
 	BeforeFunc middleware.BeforeFunc
 
 	// SuccessHandler defines a function which is executed for a valid token.
-	SuccessHandler func(c *echo.Context)
+	// In case SuccessHandler error the middleware stops handler chain execution and
+	// returns error.
+	SuccessHandler func(c *echo.Context) error
 
 	// ErrorHandler defines a function which is executed when all lookups have been done and none of them passed Validator
 	// function. ErrorHandler is executed with last missing (ErrExtractionValueMissing) or an invalid key.
@@ -83,6 +85,7 @@ type Config struct {
 	SigningKeys map[string]any
 
 	// Signing method used to check the token's signing algorithm.
+	// SigningMethod is not checked when a user-defined KeyFunc is provided.
 	// Optional. Default value HS256.
 	SigningMethod string
 

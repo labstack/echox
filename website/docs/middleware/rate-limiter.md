@@ -15,7 +15,7 @@ To add a rate limit to your application simply add the `RateLimiter` middleware.
 The example below will limit the application to 20 requests/sec using the default in-memory store:
 
 ```go
-e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(rate.Limit(20))))
+e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(20.0)))
 ```
 
 :::info
@@ -28,20 +28,20 @@ If the provided rate is a float number, Burst will be treated as the rounded dow
 
 ```go
 config := middleware.RateLimiterConfig{
-    Skipper: middleware.DefaultSkipper,
-    Store: middleware.NewRateLimiterMemoryStoreWithConfig(
-        middleware.RateLimiterMemoryStoreConfig{Rate: rate.Limit(10), Burst: 30, ExpiresIn: 3 * time.Minute},
-    ),
-    IdentifierExtractor: func(ctx echo.Context) (string, error) {
-        id := ctx.RealIP()
-        return id, nil
-    },
-    ErrorHandler: func(context echo.Context, err error) error {
-        return context.JSON(http.StatusForbidden, nil)
-    },
-    DenyHandler: func(context echo.Context, identifier string,err error) error {
-        return context.JSON(http.StatusTooManyRequests, nil)
-    },
+	Skipper: middleware.DefaultSkipper,
+	Store: middleware.NewRateLimiterMemoryStoreWithConfig(
+		middleware.RateLimiterMemoryStoreConfig{Rate: 10, Burst: 30, ExpiresIn: 3 * time.Minute},
+	),
+	IdentifierExtractor: func(c *echo.Context) (string, error) {
+		id := c.RealIP()
+		return id, nil
+	},
+	ErrorHandler: func(c *echo.Context, err error) error {
+		return c.JSON(http.StatusForbidden, nil)
+	},
+	DenyHandler: func(c *echo.Context, identifier string,err error) error {
+		return c.JSON(http.StatusTooManyRequests, nil)
+	},
 }
 
 e.Use(middleware.RateLimiterWithConfig(config))
