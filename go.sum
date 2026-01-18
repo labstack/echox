@@ -26,10 +26,16 @@ github.com/kylelemons/godebug v1.1.0 h1:RPNrshWIDI6G2gRW9EHilWtl7Z6Sb1BR0xunSBf0
 github.com/kylelemons/godebug v1.1.0/go.mod h1:9/0rRGxNHcop5bhtWyNeEfOS8JIWk580+fNqagV/RAw=
 github.com/labstack/echo-contrib v0.17.5-0.20260113213056-68ad9fe34c3d h1:P5nNuXYDv47aLCbf+jLWxmIgtCLPFZQPRqNP52KUoKI=
 github.com/labstack/echo-contrib v0.17.5-0.20260113213056-68ad9fe34c3d/go.mod h1:tGZ39uN7bCDY4WtVWd2KiDFI2PxHB5lhLOtSNb+9tE4=
+github.com/labstack/echo-contrib v0.50.0 h1:MLTQdqME3BEBczV2thYz9yPT5sBhzkoUEpwAOY9llds=
+github.com/labstack/echo-contrib v0.50.0/go.mod h1:oftqJL4enNg9ao1VLpVZmisVE5/8uwHtIYE4zTpqyWU=
 github.com/labstack/echo-jwt/v5 v5.0.0-20260101195926-7cdd901b4337 h1:+9keiGOPRLJvrh+hp+4hApQK/seq3iVr0hVdRweUUYI=
 github.com/labstack/echo-jwt/v5 v5.0.0-20260101195926-7cdd901b4337/go.mod h1:7zV1rqeuZ57XS4nwL/ymw4tywVUzg5SEovZandLv9nI=
+github.com/labstack/echo-jwt/v5 v5.0.0 h1:uPp+FpkI/PKpMPPygtnK3RQOpg5a2wlM04UgfpWLVyI=
+github.com/labstack/echo-jwt/v5 v5.0.0/go.mod h1:RYF2ojWXbaY09QQ5J9vVtPUtkyI5UztS0gJotmCRz/U=
 github.com/labstack/echo/v5 v5.0.0-20260106091252-d6cb58b5c24e h1:QFu8S1iZijCXEUcP8u/h+JtZYlekbt0VIndrKbT/VAo=
 github.com/labstack/echo/v5 v5.0.0-20260106091252-d6cb58b5c24e/go.mod h1:5La3y+CVfH4IzVRlQA2LmK+clJEniclmzbqSyZIhsP4=
+github.com/labstack/echo/v5 v5.0.0 h1:JHKGrI0cbNsNMyKvranuY0C94O4hSM7yc/HtwcV3Na4=
+github.com/labstack/echo/v5 v5.0.0/go.mod h1:SyvlSdObGjRXeQfCCXW/sybkZdOOQZBmpKF0bvALaeo=
 github.com/lestrrat-go/blackmagic v1.0.4 h1:IwQibdnf8l2KoO+qC3uT4OaTWsW7tuRQXy9TRN9QanA=
 github.com/lestrrat-go/blackmagic v1.0.4/go.mod h1:6AWFyKNNj0zEXQYfTMPfZrAXUWUfTIZ5ECEUEJaijtw=
 github.com/lestrrat-go/dsig v1.0.0 h1:OE09s2r9Z81kxzJYRn07TFM9XA4akrUdoMwr0L8xj38=

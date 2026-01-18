@@ -5,9 +5,9 @@ go 1.25.0
 require (
 	github.com/golang-jwt/jwt/v5 v5.3.0
 	github.com/gorilla/websocket v1.5.3
-	github.com/labstack/echo-contrib v0.17.5-0.20260113213056-68ad9fe34c3d
-	github.com/labstack/echo-jwt/v5 v5.0.0-20260101195926-7cdd901b4337
-	github.com/labstack/echo/v5 v5.0.0-20260106091252-d6cb58b5c24e
+	github.com/labstack/echo-contrib v0.50.0
+	github.com/labstack/echo-jwt/v5 v5.0.0
+	github.com/labstack/echo/v5 v5.0.0
 	github.com/lestrrat-go/jwx/v3 v3.0.13
 	github.com/prometheus/client_golang v1.23.2
 	github.com/r3labs/sse/v2 v2.10.0
