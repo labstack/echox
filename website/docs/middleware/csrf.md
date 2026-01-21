@@ -63,11 +63,11 @@ e.Use(middleware.CSRFWithConfig(middleware.CSRFConfig{
 
 Example above uses `X-XSRF-TOKEN` request header to extract CSRF token.
 
-*Example Configuration that reads token from Cookie*
+*Example Configuration that reads token from Form*
 
 ```go
 middleware.CSRFWithConfig(middleware.CSRFConfig{
-	TokenLookup:    "cookie:_csrf",
+	TokenLookup:    "form:_csrf",
 	CookiePath:     "/",
 	CookieDomain:   "example.com",
 	CookieSecure:   true,
