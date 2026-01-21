@@ -54,12 +54,12 @@ Have a look at `DefaultJSONSerializer` on [json.go](https://github.com/labstack/
 
 `Echo#HTTPErrorHandler` can be used to register a custom http error handler.
 
+[Learn more](./error-handling.md)
+
 
 ## HTTP Error Handler
 
 `Echo#OnAddRoute` can be used to register a callback function that is invoked when a new route is added to the router.
-
-[Learn more](./error-handling.md)
 
 
 ## IP Extractor for finding real IP address
