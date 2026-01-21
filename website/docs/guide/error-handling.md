@@ -108,7 +108,7 @@ func customHTTPErrorHandler(c *echo.Context, err error) {
 		cErr = c.File(errorPage)
 	}
 	if cErr != nil {
-		c.Logger().Error("failed to send error page to client", "error", errors.Join(err, fErr))
+		c.Logger().Error("failed to send error page to client", "error", errors.Join(err, cErr))
 	}
 }
 
