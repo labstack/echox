@@ -56,11 +56,11 @@ func accessible(c *echo.Context) error {
 }
 
 func restricted(c *echo.Context) error {
-	user, err := echo.ContextGet[*jwt.Token](c, "user")
+	token, err := echo.ContextGet[*jwt.Token](c, "user")
 	if err != nil {
 		return echo.ErrUnauthorized.Wrap(err)
 	}
-	claims := user.Claims.(*jwtCustomClaims)
+	claims := token.Claims.(*jwtCustomClaims)
 	name := claims.Name
 	return c.String(http.StatusOK, "Welcome "+name+"!")
 }

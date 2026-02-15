@@ -17,7 +17,7 @@ Trace requests on Echo framework with Jaeger Tracing Middleware.
 ```go
 package main
 import (
-    "github.com/labstack/echo-contrib/jaegertracing"
+    "github.com/labstack/echo-contrib/v5/jaegertracing"
     "github.com/labstack/echo/v5"
 )
 func main() {
@@ -84,7 +84,7 @@ A middleware skipper can be passed to avoid tracing spans to certain URL(s).
 package main
 import (
 	"strings"
-    "github.com/labstack/echo-contrib/jaegertracing"
+    "github.com/labstack/echo-contrib/v5/jaegertracing"
     "github.com/labstack/echo/v5"
 )
 
@@ -119,7 +119,7 @@ the duration of the invoked function. There is no need to change function argume
 ```go
 package main
 import (
-    "github.com/labstack/echo-contrib/jaegertracing"
+    "github.com/labstack/echo-contrib/v5/jaegertracing"
     "github.com/labstack/echo/v5"
     "net/http"
     "time"
@@ -157,7 +157,7 @@ giving control on data to be appended to the span like log messages, baggages an
 ```go
 package main
 import (
-    "github.com/labstack/echo-contrib/jaegertracing"
+    "github.com/labstack/echo-contrib/v5/jaegertracing"
     "github.com/labstack/echo/v5"
 )
 func main() {
