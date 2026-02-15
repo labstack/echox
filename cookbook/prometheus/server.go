@@ -3,7 +3,7 @@ package main
 import (
 	"net/http"
 
-	"github.com/labstack/echo-contrib/echoprometheus"
+	"github.com/labstack/echo-contrib/v5/echoprometheus"
 	"github.com/labstack/echo/v5"
 	"github.com/prometheus/client_golang/prometheus"
 )

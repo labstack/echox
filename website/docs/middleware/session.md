@@ -8,22 +8,49 @@ Session middleware facilitates HTTP session management backed by [gorilla sessio
 filesystem based session store; however, you can take advantage of [community maintained
 implementation](https://github.com/gorilla/sessions#store-implementations) for various backends.
 
-:::note
-
-Echo community contribution
-
-:::
 
 ## Dependencies
 
+```bash
+go get github.com/gorilla/sessions
+```
+
 ```go
 import (
-  "github.com/gorilla/sessions"
-  "github.com/labstack/echo-contrib/session"
+	"github.com/gorilla/sessions"
 )
 ```
 
-## Usage
+## Implementation
+
+Function to create session middleware and utility function to get session from context:
+```go
+func NewSessionMiddleware(store sessions.Store) echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c *echo.Context) error {
+			c.Set("_session_store", store)
+			return next(c)
+		}
+	}
+}
+
+func GetSession(c *echo.Context, name string) (*sessions.Session, error) {
+	store, err := echo.ContextGet[sessions.Store](c, "_session_store")
+	if err != nil {
+		return nil, err
+	}
+	return store.Get(c.Request(), name)
+}
+```
+
+Middleware can be initialized like this:
+```go
+	sessionStore := sessions.NewCookieStore([]byte("secret"))
+	e.Use(NewSessionMiddleware(sessionStore))
+```
+
+
+## Usage example
 
 This example exposes two endpoints: `/create-session` creates new session and `/read-session` read value from 
 session if request contains session id.
@@ -36,17 +63,34 @@ import (
 	"net/http"
 
 	"github.com/gorilla/sessions"
-	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v5"
 )
+
+func NewSessionMiddleware(store sessions.Store) echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c *echo.Context) error {
+			c.Set("_session_store", store)
+			return next(c)
+		}
+	}
+}
+
+func GetSession(c *echo.Context, name string) (*sessions.Session, error) {
+	store, err := echo.ContextGet[sessions.Store](c, "_session_store")
+	if err != nil {
+		return nil, fmt.Errorf("failed to get session store: %w", err)
+	}
+	return store.Get(c.Request(), name)
+}
 
 func main() {
 	e := echo.New()
 
-	e.Use(session.Middleware(sessions.NewCookieStore([]byte("secret"))))
+	sessionStore := sessions.NewCookieStore([]byte("secret"))
+	e.Use(NewSessionMiddleware(sessionStore))
 
 	e.GET("/create-session", func(c *echo.Context) error {
-		sess, err := session.Get("session", c)
+		sess, err := GetSession(c, "session")
 		if err != nil {
 			return err
 		}
@@ -63,7 +107,7 @@ func main() {
 	})
 
 	e.GET("/read-session", func(c *echo.Context) error {
-		sess, err := session.Get("session", c)
+		sess, err := GetSession(c, "session")
 		if err != nil {
 			return err
 		}
@@ -139,32 +183,3 @@ foo=bar
 * Connection #0 to host localhost left intact
 ```
 
-## Custom Configuration
-
-### Usage
-
-```go
-e := echo.New()
-e.Use(session.MiddlewareWithConfig(session.Config{}))
-```
-
-## Configuration
-
-```go
-Config struct {
-  // Skipper defines a function to skip middleware.
-  Skipper middleware.Skipper
-
-  // Session store.
-  // Required.
-  Store sessions.Store
-}
-```
-
-### Default Configuration
-
-```go
-DefaultConfig = Config{
-  Skipper: DefaultSkipper,
-}
-```
