@@ -178,3 +178,9 @@ var DefaultCSRFConfig = CSRFConfig{
 	CookieSameSite: http.SameSiteDefaultMode,
 }
 ```
+
+## Full example
+
+```go reference
+https://github.com/labstack/echox/blob/master/cookbook/csrf/main.go
+```
