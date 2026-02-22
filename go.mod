@@ -3,11 +3,12 @@ module github.com/labstack/echox
 go 1.25.0
 
 require (
+	github.com/casbin/casbin/v3 v3.10.0
 	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/gorilla/websocket v1.5.3
-	github.com/labstack/echo-contrib/v5 v5.0.0
-	github.com/labstack/echo-jwt/v5 v5.0.0
-	github.com/labstack/echo/v5 v5.0.3
+	github.com/labstack/echo-contrib/v5 v5.0.1
+	github.com/labstack/echo-jwt/v5 v5.0.1
+	github.com/labstack/echo/v5 v5.0.4
 	github.com/lestrrat-go/jwx/v3 v3.0.13
 	github.com/prometheus/client_golang v1.23.2
 	github.com/r3labs/sse/v2 v2.10.0
@@ -19,7 +20,6 @@ require (
 require (
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bmatcuk/doublestar/v4 v4.10.0 // indirect
-	github.com/casbin/casbin/v3 v3.10.0 // indirect
 	github.com/casbin/govaluate v1.10.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
