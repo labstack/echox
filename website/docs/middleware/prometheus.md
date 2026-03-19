@@ -4,19 +4,13 @@ description: Prometheus metrics middleware
 
 # Prometheus
 
-:::note
-
-Echo community contribution
-
-:::
-
 Prometheus middleware generates metrics for HTTP requests. 
 
-https://github.com/labstack/echo-contrib/blob/master/echoprometheus/prometheus.go
+https://github.com/labstack/echo-prometheus
 
 ## Usage
 
-- Add needed module `go get -u github.com/labstack/echo-contrib/v5`
+- Add needed module `go get -u github.com/labstack/echo-prometheus`
 - Add Prometheus middleware and metrics serving route
     ```go
     e := echo.New()
@@ -34,7 +28,7 @@ package main
 import (
 	"net/http"
 
-	"github.com/labstack/echo-contrib/v5/echoprometheus"
+	echoprometheus "github.com/labstack/echo-prometheus"
 	"github.com/labstack/echo/v5"
 )
 
@@ -116,7 +110,7 @@ package main
 import (
 	"log"
 
-	"github.com/labstack/echo-contrib/v5/echoprometheus"
+	echoprometheus "github.com/labstack/echo-prometheus"
 	"github.com/labstack/echo/v5"
 	"github.com/prometheus/client_golang/prometheus"
 )
@@ -156,7 +150,7 @@ package main
 import (
 	"log"
 
-	"github.com/labstack/echo-contrib/v5/echoprometheus"
+	echoprometheus "github.com/labstack/echo-prometheus"
 	"github.com/labstack/echo/v5"
 	"github.com/prometheus/client_golang/prometheus"
 )
@@ -203,7 +197,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/labstack/echo-contrib/v5/echoprometheus"
+	echoprometheus "github.com/labstack/echo-prometheus"
 	"github.com/labstack/echo/v5"
 )
 
@@ -240,7 +234,7 @@ package main
 import (
 	"net/http"
 
-	"github.com/labstack/echo-contrib/v5/echoprometheus"
+	echoprometheus "github.com/labstack/echo-prometheus"
 	"github.com/labstack/echo/v5"
 	"github.com/prometheus/client_golang/prometheus"
 )
