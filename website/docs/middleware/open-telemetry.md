@@ -8,6 +8,7 @@ Echo-opentelemetry is a middleware for Echo framework that provides OpenTelemetr
 https://github.com/labstack/echo-opentelemetry
 
 Open-telemetry is a set of open-source tools that provide instrumentation for cloud native applications. 
+* [OpenTelemetry Exporters](https://opentelemetry.io/docs/languages/go/exporters/)
 * [OpenTelemetry HTTP spec](https://opentelemetry.io/docs/specs/semconv/http/)
 * [HTTP metrics spec](https://opentelemetry.io/docs/specs/semconv/http/http-metrics/)
 
@@ -63,5 +64,9 @@ tp, err := echo.ContextGet[trace.Tracer](c, echootel.TracerKey)
 
 ## Example
 
-https://github.com/labstack/echo-opentelemetry/blob/main/example/main.go
+This example is exporting metrics and spans to stdout but you can use any exporter (OTLP etc).
+Read about [OpenTelemetry exporters](https://opentelemetry.io/docs/languages/go/exporters)
 
+```go reference
+https://github.com/labstack/echo-opentelemetry/blob/main/example/main.go
+```
