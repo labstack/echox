@@ -253,6 +253,12 @@ middleware. In addition to specified middleware group also inherits parent middl
 To add middleware later in the group you can use `Group.Use(m ...Middleware)`.
 Groups can also be nested.
 
+:::note
+
+Group level middlewares are tied to the route and will work only if the group has at least one route.
+
+:::
+
 ### Basic Group Usage
 
 ```go
