@@ -16,6 +16,8 @@ e.Use(middleware.Static("/static"))
 This serves static files from `static` directory. For example, a request to `/js/main.js`
 will fetch and serve `static/js/main.js` file.
 
+
+
 ## Custom Configuration
 
 ### Usage
@@ -38,7 +40,14 @@ Default behavior when using with non root URL paths is to append the URL path to
 group := root.Group("somepath")
 group.Use(middleware.Static(filepath.Join("filesystempath")))
 // When an incoming request comes for `/somepath` the actual filesystem request goes to `filesystempath/somepath` instead of only `filesystempath`. 
+group.GET("/*", func(c *echo.Context) error { return echo.ErrNotFound })
 ```
+
+:::note
+
+Group level middlewares are tied to the route and will work only if the group has at least one route.
+
+:::
 
 :::tip
 
