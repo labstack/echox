@@ -4,9 +4,19 @@ slug: /static-files
 sidebar_position: 11
 ---
 
-# Static Files
+# Serving Static Files
 
 Images, JavaScript, CSS, PDF, Fonts and so on...
+
+## Default file system
+
+Echo uses `os.DirFS(".")` as default a file system which is set to current working directory. 
+To change the default file system, use `Echo#Filesystem` field.
+
+```go
+e := echo.New()
+e.Filesystem = os.DirFS("assets")
+```
 
 ## Using Static Middleware
 
@@ -73,8 +83,16 @@ e.File("/", "public/index.html")
 
 *Usage 2*
 
-Serving a favicon from `images/favicon.ico`
+:::important
+
+Leading `/` in the file path is will not work with most of the fs.FS implementations.
+
+:::
+
+Serving a favicon from `/app/assets/favicon.ico`
 
 ```go
-e.File("/favicon.ico", "images/favicon.ico")
+e := echo.New()
+e.Filesystem = os.DirFS("/")
+e.File("/favicon.ico", "app/assets/favicon.ico") // <--- file path must not have a leading slash
 ```
