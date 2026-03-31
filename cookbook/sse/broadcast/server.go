@@ -1,8 +1,11 @@
 package main
 
 import (
-	"errors"
+	"context"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/labstack/echo/v5"
@@ -49,7 +52,17 @@ func main() {
 		return nil
 	})
 
-	if err := e.Start(":8080"); err != nil && !errors.Is(err, http.ErrServerClosed) {
-		e.Logger.Error("shutting down the server", "error", err)
+	sc := echo.StartConfig{
+		Address: ":8080",
+		BeforeServeFunc: func(s *http.Server) error {
+			s.WriteTimeout = 0 // IMPORTANT: disable for SSE
+			return nil
+		},
+	}
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM) // start shutdown process on ctrl+c
+	defer cancel()
+
+	if err := sc.Start(ctx, e); err != nil {
+		e.Logger.Error("failed to start server", "error", err)
 	}
 }

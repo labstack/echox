@@ -1,9 +1,13 @@
 package main
 
 import (
-	"errors"
+	"context"
+	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/labstack/echo/v5"
@@ -27,14 +31,16 @@ func main() {
 
 		ticker := time.NewTicker(1 * time.Second)
 		defer ticker.Stop()
+		count := uint64(0)
 		for {
 			select {
 			case <-c.Request().Context().Done():
 				log.Printf("SSE client disconnected, ip: %v", c.RealIP())
 				return nil
 			case <-ticker.C:
+				count++
 				event := Event{
-					Data: []byte("time: " + time.Now().Format(time.RFC3339Nano)),
+					Data: []byte(fmt.Sprintf("count: %d, time: %s\n\n", count, time.Now().Format(time.RFC3339Nano))),
 				}
 				if err := event.MarshalTo(w); err != nil {
 					return err
@@ -46,7 +52,17 @@ func main() {
 		}
 	})
 
-	if err := e.Start(":8080"); err != nil && !errors.Is(err, http.ErrServerClosed) {
-		log.Fatal(err)
+	sc := echo.StartConfig{
+		Address: ":8080",
+		BeforeServeFunc: func(s *http.Server) error {
+			s.WriteTimeout = 0 // IMPORTANT: disable for SSE
+			return nil
+		},
+	}
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM) // start shutdown process on ctrl+c
+	defer cancel()
+
+	if err := sc.Start(ctx, e); err != nil {
+		e.Logger.Error("failed to start server", "error", err)
 	}
 }
