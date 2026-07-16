@@ -23,12 +23,17 @@ e.DELETE("/users/:id", deleteUser)
 e.GET("/static/*", serveFiles)    // wildcard
 ```
 
-`Any` registra um handler para todos os métodos suportados, e `Match` para um conjunto específico:
+`Any` registra um handler para qualquer método HTTP — incluindo os que não estão na
+lista predefinida do Echo — e `Match` para um conjunto específico:
 
 ```go
 e.Any("/ping", pong)
 e.Match([]string{http.MethodGet, http.MethodPost}, "/form", handleForm)
 ```
+
+:::note
+Uma rota de método específico registrada para o mesmo caminho tem precedência sobre a rota `Any`.
+:::
 
 ## Tipos de correspondência
 

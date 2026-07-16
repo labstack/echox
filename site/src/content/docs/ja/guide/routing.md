@@ -24,12 +24,17 @@ e.DELETE("/users/:id", deleteUser)
 e.GET("/static/*", serveFiles)    // wildcard
 ```
 
-`Any` はサポートされているすべてのメソッドにハンドラを登録し、`Match` は指定した集合に登録します。
+`Any` は任意の HTTP メソッド（Echo にあらかじめ定義された一覧にないものも含む）にハンドラを
+登録し、`Match` は指定した集合に登録します。
 
 ```go
 e.Any("/ping", pong)
 e.Match([]string{http.MethodGet, http.MethodPost}, "/form", handleForm)
 ```
+
+:::note
+同じパスに登録されたメソッド固有のルートは、`Any` ルートより優先されます。
+:::
 
 ## マッチ種別
 

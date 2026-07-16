@@ -23,12 +23,16 @@ e.DELETE("/users/:id", deleteUser)
 e.GET("/static/*", serveFiles)    // wildcard
 ```
 
-`Any` 会为所有支持的方法注册处理函数，`Match` 则用于一组指定方法：
+`Any` 会为任意 HTTP 方法（包括不在 Echo 预定义列表中的方法）注册处理函数，`Match` 则用于一组指定方法：
 
 ```go
 e.Any("/ping", pong)
 e.Match([]string{http.MethodGet, http.MethodPost}, "/form", handleForm)
 ```
+
+:::note
+为同一路径注册的特定方法路由优先于 `Any` 路由。
+:::
 
 ## 匹配类型
 
