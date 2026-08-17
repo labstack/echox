@@ -35,7 +35,7 @@ import { starsLabel, echoVersion } from '../data/github.ts';
 <span class="kw">func</span> <span class="fnn">main</span>() &#123;
     e := echo.<span class="fnn">New</span>()
     e.<span class="fnn">GET</span>(<span class="str">"/"</span>, <span class="kw">func</span>(c *echo.Context) <span class="kw">error</span> &#123;
-        <span class="kw">return</span> c.<span class="fnn">JSON</span>(<span class="str">200</span>, echo.Map&#123;<span class="str">"message"</span>: <span class="str">"Hello, World!"</span>&#125;)
+        <span class="kw">return</span> c.<span class="fnn">JSON</span>(<span class="str">200</span>, <span class="kw">map</span>[<span class="kw">string</span>]<span class="kw">string</span>&#123;<span class="str">"message"</span>: <span class="str">"Hello, World!"</span>&#125;)
     &#125;)
     e.<span class="fnn">Start</span>(<span class="str">":1323"</span>)
 &#125;</pre>
