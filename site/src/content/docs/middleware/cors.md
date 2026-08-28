@@ -137,3 +137,56 @@ e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 
 For dynamic origin validation, use `UnsafeAllowOriginFunc` and validate each origin
 carefully — attackers may register look-alike or hostile (sub)domain names.
+
+### Behind a reverse proxy
+
+When you enable this middleware on every layer of a chained-proxy setup — e.g. an Echo
+gateway whose handler proxies to an upstream Echo service that *also* runs `CORS` — the
+response ends up with duplicated headers, because the reverse proxy copies the upstream's
+CORS headers on top of the ones the gateway already set:
+
+```
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Origin: *
+Vary: Origin
+Vary: Origin
+```
+
+A duplicated `Access-Control-Allow-Origin` is rejected by browsers (only one is allowed).
+This is a configuration issue, not something the CORS middleware deduplicates for you.
+
+Fix it at the boundary, not in the middleware:
+
+- **Own CORS at the edge only.** Internal upstream services that sit behind a gateway
+  generally should not run CORS at all — let the outermost service own it.
+- **Strip upstream CORS headers when proxying.** If an upstream must keep CORS for
+  standalone use, remove the CORS headers it set before they are copied, using
+  [`httputil.ReverseProxy.ModifyResponse`](https://pkg.go.dev/net/http/httputil#ReverseProxy).
+  Delete every `Access-Control-*` header, and remove only the `Origin` token from `Vary`
+  so unrelated caching directives (e.g. `Accept-Encoding`) are preserved:
+
+  ```go
+  proxy := httputil.NewSingleHostReverseProxy(upstream)
+  proxy.ModifyResponse = func(res *http.Response) error {
+  	for k := range res.Header {
+  		if strings.HasPrefix(k, "Access-Control-") {
+  			res.Header.Del(k)
+  		}
+  	}
+
+  	// Drop only the "Origin" token from Vary, keeping other directives.
+  	var kept []string
+  	for _, v := range res.Header.Values(echo.HeaderVary) {
+  		for _, tok := range strings.Split(v, ",") {
+  			if tok = strings.TrimSpace(tok); tok != "" && !strings.EqualFold(tok, echo.HeaderOrigin) {
+  				kept = append(kept, tok)
+  			}
+  		}
+  	}
+  	res.Header.Del(echo.HeaderVary)
+  	for _, v := range kept {
+  		res.Header.Add(echo.HeaderVary, v)
+  	}
+  	return nil
+  }
+  ```
