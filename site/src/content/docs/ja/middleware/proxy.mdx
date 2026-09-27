@@ -1,0 +1,79 @@
+---
+title: プロキシ
+description: 負荷分散付きの HTTP と WebSocket のリバースプロキシミドルウェアです。
+sidebar:
+  order: 16
+---
+
+import ConfigReference from '../../../../components/ConfigReference.astro';
+
+Proxy は HTTP/WebSocket リバースプロキシミドルウェアを提供します。設定された負荷分散方式を使って、
+リクエストを上流サーバーへ転送します。
+
+すべてのコアミドルウェアは `middleware` パッケージに含まれています：
+
+```go
+import "github.com/labstack/echo/v5/middleware"
+```
+
+## 使い方
+
+```go
+url1, err := url.Parse("http://localhost:8081")
+if err != nil {
+	e.Logger.Error("failed to parse url", "error", err)
+}
+url2, err := url.Parse("http://localhost:8082")
+if err != nil {
+	e.Logger.Error("failed to parse url", "error", err)
+}
+e.Use(middleware.Proxy(middleware.NewRoundRobinBalancer([]*middleware.ProxyTarget{
+	{
+		URL: url1,
+	},
+	{
+		URL: url2,
+	},
+})))
+```
+
+## カスタム設定
+
+```go
+e := echo.New()
+e.Use(middleware.ProxyWithConfig(middleware.ProxyConfig{}))
+```
+
+## 設定
+
+<ConfigReference name="ProxyConfig" locale="ja" />
+
+### デフォルト設定
+
+| 名前       | 値             |
+| ---------- | -------------- |
+| Skipper    | DefaultSkipper |
+| ContextKey | `target`       |
+
+### 正規表現ベースのルール
+
+プロキシリクエストの高度な書き換えでは、正規表現でルールを定義することもできます。
+通常のキャプチャグループは `()` で定義し、書き換え後のパスでインデックス
+（`$1`、`$2` など）により参照できます。
+
+`RegexRewrite` と通常の `Rewrite` ルールは組み合わせられます。
+
+```go
+e.Use(middleware.ProxyWithConfig(middleware.ProxyConfig{
+	Balancer: rrb,
+	Rewrite: map[string]string{
+		"^/v1/*": "/v2/$1",
+	},
+	RegexRewrite: map[*regexp.Regexp]string{
+		regexp.MustCompile("^/foo/([0-9].*)"):  "/num/$1",
+		regexp.MustCompile("^/bar/(.+?)/(.*)"): "/baz/$2/$1",
+	},
+}))
+```
+
+完全な例は[リバースプロキシ](/ja/cookbook/reverse-proxy/) cookbook を参照してください。

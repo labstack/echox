@@ -1,0 +1,62 @@
+---
+title: Basic Auth
+description: 用于验证用户名和密码凭据的 HTTP Basic 认证中间件。
+sidebar:
+  order: 1
+---
+
+import ConfigReference from '../../../../components/ConfigReference.astro';
+
+Basic Auth 中间件提供 HTTP Basic 认证。
+
+- 对于有效凭据，它会调用下一个处理函数。
+- 对于缺失或无效凭据，它会发送 `401 Unauthorized` 响应。
+
+所有核心中间件都位于 `middleware` 包中：
+
+```go
+import "github.com/labstack/echo/v5/middleware"
+```
+
+## 用法
+
+```go
+e.Use(middleware.BasicAuth(func(c *echo.Context, username, password string) (bool, error) {
+	// Use a constant time comparison to prevent timing attacks.
+	if subtle.ConstantTimeCompare([]byte(username), []byte("joe")) == 1 &&
+		subtle.ConstantTimeCompare([]byte(password), []byte("secret")) == 1 {
+		return true, nil
+	}
+	return false, nil
+}))
+```
+
+## 自定义配置
+
+```go
+e.Use(middleware.BasicAuthWithConfig(middleware.BasicAuthConfig{}))
+```
+
+## 配置
+
+<ConfigReference name="BasicAuthConfig" locale="zh-cn" />
+
+`Validator` 的签名为：
+
+```go
+type BasicAuthValidator func(c *echo.Context, user string, password string) (bool, error)
+```
+
+### 默认配置
+
+```go
+// Effective defaults applied when fields are left unset.
+BasicAuthConfig{
+	Skipper: DefaultSkipper,
+	Realm:   "Restricted",
+}
+```
+
+:::caution[安全]
+请始终使用 `subtle.ConstantTimeCompare` 比较凭据，以防止时序攻击。
+:::

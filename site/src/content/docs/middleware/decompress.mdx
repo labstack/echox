@@ -1,0 +1,52 @@
+---
+title: Decompress
+description: Transparently decompress gzip-encoded request bodies.
+sidebar:
+  order: 8
+---
+
+import ConfigReference from '../../../components/ConfigReference.astro';
+
+Decompress middleware decompresses the HTTP request body when the `Content-Encoding`
+header is set to `gzip`.
+
+:::note
+The body is decompressed in memory and held there for the lifetime of the request (and
+until garbage collection).
+:::
+
+All core middleware lives in the `middleware` package:
+
+```go
+import "github.com/labstack/echo/v5/middleware"
+```
+
+## Usage
+
+```go
+e.Use(middleware.Decompress())
+```
+
+## Custom configuration
+
+```go
+e := echo.New()
+e.Use(middleware.DecompressWithConfig(middleware.DecompressConfig{
+	Skipper: middleware.DefaultSkipper,
+}))
+```
+
+## Configuration
+
+<ConfigReference name="DecompressConfig" />
+
+### Default configuration
+
+```go
+// Effective defaults applied when fields are left unset.
+DecompressConfig{
+	Skipper:             DefaultSkipper,
+	GzipDecompressPool:  &DefaultGzipDecompressPool{},
+	MaxDecompressedSize: 100 * MB,
+}
+```

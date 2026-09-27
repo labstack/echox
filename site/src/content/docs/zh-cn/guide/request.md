@@ -105,6 +105,8 @@ curl http://localhost:1323/users/123
 Echo 也可以把请求数据绑定到原生 Go struct 和变量中。参见
 [绑定](/zh-cn/guide/binding/)。
 
+<a id="validate-data"></a>
+
 ## 验证数据
 
 Echo 没有内置数据验证。你可以通过 `Echo#Validator` 注册自定义 validator，并使用

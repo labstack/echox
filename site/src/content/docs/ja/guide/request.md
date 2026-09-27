@@ -106,6 +106,8 @@ curl http://localhost:1323/users/123
 Echo はリクエストデータをネイティブの Go struct や変数にもバインドできます。
 [バインディング](/ja/guide/binding/)を参照してください。
 
+<a id="validate-data"></a>
+
 ## データを検証する
 
 Echo には組み込みのデータ検証はありません。`Echo#Validator` でカスタム validator を登録し、

@@ -106,6 +106,8 @@ curl http://localhost:1323/users/123
 Echo también puede vincular datos de request a structs y variables nativas de Go. Consulta
 [Binding](/es/guide/binding/).
 
+<a id="validate-data"></a>
+
 ## Validar datos
 
 Echo no incluye validación de datos integrada. Puedes registrar un validator personalizado mediante

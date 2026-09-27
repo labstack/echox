@@ -1,17 +1,34 @@
-import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { locales, pages, sections, siteDir } from './translation-sections.mjs';
 
-const siteDir = fileURLToPath(new URL('..', import.meta.url));
 const baseline = JSON.parse(readFileSync(join(siteDir, 'translation-baseline.json'), 'utf8'));
-const hash = (page) => createHash('sha256').update(readFileSync(join(siteDir, 'src/content/docs/middleware', `${page}.mdx`))).digest('hex');
 let stale = 0;
-for (const [locale, pages] of Object.entries(baseline)) {
-  for (const [page, reviewedHash] of Object.entries(pages)) {
-    const status = reviewedHash === hash(page) ? 'current' : 'needs review';
-    if (status !== 'current') stale++;
-    console.log(`${locale}/middleware/${page}: ${status}`);
+for (const locale of locales) {
+  for (const page of pages) {
+    const english = sections('', page);
+    const translated = sections(locale, page);
+    const accepted = baseline[locale]?.[page];
+    if (!Array.isArray(accepted)) {
+      console.log(`${locale}/middleware/${page}: needs review (no section baseline)`);
+      stale++;
+      continue;
+    }
+    const count = Math.max(english.length, translated.length, accepted.length);
+    for (let index = 0; index < count; index++) {
+      const source = english[index];
+      const translation = translated[index];
+      const recorded = accepted[index];
+      const changes = [];
+      if (!source || !translation || !recorded) changes.push('section count changed');
+      if (source && recorded && source.hash !== recorded.source) changes.push('English changed');
+      if (translation && recorded && translation.hash !== recorded.translation) changes.push('translation changed');
+      if (changes.length) {
+        console.log(`${locale}/middleware/${page} §${index + 1} ${source?.heading ?? recorded?.heading ?? 'missing'}: ${changes.join(', ')}`);
+        stale++;
+      }
+    }
   }
 }
-console.log(`${stale} translation(s) need review; this report does not validate the prose`);
+console.log(`${stale} section(s) need review; matching hashes track edits, not translation quality`);
+if (stale) process.exitCode = 1;

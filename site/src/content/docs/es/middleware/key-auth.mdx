@@ -1,0 +1,59 @@
+---
+title: Key Auth
+description: Middleware de autenticación basada en clave que valida una API key desde header, query, form o cookie.
+sidebar:
+  order: 11
+---
+
+import ConfigReference from '../../../../components/ConfigReference.astro';
+
+El middleware Key Auth proporciona autenticación basada en clave.
+
+- Para una clave válida llama al siguiente handler.
+- Para una clave inválida, envía una response `401 Unauthorized`.
+- Para una clave ausente, envía una response `400 Bad Request`.
+
+Todo el middleware principal reside en el paquete `middleware`:
+
+```go
+import "github.com/labstack/echo/v5/middleware"
+```
+
+## Uso
+
+```go
+e.Use(middleware.KeyAuth(func(c *echo.Context, key string, source middleware.ExtractorSource) (bool, error) {
+	return key == "valid-key", nil
+}))
+```
+
+## Configuración personalizada
+
+```go
+e := echo.New()
+e.Use(middleware.KeyAuthWithConfig(middleware.KeyAuthConfig{
+	KeyLookup: "query:api-key",
+	Validator: func(c *echo.Context, key string, source middleware.ExtractorSource) (bool, error) {
+		return key == "valid-key", nil
+	},
+}))
+```
+
+## Configuración
+
+<ConfigReference name="KeyAuthConfig" locale="es" />
+
+`Validator` tiene esta firma:
+
+```go
+type KeyAuthValidator func(c *echo.Context, key string, source ExtractorSource) (bool, error)
+```
+
+### Configuración por defecto
+
+```go
+DefaultKeyAuthConfig = KeyAuthConfig{
+	Skipper:   DefaultSkipper,
+	KeyLookup: "header:" + echo.HeaderAuthorization + ":Bearer ",
+}
+```

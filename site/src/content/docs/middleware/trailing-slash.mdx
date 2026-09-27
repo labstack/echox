@@ -1,0 +1,54 @@
+---
+title: Trailing Slash
+description: Add or remove a trailing slash from the request URI.
+sidebar:
+  order: 25
+---
+
+import ConfigReference from '../../../components/ConfigReference.astro';
+
+All core middleware lives in the `middleware` package:
+
+```go
+import "github.com/labstack/echo/v5/middleware"
+```
+
+## Add trailing slash
+
+Add trailing slash middleware adds a trailing slash to the request URI.
+
+### Usage
+
+```go
+e := echo.New()
+e.Pre(middleware.AddTrailingSlash())
+```
+
+## Remove trailing slash
+
+Remove trailing slash middleware removes a trailing slash from the request URI.
+
+### Usage
+
+```go
+e := echo.New()
+e.Pre(middleware.RemoveTrailingSlash())
+```
+
+## Custom configuration
+
+```go
+e := echo.New()
+e.Use(middleware.AddTrailingSlashWithConfig(middleware.AddTrailingSlashConfig{
+	RedirectCode: http.StatusMovedPermanently,
+}))
+```
+
+The example above adds a trailing slash to the request URI and redirects with
+`301 - StatusMovedPermanently`.
+
+## Configuration
+
+<ConfigReference name="AddTrailingSlashConfig" />
+
+<ConfigReference name="RemoveTrailingSlashConfig" />

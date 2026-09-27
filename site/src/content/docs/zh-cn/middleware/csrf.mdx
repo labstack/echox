@@ -1,0 +1,113 @@
+---
+title: CSRF
+description: 使用 Sec-Fetch-Site 元数据和 token 验证提供 Cross-Site Request Forgery 防护。
+sidebar:
+  order: 7
+---
+
+import ConfigReference from '../../../../components/ConfigReference.astro';
+
+Cross-Site Request Forgery（CSRF，有时读作 "sea-surf"，也称 XSRF）是一类恶意利用，
+攻击者会从网站信任的用户那里传递未授权命令。
+
+所有核心中间件都位于 `middleware` 包中：
+
+```go
+import "github.com/labstack/echo/v5/middleware"
+```
+
+## 用法
+
+```go
+e.Use(middleware.CSRF())
+```
+
+## 工作原理
+
+CSRF 中间件支持
+[`Sec-Fetch-Site`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Sec-Fetch-Site)
+header，作为现代的纵深防御方式来进行
+[CSRF protection](https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#fetch-metadata-headers)，
+它在传统 token 机制之外实现了 OWASP 推荐的 Fetch Metadata API。
+
+现代浏览器会自动随每个请求发送 `Sec-Fetch-Site` header，表明请求来源和目标之间的关系。
+中间件会用它做出安全决策：
+
+- **`same-origin`** 或 **`none`**：允许（完全同源或用户直接导航）
+- **`same-site`**：回退到 token 验证（例如子域到主域）
+- **`cross-site`**：对不安全方法（POST、PUT、DELETE、PATCH）默认以 `403` 错误阻止
+
+对于不发送此 header 的浏览器（旧浏览器），中间件会无缝回退到传统基于 token 的 CSRF 防护。
+
+两个选项可调整 `Sec-Fetch-Site` 行为：
+
+- `TrustedOrigins []string`：为跨站请求允许特定 origin（适用于 OAuth 回调、webhook）
+- `AllowSecFetchSiteFunc func(c *echo.Context) (bool, error)`：用于 same-site/cross-site 验证的自定义逻辑
+
+```go
+e.Use(middleware.CSRFWithConfig(middleware.CSRFConfig{
+	// Allow OAuth callbacks from a trusted provider.
+	TrustedOrigins: []string{"https://oauth-provider.com"},
+
+	// Custom validation for same-site/cross-site requests.
+	AllowSecFetchSiteFunc: func(c *echo.Context) (bool, error) {
+		// Your custom authorization logic here.
+		return validateCustomAuth(c), nil
+		// return true, err  // blocks the request with an error
+		// return true, nil  // allows the request through
+		// return false, nil // falls back to legacy token logic
+	},
+}))
+```
+
+## 基于 token 的防护
+
+```go
+e := echo.New()
+e.Use(middleware.CSRFWithConfig(middleware.CSRFConfig{
+	TokenLookup: "header:X-XSRF-TOKEN",
+}))
+```
+
+上面的示例会从 `X-XSRF-TOKEN` 请求 header 中提取 CSRF token。
+
+改为从 Cookie 读取 token：
+
+```go
+middleware.CSRFWithConfig(middleware.CSRFConfig{
+	TokenLookup:    "cookie:_csrf",
+	CookiePath:     "/",
+	CookieDomain:   "example.com",
+	CookieSecure:   true,
+	CookieHTTPOnly: true,
+	CookieSameSite: http.SameSiteStrictMode,
+})
+```
+
+## 访问 CSRF token
+
+- **服务端**：token 可从上下文的 `ContextKey` 下取得，并可通过模板传给客户端。
+- **客户端**：token 可从 CSRF Cookie 中读取。
+
+## 配置
+
+<ConfigReference name="CSRFConfig" locale="zh-cn" />
+
+### 默认配置
+
+```go
+var DefaultCSRFConfig = CSRFConfig{
+	Skipper:        DefaultSkipper,
+	TokenLength:    32,
+	TokenLookup:    "header:" + echo.HeaderXCSRFToken,
+	ContextKey:     "csrf",
+	CookieName:     "_csrf",
+	CookieMaxAge:   86400,
+	CookieSameSite: http.SameSiteDefaultMode,
+}
+```
+
+## 完整示例
+
+完整、可运行的示例可在
+[echox cookbook](https://github.com/labstack/echox/blob/master/cookbook/csrf/main.go) 中找到。

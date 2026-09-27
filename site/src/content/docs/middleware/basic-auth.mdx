@@ -1,0 +1,62 @@
+---
+title: Basic Auth
+description: HTTP Basic authentication middleware that validates username and password credentials.
+sidebar:
+  order: 1
+---
+
+import ConfigReference from '../../../components/ConfigReference.astro';
+
+Basic Auth middleware provides HTTP basic authentication.
+
+- For valid credentials it calls the next handler.
+- For missing or invalid credentials, it sends a `401 Unauthorized` response.
+
+All core middleware lives in the `middleware` package:
+
+```go
+import "github.com/labstack/echo/v5/middleware"
+```
+
+## Usage
+
+```go
+e.Use(middleware.BasicAuth(func(c *echo.Context, username, password string) (bool, error) {
+	// Use a constant time comparison to prevent timing attacks.
+	if subtle.ConstantTimeCompare([]byte(username), []byte("joe")) == 1 &&
+		subtle.ConstantTimeCompare([]byte(password), []byte("secret")) == 1 {
+		return true, nil
+	}
+	return false, nil
+}))
+```
+
+## Custom configuration
+
+```go
+e.Use(middleware.BasicAuthWithConfig(middleware.BasicAuthConfig{}))
+```
+
+## Configuration
+
+<ConfigReference name="BasicAuthConfig" />
+
+The `Validator` has the signature:
+
+```go
+type BasicAuthValidator func(c *echo.Context, user string, password string) (bool, error)
+```
+
+### Default configuration
+
+```go
+// Effective defaults applied when fields are left unset.
+BasicAuthConfig{
+	Skipper: DefaultSkipper,
+	Realm:   "Restricted",
+}
+```
+
+:::caution[Security]
+Always compare credentials with `subtle.ConstantTimeCompare` to prevent timing attacks.
+:::

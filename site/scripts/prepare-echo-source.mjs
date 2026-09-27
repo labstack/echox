@@ -5,9 +5,11 @@ import { fileURLToPath } from 'node:url';
 
 const siteDir = fileURLToPath(new URL('..', import.meta.url));
 const repoDir = dirname(siteDir);
-const pin = JSON.parse(readFileSync(join(siteDir, 'echo-source.json'), 'utf8'));
+const channel = process.env.DOCS_CHANNEL === 'next' ? 'next' : 'stable';
+const pin = JSON.parse(readFileSync(join(siteDir, channel === 'next' ? 'next-source.json' : 'echo-source.json'), 'utf8'));
+const externalSources = JSON.parse(readFileSync(join(siteDir, 'external-sources.json'), 'utf8'));
 const override = process.env.ECHO_SOURCE_DIR;
-const sourceDir = override ? resolve(siteDir, override) : join(repoDir, '.cache', 'echo-source');
+const sourceDir = override ? resolve(siteDir, override) : join(repoDir, '.cache', `echo-${channel}`);
 const referenceDir = join(repoDir, 'reference');
 const generatedDir = join(siteDir, 'src', 'generated');
 
@@ -53,6 +55,18 @@ if (manifest.revision !== revision || !manifest.configs.some((config) => config.
 run('go', ['test', './...'], referenceDir, goEnvironment);
 mkdirSync(generatedDir, { recursive: true });
 writeFileSync(join(generatedDir, 'config-fields.json'), `${JSON.stringify(manifest, null, 2)}\n`);
+for (const [slug, source] of Object.entries(externalSources)) {
+  const download = JSON.parse(run('go', ['mod', 'download', '-json', `${source.module}@${source.version}`], repoDir, { GOWORK: 'off' }));
+  if (download.Error || !download.Dir) throw new Error(`${source.module}@${source.version}: ${download.Error || 'source directory missing'}`);
+  const extracted = JSON.parse(run('go', [
+    'run', './cmd/config-fields', '-root', download.Dir, '-revision', source.version,
+    '-module', source.module, '-directory', '.', '-package', source.package,
+  ], referenceDir, goEnvironment));
+  if (extracted.module !== source.module || extracted.revision !== source.version || !extracted.configs.length || !extracted.functions.length) {
+    throw new Error(`${source.module}@${source.version}: incomplete API manifest`);
+  }
+  writeFileSync(join(generatedDir, `${slug}.json`), `${JSON.stringify(extracted, null, 2)}\n`);
+}
 copyFileSync(join(referenceDir, 'request-logger', 'main.go'), join(generatedDir, 'request-logger.go.txt'));
 copyFileSync(join(referenceDir, 'static', 'main.go'), join(generatedDir, 'static.go.txt'));
 console.log(`Prepared Echo source ${revision}`);

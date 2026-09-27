@@ -146,6 +146,8 @@ err := echo.QueryParamsBinder(c).
 `MustTypes(...)` 方法，例如 `Int64`、`MustInt64`、`Int64s`。使用
 `BindWithDelimiter("id", &dest, ",")` 可拆分用逗号连接的值。
 
+<a id="custom-binder"></a>
+
 ## 自定义 binder
 
 通过 `Echo#Binder` 注册自定义 binder：

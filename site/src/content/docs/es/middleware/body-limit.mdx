@@ -1,0 +1,47 @@
+---
+title: Body Limit
+description: Rechaza requests cuyo body supera un tamaño máximo configurado.
+sidebar:
+  order: 3
+---
+
+import ConfigReference from '../../../../components/ConfigReference.astro';
+
+El middleware Body Limit establece el tamaño máximo permitido para un body de request. Si el tamaño
+supera el límite configurado, envía una response `413 Request Entity Too Large`.
+
+El límite se aplica tanto al header de request `Content-Length` como al contenido real leído,
+lo que lo hace resistente a headers falsificados. El límite se especifica en bytes.
+
+Todo el middleware principal reside en el paquete `middleware`:
+
+```go
+import "github.com/labstack/echo/v5/middleware"
+```
+
+## Uso
+
+```go
+e := echo.New()
+e.Use(middleware.BodyLimit(2_097_152)) // 2 MB
+```
+
+## Configuración personalizada
+
+```go
+e := echo.New()
+e.Use(middleware.BodyLimitWithConfig(middleware.BodyLimitConfig{}))
+```
+
+## Configuración
+
+<ConfigReference name="BodyLimitConfig" locale="es" />
+
+### Configuración por defecto
+
+```go
+// Effective defaults applied when fields are left unset (Limit is required).
+BodyLimitConfig{
+	Skipper: DefaultSkipper,
+}
+```

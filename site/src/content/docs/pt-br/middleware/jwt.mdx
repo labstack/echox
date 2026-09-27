@@ -1,0 +1,45 @@
+---
+title: JWT
+description: Middleware de autenticação JSON Web Token fornecido pelo módulo echo-jwt.
+sidebar:
+  order: 10
+---
+
+import ConfigReference from '../../../../components/ConfigReference.astro';
+
+O middleware JWT fornece autenticação JSON Web Token (JWT). Ele vive em um módulo separado:
+[github.com/labstack/echo-jwt](https://github.com/labstack/echo-jwt).
+
+Comportamento:
+
+- Para um token válido, ele define o usuário no contexto e chama o próximo handler.
+- Para um token inválido, ele envia uma response `401 Unauthorized`.
+- Para um header `Authorization` ausente ou inválido, ele envia uma response `400 Bad Request`.
+
+## Dependências
+
+```go
+import "github.com/labstack/echo-jwt/v5"
+```
+
+## Uso
+
+```go
+e.Use(echojwt.JWT([]byte("secret")))
+```
+
+## Configuração customizada
+
+```go
+e.Use(echojwt.WithConfig(echojwt.Config{
+	SigningKey: []byte("secret"),
+}))
+```
+
+## Configuração
+
+<ConfigReference name="Config" source="jwt" locale="pt-br" />
+
+## Exemplo
+
+Veja a [receita de JWT](/pt-br/cookbook/jwt/) para um exemplo completo.

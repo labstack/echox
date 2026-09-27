@@ -2,11 +2,15 @@ import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import { redirects } from './src/redirects.mjs';
 
+const next = process.env.DOCS_CHANNEL === 'next';
+
 // https://astro.build/config
 export default defineConfig({
   site: 'https://echo.labstack.com',
+  base: next ? '/next/' : '/',
+  outDir: next ? './dist-next' : './dist',
   // Preserve every live Docusaurus /docs/* URL at cutover (generated — see ./src/redirects.mjs).
-  redirects,
+  redirects: next ? {} : redirects,
   integrations: [
     starlight({
       title: 'Echo',
@@ -36,6 +40,7 @@ export default defineConfig({
       // Keep Starlight's built-in Pagefind ⌘K search; Search override adds the
       // empty-state launchpad. "Ask AI" is the kapa.ai widget (see head).
       components: {
+        Banner: './src/components/VersionBanner.astro',
         Footer: './src/components/Footer.astro',
         Search: './src/components/Search.astro',
       },

@@ -1,0 +1,59 @@
+---
+title: Gzip
+description: Compress HTTP responses with the gzip compression scheme.
+sidebar:
+  order: 9
+---
+
+import ConfigReference from '../../../components/ConfigReference.astro';
+
+Gzip middleware compresses the HTTP response using the gzip compression scheme.
+
+All core middleware lives in the `middleware` package:
+
+```go
+import "github.com/labstack/echo/v5/middleware"
+```
+
+## Usage
+
+```go
+e.Use(middleware.Gzip())
+```
+
+## Custom configuration
+
+```go
+e := echo.New()
+e.Use(middleware.GzipWithConfig(middleware.GzipConfig{
+	Level: 5,
+}))
+```
+
+:::tip
+Pass a skipper to disable gzip for certain URLs.
+:::
+
+```go
+e := echo.New()
+e.Use(middleware.GzipWithConfig(middleware.GzipConfig{
+	Skipper: func(c *echo.Context) bool {
+		return strings.Contains(c.Path(), "metrics") // change "metrics" to your own path
+	},
+}))
+```
+
+## Configuration
+
+<ConfigReference name="GzipConfig" />
+
+### Default configuration
+
+```go
+// Effective defaults applied when fields are left unset.
+GzipConfig{
+	Skipper:   DefaultSkipper,
+	Level:     -1,
+	MinLength: 0,
+}
+```

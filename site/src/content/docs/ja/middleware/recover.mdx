@@ -1,0 +1,49 @@
+---
+title: Recover
+description: チェーン内のどこで起きた panic からも復旧し、一元化されたエラーハンドラへ委譲します。
+sidebar:
+  order: 18
+---
+
+import ConfigReference from '../../../../components/ConfigReference.astro';
+
+Recover ミドルウェアは、チェーン内のどこで発生した panic からも復旧し、スタックトレースを出力して、
+一元化された [HTTPErrorHandler](/ja/guide/customization/#http-error-handler) に制御を渡します。
+
+すべてのコアミドルウェアは `middleware` パッケージに含まれています：
+
+```go
+import "github.com/labstack/echo/v5/middleware"
+```
+
+## 使い方
+
+```go
+e.Use(middleware.Recover())
+```
+
+## カスタム設定
+
+```go
+e := echo.New()
+e.Use(middleware.RecoverWithConfig(middleware.RecoverConfig{
+	StackSize: 1 << 10, // 1 KB
+}))
+```
+
+上の例では `StackSize` を 1 KB にし、`DisableStackAll` と `DisablePrintStack` はデフォルト値を使います。
+
+## 設定
+
+<ConfigReference name="RecoverConfig" locale="ja" />
+
+### デフォルト設定
+
+```go
+var DefaultRecoverConfig = RecoverConfig{
+	Skipper:           DefaultSkipper,
+	StackSize:         4 << 10, // 4 KB
+	DisableStackAll:   false,
+	DisablePrintStack: false,
+}
+```

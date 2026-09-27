@@ -1,0 +1,51 @@
+---
+title: Method Override
+description: Override the HTTP method of a POST request via header, form, or query value.
+sidebar:
+  order: 13
+---
+
+import ConfigReference from '../../../components/ConfigReference.astro';
+
+Method Override middleware reads the overridden method from the request and uses it
+instead of the original method.
+
+:::note
+For security reasons, only the `POST` method can be overridden.
+:::
+
+All core middleware lives in the `middleware` package:
+
+```go
+import "github.com/labstack/echo/v5/middleware"
+```
+
+## Usage
+
+```go
+e.Pre(middleware.MethodOverride())
+```
+
+## Custom configuration
+
+```go
+e := echo.New()
+e.Pre(middleware.MethodOverrideWithConfig(middleware.MethodOverrideConfig{
+	Getter: middleware.MethodFromForm("_method"),
+}))
+```
+
+The method can be sourced with `MethodFromHeader`, `MethodFromForm`, or `MethodFromQuery`.
+
+## Configuration
+
+<ConfigReference name="MethodOverrideConfig" />
+
+### Default configuration
+
+```go
+DefaultMethodOverrideConfig = MethodOverrideConfig{
+	Skipper: DefaultSkipper,
+	Getter:  MethodFromHeader(echo.HeaderXHTTPMethodOverride),
+}
+```

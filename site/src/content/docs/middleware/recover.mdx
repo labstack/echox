@@ -1,0 +1,51 @@
+---
+title: Recover
+description: Recover from panics anywhere in the chain and delegate to the centralized error handler.
+sidebar:
+  order: 18
+---
+
+import ConfigReference from '../../../components/ConfigReference.astro';
+
+Recover middleware recovers from panics anywhere in the chain, prints the stack trace, and
+passes control to the centralized
+[HTTPErrorHandler](/guide/customization/#http-error-handler).
+
+All core middleware lives in the `middleware` package:
+
+```go
+import "github.com/labstack/echo/v5/middleware"
+```
+
+## Usage
+
+```go
+e.Use(middleware.Recover())
+```
+
+## Custom configuration
+
+```go
+e := echo.New()
+e.Use(middleware.RecoverWithConfig(middleware.RecoverConfig{
+	StackSize: 1 << 10, // 1 KB
+}))
+```
+
+The example above uses a `StackSize` of 1 KB and default values for `DisableStackAll` and
+`DisablePrintStack`.
+
+## Configuration
+
+<ConfigReference name="RecoverConfig" />
+
+### Default configuration
+
+```go
+var DefaultRecoverConfig = RecoverConfig{
+	Skipper:           DefaultSkipper,
+	StackSize:         4 << 10, // 4 KB
+	DisableStackAll:   false,
+	DisablePrintStack: false,
+}
+```

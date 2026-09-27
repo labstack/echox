@@ -27,11 +27,12 @@ export const redirects = {
   '/docs/quick-start': '/guide/quickstart/',
   '/docs/start-server': '/guide/customization/',
   '/docs/category/guide': '/guide/quickstart/',
-  '/docs/category/middleware': '/middleware/basic-auth/',
+  '/docs/category/middleware': '/middleware/',
+  '/docs/middleware/index': '/middleware/',
   '/docs/category/cookbook': '/cookbook/hello-world/',
   '/search': '/',
   // Bulk, generated from the current content tree.
   ...fromList('', 'guide/', pages('guide').filter((n) => !GUIDE_SKIP.has(n))),
-  ...fromList('middleware/', 'middleware/', pages('middleware')),
+  ...fromList('middleware/', 'middleware/', pages('middleware').filter((name) => name !== 'index')),
   ...fromList('cookbook/', 'cookbook/', pages('cookbook')),
 };

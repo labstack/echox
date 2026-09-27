@@ -1,26 +1,40 @@
 ---
-import manifest from '../generated/config-fields.json';
+import echoManifest from '../generated/config-fields.json';
+import jwtManifest from '../generated/jwt.json';
+import prometheusManifest from '../generated/prometheus.json';
+import telemetryManifest from '../generated/open-telemetry.json';
+import externalSources from '../../external-sources.json';
 
 interface Props {
   name: string;
   locale?: 'en' | 'es' | 'ja' | 'pt-br' | 'zh-cn';
+  source?: 'echo' | 'jwt' | 'prometheus' | 'open-telemetry';
 }
 
-const { name, locale = 'en' } = Astro.props;
+const { name, locale = 'en', source = 'echo' } = Astro.props;
+const manifest = { echo: echoManifest, jwt: jwtManifest, prometheus: prometheusManifest, 'open-telemetry': telemetryManifest }[source];
+const repository = source === 'echo' ? 'https://github.com/labstack/echo' : externalSources[source].repository;
 const config = manifest.configs.find((entry) => entry.name === name);
-if (!config) throw new Error(`Missing Echo source reference for ${name}`);
+if (!config) throw new Error(`Missing ${source} source reference for ${name}`);
+const stem = name.replace(/Config$/, '');
+const functions = manifest.functions.filter((entry) =>
+  entry.signature.includes(name) || entry.name === stem || entry.name === `New${stem}` ||
+  (name === 'RedirectConfig' && /Redirect$/.test(entry.name)) ||
+  (source === 'jwt' && entry.name === 'JWT') ||
+  (source === 'open-telemetry' && name === 'Config' && entry.name === 'NewMiddleware')
+);
 const labels = {
-  en: { field: 'Field', type: 'Type', source: 'Source', deprecated: 'Deprecated', caption: 'Fields from Echo source' },
-  es: { field: 'Campo', type: 'Tipo', source: 'Fuente', deprecated: 'Obsoleto', caption: 'Campos del código de Echo' },
-  ja: { field: 'フィールド', type: '型', source: 'ソース', deprecated: '非推奨', caption: 'Echo のソースコードのフィールド' },
-  'pt-br': { field: 'Campo', type: 'Tipo', source: 'Código', deprecated: 'Obsoleto', caption: 'Campos do código do Echo' },
-  'zh-cn': { field: '字段', type: '类型', source: '源码', deprecated: '已弃用', caption: 'Echo 源码中的字段' },
+  en: { field: 'Field', type: 'Type', source: 'Source', deprecated: 'Deprecated', caption: 'Fields from package source', functions: 'Functions from package source' },
+  es: { field: 'Campo', type: 'Tipo', source: 'Fuente', deprecated: 'Obsoleto', caption: 'Campos del código fuente', functions: 'Funciones del código fuente' },
+  ja: { field: 'フィールド', type: '型', source: 'ソース', deprecated: '非推奨', caption: 'パッケージのソースコードのフィールド', functions: 'パッケージのソースコードの関数' },
+  'pt-br': { field: 'Campo', type: 'Tipo', source: 'Código', deprecated: 'Obsoleto', caption: 'Campos do código-fonte', functions: 'Funções do código-fonte' },
+  'zh-cn': { field: '字段', type: '类型', source: '源码', deprecated: '已弃用', caption: '包源码中的字段', functions: '包源码中的函数' },
 }[locale];
-const sourceUrl = (line: number) => `https://github.com/labstack/echo/blob/${manifest.revision}/${config.file}#L${line}`;
+const sourceUrl = (file: string, line: number) => `${repository}/blob/${manifest.revision}/${file}#L${line}`;
 ---
 
 <div class="echo-config-reference">
-  <p class="revision"><a href={sourceUrl(config.line)}>{config.name}</a> · <a href={`https://github.com/labstack/echo/tree/${manifest.revision}`}>Echo {manifest.revision.slice(0, 7)}</a></p>
+  <p class="revision"><a href={sourceUrl(config.file, config.line)}>{config.name}</a> · <a href={`${repository}/tree/${manifest.revision}`}>{manifest.module}@{source === 'echo' ? manifest.revision.slice(0, 7) : manifest.revision}</a></p>
   <div class="table-scroll">
     <table>
       <caption>{labels.caption}</caption>
@@ -29,22 +43,34 @@ const sourceUrl = (line: number) => `https://github.com/labstack/echo/blob/${man
         {config.fields.map((field) => <tr>
           <th scope="row"><code>{field.name}</code>{field.deprecated && <span class="deprecated">{labels.deprecated}</span>}</th>
           <td><code>{field.type}</code></td>
-          <td><a href={sourceUrl(field.line)} aria-label={`${field.name} ${labels.source}`}>L{field.line}</a></td>
+          <td><a href={sourceUrl(config.file, field.line)} aria-label={`${field.name} ${labels.source}`}>L{field.line}</a></td>
         </tr>)}
       </tbody>
     </table>
   </div>
+  {functions.length > 0 && <div class="table-scroll">
+    <table>
+      <caption>{labels.functions}</caption>
+      <thead><tr><th scope="col">{labels.type}</th><th scope="col">{labels.source}</th></tr></thead>
+      <tbody>
+        {functions.map((entry) => <tr>
+          <th scope="row"><code>{entry.signature}</code></th>
+          <td><a href={sourceUrl(entry.file, entry.line)} aria-label={`${entry.name} ${labels.source}`}>L{entry.line}</a></td>
+        </tr>)}
+      </tbody>
+    </table>
+  </div>}
 </div>
 
 <style>
   .echo-config-reference { margin-block: 1.25rem 2rem; }
   .revision { font-size: var(--sl-text-sm); color: var(--sl-color-gray-3); margin-bottom: .6rem; }
-  .table-scroll { overflow-x: auto; }
+  .table-scroll { overflow-x: auto; margin-bottom: 1.25rem; }
   table { width: 100%; border-collapse: collapse; font-size: var(--sl-text-sm); }
   caption { text-align: left; font-weight: 600; margin-bottom: .5rem; }
   th, td { border-bottom: 1px solid var(--sl-color-hairline); padding: .55rem .7rem; text-align: left; vertical-align: top; }
   thead th { color: var(--sl-color-gray-2); }
   tbody th { font-weight: 500; }
-  code { overflow-wrap: anywhere; }
+  code { overflow-wrap: anywhere; white-space: pre-wrap; }
   .deprecated { display: inline-block; margin-inline-start: .5rem; font-size: .75em; color: var(--sl-color-text-accent); }
 </style>

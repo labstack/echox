@@ -148,6 +148,8 @@ Cada tipo soportado ofrece métodos `Type(...)`, `MustType(...)`, `Types(...)` (
 `MustTypes(...)`, por ejemplo `Int64`, `MustInt64`, `Int64s`. Usa
 `BindWithDelimiter("id", &dest, ",")` para separar valores unidos por comas.
 
+<a id="custom-binder"></a>
+
 ## Binder personalizado
 
 Registra un binder personalizado mediante `Echo#Binder`:

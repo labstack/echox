@@ -1,0 +1,56 @@
+---
+title: 安全
+description: 防护 XSS、内容嗅探、点击劫持和其他注入攻击。
+sidebar:
+  order: 22
+---
+
+import ConfigReference from '../../../../components/ConfigReference.astro';
+
+Secure 中间件提供对跨站脚本（XSS）、内容类型嗅探、点击劫持、不安全连接和其他代码注入攻击的防护。
+
+所有核心中间件都位于 `middleware` 包中：
+
+```go
+import "github.com/labstack/echo/v5/middleware"
+```
+
+## 用法
+
+```go
+e.Use(middleware.Secure())
+```
+
+## 自定义配置
+
+```go
+e := echo.New()
+e.Use(middleware.SecureWithConfig(middleware.SecureConfig{
+	XSSProtection:         "",
+	ContentTypeNosniff:    "",
+	XFrameOptions:         "",
+	HSTSMaxAge:            3600,
+	ContentSecurityPolicy: "default-src 'self'",
+}))
+```
+
+:::note
+传入空的 `XSSProtection`、`ContentTypeNosniff`、`XFrameOptions` 或
+`ContentSecurityPolicy` 会禁用对应防护。
+:::
+
+## 配置
+
+<ConfigReference name="SecureConfig" locale="zh-cn" />
+
+### 默认配置
+
+```go
+var DefaultSecureConfig = SecureConfig{
+	Skipper:            DefaultSkipper,
+	XSSProtection:      "1; mode=block",
+	ContentTypeNosniff: "nosniff",
+	XFrameOptions:      "SAMEORIGIN",
+	HSTSPreloadEnabled: false,
+}
+```

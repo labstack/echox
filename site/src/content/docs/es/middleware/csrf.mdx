@@ -1,0 +1,117 @@
+---
+title: CSRF
+description: Protección contra Cross-Site Request Forgery usando metadatos Sec-Fetch-Site y validación de tokens.
+sidebar:
+  order: 7
+---
+
+import ConfigReference from '../../../../components/ConfigReference.astro';
+
+Cross-Site Request Forgery (CSRF, a veces pronunciado "sea-surf", o XSRF) es un tipo de
+exploit malicioso en el que se transmiten comandos no autorizados desde un usuario en el que
+un sitio web confía.
+
+Todo el middleware principal reside en el paquete `middleware`:
+
+```go
+import "github.com/labstack/echo/v5/middleware"
+```
+
+## Uso
+
+```go
+e.Use(middleware.CSRF())
+```
+
+## Cómo funciona
+
+El middleware CSRF soporta el header
+[`Sec-Fetch-Site`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Sec-Fetch-Site)
+como un enfoque moderno de defensa en profundidad para la
+[protección CSRF](https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#fetch-metadata-headers),
+implementando la Fetch Metadata API recomendada por OWASP junto al mecanismo tradicional
+basado en tokens.
+
+Los navegadores modernos envían automáticamente el header `Sec-Fetch-Site` con cada request,
+indicando la relación entre el origin del request y el destino. El middleware usa esto para
+tomar una decisión de seguridad:
+
+- **`same-origin`** o **`none`**: permitido (coincidencia exacta de origin o navegación directa del usuario)
+- **`same-site`**: vuelve a la validación por token (por ejemplo, de subdominio a dominio principal)
+- **`cross-site`**: bloqueado por defecto con un error `403` para métodos inseguros (POST, PUT, DELETE, PATCH)
+
+Para navegadores que no envían este header (navegadores más antiguos), el middleware vuelve
+sin interrupciones a la protección CSRF tradicional basada en tokens.
+
+Dos opciones ajustan el comportamiento de `Sec-Fetch-Site`:
+
+- `TrustedOrigins []string`: allowlist de origins específicos para requests cross-site (útil para callbacks OAuth, webhooks)
+- `AllowSecFetchSiteFunc func(c *echo.Context) (bool, error)`: lógica personalizada para validación same-site/cross-site
+
+```go
+e.Use(middleware.CSRFWithConfig(middleware.CSRFConfig{
+	// Allow OAuth callbacks from a trusted provider.
+	TrustedOrigins: []string{"https://oauth-provider.com"},
+
+	// Custom validation for same-site/cross-site requests.
+	AllowSecFetchSiteFunc: func(c *echo.Context) (bool, error) {
+		// Your custom authorization logic here.
+		return validateCustomAuth(c), nil
+		// return true, err  // blocks the request with an error
+		// return true, nil  // allows the request through
+		// return false, nil // falls back to legacy token logic
+	},
+}))
+```
+
+## Protección basada en tokens
+
+```go
+e := echo.New()
+e.Use(middleware.CSRFWithConfig(middleware.CSRFConfig{
+	TokenLookup: "header:X-XSRF-TOKEN",
+}))
+```
+
+El ejemplo anterior extrae el token CSRF del header de request `X-XSRF-TOKEN`.
+
+Leer el token desde una cookie en su lugar:
+
+```go
+middleware.CSRFWithConfig(middleware.CSRFConfig{
+	TokenLookup:    "cookie:_csrf",
+	CookiePath:     "/",
+	CookieDomain:   "example.com",
+	CookieSecure:   true,
+	CookieHTTPOnly: true,
+	CookieSameSite: http.SameSiteStrictMode,
+})
+```
+
+## Acceder al token CSRF
+
+- **Server-side**: el token está disponible desde el contexto bajo `ContextKey` y se puede pasar al cliente mediante un template.
+- **Client-side**: el token se puede leer desde la cookie CSRF.
+
+## Configuración
+
+<ConfigReference name="CSRFConfig" locale="es" />
+
+### Configuración por defecto
+
+```go
+var DefaultCSRFConfig = CSRFConfig{
+	Skipper:        DefaultSkipper,
+	TokenLength:    32,
+	TokenLookup:    "header:" + echo.HeaderXCSRFToken,
+	ContextKey:     "csrf",
+	CookieName:     "_csrf",
+	CookieMaxAge:   86400,
+	CookieSameSite: http.SameSiteDefaultMode,
+}
+```
+
+## Ejemplo completo
+
+Hay un ejemplo completo y ejecutable disponible en el
+[recetario de echox](https://github.com/labstack/echox/blob/master/cookbook/csrf/main.go).

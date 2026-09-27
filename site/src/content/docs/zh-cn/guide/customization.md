@@ -43,6 +43,8 @@ e.Logger = slog.New(slog.NewJSONHandler(os.Stdout, nil))
 
 [了解更多](/zh-cn/guide/templates/)
 
+<a id="http-error-handler"></a>
+
 ## HTTP 错误处理函数
 
 `Echo#HTTPErrorHandler` 注册自定义 HTTP 错误处理函数。

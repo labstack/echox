@@ -1,0 +1,80 @@
+{
+  "/": {
+    "html": {
+      "raw": 27523,
+      "gzip": 8601
+    },
+    "firstLoadAssets": {
+      "raw": 94854,
+      "gzip": 19546
+    },
+    "externalDomains": [
+      "encore.dev",
+      "fonts.googleapis.com",
+      "fonts.gstatic.com",
+      "github.com",
+      "pkg.go.dev",
+      "unpkg.com",
+      "widget.kapa.ai",
+      "x.com"
+    ]
+  },
+  "/middleware/cors/": {
+    "html": {
+      "raw": 60522,
+      "gzip": 11390
+    },
+    "firstLoadAssets": {
+      "raw": 118355,
+      "gzip": 26052
+    },
+    "externalDomains": [
+      "blog.portswigger.net",
+      "fonts.googleapis.com",
+      "fonts.gstatic.com",
+      "github.com",
+      "unpkg.com",
+      "widget.kapa.ai",
+      "x.com"
+    ]
+  },
+  "/next/": {
+    "html": {
+      "raw": 27645,
+      "gzip": 8615
+    },
+    "firstLoadAssets": {
+      "raw": 94869,
+      "gzip": 19549
+    },
+    "externalDomains": [
+      "encore.dev",
+      "fonts.googleapis.com",
+      "fonts.gstatic.com",
+      "github.com",
+      "pkg.go.dev",
+      "unpkg.com",
+      "widget.kapa.ai",
+      "x.com"
+    ]
+  },
+  "/next/middleware/cors/": {
+    "html": {
+      "raw": 60976,
+      "gzip": 11405
+    },
+    "firstLoadAssets": {
+      "raw": 118370,
+      "gzip": 26055
+    },
+    "externalDomains": [
+      "blog.portswigger.net",
+      "fonts.googleapis.com",
+      "fonts.gstatic.com",
+      "github.com",
+      "unpkg.com",
+      "widget.kapa.ai",
+      "x.com"
+    ]
+  }
+}

@@ -10,4 +10,5 @@ vendor
 .cache/
 site/src/generated/
 site/dist/
+site/dist-next/
 site/node_modules/

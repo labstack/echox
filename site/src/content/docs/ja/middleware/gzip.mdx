@@ -1,0 +1,59 @@
+---
+title: Gzip
+description: gzip 圧縮方式で HTTP レスポンスを圧縮します。
+sidebar:
+  order: 9
+---
+
+import ConfigReference from '../../../../components/ConfigReference.astro';
+
+Gzip ミドルウェアは gzip 圧縮方式を使って HTTP レスポンスを圧縮します。
+
+すべてのコアミドルウェアは `middleware` パッケージに含まれています：
+
+```go
+import "github.com/labstack/echo/v5/middleware"
+```
+
+## 使い方
+
+```go
+e.Use(middleware.Gzip())
+```
+
+## カスタム設定
+
+```go
+e := echo.New()
+e.Use(middleware.GzipWithConfig(middleware.GzipConfig{
+	Level: 5,
+}))
+```
+
+:::tip
+skipper を渡すと、特定の URL で gzip を無効化できます。
+:::
+
+```go
+e := echo.New()
+e.Use(middleware.GzipWithConfig(middleware.GzipConfig{
+	Skipper: func(c *echo.Context) bool {
+		return strings.Contains(c.Path(), "metrics") // change "metrics" to your own path
+	},
+}))
+```
+
+## 設定
+
+<ConfigReference name="GzipConfig" locale="ja" />
+
+### デフォルト設定
+
+```go
+// Effective defaults applied when fields are left unset.
+GzipConfig{
+	Skipper:   DefaultSkipper,
+	Level:     -1,
+	MinLength: 0,
+}
+```

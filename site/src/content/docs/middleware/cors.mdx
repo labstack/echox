@@ -1,0 +1,68 @@
+---
+title: CORS
+description: Cross-Origin Resource Sharing middleware for secure cross-domain access control.
+sidebar:
+  order: 6
+---
+
+import ConfigReference from '../../../components/ConfigReference.astro';
+
+CORS middleware implements the [CORS](https://fetch.spec.whatwg.org/#http-cors-protocol) specification. CORS gives
+web servers cross-domain access controls, which enable secure cross-domain data transfers.
+
+All core middleware lives in the `middleware` package:
+
+```go
+import "github.com/labstack/echo/v5/middleware"
+```
+
+## Usage
+
+```go
+e.Use(middleware.CORS("https://example.com", "https://subdomain.example.com"))
+```
+
+## Custom configuration
+
+```go
+e := echo.New()
+e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+	AllowOrigins: []string{"https://labstack.com", "https://labstack.net"},
+	AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
+}))
+```
+
+## Configuration
+
+<ConfigReference name="CORSConfig" />
+
+### Default configuration
+
+```go
+// Effective defaults applied when fields are left unset.
+CORSConfig{
+	Skipper:      DefaultSkipper,
+	AllowMethods: []string{http.MethodGet, http.MethodHead, http.MethodPut, http.MethodPatch, http.MethodPost, http.MethodDelete},
+}
+```
+
+## Security
+
+A wildcard origin (`AllowOrigins: []string{"*"}`) combined with `AllowCredentials: true`
+is dangerous: it would reflect **any** request's `Origin` back in
+`Access-Control-Allow-Origin`, letting a page on any site make credentialed cross-origin
+requests to your API (see [Exploiting CORS misconfigurations](https://blog.portswigger.net/2016/10/exploiting-cors-misconfigurations-for.html)).
+
+Echo refuses this combination rather than building an insecure middleware: `CORS` and
+`CORSWithConfig` **panic**, and `CORSConfig.ToMiddleware()` returns an error. To allow
+credentialed requests, list the trusted origins explicitly:
+
+```go
+e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+	AllowOrigins:     []string{"https://example.com"},
+	AllowCredentials: true,
+}))
+```
+
+For dynamic origin validation, use `UnsafeAllowOriginFunc` and validate each origin
+carefully — attackers may register look-alike or hostile (sub)domain names.

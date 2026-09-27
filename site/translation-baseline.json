@@ -1,18 +1,414 @@
 {
   "es": {
-    "logger": "53b60faa99c9656e18cf4abad32e9716768586b71ba83a67f619bd596732a99f",
-    "static": "3992dc8bcbc8b8cac1ec8c89e9e9ea0e26b804053b7658b9a294e7e1926de21d"
+    "logger": [
+      {
+        "heading": "Introduction",
+        "source": "94523fd94aa50fbaa0768814844b27851c8cf6001e34caa65777c4fca336da64",
+        "translation": "2f52c52bdd41e8e7ce8cfcdcfb9851bb996776484cf62ed1afc6bba1b9cea78c"
+      },
+      {
+        "heading": "Examples",
+        "source": "3ebeaafc26570f4f78a26969ada27053cf4f76583c94ab4cb317397ad58cb912",
+        "translation": "abbd80987209bfd313cb1c72ca9b0ad583748173cf75b38c9f9275945a0e573d"
+      },
+      {
+        "heading": "slog ([log/slog](https://pkg.go.dev/log/slog))",
+        "source": "17dff52662407b82e908d67654d26b42524278afe0abc92e025be91d44a248f5",
+        "translation": "7ee303042efd029b99ba1ee8480a3de81a26072c539e059cf5f49a4e075fe270"
+      },
+      {
+        "heading": "fmt.Printf",
+        "source": "f8dccf54b6ceea209642e6479207ef687a060d5796bed33d77d09eb79fdb6399",
+        "translation": "a8b58ef6644bc1def65879aaa85826aa1625ad25318270bd75a4b475ced13186"
+      },
+      {
+        "heading": "Zerolog ([rs/zerolog](https://github.com/rs/zerolog))",
+        "source": "1085ef236f2ef6e6fe220d6768310c46bcde824a61a07cb9ab3910cafd9685da",
+        "translation": "befd0ab263992a1beb208a91979a4c16909fc7534fe5058903e06219f6eb02aa"
+      },
+      {
+        "heading": "Zap ([uber-go/zap](https://github.com/uber-go/zap))",
+        "source": "2e058c15b02940faf8afd831dab8460df96c9ace96cbdae6b5f1c2a94bb4115a",
+        "translation": "35b6d5a00d63a345221b45b90b430aff8e99290a02c93722dd5be7f4fbddf780"
+      },
+      {
+        "heading": "Logrus ([sirupsen/logrus](https://github.com/sirupsen/logrus))",
+        "source": "ed8a2bcc7697ddfbe08f39864809f6d4d546ff631cadec183bc3407915b60540",
+        "translation": "b8702de6e1eac8d13327a87c6d0c18ee5792f2ff7b74a6da619e8af02bd52a97"
+      },
+      {
+        "heading": "Configuration",
+        "source": "8a2cce592a3432f115c8351e1121160b24cfe061e72f30da0bfb46cdbd13812f",
+        "translation": "797a20803ef83c426237d718c2a83c1a7672612e893c3f4ba4354ee4cb987b82"
+      },
+      {
+        "heading": "Troubleshooting",
+        "source": "d0ce6966d20aa887e1e8fd1cda50f21fd3b90ebfb5e8576b2742d3b44bc1a1b8",
+        "translation": "8edf0ba1f65581eaf5ede6f8bd32753f87e0a3a5872231d9ef9944fe86337d75"
+      },
+      {
+        "heading": "panic: missing LogValuesFunc callback function for request logger middleware",
+        "source": "dc3af55180039aba8f8c24bc5747fa31443cf5499eaf2a0bbec494106705fec2",
+        "translation": "2a87cbc0b5d7e6c24466acd651304769f8fe95f8cdddc4709842147d42afd4ac"
+      },
+      {
+        "heading": "Parameters in logs are empty",
+        "source": "32f2baa3562fca7157bde6e56a48d96c311ad158a81ef9c2d36a032b9d2df70c",
+        "translation": "b236f1893cdcbbbd0c6356603be86b568e5fe92491bd3d884a807a6b85ebf063"
+      }
+    ],
+    "static": [
+      {
+        "heading": "Introduction",
+        "source": "422369bde81e0c74f5e4f1c1d8ebfe2e3efb64152dc6f5501c0bc0dcfd999978",
+        "translation": "e0c5e49622351ea620b8ead8baf0af05a3e385e4b3a58f17a834a36ac0552dd2"
+      },
+      {
+        "heading": "Usage",
+        "source": "b00701c744a826049dc4ed3647c207de58e09679a83b148fbb21d910f78ab45a",
+        "translation": "1e8fbc8d34821c2bec17ab5faca3609061f561beae0ad7e337b4dc6a9ca69e4d"
+      },
+      {
+        "heading": "Custom configuration",
+        "source": "a2813ae8b704d824122ad558df040306c19a459797040cb6bc1d55ff7457f180",
+        "translation": "07baa81e4e0b987e60e30ccd91a79e4a255128028fffd36c416c7b5485efb1d4"
+      },
+      {
+        "heading": "Configuration",
+        "source": "96afa911c3905d30f13fd6b6fe11ff86b469c3a019f34e8593e56d7e3837c123",
+        "translation": "bada99ad46d72011642dae4e680dce576bba950b13c2ebe98818fa139ed3649b"
+      },
+      {
+        "heading": "Default configuration",
+        "source": "4178c79309946e059e92d5a255cd0695542664baccae90f140c4ad326e54159a",
+        "translation": "7379ff2ee6b57d2b8be2c6054b763fcc3d16068ba7a2a3f5e2d56491bef37ca3"
+      }
+    ],
+    "index": [
+      {
+        "heading": "Introduction",
+        "source": "7c71b201575d6bfa2361097f602173fb4c2cc8ecbd2523476d15b210be588374",
+        "translation": "cf69a20ae7a424d23e03f941cf873429fdd93f552fc75a7e4c740cafa8bda350"
+      },
+      {
+        "heading": "What are you trying to do?",
+        "source": "02384bd4c391bb598b49205e819a706b0d5aa4d30de8d5007186882c7088f00b",
+        "translation": "158a985b9a365a84d7a3a082dc8e550dcdaf4059bb9e20138be0da049a58bb02"
+      },
+      {
+        "heading": "From code to a working request",
+        "source": "1f762886a7a7d1ce615a2cba6c294ebb4cc1ef0794aac530bacec414a5aaebb0",
+        "translation": "09cd06da4b1dde7356355595554002dc43f5dc9b52e66e6a56dac9ee24d23429"
+      }
+    ]
   },
   "ja": {
-    "logger": "53b60faa99c9656e18cf4abad32e9716768586b71ba83a67f619bd596732a99f",
-    "static": "3992dc8bcbc8b8cac1ec8c89e9e9ea0e26b804053b7658b9a294e7e1926de21d"
+    "logger": [
+      {
+        "heading": "Introduction",
+        "source": "94523fd94aa50fbaa0768814844b27851c8cf6001e34caa65777c4fca336da64",
+        "translation": "5b4126f9db71921e2d0b05a5ecca6dbf1ae196ee5701d9fed6bff7391323dd22"
+      },
+      {
+        "heading": "Examples",
+        "source": "3ebeaafc26570f4f78a26969ada27053cf4f76583c94ab4cb317397ad58cb912",
+        "translation": "50fa0fbee6df07e667dd622a73ed815b2e9e98fc0c69df0c49f1e2b7cfdcfd97"
+      },
+      {
+        "heading": "slog ([log/slog](https://pkg.go.dev/log/slog))",
+        "source": "17dff52662407b82e908d67654d26b42524278afe0abc92e025be91d44a248f5",
+        "translation": "e8e7050ec9460cd3e94b8d9e243b4f94845d5d77fa212335e55c6a61744d1cbf"
+      },
+      {
+        "heading": "fmt.Printf",
+        "source": "f8dccf54b6ceea209642e6479207ef687a060d5796bed33d77d09eb79fdb6399",
+        "translation": "65b3e86dd3d694fdcb3a847329b82342b3ecd92b59e78b2e91e3f43ce4f24011"
+      },
+      {
+        "heading": "Zerolog ([rs/zerolog](https://github.com/rs/zerolog))",
+        "source": "1085ef236f2ef6e6fe220d6768310c46bcde824a61a07cb9ab3910cafd9685da",
+        "translation": "e9d7d01a390cb743abb0d3aeb28c158acc5eb2a3ff018991792aec6b91b965e3"
+      },
+      {
+        "heading": "Zap ([uber-go/zap](https://github.com/uber-go/zap))",
+        "source": "2e058c15b02940faf8afd831dab8460df96c9ace96cbdae6b5f1c2a94bb4115a",
+        "translation": "ca87e1eb006c6406864c93e5222e11a923bc328bd2915fec894d244d92d11c80"
+      },
+      {
+        "heading": "Logrus ([sirupsen/logrus](https://github.com/sirupsen/logrus))",
+        "source": "ed8a2bcc7697ddfbe08f39864809f6d4d546ff631cadec183bc3407915b60540",
+        "translation": "eb71c1aeca5bbdab334c77c846a5ea222c55daa7702522d7f24bfbd2fd1ca6a8"
+      },
+      {
+        "heading": "Configuration",
+        "source": "8a2cce592a3432f115c8351e1121160b24cfe061e72f30da0bfb46cdbd13812f",
+        "translation": "d62266ee88c2ca63ba1a5e0e8f4ae01c82feeb4bba1b12c229db93d2c9140dfe"
+      },
+      {
+        "heading": "Troubleshooting",
+        "source": "d0ce6966d20aa887e1e8fd1cda50f21fd3b90ebfb5e8576b2742d3b44bc1a1b8",
+        "translation": "478da0c4aa2b7069d265159f6a20ffa13d03ed4fde6f711ddad1da7bf8f377b3"
+      },
+      {
+        "heading": "panic: missing LogValuesFunc callback function for request logger middleware",
+        "source": "dc3af55180039aba8f8c24bc5747fa31443cf5499eaf2a0bbec494106705fec2",
+        "translation": "0d11c5eaf13dd417a00cb11ab9eef0a8e53d8678ef10a5a974af8770b67647c7"
+      },
+      {
+        "heading": "Parameters in logs are empty",
+        "source": "32f2baa3562fca7157bde6e56a48d96c311ad158a81ef9c2d36a032b9d2df70c",
+        "translation": "f9067a864020bc031f104ffc79b20e576c178ccba065c2d885e537a56f24843a"
+      }
+    ],
+    "static": [
+      {
+        "heading": "Introduction",
+        "source": "422369bde81e0c74f5e4f1c1d8ebfe2e3efb64152dc6f5501c0bc0dcfd999978",
+        "translation": "55475394a371f6b393b9d715cceb6c2d19ac2d7528126f26a0a8901ac843b3c7"
+      },
+      {
+        "heading": "Usage",
+        "source": "b00701c744a826049dc4ed3647c207de58e09679a83b148fbb21d910f78ab45a",
+        "translation": "ba4ad065d9f1c586c25485328168f6112befae5ef5b164b8c59eead6bf93b8cc"
+      },
+      {
+        "heading": "Custom configuration",
+        "source": "a2813ae8b704d824122ad558df040306c19a459797040cb6bc1d55ff7457f180",
+        "translation": "519b6f6643999e4419c503fc5638d23e7bf033090fe303c205a10a7eb4b24871"
+      },
+      {
+        "heading": "Configuration",
+        "source": "96afa911c3905d30f13fd6b6fe11ff86b469c3a019f34e8593e56d7e3837c123",
+        "translation": "be941df7cfb299dbc825a663759a9a2bad17b5712b862f096db82ed6c1055291"
+      },
+      {
+        "heading": "Default configuration",
+        "source": "4178c79309946e059e92d5a255cd0695542664baccae90f140c4ad326e54159a",
+        "translation": "155968c41190d2e099d7f1b1d075e0db37dd4ad1a22c3dba54e3470d4ec8acff"
+      }
+    ],
+    "index": [
+      {
+        "heading": "Introduction",
+        "source": "7c71b201575d6bfa2361097f602173fb4c2cc8ecbd2523476d15b210be588374",
+        "translation": "1757d6bdedc70a596ddf90aec89eaa87296e869bfdba1d94259415a1c22364ad"
+      },
+      {
+        "heading": "What are you trying to do?",
+        "source": "02384bd4c391bb598b49205e819a706b0d5aa4d30de8d5007186882c7088f00b",
+        "translation": "518db0139337888572c808b05d1c57289362685942c2984dfabf0bdcf1703af3"
+      },
+      {
+        "heading": "From code to a working request",
+        "source": "1f762886a7a7d1ce615a2cba6c294ebb4cc1ef0794aac530bacec414a5aaebb0",
+        "translation": "4f01c5506f7ccc9cd803b415d477696c52907c38deabe5ad4fad822732950484"
+      }
+    ]
   },
   "pt-br": {
-    "logger": "53b60faa99c9656e18cf4abad32e9716768586b71ba83a67f619bd596732a99f",
-    "static": "3992dc8bcbc8b8cac1ec8c89e9e9ea0e26b804053b7658b9a294e7e1926de21d"
+    "logger": [
+      {
+        "heading": "Introduction",
+        "source": "94523fd94aa50fbaa0768814844b27851c8cf6001e34caa65777c4fca336da64",
+        "translation": "cc0601e0ba7331abc93180a16dcb8963b8d6c2326018690bbb4c793e40034389"
+      },
+      {
+        "heading": "Examples",
+        "source": "3ebeaafc26570f4f78a26969ada27053cf4f76583c94ab4cb317397ad58cb912",
+        "translation": "1cf4241cf3d48be98e039e3692b6c381a2d8de10e7e799e9b094cc233e74fbff"
+      },
+      {
+        "heading": "slog ([log/slog](https://pkg.go.dev/log/slog))",
+        "source": "17dff52662407b82e908d67654d26b42524278afe0abc92e025be91d44a248f5",
+        "translation": "fbbe0be70d5b1ebde3781553f78ce6306c44f082901606d1078e4decbbb3b8ed"
+      },
+      {
+        "heading": "fmt.Printf",
+        "source": "f8dccf54b6ceea209642e6479207ef687a060d5796bed33d77d09eb79fdb6399",
+        "translation": "28e77169e2562f4804c8b798cfb240a192edb064023016d7e2c732f82e60348e"
+      },
+      {
+        "heading": "Zerolog ([rs/zerolog](https://github.com/rs/zerolog))",
+        "source": "1085ef236f2ef6e6fe220d6768310c46bcde824a61a07cb9ab3910cafd9685da",
+        "translation": "f9d3de928278bc86cc7210bd8f7bafd2691842ede043af03ba251a24d5ff3e19"
+      },
+      {
+        "heading": "Zap ([uber-go/zap](https://github.com/uber-go/zap))",
+        "source": "2e058c15b02940faf8afd831dab8460df96c9ace96cbdae6b5f1c2a94bb4115a",
+        "translation": "d0780c1943780109533fb4e877ff9f0efdf3c2cccfcc29b9b6019785a6e05b09"
+      },
+      {
+        "heading": "Logrus ([sirupsen/logrus](https://github.com/sirupsen/logrus))",
+        "source": "ed8a2bcc7697ddfbe08f39864809f6d4d546ff631cadec183bc3407915b60540",
+        "translation": "342b3fa592ab865115ff88a280a63c54329bd4ec2fe9105352a64f0cb0aff15f"
+      },
+      {
+        "heading": "Configuration",
+        "source": "8a2cce592a3432f115c8351e1121160b24cfe061e72f30da0bfb46cdbd13812f",
+        "translation": "d7f5f019261dffbf2ed84368a95a668588b92354c89cbbea2d9a69910ef08614"
+      },
+      {
+        "heading": "Troubleshooting",
+        "source": "d0ce6966d20aa887e1e8fd1cda50f21fd3b90ebfb5e8576b2742d3b44bc1a1b8",
+        "translation": "2c8d43dcc9368452533513ed9abcb626e2fa4e46247f5b17e868e3d686022cfe"
+      },
+      {
+        "heading": "panic: missing LogValuesFunc callback function for request logger middleware",
+        "source": "dc3af55180039aba8f8c24bc5747fa31443cf5499eaf2a0bbec494106705fec2",
+        "translation": "7eabadea77babad2eca9619b42b67241ba4d724c46e4797f3a8525211d931f1b"
+      },
+      {
+        "heading": "Parameters in logs are empty",
+        "source": "32f2baa3562fca7157bde6e56a48d96c311ad158a81ef9c2d36a032b9d2df70c",
+        "translation": "03cd5f6de6d60233632b5b3f7c914097d919a70809458ed875ab48ecc6394826"
+      }
+    ],
+    "static": [
+      {
+        "heading": "Introduction",
+        "source": "422369bde81e0c74f5e4f1c1d8ebfe2e3efb64152dc6f5501c0bc0dcfd999978",
+        "translation": "37c7b44aec45fe06c34a5b85ee84a017df647430da307c06ad9e6462ac338661"
+      },
+      {
+        "heading": "Usage",
+        "source": "b00701c744a826049dc4ed3647c207de58e09679a83b148fbb21d910f78ab45a",
+        "translation": "2b3a3f074dd6a18a7af7b2bd316893e740da095a80a7fabc6541e2bad5da7bb5"
+      },
+      {
+        "heading": "Custom configuration",
+        "source": "a2813ae8b704d824122ad558df040306c19a459797040cb6bc1d55ff7457f180",
+        "translation": "226f96f49e8238fec4b183975f234235775a3490e160b6869ca8f13985a2e478"
+      },
+      {
+        "heading": "Configuration",
+        "source": "96afa911c3905d30f13fd6b6fe11ff86b469c3a019f34e8593e56d7e3837c123",
+        "translation": "74a4ee214a8d14265f3743345be637cf0351b4bb0e5281dadc2855b0effaadb9"
+      },
+      {
+        "heading": "Default configuration",
+        "source": "4178c79309946e059e92d5a255cd0695542664baccae90f140c4ad326e54159a",
+        "translation": "83052e253e1a91debf48ac4305b0daf4f24897b41f2f4cf301fe0c811461b052"
+      }
+    ],
+    "index": [
+      {
+        "heading": "Introduction",
+        "source": "7c71b201575d6bfa2361097f602173fb4c2cc8ecbd2523476d15b210be588374",
+        "translation": "b08dfbe2275e82bb804d14aa346d35054744c0a800e3d72b6031721c93c7630b"
+      },
+      {
+        "heading": "What are you trying to do?",
+        "source": "02384bd4c391bb598b49205e819a706b0d5aa4d30de8d5007186882c7088f00b",
+        "translation": "a8e1838a7a89c8964a8ed7c653c66f2ffa4d44984c203612fb429ff1c207f9bf"
+      },
+      {
+        "heading": "From code to a working request",
+        "source": "1f762886a7a7d1ce615a2cba6c294ebb4cc1ef0794aac530bacec414a5aaebb0",
+        "translation": "073fe7340029f242631794ffb06ce64504365b0f746d33dbce90085ec314b968"
+      }
+    ]
   },
   "zh-cn": {
-    "logger": "53b60faa99c9656e18cf4abad32e9716768586b71ba83a67f619bd596732a99f",
-    "static": "3992dc8bcbc8b8cac1ec8c89e9e9ea0e26b804053b7658b9a294e7e1926de21d"
+    "logger": [
+      {
+        "heading": "Introduction",
+        "source": "94523fd94aa50fbaa0768814844b27851c8cf6001e34caa65777c4fca336da64",
+        "translation": "7e6938c1543b621e1642026cef54788a37142f9a5af8ad72a7ba95cd9c262c58"
+      },
+      {
+        "heading": "Examples",
+        "source": "3ebeaafc26570f4f78a26969ada27053cf4f76583c94ab4cb317397ad58cb912",
+        "translation": "44c4fe9da3b31b716330ca925aa533679a09b7647fd5c193497712c226bd6cc1"
+      },
+      {
+        "heading": "slog ([log/slog](https://pkg.go.dev/log/slog))",
+        "source": "17dff52662407b82e908d67654d26b42524278afe0abc92e025be91d44a248f5",
+        "translation": "ef77cb5c07205c71695a925391f08c930aacc47c505eb1d0cfb781f1f0d76a2a"
+      },
+      {
+        "heading": "fmt.Printf",
+        "source": "f8dccf54b6ceea209642e6479207ef687a060d5796bed33d77d09eb79fdb6399",
+        "translation": "e40754606b9549d0de82c0a7f85bb1030ee5ac889f442e25f738fa3fc5ecac61"
+      },
+      {
+        "heading": "Zerolog ([rs/zerolog](https://github.com/rs/zerolog))",
+        "source": "1085ef236f2ef6e6fe220d6768310c46bcde824a61a07cb9ab3910cafd9685da",
+        "translation": "246d77b68f08299af14c271f34fa58abf91ee2b5bf78d1cd9df1ab10714197f3"
+      },
+      {
+        "heading": "Zap ([uber-go/zap](https://github.com/uber-go/zap))",
+        "source": "2e058c15b02940faf8afd831dab8460df96c9ace96cbdae6b5f1c2a94bb4115a",
+        "translation": "dd93d1615cd464fe004d5456e3b9110163c08c52a402a27f00a5e9a1c8c3027e"
+      },
+      {
+        "heading": "Logrus ([sirupsen/logrus](https://github.com/sirupsen/logrus))",
+        "source": "ed8a2bcc7697ddfbe08f39864809f6d4d546ff631cadec183bc3407915b60540",
+        "translation": "b1b612d484f47d988822870a66aa062e47d676e86a900cecc20d55488e66f83a"
+      },
+      {
+        "heading": "Configuration",
+        "source": "8a2cce592a3432f115c8351e1121160b24cfe061e72f30da0bfb46cdbd13812f",
+        "translation": "ff70599b1fba6da252dfc533e71a56b943e393d245e353aa91f343f8bd09ef79"
+      },
+      {
+        "heading": "Troubleshooting",
+        "source": "d0ce6966d20aa887e1e8fd1cda50f21fd3b90ebfb5e8576b2742d3b44bc1a1b8",
+        "translation": "e84eb9d59fd2c1773fa6083c3700f440a33bac3394ca552dc8c6810123708662"
+      },
+      {
+        "heading": "panic: missing LogValuesFunc callback function for request logger middleware",
+        "source": "dc3af55180039aba8f8c24bc5747fa31443cf5499eaf2a0bbec494106705fec2",
+        "translation": "bd2a996ea681e94ddb6f447c5a992cb37531ba1fb9637998a0d43756d839d797"
+      },
+      {
+        "heading": "Parameters in logs are empty",
+        "source": "32f2baa3562fca7157bde6e56a48d96c311ad158a81ef9c2d36a032b9d2df70c",
+        "translation": "83d7e0004a0ca3f069ae64d7c41a54330e63735dce6adb59f3672373d8187e87"
+      }
+    ],
+    "static": [
+      {
+        "heading": "Introduction",
+        "source": "422369bde81e0c74f5e4f1c1d8ebfe2e3efb64152dc6f5501c0bc0dcfd999978",
+        "translation": "6827b7d640c2233454c3e10937b2528fe881e122d34cf2a4b59591100ad90626"
+      },
+      {
+        "heading": "Usage",
+        "source": "b00701c744a826049dc4ed3647c207de58e09679a83b148fbb21d910f78ab45a",
+        "translation": "170d1256c50f5c08f79548dd1dfce76393e89ecf195168cca880c4a63fcba28b"
+      },
+      {
+        "heading": "Custom configuration",
+        "source": "a2813ae8b704d824122ad558df040306c19a459797040cb6bc1d55ff7457f180",
+        "translation": "697fb5207b64f565147cfbf0d638378a67f235d460bdb223898a1c4deed7a793"
+      },
+      {
+        "heading": "Configuration",
+        "source": "96afa911c3905d30f13fd6b6fe11ff86b469c3a019f34e8593e56d7e3837c123",
+        "translation": "599ab4e29be77acbf37b2299f8a3155f785e2537aaa1d152a3c9d36b435550d2"
+      },
+      {
+        "heading": "Default configuration",
+        "source": "4178c79309946e059e92d5a255cd0695542664baccae90f140c4ad326e54159a",
+        "translation": "efc9a058c6b155a27dbc26bd1911399795449ad7e9967a1473eb744fd67c3d44"
+      }
+    ],
+    "index": [
+      {
+        "heading": "Introduction",
+        "source": "7c71b201575d6bfa2361097f602173fb4c2cc8ecbd2523476d15b210be588374",
+        "translation": "c1605c796dfed7b557a2d6c111316a42f7031ffa7dbf4def8413289a85160c28"
+      },
+      {
+        "heading": "What are you trying to do?",
+        "source": "02384bd4c391bb598b49205e819a706b0d5aa4d30de8d5007186882c7088f00b",
+        "translation": "7662d69cd25ff51edd8509a2b0f20b58bf01ebbbcd9df3828fa4f070389e6c23"
+      },
+      {
+        "heading": "From code to a working request",
+        "source": "1f762886a7a7d1ce615a2cba6c294ebb4cc1ef0794aac530bacec414a5aaebb0",
+        "translation": "84a1207205b2922e3b5ad18f4aaef8b07af5a79e66aaa0f00fbcc3e305cab785"
+      }
+    ]
   }
 }

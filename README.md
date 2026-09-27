@@ -15,10 +15,14 @@ the runnable cookbook recipes the docs reference.
 
 ## Documentation site
 
-Requires [Node.js](https://nodejs.org) (LTS), Go 1.27, and Git. The site build
-fetches the Echo commit recorded in `site/echo-source.json`, compiles the
-`reference/` examples against it, extracts exported middleware fields, and
-checks them against `site/reference-baseline.json` before building pages.
+Requires [Node.js](https://nodejs.org) (LTS), Go 1.27, and Git. The build
+publishes the stable docs at `/` and a next preview at `/next/`, each with its
+own search index and source revision. Those revisions are pinned in
+`site/echo-source.json` and `site/next-source.json`. The build compiles the
+`reference/` examples against both, extracts middleware fields and function
+signatures, and checks them against `site/reference-baseline.json`. JWT,
+Prometheus, and OpenTelemetry are extracted from their own pinned modules in
+`site/external-sources.json` and checked against `site/external-baseline.json`.
 
 ```bash
 cd site
@@ -28,18 +32,23 @@ npm run build    # production build to site/dist
 npm run preview  # preview the production build
 ```
 
-The first build fetches the pinned Echo source into `.cache/`. To test a proposed
-Echo checkout instead, set `ECHO_SOURCE_DIR` to its absolute path when running
-`npm run build`. The build reports changed fields and stops; review the affected
-pages, run `npm run source:prepare` and `npm run source:accept`, then review the
-baseline diff before committing it. The generated files in `site/src/generated/`
-are never edited or committed.
+The first build fetches pinned source into `.cache/`. To test a proposed next
+Echo checkout, set `ECHO_SOURCE_DIR` to its absolute path when running
+`npm run build`. The build reports changed API facts and stops. Review the
+affected pages and behavior, run `npm run source:prepare` and
+`npm run source:accept`, then review the baseline diff before committing it.
+The generated files in `site/src/generated/` are never edited or committed.
+`npm run site:check` checks routes, local links and fragments, image text,
+search assets, and locale coverage. `npm run performance:check` catches large
+HTML or first-load asset growth on representative stable and next pages.
 
-`npm run translations:status` reports whether the reviewed Spanish, Japanese,
-Portuguese, and Chinese Request Logger and Static pages still match the current
-English source. After reviewing those translations, run
-`npm run translations:accept` and review the hash changes. This report tracks
-freshness; it does not validate translation quality.
+`npm run translations:status` identifies changed sections in the Spanish,
+Japanese, Portuguese, and Chinese Request Logger, Static, and middleware task
+pages. Translate and review the affected section, then record that page with
+`npm run translations:accept -- es logger` (replace locale and page) and review
+the baseline diff. This tracks edits to both English and localized text; it
+does not judge translation quality. The API tables are generated from source,
+so translators focus on explanations, task guidance, examples, and safety notes.
 
 Content is Markdown/MDX under `site/src/content/docs/` (`guide/`, `middleware/`,
 `cookbook/`). To add a page, drop a file in the right folder — the sidebar is

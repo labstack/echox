@@ -1,0 +1,87 @@
+---
+title: OpenTelemetry
+description: Instrumentação OpenTelemetry para requests HTTP no Echo.
+sidebar:
+  order: 14
+---
+
+import ConfigReference from '../../../../components/ConfigReference.astro';
+
+[Echo OpenTelemetry](https://github.com/labstack/echo-opentelemetry) é um middleware que
+fornece instrumentação OpenTelemetry para requests HTTP.
+
+OpenTelemetry é um conjunto de ferramentas open-source que fornecem instrumentação para aplicações
+cloud-native.
+
+- [OpenTelemetry Exporters](https://opentelemetry.io/docs/languages/go/exporters/)
+- [OpenTelemetry HTTP spec](https://opentelemetry.io/docs/specs/semconv/http/)
+- [HTTP metrics spec](https://opentelemetry.io/docs/specs/semconv/http/http-metrics/)
+
+## Uso
+
+Adicione a dependência do middleware OpenTelemetry com Go modules:
+
+```bash
+go get github.com/labstack/echo-opentelemetry
+```
+
+Importe o middleware e a API de trace do OpenTelemetry:
+
+```go
+import (
+	echootel "github.com/labstack/echo-opentelemetry"
+	"go.opentelemetry.io/otel/trace"
+)
+```
+
+Registre-o com configuração completa:
+
+```go
+e.Use(echootel.NewMiddlewareWithConfig(echootel.Config{
+	ServerName:     "my-server",
+	TracerProvider: tp,
+
+	//Skipper:             nil,
+	//OnNextError:         nil,
+	//OnExtractionError:   nil,
+	//MeterProvider:       nil,
+	//Propagators:         nil,
+	//SpanStartOptions:    nil,
+	//SpanStartAttributes: nil,
+	//SpanEndAttributes:   nil,
+	//MetricAttributes:    nil,
+	//Metrics:             nil,
+}))
+```
+
+Para opções de configuração, veja a struct [`Config`](https://github.com/labstack/echo-opentelemetry/blob/main/otel.go#L28).
+
+Adicione o middleware de forma simplificada fornecendo apenas o nome do servidor:
+
+```go
+e.Use(echootel.NewMiddleware("app.example.com"))
+```
+
+Adicione o middleware com opções de configuração:
+
+```go
+e.Use(echootel.NewMiddlewareWithConfig(echootel.Config{
+	TracerProvider: tp,
+}))
+```
+
+Recupere o tracer a partir do contexto do Echo:
+
+```go
+tracer, err := echo.ContextGet[trace.Tracer](c, echootel.TracerKey)
+```
+
+## Exemplo
+
+O [exemplo](https://github.com/labstack/echo-opentelemetry/blob/main/example/main.go) exporta
+métricas e spans para stdout, mas você pode usar qualquer exporter (OTLP etc.). Veja a
+documentação de [OpenTelemetry exporters](https://opentelemetry.io/docs/languages/go/exporters).
+
+## Referência da API
+
+<ConfigReference name="Config" source="open-telemetry" locale="pt-br" />

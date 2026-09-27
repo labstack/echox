@@ -11,6 +11,7 @@ import Default from '@astrojs/starlight/components/Search.astro';
 </div>
 
 <script>
+  const base = import.meta.env.BASE_URL.replace(/\/$/, '');
   // Command-palette empty state: inject quick links + a shortcut footer into the
   // Pagefind modal once it mounts. terminal.css shows it only while the query is
   // empty (the results drawer carries .pagefind-ui__hidden then).
@@ -18,15 +19,15 @@ import Default from '@astrojs/starlight/components/Search.astro';
     <div class="echo-search-empty">
       <div class="ess-group">
         <div class="ess-label">Start here</div>
-        <a class="ess-link" href="/guide/quickstart/"><i aria-hidden="true" class="ph ph-rocket-launch"></i> Quickstart <span class="ess-sec">Guide</span></a>
-        <a class="ess-link" href="/guide/routing/"><i aria-hidden="true" class="ph ph-signpost"></i> Routing <span class="ess-sec">Guide</span></a>
-        <a class="ess-link" href="/guide/binding/"><i aria-hidden="true" class="ph ph-brackets-curly"></i> Binding <span class="ess-sec">Guide</span></a>
+        <a class="ess-link" href="${base}/guide/quickstart/"><i aria-hidden="true" class="ph ph-rocket-launch"></i> Quickstart <span class="ess-sec">Guide</span></a>
+        <a class="ess-link" href="${base}/guide/routing/"><i aria-hidden="true" class="ph ph-signpost"></i> Routing <span class="ess-sec">Guide</span></a>
+        <a class="ess-link" href="${base}/guide/binding/"><i aria-hidden="true" class="ph ph-brackets-curly"></i> Binding <span class="ess-sec">Guide</span></a>
       </div>
       <div class="ess-group">
         <div class="ess-label">Popular</div>
-        <a class="ess-link" href="/middleware/jwt/"><i aria-hidden="true" class="ph ph-lock-key"></i> JWT <span class="ess-sec">Middleware</span></a>
-        <a class="ess-link" href="/middleware/cors/"><i aria-hidden="true" class="ph ph-globe"></i> CORS <span class="ess-sec">Middleware</span></a>
-        <a class="ess-link" href="/cookbook/hello-world/"><i aria-hidden="true" class="ph ph-cube"></i> Hello World <span class="ess-sec">Cookbook</span></a>
+        <a class="ess-link" href="${base}/middleware/jwt/"><i aria-hidden="true" class="ph ph-lock-key"></i> JWT <span class="ess-sec">Middleware</span></a>
+        <a class="ess-link" href="${base}/middleware/cors/"><i aria-hidden="true" class="ph ph-globe"></i> CORS <span class="ess-sec">Middleware</span></a>
+        <a class="ess-link" href="${base}/cookbook/hello-world/"><i aria-hidden="true" class="ph ph-cube"></i> Hello World <span class="ess-sec">Cookbook</span></a>
       </div>
       <div class="ess-foot">
         <span><kbd>↵</kbd>open</span><span><kbd>↑</kbd><kbd>↓</kbd>navigate</span><span><kbd>esc</kbd>close</span>

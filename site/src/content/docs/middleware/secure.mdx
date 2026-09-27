@@ -1,0 +1,57 @@
+---
+title: Secure
+description: Protect against XSS, content sniffing, clickjacking, and other injection attacks.
+sidebar:
+  order: 22
+---
+
+import ConfigReference from '../../../components/ConfigReference.astro';
+
+Secure middleware provides protection against cross-site scripting (XSS), content type
+sniffing, clickjacking, insecure connections, and other code injection attacks.
+
+All core middleware lives in the `middleware` package:
+
+```go
+import "github.com/labstack/echo/v5/middleware"
+```
+
+## Usage
+
+```go
+e.Use(middleware.Secure())
+```
+
+## Custom configuration
+
+```go
+e := echo.New()
+e.Use(middleware.SecureWithConfig(middleware.SecureConfig{
+	XSSProtection:         "",
+	ContentTypeNosniff:    "",
+	XFrameOptions:         "",
+	HSTSMaxAge:            3600,
+	ContentSecurityPolicy: "default-src 'self'",
+}))
+```
+
+:::note
+Passing an empty `XSSProtection`, `ContentTypeNosniff`, `XFrameOptions`, or
+`ContentSecurityPolicy` disables that protection.
+:::
+
+## Configuration
+
+<ConfigReference name="SecureConfig" />
+
+### Default configuration
+
+```go
+var DefaultSecureConfig = SecureConfig{
+	Skipper:            DefaultSkipper,
+	XSSProtection:      "1; mode=block",
+	ContentTypeNosniff: "nosniff",
+	XFrameOptions:      "SAMEORIGIN",
+	HSTSPreloadEnabled: false,
+}
+```

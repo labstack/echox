@@ -1,0 +1,54 @@
+---
+title: Trailing Slash
+description: Adicione ou remova uma barra final da URI do request.
+sidebar:
+  order: 25
+---
+
+import ConfigReference from '../../../../components/ConfigReference.astro';
+
+Todo o middleware principal fica no pacote `middleware`:
+
+```go
+import "github.com/labstack/echo/v5/middleware"
+```
+
+## Adicionar barra final
+
+O middleware Add trailing slash adiciona uma barra final à URI do request.
+
+### Uso
+
+```go
+e := echo.New()
+e.Pre(middleware.AddTrailingSlash())
+```
+
+## Remover barra final
+
+O middleware Remove trailing slash remove uma barra final da URI do request.
+
+### Uso
+
+```go
+e := echo.New()
+e.Pre(middleware.RemoveTrailingSlash())
+```
+
+## Configuração customizada
+
+```go
+e := echo.New()
+e.Use(middleware.AddTrailingSlashWithConfig(middleware.AddTrailingSlashConfig{
+	RedirectCode: http.StatusMovedPermanently,
+}))
+```
+
+O exemplo acima adiciona uma barra final à URI do request e redireciona com
+`301 - StatusMovedPermanently`.
+
+## Configuração
+
+<ConfigReference name="AddTrailingSlashConfig" locale="pt-br" />
+
+<ConfigReference name="RemoveTrailingSlashConfig" locale="pt-br" />

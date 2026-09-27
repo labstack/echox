@@ -1,0 +1,44 @@
+---
+title: Context Timeout
+description: Aplica un timeout al contexto del request para que las operaciones conscientes del contexto puedan retornar antes.
+sidebar:
+  order: 5
+---
+
+import ConfigReference from '../../../../components/ConfigReference.astro';
+
+El middleware Context Timeout aplica un timeout al contexto del request dentro de un periodo
+predefinido, para que los métodos conscientes del contexto puedan retornar antes cuando se supera el deadline.
+
+Todo el middleware principal reside en el paquete `middleware`:
+
+```go
+import "github.com/labstack/echo/v5/middleware"
+```
+
+## Uso
+
+```go
+e.Use(middleware.ContextTimeout(60 * time.Second))
+```
+
+## Configuración personalizada
+
+```go
+e.Use(middleware.ContextTimeoutWithConfig(middleware.ContextTimeoutConfig{
+	Timeout: 60 * time.Second,
+}))
+```
+
+## Configuración
+
+<ConfigReference name="ContextTimeoutConfig" locale="es" />
+
+### Configuración por defecto
+
+```go
+// Effective defaults applied when fields are left unset (Timeout is required).
+ContextTimeoutConfig{
+	Skipper: DefaultSkipper,
+}
+```

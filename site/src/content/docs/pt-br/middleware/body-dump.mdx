@@ -1,0 +1,59 @@
+---
+title: Body Dump
+description: Capture payloads de request e response e passe-os para um handler para logging ou debugging.
+sidebar:
+  order: 2
+---
+
+import ConfigReference from '../../../../components/ConfigReference.astro';
+
+O middleware Body Dump captura os payloads de request e response e os passa para um
+handler registrado. Em geral, ele é usado para debugging ou logging.
+
+:::caution
+Evite Body Dump para payloads grandes, como uploads ou downloads de arquivos. Se precisar usá-lo
+nessas rotas, adicione uma exceção na função skipper.
+:::
+
+Todo o middleware principal fica no pacote `middleware`:
+
+```go
+import "github.com/labstack/echo/v5/middleware"
+```
+
+## Uso
+
+```go
+e := echo.New()
+e.Use(middleware.BodyDump(func(c *echo.Context, reqBody, resBody []byte, err error) {
+	// Handle the request and response bodies.
+}))
+```
+
+## Configuração customizada
+
+```go
+e := echo.New()
+e.Use(middleware.BodyDumpWithConfig(middleware.BodyDumpConfig{}))
+```
+
+## Configuração
+
+<ConfigReference name="BodyDumpConfig" locale="pt-br" />
+
+O `Handler` tem a assinatura:
+
+```go
+type BodyDumpHandler func(c *echo.Context, reqBody []byte, resBody []byte, err error)
+```
+
+### Configuração padrão
+
+```go
+// Effective defaults applied when fields are left unset (Handler is required).
+BodyDumpConfig{
+	Skipper:          DefaultSkipper,
+	MaxRequestBytes:  5 * MB,
+	MaxResponseBytes: 5 * MB,
+}
+```
