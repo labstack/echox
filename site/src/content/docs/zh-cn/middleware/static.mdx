@@ -1,0 +1,44 @@
+---
+title: Static
+description: 从目录提供文件，并默认安全地处理编码路径。
+sidebar:
+  order: 24
+---
+
+import { Code } from '@astrojs/starlight/components';
+import ConfigReference from '../../../../components/ConfigReference.astro';
+import example from '../../../../generated/static.go.txt?raw';
+
+Static 中间件从根目录提供文件。下面的示例在 `/` 提供 `public/index.html`。
+
+## 用法
+
+在 `echox` 源码目录运行 `cd reference/static && go run .`，然后打开 `http://localhost:1323/`。
+
+<Code code={example} lang="go" title="static/main.go" />
+
+本页直接导入文档 CI 编译的同一个文件。示例将 `EnablePathUnescaping` 保持为 `false`，这是处理编码斜杠的安全默认值。
+
+## 自定义配置
+
+`Root` 指定要提供的目录。`Browse` 启用目录列表，`HTML5` 将未找到的路径转到索引文件，`Filesystem` 可接收 `fs.FS`。如果分组的 URL 前缀不应成为文件路径的一部分，请使用 `IgnoreBase`。
+
+#### 示例 1
+
+将 Static 中间件附加到非根路径的分组时，Echo 通常会将分组的 URL 前缀加入文件路径。如果文件系统根目录已经包含该前缀，请设置 `IgnoreBase: true`。分组需要有匹配的路由才能运行其中间件。
+
+#### 示例 2
+
+要提供嵌入式文件系统，请将 `embed.FS` 赋给 `Filesystem`，并将其中的资源目录设为 `Root`。完整程序见[嵌入资源示例](/zh-cn/cookbook/embed-resources/)。
+
+## 配置
+
+下表由所标注 Echo 修订版本的导出字段生成。它标记弃用字段，但不推断默认值或安全行为。
+
+<ConfigReference name="StaticConfig" locale="zh-cn" />
+
+### 默认配置
+
+`Index` 默认为 `index.html`。`EnablePathUnescaping` 默认为 `false`，因此通配符路径中的编码斜杠不会被解码。`DisablePathUnescaping` 已弃用，当前 Echo 会忽略它；确实需要解码时请使用 `EnablePathUnescaping`。
+
+只有在文件名需要 URL 编码字符，且路由规则不限制子目录访问时才启用解码。在路由匹配后解码斜杠可能绕过保护性路由。

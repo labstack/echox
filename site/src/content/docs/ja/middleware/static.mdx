@@ -1,0 +1,44 @@
+---
+title: Static
+description: ディレクトリ内のファイルを配信し、エンコードされたパスを安全な既定値で扱います。
+sidebar:
+  order: 24
+---
+
+import { Code } from '@astrojs/starlight/components';
+import ConfigReference from '../../../../components/ConfigReference.astro';
+import example from '../../../../generated/static.go.txt?raw';
+
+Static ミドルウェアはルートディレクトリからファイルを配信します。この例では `/` で `public/index.html` を配信します。
+
+## 使い方
+
+`echox` のソースディレクトリで `cd reference/static && go run .` を実行し、`http://localhost:1323/` を開いてください。
+
+<Code code={example} lang="go" title="static/main.go" />
+
+このページはドキュメントの CI がコンパイルするファイルをそのまま読み込みます。この例の `EnablePathUnescaping` は `false` で、エンコードされたスラッシュに対する安全な既定値です。
+
+## カスタム設定
+
+`Root` は配信するディレクトリです。`Browse` はディレクトリ一覧を有効にし、`HTML5` は見つからないパスをインデックスファイルに転送し、`Filesystem` には `fs.FS` を指定できます。グループの URL プレフィックスをファイルパスに含めたくない場合は `IgnoreBase` を使います。
+
+#### 例 1
+
+ルート以外のグループに Static ミドルウェアを設定すると、通常はグループの URL プレフィックスがファイルパスに含まれます。ファイルシステムのルートがすでにその場所を指している場合は `IgnoreBase: true` を設定します。グループのミドルウェアを実行するには、一致するルートが必要です。
+
+#### 例 2
+
+埋め込みファイルシステムを配信するには、`Filesystem` に `embed.FS`、`Root` にその中のアセットディレクトリを設定します。完全なプログラムは[埋め込みリソースのクックブック](/ja/cookbook/embed-resources/)を参照してください。
+
+## 設定
+
+この表は、記載された Echo リビジョンの公開フィールドから生成されます。非推奨フィールドを示しますが、デフォルト値やセキュリティ上の動作は推測しません。
+
+<ConfigReference name="StaticConfig" locale="ja" />
+
+### デフォルト設定
+
+`Index` の既定値は `index.html` です。`EnablePathUnescaping` の既定値は `false` で、ワイルドカードパス内のエンコードされたスラッシュをデコードしません。`DisablePathUnescaping` は非推奨で、現在の Echo では無視されます。明示的にデコードが必要な場合は `EnablePathUnescaping` を使います。
+
+ファイル名に URL エンコードされた文字が必要で、ルートでサブディレクトリへのアクセスを制限していない場合にのみ有効にしてください。ルーティング後にスラッシュをデコードすると、保護用ルートを回避できる場合があります。

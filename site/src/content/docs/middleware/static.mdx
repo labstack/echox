@@ -1,0 +1,44 @@
+---
+title: Static
+description: Serve files from a directory and keep encoded paths safe by default.
+sidebar:
+  order: 24
+---
+
+import { Code } from '@astrojs/starlight/components';
+import ConfigReference from '../../../components/ConfigReference.astro';
+import example from '../../../generated/static.go.txt?raw';
+
+Static middleware serves files from a root directory. The example below serves `public/index.html` at `/`.
+
+## Usage
+
+From the `echox` checkout, run `cd reference/static && go run .`, then open `http://localhost:1323/`.
+
+<Code code={example} lang="go" title="static/main.go" />
+
+The page imports the same file that documentation CI compiles. The example keeps `EnablePathUnescaping` false, the safe default for encoded slashes.
+
+## Custom configuration
+
+Set `Root` to the directory to serve. `Browse` enables directory listings, `HTML5` forwards missing paths to the index file for a single-page application, and `Filesystem` lets you provide an `fs.FS`. Use `IgnoreBase` when a group's URL prefix should not become part of the file path.
+
+#### Example 1
+
+When Static middleware is attached to a non-root group, Echo normally includes the group's URL prefix in the filesystem path. Set `IgnoreBase: true` if your filesystem root already points inside that prefix. A group needs a matching route for its middleware to run.
+
+#### Example 2
+
+To serve an embedded filesystem, set `Filesystem` to your `embed.FS` and `Root` to the asset directory within it. See the [embed resources cookbook](/cookbook/embed-resources/) for a complete program.
+
+## Configuration
+
+The table comes from the exported fields in the recorded Echo revision. It identifies deprecated fields but does not infer defaults or security behavior.
+
+<ConfigReference name="StaticConfig" />
+
+### Default configuration
+
+`Index` defaults to `index.html`. `EnablePathUnescaping` defaults to `false`, so encoded slashes in the wildcard path stay encoded. `DisablePathUnescaping` is deprecated and ignored by current Echo; use `EnablePathUnescaping` when you explicitly need unescaping.
+
+Enable unescaping only when you need URL-encoded characters in filenames and your route rules do not restrict access to subdirectories. Decoding an encoded slash after routing can bypass a route guard that matched the encoded path differently. Review the linked source in the table before enabling it.

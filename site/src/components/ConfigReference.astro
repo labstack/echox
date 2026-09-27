@@ -1,0 +1,50 @@
+---
+import manifest from '../generated/config-fields.json';
+
+interface Props {
+  name: string;
+  locale?: 'en' | 'es' | 'ja' | 'pt-br' | 'zh-cn';
+}
+
+const { name, locale = 'en' } = Astro.props;
+const config = manifest.configs.find((entry) => entry.name === name);
+if (!config) throw new Error(`Missing Echo source reference for ${name}`);
+const labels = {
+  en: { field: 'Field', type: 'Type', source: 'Source', deprecated: 'Deprecated', caption: 'Fields from Echo source' },
+  es: { field: 'Campo', type: 'Tipo', source: 'Fuente', deprecated: 'Obsoleto', caption: 'Campos del código de Echo' },
+  ja: { field: 'フィールド', type: '型', source: 'ソース', deprecated: '非推奨', caption: 'Echo のソースコードのフィールド' },
+  'pt-br': { field: 'Campo', type: 'Tipo', source: 'Código', deprecated: 'Obsoleto', caption: 'Campos do código do Echo' },
+  'zh-cn': { field: '字段', type: '类型', source: '源码', deprecated: '已弃用', caption: 'Echo 源码中的字段' },
+}[locale];
+const sourceUrl = (line: number) => `https://github.com/labstack/echo/blob/${manifest.revision}/${config.file}#L${line}`;
+---
+
+<div class="echo-config-reference">
+  <p class="revision"><a href={sourceUrl(config.line)}>{config.name}</a> · <a href={`https://github.com/labstack/echo/tree/${manifest.revision}`}>Echo {manifest.revision.slice(0, 7)}</a></p>
+  <div class="table-scroll">
+    <table>
+      <caption>{labels.caption}</caption>
+      <thead><tr><th scope="col">{labels.field}</th><th scope="col">{labels.type}</th><th scope="col">{labels.source}</th></tr></thead>
+      <tbody>
+        {config.fields.map((field) => <tr>
+          <th scope="row"><code>{field.name}</code>{field.deprecated && <span class="deprecated">{labels.deprecated}</span>}</th>
+          <td><code>{field.type}</code></td>
+          <td><a href={sourceUrl(field.line)} aria-label={`${field.name} ${labels.source}`}>L{field.line}</a></td>
+        </tr>)}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<style>
+  .echo-config-reference { margin-block: 1.25rem 2rem; }
+  .revision { font-size: var(--sl-text-sm); color: var(--sl-color-gray-3); margin-bottom: .6rem; }
+  .table-scroll { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: var(--sl-text-sm); }
+  caption { text-align: left; font-weight: 600; margin-bottom: .5rem; }
+  th, td { border-bottom: 1px solid var(--sl-color-hairline); padding: .55rem .7rem; text-align: left; vertical-align: top; }
+  thead th { color: var(--sl-color-gray-2); }
+  tbody th { font-weight: 500; }
+  code { overflow-wrap: anywhere; }
+  .deprecated { display: inline-block; margin-inline-start: .5rem; font-size: .75em; color: var(--sl-color-text-accent); }
+</style>

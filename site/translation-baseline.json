@@ -1,0 +1,18 @@
+{
+  "es": {
+    "logger": "53b60faa99c9656e18cf4abad32e9716768586b71ba83a67f619bd596732a99f",
+    "static": "3992dc8bcbc8b8cac1ec8c89e9e9ea0e26b804053b7658b9a294e7e1926de21d"
+  },
+  "ja": {
+    "logger": "53b60faa99c9656e18cf4abad32e9716768586b71ba83a67f619bd596732a99f",
+    "static": "3992dc8bcbc8b8cac1ec8c89e9e9ea0e26b804053b7658b9a294e7e1926de21d"
+  },
+  "pt-br": {
+    "logger": "53b60faa99c9656e18cf4abad32e9716768586b71ba83a67f619bd596732a99f",
+    "static": "3992dc8bcbc8b8cac1ec8c89e9e9ea0e26b804053b7658b9a294e7e1926de21d"
+  },
+  "zh-cn": {
+    "logger": "53b60faa99c9656e18cf4abad32e9716768586b71ba83a67f619bd596732a99f",
+    "static": "3992dc8bcbc8b8cac1ec8c89e9e9ea0e26b804053b7658b9a294e7e1926de21d"
+  }
+}

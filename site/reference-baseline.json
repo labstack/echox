@@ -1,0 +1,552 @@
+{
+  "configs": {
+    "AddTrailingSlashConfig": {
+      "Skipper": {
+        "type": "Skipper",
+        "deprecated": false
+      },
+      "RedirectCode": {
+        "type": "int",
+        "deprecated": false
+      }
+    },
+    "BasicAuthConfig": {
+      "Skipper": {
+        "type": "Skipper",
+        "deprecated": false
+      },
+      "Validator": {
+        "type": "BasicAuthValidator",
+        "deprecated": false
+      },
+      "Realm": {
+        "type": "string",
+        "deprecated": false
+      },
+      "AllowedCheckLimit": {
+        "type": "uint",
+        "deprecated": false
+      }
+    },
+    "BodyDumpConfig": {
+      "Skipper": {
+        "type": "Skipper",
+        "deprecated": false
+      },
+      "Handler": {
+        "type": "BodyDumpHandler",
+        "deprecated": false
+      },
+      "MaxRequestBytes": {
+        "type": "int64",
+        "deprecated": false
+      },
+      "MaxResponseBytes": {
+        "type": "int64",
+        "deprecated": false
+      }
+    },
+    "BodyLimitConfig": {
+      "Skipper": {
+        "type": "Skipper",
+        "deprecated": false
+      },
+      "LimitBytes": {
+        "type": "int64",
+        "deprecated": false
+      }
+    },
+    "CORSConfig": {
+      "Skipper": {
+        "type": "Skipper",
+        "deprecated": false
+      },
+      "AllowOrigins": {
+        "type": "[]string",
+        "deprecated": false
+      },
+      "UnsafeAllowOriginFunc": {
+        "type": "func(c *echo.Context, origin string) (allowedOrigin string, allowed bool, err error)",
+        "deprecated": false
+      },
+      "AllowMethods": {
+        "type": "[]string",
+        "deprecated": false
+      },
+      "AllowHeaders": {
+        "type": "[]string",
+        "deprecated": false
+      },
+      "AllowCredentials": {
+        "type": "bool",
+        "deprecated": false
+      },
+      "ExposeHeaders": {
+        "type": "[]string",
+        "deprecated": false
+      },
+      "MaxAge": {
+        "type": "int",
+        "deprecated": false
+      }
+    },
+    "CSRFConfig": {
+      "Skipper": {
+        "type": "Skipper",
+        "deprecated": false
+      },
+      "TrustedOrigins": {
+        "type": "[]string",
+        "deprecated": false
+      },
+      "AllowSecFetchSiteFunc": {
+        "type": "func(c *echo.Context) (bool, error)",
+        "deprecated": false
+      },
+      "TokenLength": {
+        "type": "uint8",
+        "deprecated": false
+      },
+      "TokenLookup": {
+        "type": "string",
+        "deprecated": false
+      },
+      "Generator": {
+        "type": "func() string",
+        "deprecated": false
+      },
+      "ContextKey": {
+        "type": "string",
+        "deprecated": false
+      },
+      "CookieName": {
+        "type": "string",
+        "deprecated": false
+      },
+      "CookieDomain": {
+        "type": "string",
+        "deprecated": false
+      },
+      "CookiePath": {
+        "type": "string",
+        "deprecated": false
+      },
+      "CookieMaxAge": {
+        "type": "int",
+        "deprecated": false
+      },
+      "CookieSecure": {
+        "type": "bool",
+        "deprecated": false
+      },
+      "CookieHTTPOnly": {
+        "type": "bool",
+        "deprecated": false
+      },
+      "CookieSameSite": {
+        "type": "http.SameSite",
+        "deprecated": false
+      },
+      "ErrorHandler": {
+        "type": "func(c *echo.Context, err error) error",
+        "deprecated": false
+      }
+    },
+    "ContextTimeoutConfig": {
+      "Skipper": {
+        "type": "Skipper",
+        "deprecated": false
+      },
+      "ErrorHandler": {
+        "type": "func(c *echo.Context, err error) error",
+        "deprecated": false
+      },
+      "Timeout": {
+        "type": "time.Duration",
+        "deprecated": false
+      }
+    },
+    "DecompressConfig": {
+      "Skipper": {
+        "type": "Skipper",
+        "deprecated": false
+      },
+      "GzipDecompressPool": {
+        "type": "Decompressor",
+        "deprecated": false
+      },
+      "MaxDecompressedSize": {
+        "type": "int64",
+        "deprecated": false
+      }
+    },
+    "GzipConfig": {
+      "Skipper": {
+        "type": "Skipper",
+        "deprecated": false
+      },
+      "Level": {
+        "type": "int",
+        "deprecated": false
+      },
+      "MinLength": {
+        "type": "int",
+        "deprecated": false
+      }
+    },
+    "KeyAuthConfig": {
+      "Skipper": {
+        "type": "Skipper",
+        "deprecated": false
+      },
+      "KeyLookup": {
+        "type": "string",
+        "deprecated": false
+      },
+      "AllowedCheckLimit": {
+        "type": "uint",
+        "deprecated": false
+      },
+      "Validator": {
+        "type": "KeyAuthValidator",
+        "deprecated": false
+      },
+      "ErrorHandler": {
+        "type": "KeyAuthErrorHandler",
+        "deprecated": false
+      },
+      "ContinueOnIgnoredError": {
+        "type": "bool",
+        "deprecated": false
+      }
+    },
+    "MethodOverrideConfig": {
+      "Skipper": {
+        "type": "Skipper",
+        "deprecated": false
+      },
+      "Getter": {
+        "type": "MethodOverrideGetter",
+        "deprecated": false
+      }
+    },
+    "ProxyConfig": {
+      "Skipper": {
+        "type": "Skipper",
+        "deprecated": false
+      },
+      "Balancer": {
+        "type": "ProxyBalancer",
+        "deprecated": false
+      },
+      "RetryCount": {
+        "type": "int",
+        "deprecated": false
+      },
+      "RetryFilter": {
+        "type": "func(c *echo.Context, e error) bool",
+        "deprecated": false
+      },
+      "ErrorHandler": {
+        "type": "func(c *echo.Context, err error) error",
+        "deprecated": false
+      },
+      "Rewrite": {
+        "type": "map[string]string",
+        "deprecated": false
+      },
+      "RegexRewrite": {
+        "type": "map[*regexp.Regexp]string",
+        "deprecated": false
+      },
+      "ContextKey": {
+        "type": "string",
+        "deprecated": false
+      },
+      "Transport": {
+        "type": "http.RoundTripper",
+        "deprecated": false
+      },
+      "ModifyResponse": {
+        "type": "func(*http.Response) error",
+        "deprecated": false
+      }
+    },
+    "RateLimiterConfig": {
+      "Skipper": {
+        "type": "Skipper",
+        "deprecated": false
+      },
+      "BeforeFunc": {
+        "type": "BeforeFunc",
+        "deprecated": false
+      },
+      "IdentifierExtractor": {
+        "type": "Extractor",
+        "deprecated": false
+      },
+      "Store": {
+        "type": "RateLimiterStore",
+        "deprecated": false
+      },
+      "ErrorHandler": {
+        "type": "func(c *echo.Context, err error) error",
+        "deprecated": false
+      },
+      "DenyHandler": {
+        "type": "func(c *echo.Context, identifier string, err error) error",
+        "deprecated": false
+      }
+    },
+    "RateLimiterMemoryStoreConfig": {
+      "Rate": {
+        "type": "float64",
+        "deprecated": false
+      },
+      "Burst": {
+        "type": "int",
+        "deprecated": false
+      },
+      "ExpiresIn": {
+        "type": "time.Duration",
+        "deprecated": false
+      }
+    },
+    "RecoverConfig": {
+      "Skipper": {
+        "type": "Skipper",
+        "deprecated": false
+      },
+      "StackSize": {
+        "type": "int",
+        "deprecated": false
+      },
+      "DisableStackAll": {
+        "type": "bool",
+        "deprecated": false
+      },
+      "DisablePrintStack": {
+        "type": "bool",
+        "deprecated": false
+      }
+    },
+    "RedirectConfig": {
+      "Code": {
+        "type": "int",
+        "deprecated": false
+      }
+    },
+    "RemoveTrailingSlashConfig": {
+      "Skipper": {
+        "type": "Skipper",
+        "deprecated": false
+      },
+      "RedirectCode": {
+        "type": "int",
+        "deprecated": false
+      }
+    },
+    "RequestIDConfig": {
+      "Skipper": {
+        "type": "Skipper",
+        "deprecated": false
+      },
+      "Generator": {
+        "type": "func() string",
+        "deprecated": false
+      },
+      "RequestIDHandler": {
+        "type": "func(c *echo.Context, requestID string)",
+        "deprecated": false
+      },
+      "TargetHeader": {
+        "type": "string",
+        "deprecated": false
+      }
+    },
+    "RequestLoggerConfig": {
+      "Skipper": {
+        "type": "Skipper",
+        "deprecated": false
+      },
+      "BeforeNextFunc": {
+        "type": "func(c *echo.Context)",
+        "deprecated": false
+      },
+      "LogValuesFunc": {
+        "type": "func(c *echo.Context, v RequestLoggerValues) error",
+        "deprecated": false
+      },
+      "HandleError": {
+        "type": "bool",
+        "deprecated": false
+      },
+      "LogLatency": {
+        "type": "bool",
+        "deprecated": false
+      },
+      "LogProtocol": {
+        "type": "bool",
+        "deprecated": false
+      },
+      "LogRemoteIP": {
+        "type": "bool",
+        "deprecated": false
+      },
+      "LogHost": {
+        "type": "bool",
+        "deprecated": false
+      },
+      "LogMethod": {
+        "type": "bool",
+        "deprecated": false
+      },
+      "LogURI": {
+        "type": "bool",
+        "deprecated": false
+      },
+      "LogURIPath": {
+        "type": "bool",
+        "deprecated": false
+      },
+      "LogRoutePath": {
+        "type": "bool",
+        "deprecated": false
+      },
+      "LogRequestID": {
+        "type": "bool",
+        "deprecated": false
+      },
+      "LogReferer": {
+        "type": "bool",
+        "deprecated": false
+      },
+      "LogUserAgent": {
+        "type": "bool",
+        "deprecated": false
+      },
+      "LogStatus": {
+        "type": "bool",
+        "deprecated": false
+      },
+      "LogContentLength": {
+        "type": "bool",
+        "deprecated": false
+      },
+      "LogResponseSize": {
+        "type": "bool",
+        "deprecated": false
+      },
+      "LogHeaders": {
+        "type": "[]string",
+        "deprecated": false
+      },
+      "LogQueryParams": {
+        "type": "[]string",
+        "deprecated": false
+      },
+      "LogFormValues": {
+        "type": "[]string",
+        "deprecated": false
+      }
+    },
+    "RewriteConfig": {
+      "Skipper": {
+        "type": "Skipper",
+        "deprecated": false
+      },
+      "Rules": {
+        "type": "map[string]string",
+        "deprecated": false
+      },
+      "RegexRules": {
+        "type": "map[*regexp.Regexp]string",
+        "deprecated": false
+      }
+    },
+    "SecureConfig": {
+      "Skipper": {
+        "type": "Skipper",
+        "deprecated": false
+      },
+      "XSSProtection": {
+        "type": "string",
+        "deprecated": false
+      },
+      "ContentTypeNosniff": {
+        "type": "string",
+        "deprecated": false
+      },
+      "XFrameOptions": {
+        "type": "string",
+        "deprecated": false
+      },
+      "HSTSMaxAge": {
+        "type": "int",
+        "deprecated": false
+      },
+      "HSTSExcludeSubdomains": {
+        "type": "bool",
+        "deprecated": false
+      },
+      "ContentSecurityPolicy": {
+        "type": "string",
+        "deprecated": false
+      },
+      "CSPReportOnly": {
+        "type": "bool",
+        "deprecated": false
+      },
+      "HSTSPreloadEnabled": {
+        "type": "bool",
+        "deprecated": false
+      },
+      "ReferrerPolicy": {
+        "type": "string",
+        "deprecated": false
+      }
+    },
+    "StaticConfig": {
+      "Skipper": {
+        "type": "Skipper",
+        "deprecated": false
+      },
+      "Root": {
+        "type": "string",
+        "deprecated": false
+      },
+      "Filesystem": {
+        "type": "fs.FS",
+        "deprecated": false
+      },
+      "Index": {
+        "type": "string",
+        "deprecated": false
+      },
+      "HTML5": {
+        "type": "bool",
+        "deprecated": false
+      },
+      "Browse": {
+        "type": "bool",
+        "deprecated": false
+      },
+      "IgnoreBase": {
+        "type": "bool",
+        "deprecated": false
+      },
+      "DisablePathUnescaping": {
+        "type": "bool",
+        "deprecated": true
+      },
+      "EnablePathUnescaping": {
+        "type": "bool",
+        "deprecated": false
+      },
+      "DirectoryListTemplate": {
+        "type": "string",
+        "deprecated": false
+      }
+    }
+  }
+}

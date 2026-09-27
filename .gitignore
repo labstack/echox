@@ -7,3 +7,7 @@ vendor
 .superpowers/
 .serena/
 .playwright-mcp/
+.cache/
+site/src/generated/
+site/dist/
+site/node_modules/

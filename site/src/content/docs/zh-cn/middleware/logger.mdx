@@ -1,0 +1,54 @@
+---
+title: Request Logger
+description: 使用任意日志库记录选定的请求和响应数据。
+sidebar:
+  order: 12
+---
+
+import { Code } from '@astrojs/starlight/components';
+import ConfigReference from '../../../../components/ConfigReference.astro';
+import example from '../../../../generated/request-logger.go.txt?raw';
+
+`RequestLogger` 将选定的请求和响应数据传给必填的 `LogValuesFunc` 回调。你可以在回调中使用 `slog` 或其他日志库。每个 `Log*` 字段控制对应数据的提取；例如，`LogStatus: true` 会填充 `v.Status`。
+
+## 示例
+
+### slog ([log/slog](https://pkg.go.dev/log/slog))
+
+下面的完整程序以 JSON 格式记录 URI 和状态码。在 `echox` 源码目录运行 `cd reference/request-logger && go run .`，然后访问 `http://localhost:1323/`。
+
+<Code code={example} lang="go" title="request-logger/main.go" />
+
+本页直接导入文档 CI 编译的同一个文件。下一个处理器返回错误时，`v.Error` 会包含该错误。设置 `HandleError: true` 后，全局错误处理器会先写入响应，再调用 `LogValuesFunc`；上游中间件此时无法更改状态码或响应体。
+
+### fmt.Printf
+
+在小型应用中，`LogValuesFunc` 可以调用 `fmt.Printf`。记得启用所读取数据对应的 `Log*` 字段。
+
+### Zerolog ([rs/zerolog](https://github.com/rs/zerolog))
+
+在 `LogValuesFunc` 中将选定的数据传给 Zerolog。
+
+### Zap ([uber-go/zap](https://github.com/uber-go/zap))
+
+同一个回调也可以将数据传给 Zap。
+
+### Logrus ([sirupsen/logrus](https://github.com/sirupsen/logrus))
+
+从 `RequestLoggerValues` 构造 Logrus 字段。
+
+## 配置
+
+下表由所标注 Echo 修订版本的导出字段生成，不推断运行时默认值。
+
+<ConfigReference name="RequestLoggerConfig" locale="zh-cn" />
+
+## 故障排除
+
+### panic: missing LogValuesFunc callback function for request logger middleware
+
+`LogValuesFunc` 为必填项。调用 `RequestLoggerWithConfig` 前需设置它；上面的可运行示例已包含该回调。
+
+### 日志中的参数为空
+
+启用对应的提取字段：`v.URI` 需要 `LogURI: true`，`v.Status` 需要 `LogStatus: true`。

@@ -1,0 +1,54 @@
+---
+title: Request Logger
+description: 選択したリクエストとレスポンスの値を、任意のログライブラリで記録します。
+sidebar:
+  order: 12
+---
+
+import { Code } from '@astrojs/starlight/components';
+import ConfigReference from '../../../../components/ConfigReference.astro';
+import example from '../../../../generated/request-logger.go.txt?raw';
+
+`RequestLogger` は、選択したリクエストとレスポンスの値を必須の `LogValuesFunc` に渡します。この関数で `slog` などに記録できます。各 `Log*` フィールドは対応する値の取得を有効にします。たとえば `LogStatus: true` を設定すると `v.Status` に値が入ります。
+
+## 例
+
+### slog ([log/slog](https://pkg.go.dev/log/slog))
+
+この完全なプログラムは URI とステータスを JSON で記録します。`echox` のソースディレクトリで `cd reference/request-logger && go run .` を実行し、`http://localhost:1323/` にアクセスしてください。
+
+<Code code={example} lang="go" title="request-logger/main.go" />
+
+このページはドキュメントの CI がコンパイルするファイルをそのまま読み込みます。次のハンドラーがエラーを返すと `v.Error` に値が入ります。`HandleError: true` の場合、`LogValuesFunc` より前にグローバルエラーハンドラーがレスポンスを書き込むため、上流のミドルウェアはそのステータスや本文を変更できません。
+
+### fmt.Printf
+
+小さなアプリケーションでは、`LogValuesFunc` から `fmt.Printf` を呼べます。読み取る値に対応する `Log*` フィールドを有効にしてください。
+
+### Zerolog ([rs/zerolog](https://github.com/rs/zerolog))
+
+`LogValuesFunc` 内で、選択した値を Zerolog に渡します。
+
+### Zap ([uber-go/zap](https://github.com/uber-go/zap))
+
+同じコールバックを使って値を Zap に渡せます。
+
+### Logrus ([sirupsen/logrus](https://github.com/sirupsen/logrus))
+
+`RequestLoggerValues` から Logrus のフィールドを作成します。
+
+## 設定
+
+この表は、記載された Echo リビジョンの公開フィールドから生成されます。実行時のデフォルト値は推測しません。
+
+<ConfigReference name="RequestLoggerConfig" locale="ja" />
+
+## トラブルシューティング
+
+### panic: missing LogValuesFunc callback function for request logger middleware
+
+`LogValuesFunc` は必須です。`RequestLoggerWithConfig` を呼ぶ前に設定してください。上の実行可能な例にも含まれています。
+
+### ログ内のパラメーターが空
+
+対応する取得フィールドを有効にしてください。`v.URI` には `LogURI: true`、`v.Status` には `LogStatus: true` が必要です。
