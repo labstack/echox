@@ -56,7 +56,7 @@ export default defineConfig({
         // We hide kapa's default floating launcher and open the modal from our
         // own "Ask AI" pill in the header (see Search.astro) so the trigger
         // matches the Terminal chrome instead of kapa's stock button.
-        {
+        ...(!next ? [{
           tag: 'script',
           attrs: {
             async: true,
@@ -75,7 +75,7 @@ export default defineConfig({
             'data-button-hide': 'true',
             'data-modal-override-open-selector': '#echo-ask-ai',
           },
-        },
+        }] : []),
         // Dark-first: default new visitors to dark unless they've chosen otherwise.
         {
           tag: 'script',

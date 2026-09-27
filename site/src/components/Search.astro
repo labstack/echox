@@ -1,13 +1,14 @@
 ---
 import Default from '@astrojs/starlight/components/Search.astro';
+const isNext = process.env.DOCS_CHANNEL === 'next';
 ---
 <div class="echo-search-row">
   <Default />
-  {/* Opens the kapa.ai modal — wired via data-modal-override-open-selector in astro.config. */}
-  <button id="echo-ask-ai" class="echo-ask-ai" type="button" aria-label="Ask AI about Echo">
+  {/* The kapa.ai index covers release docs; next pages use their own Pagefind index. */}
+  {!isNext && <button id="echo-ask-ai" class="echo-ask-ai" type="button" aria-label="Ask AI about Echo">
     <i class="ph ph-sparkle" aria-hidden="true"></i>
     <span class="echo-ask-ai__label">Ask AI</span>
-  </button>
+  </button>}
 </div>
 
 <script>

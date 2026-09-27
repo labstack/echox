@@ -22,7 +22,7 @@ Está começando com Echo? Crie primeiro um servidor com o [guia de início](../
 ## Do código a uma requisição real
 
 1. Escolha a tarefa acima e copie o menor exemplo de uso.
-2. Consulte a configuração para ver os campos e assinaturas da revisão indicada do Echo. Leia os padrões e as notas de segurança antes de alterar o comportamento.
+2. Consulte a configuração para ver os campos e assinaturas da revisão indicada do Echo. Leia os valores padrão e as notas de segurança antes de alterar o comportamento.
 3. Execute o exemplo completo ou a receita vinculada e envie uma requisição com `curl`.
 
 Para criar sua primeira API, siga por [roteamento](../guide/routing/), [binding](../guide/binding/), [tratamento de erros](../guide/error-handling/) e [testes](../guide/testing/). Para tráfego de produção, adicione [Recover](./recover/) e [Request Logger](./logger/) antes de escolher os middlewares de segurança.

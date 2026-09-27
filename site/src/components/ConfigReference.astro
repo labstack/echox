@@ -24,25 +24,27 @@ const functions = manifest.functions.filter((entry) =>
   (source === 'open-telemetry' && name === 'Config' && entry.name === 'NewMiddleware')
 );
 const labels = {
-  en: { field: 'Field', type: 'Type', source: 'Source', deprecated: 'Deprecated', caption: 'Fields from package source', functions: 'Functions from package source' },
-  es: { field: 'Campo', type: 'Tipo', source: 'Fuente', deprecated: 'Obsoleto', caption: 'Campos del código fuente', functions: 'Funciones del código fuente' },
-  ja: { field: 'フィールド', type: '型', source: 'ソース', deprecated: '非推奨', caption: 'パッケージのソースコードのフィールド', functions: 'パッケージのソースコードの関数' },
-  'pt-br': { field: 'Campo', type: 'Tipo', source: 'Código', deprecated: 'Obsoleto', caption: 'Campos do código-fonte', functions: 'Funções do código-fonte' },
-  'zh-cn': { field: '字段', type: '类型', source: '源码', deprecated: '已弃用', caption: '包源码中的字段', functions: '包源码中的函数' },
+  en: { field: 'Field', type: 'Type', description: 'Description', source: 'Source', deprecated: 'Deprecated', caption: 'Fields from package source', functions: 'Functions from package source', note: '' },
+  es: { field: 'Campo', type: 'Tipo', description: 'Descripción', source: 'Fuente', deprecated: 'Obsoleto', caption: 'Campos del código fuente', functions: 'Funciones del código fuente', note: 'Las descripciones de los campos se generan a partir de comentarios del código fuente en inglés.' },
+  ja: { field: 'フィールド', type: '型', description: '説明', source: 'ソース', deprecated: '非推奨', caption: 'パッケージのソースコードのフィールド', functions: 'パッケージのソースコードの関数', note: 'フィールドの説明は英語のソースコードのコメントから生成されています。' },
+  'pt-br': { field: 'Campo', type: 'Tipo', description: 'Descrição', source: 'Código', deprecated: 'Obsoleto', caption: 'Campos do código-fonte', functions: 'Funções do código-fonte', note: 'As descrições dos campos são geradas dos comentários do código-fonte em inglês.' },
+  'zh-cn': { field: '字段', type: '类型', description: '说明', source: '源码', deprecated: '已弃用', caption: '包源码中的字段', functions: '包源码中的函数', note: '字段说明由英文源码注释生成。' },
 }[locale];
 const sourceUrl = (file: string, line: number) => `${repository}/blob/${manifest.revision}/${file}#L${line}`;
 ---
 
 <div class="echo-config-reference">
   <p class="revision"><a href={sourceUrl(config.file, config.line)}>{config.name}</a> · <a href={`${repository}/tree/${manifest.revision}`}>{manifest.module}@{source === 'echo' ? manifest.revision.slice(0, 7) : manifest.revision}</a></p>
+  {labels.note && <p class="revision">{labels.note}</p>}
   <div class="table-scroll">
     <table>
       <caption>{labels.caption}</caption>
-      <thead><tr><th scope="col">{labels.field}</th><th scope="col">{labels.type}</th><th scope="col">{labels.source}</th></tr></thead>
+      <thead><tr><th scope="col">{labels.field}</th><th scope="col">{labels.type}</th><th scope="col">{labels.description}</th><th scope="col">{labels.source}</th></tr></thead>
       <tbody>
         {config.fields.map((field) => <tr>
           <th scope="row"><code>{field.name}</code>{field.deprecated && <span class="deprecated">{labels.deprecated}</span>}</th>
           <td><code>{field.type}</code></td>
+          <td class="field-description">{field.doc || '—'}</td>
           <td><a href={sourceUrl(config.file, field.line)} aria-label={`${field.name} ${labels.source}`}>L{field.line}</a></td>
         </tr>)}
       </tbody>
@@ -72,5 +74,6 @@ const sourceUrl = (file: string, line: number) => `${repository}/blob/${manifest
   thead th { color: var(--sl-color-gray-2); }
   tbody th { font-weight: 500; }
   code { overflow-wrap: anywhere; white-space: pre-wrap; }
+  .field-description { min-width: 16rem; white-space: pre-line; overflow-wrap: anywhere; }
   .deprecated { display: inline-block; margin-inline-start: .5rem; font-size: .75em; color: var(--sl-color-text-accent); }
 </style>

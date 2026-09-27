@@ -41,7 +41,7 @@ func privateFunction() {}
 	if got.Configs[0].File != "middleware/example.go" || len(fields) != 2 {
 		t.Fatalf("unexpected config: %#v", got.Configs[0])
 	}
-	if fields[0].Name != "Old" || fields[0].Type != "bool" || !fields[0].Deprecated || fields[1].Name != "New" {
+	if fields[0].Name != "Old" || fields[0].Type != "bool" || fields[0].Doc != "Deprecated: use New instead." || !fields[0].Deprecated || fields[1].Name != "New" {
 		t.Fatalf("unexpected fields: %#v", fields)
 	}
 	if len(got.Functions) != 1 || got.Functions[0].Name != "ExampleWithConfig" || got.Functions[0].Signature != "func ExampleWithConfig(c ExampleConfig) bool" || got.Functions[0].File != "middleware/example.go" {

@@ -42,7 +42,9 @@ The generated files in `site/src/generated/` are never edited or committed.
 search assets, and locale coverage. `npm run performance:check` catches large
 HTML or first-load asset growth on representative stable and next pages.
 
-`npm run translations:status` identifies changed sections in the Spanish,
+Generated field descriptions come from the pinned Go source comments and remain
+in English on localized pages; the surrounding task guidance is authored per
+locale. `npm run translations:status` identifies changed sections in the Spanish,
 Japanese, Portuguese, and Chinese Request Logger, Static, and middleware task
 pages. Translate and review the affected section, then record that page with
 `npm run translations:accept -- es logger` (replace locale and page) and review

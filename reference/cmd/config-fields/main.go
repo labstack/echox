@@ -22,6 +22,7 @@ import (
 type field struct {
 	Name       string `json:"name"`
 	Type       string `json:"type"`
+	Doc        string `json:"doc,omitempty"`
 	Deprecated bool   `json:"deprecated,omitempty"`
 	Line       int    `json:"line"`
 }
@@ -139,6 +140,7 @@ func extractPackage(root, revision, module, directory, packageName string) (mani
 						entry.Fields = append(entry.Fields, field{
 							Name:       name.Name,
 							Type:       rendered.String(),
+							Doc:        fieldDoc,
 							Deprecated: strings.Contains(fieldDoc, "Deprecated:"),
 							Line:       fs.Position(name.Pos()).Line,
 						})

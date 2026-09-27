@@ -47,6 +47,12 @@ for (const file of htmlFiles) {
   const markup = html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, '').replace(/<pre\b[^>]*>[\s\S]*?<\/pre>/gi, '');
   const route = routes.find((item) => file === join(distDir, item, 'index.html') || file === join(distDir, item));
   const redirect = route.startsWith('/docs/') || route === '/docs/' || route === '/search/';
+  if (route === '/' && (!html.includes('widget.kapa.ai') || !html.includes('id="echo-ask-ai"'))) {
+    problems.push('Release docs lost Ask AI');
+  }
+  if (route.startsWith('/next/') && (html.includes('widget.kapa.ai') || html.includes('id="echo-ask-ai"'))) {
+    problems.push(`${route}: release-only Ask AI appears on next docs`);
+  }
   if (!redirect && !/\<html\b[^>]*\blang="[^"]+"/.test(html)) problems.push(`${route}: missing document language`);
   if (route.endsWith('/404.html')) continue;
   for (const [tag] of markup.matchAll(/<img\b[^>]*>/g)) {
