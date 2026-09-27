@@ -23,6 +23,8 @@ A página importa o mesmo arquivo compilado pela CI da documentação. O exemplo
 
 `Root` define o diretório servido. `Browse` habilita a listagem de diretórios, `HTML5` encaminha caminhos não encontrados ao arquivo de índice e `Filesystem` aceita um `fs.FS`. Use `IgnoreBase` quando o prefixo da URL de um grupo não deve entrar no caminho do arquivo.
 
+O fallback varia entre as revisões. O Echo v5.3.0 serve o arquivo de índice quando o próximo handler retorna 404. Na revisão `next` registrada, isso só ocorre para um 404 do roteador; um 404 retornado por uma rota correspondente é preservado. A diferença importa quando uma SPA e rotas de API compartilham o servidor.
+
 #### Exemplo 1
 
 Em um grupo fora da raiz, o Echo normalmente inclui o prefixo da URL do grupo no caminho do arquivo. Use `IgnoreBase: true` se o diretório raiz já incluir esse prefixo. O grupo precisa de uma rota correspondente para executar seu middleware.

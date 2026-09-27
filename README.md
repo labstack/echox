@@ -20,7 +20,8 @@ publishes the stable docs at `/` and a next preview at `/next/`, each with its
 own search index and source revision. Those revisions are pinned in
 `site/echo-source.json` and `site/next-source.json`. The build compiles the
 `reference/` examples against both, extracts middleware fields and function
-signatures, and checks them against `site/reference-baseline.json`. JWT,
+signatures, and checks stable against `site/reference-baseline.json` and next
+against `site/next-reference-baseline.json`. JWT,
 Prometheus, and OpenTelemetry are extracted from their own pinned modules in
 `site/external-sources.json` and checked against `site/external-baseline.json`.
 
@@ -35,8 +36,15 @@ npm run preview  # preview the production build
 The first build fetches pinned source into `.cache/`. To test a proposed next
 Echo checkout, set `ECHO_SOURCE_DIR` to its absolute path when running
 `npm run build`. The build reports changed API facts and stops. Review the
-affected pages and behavior, run `npm run source:prepare` and
-`npm run source:accept`, then review the baseline diff before committing it.
+affected pages and behavior, then prepare and accept the **next** baseline:
+
+```bash
+DOCS_CHANNEL=next ECHO_SOURCE_DIR=/absolute/path/to/echo npm run source:prepare
+DOCS_CHANNEL=next ECHO_SOURCE_DIR=/absolute/path/to/echo npm run source:accept
+```
+
+Review the baseline diff, update `site/next-source.json` to the proposed
+revision, and rerun the full build. The release baseline remains independent.
 The generated files in `site/src/generated/` are never edited or committed.
 `npm run site:check` checks routes, local links and fragments, image text,
 search assets, and locale coverage. `npm run performance:check` catches large

@@ -3,8 +3,14 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const siteDir = fileURLToPath(new URL('..', import.meta.url));
+const channel = process.env.DOCS_CHANNEL === 'next' ? 'next' : 'stable';
+const baselineFile = channel === 'next' ? 'next-reference-baseline.json' : 'reference-baseline.json';
 const manifest = JSON.parse(readFileSync(join(siteDir, 'src/generated/config-fields.json'), 'utf8'));
-const baseline = JSON.parse(readFileSync(join(siteDir, 'reference-baseline.json'), 'utf8'));
+const pin = JSON.parse(readFileSync(join(siteDir, channel === 'next' ? 'next-source.json' : 'echo-source.json'), 'utf8'));
+if (!process.env.ECHO_SOURCE_DIR && manifest.revision !== pin.revision) {
+  throw new Error(`Generated Echo source is ${manifest.revision}; expected ${channel} revision ${pin.revision}. Run source:prepare for this channel first.`);
+}
+const baseline = JSON.parse(readFileSync(join(siteDir, baselineFile), 'utf8'));
 const pages = JSON.parse(readFileSync(join(siteDir, 'reference-pages.json'), 'utf8'));
 const externalSources = JSON.parse(readFileSync(join(siteDir, 'external-sources.json'), 'utf8'));
 const externalBaseline = JSON.parse(readFileSync(join(siteDir, 'external-baseline.json'), 'utf8'));
@@ -51,7 +57,7 @@ for (const [slug, source] of Object.entries(externalSources)) {
   }
 }
 if (differences.length) {
-  throw new Error(`Middleware API changed. Review the affected pages, then update the baseline:\n${differences.join('\n')}`);
+  throw new Error(`${channel} middleware API changed. Review the affected pages, then update ${baselineFile}:\n${differences.join('\n')}`);
 }
 
 const documented = Object.values(pages).flat();

@@ -23,6 +23,8 @@ The page imports the same file that documentation CI compiles. The example keeps
 
 Set `Root` to the directory to serve. `Browse` enables directory listings, `HTML5` forwards missing paths to the index file for a single-page application, and `Filesystem` lets you provide an `fs.FS`. Use `IgnoreBase` when a group's URL prefix should not become part of the file path.
 
+The fallback differs by revision. Echo v5.3.0 serves the index when a downstream handler returns 404. In the recorded `next` revision, it serves the index only for a router-level 404; a matched route's 404 passes through. This matters when an SPA and API routes share a server.
+
 #### Example 1
 
 When Static middleware is attached to a non-root group, Echo normally includes the group's URL prefix in the filesystem path. Set `IgnoreBase: true` if your filesystem root already points inside that prefix. A group needs a matching route for its middleware to run.

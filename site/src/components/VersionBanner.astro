@@ -1,9 +1,9 @@
 ---
 import stable from '../../echo-source.json';
-import next from '../../next-source.json';
+import manifest from '../generated/config-fields.json';
 
 const isNext = process.env.DOCS_CHANNEL === 'next';
-const pin = isNext ? next : stable;
+const revision = manifest.revision;
 const path = Astro.url.pathname;
 const locale = path.split('/').find((part) => ['es', 'ja', 'pt-br', 'zh-cn'].includes(part)) || 'en';
 const labels = {
@@ -19,8 +19,8 @@ const counterpart = /\/(?:404|404\.html)\/?$/.test(path)
 ---
 
 <nav class="echo-version-banner" aria-label="Documentation version" data-pagefind-ignore>
-  <strong>{isNext ? labels.next : `${labels.release} · Echo ${pin.release}`}</strong>
-  <span>· {labels.source} <a href={`https://github.com/labstack/echo/tree/${pin.revision}`}>{pin.revision.slice(0, 7)}</a></span>
+  <strong>{isNext ? labels.next : `${labels.release} · Echo ${stable.release}`}</strong>
+  <span>· {labels.source} <a href={`https://github.com/labstack/echo/tree/${revision}`}>{revision.slice(0, 7)}</a></span>
   <a class="switch" data-version-switch href={counterpart}>{labels.switch} →</a>
 </nav>
 
