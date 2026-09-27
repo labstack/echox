@@ -9,6 +9,8 @@ HTTP/2 mejora la latencia mediante multiplexing de requests, compresión de head
 server push. El servidor HTTP de Go negocia HTTP/2 automáticamente sobre TLS, por lo que
 servir HTTP/2 con Echo consiste en iniciar el servidor con un certificado.
 
+<a id="1-generate-a-self-signed-x509-tls-certificate"></a>
+
 ## 1. Generar un certificado TLS X.509 autofirmado
 
 Ejecuta el siguiente comando para generar `cert.pem` y `key.pem`:

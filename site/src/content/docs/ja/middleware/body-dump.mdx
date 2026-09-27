@@ -1,0 +1,59 @@
+---
+title: ボディダンプ
+description: リクエストとレスポンスのペイロードをキャプチャし、ログ記録やデバッグ用のハンドラへ渡します。
+sidebar:
+  order: 2
+---
+
+import ConfigReference from '../../../../components/ConfigReference.astro';
+
+Body Dump ミドルウェアは、リクエストとレスポンスのペイロードをキャプチャして登録済みハンドラへ渡します。
+一般的にはデバッグやログ記録に使います。
+
+:::caution
+ファイルのアップロードやダウンロードなど、大きなペイロードには Body Dump を避けてください。
+そのようなルートで使う必要がある場合は、skipper 関数に例外を追加してください。
+:::
+
+すべてのコアミドルウェアは `middleware` パッケージに含まれています：
+
+```go
+import "github.com/labstack/echo/v5/middleware"
+```
+
+## 使い方
+
+```go
+e := echo.New()
+e.Use(middleware.BodyDump(func(c *echo.Context, reqBody, resBody []byte, err error) {
+	// Handle the request and response bodies.
+}))
+```
+
+## カスタム設定
+
+```go
+e := echo.New()
+e.Use(middleware.BodyDumpWithConfig(middleware.BodyDumpConfig{}))
+```
+
+## 設定
+
+<ConfigReference name="BodyDumpConfig" locale="ja" />
+
+`Handler` のシグネチャは次のとおりです。
+
+```go
+type BodyDumpHandler func(c *echo.Context, reqBody []byte, resBody []byte, err error)
+```
+
+### デフォルト設定
+
+```go
+// Effective defaults applied when fields are left unset (Handler is required).
+BodyDumpConfig{
+	Skipper:          DefaultSkipper,
+	MaxRequestBytes:  5 * MB,
+	MaxResponseBytes: 5 * MB,
+}
+```

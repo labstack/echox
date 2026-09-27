@@ -152,6 +152,8 @@ err := echo.QueryParamsBinder(c).
 `MustTypes(...)` メソッドがあります。例：`Int64`、`MustInt64`、`Int64s`。
 カンマ区切りの値を分割するには `BindWithDelimiter("id", &dest, ",")` を使います。
 
+<a id="custom-binder"></a>
+
 ## カスタム binder
 
 `Echo#Binder` でカスタム binder を登録します。

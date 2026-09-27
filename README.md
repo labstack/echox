@@ -10,11 +10,20 @@ the runnable cookbook recipes the docs reference.
 | ----------- | --------------------------------------------------------------------------------------------------- |
 | `site/`     | The docs site — [Astro](https://astro.build) + [Starlight](https://starlight.astro.build). Content lives in `site/src/content/docs/`. |
 | `cookbook/` | Standalone, runnable Go example apps referenced from the docs.                                       |
+| `reference/` | Source-owned middleware examples and the config-field extractor used by the site build.          |
 | `docs/`     | Internal design specs.                                                                               |
 
 ## Documentation site
 
-Requires [Node.js](https://nodejs.org) (LTS).
+Requires [Node.js](https://nodejs.org) (LTS), Go 1.27, and Git. The build
+publishes the stable docs at `/` and a next preview at `/next/`, each with its
+own search index and source revision. Those revisions are pinned in
+`site/echo-source.json` and `site/next-source.json`. The build compiles the
+`reference/` examples against both, extracts middleware fields and function
+signatures, and checks stable against `site/reference-baseline.json` and next
+against `site/next-reference-baseline.json`. JWT,
+Prometheus, and OpenTelemetry are extracted from their own pinned modules in
+`site/external-sources.json` and checked against `site/external-baseline.json`.
 
 ```bash
 cd site
@@ -23,6 +32,33 @@ npm run dev      # dev server at http://localhost:4321
 npm run build    # production build to site/dist
 npm run preview  # preview the production build
 ```
+
+The first build fetches pinned source into `.cache/`. To test a proposed next
+Echo checkout, set `ECHO_SOURCE_DIR` to its absolute path when running
+`npm run build`. The build reports changed API facts and stops. Review the
+affected pages and behavior, then prepare and accept the **next** baseline:
+
+```bash
+DOCS_CHANNEL=next ECHO_SOURCE_DIR=/absolute/path/to/echo npm run source:prepare
+DOCS_CHANNEL=next ECHO_SOURCE_DIR=/absolute/path/to/echo npm run source:accept
+```
+
+Review the baseline diff, update `site/next-source.json` to the proposed
+revision, and rerun the full build. The release baseline remains independent.
+The generated files in `site/src/generated/` are never edited or committed.
+`npm run site:check` checks routes, local links and fragments, image text,
+search assets, and locale coverage. `npm run performance:check` catches large
+HTML or first-load asset growth on representative stable and next pages.
+
+Generated field descriptions come from the pinned Go source comments and remain
+in English on localized pages; the surrounding task guidance is authored per
+locale. `npm run translations:status` identifies changed sections in the Spanish,
+Japanese, Portuguese, and Chinese Request Logger, Static, and middleware task
+pages. Translate and review the affected section, then record that page with
+`npm run translations:accept -- es logger` (replace locale and page) and review
+the baseline diff. This tracks edits to both English and localized text; it
+does not judge translation quality. The API tables are generated from source,
+so translators focus on explanations, task guidance, examples, and safety notes.
 
 Content is Markdown/MDX under `site/src/content/docs/` (`guide/`, `middleware/`,
 `cookbook/`). To add a page, drop a file in the right folder — the sidebar is

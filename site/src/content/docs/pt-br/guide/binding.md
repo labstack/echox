@@ -149,6 +149,8 @@ Cada tipo suportado oferece métodos `Type(...)`, `MustType(...)`, `Types(...)` 
 `MustTypes(...)` — por exemplo, `Int64`, `MustInt64`, `Int64s`. Use
 `BindWithDelimiter("id", &dest, ",")` para separar valores unidos por vírgula.
 
+<a id="custom-binder"></a>
+
 ## Binder customizado
 
 Registre um binder customizado via `Echo#Binder`:

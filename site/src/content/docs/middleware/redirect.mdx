@@ -1,0 +1,100 @@
+---
+title: Redirect
+description: Redirect requests between HTTP/HTTPS and www/non-www variants.
+sidebar:
+  order: 19
+---
+
+import ConfigReference from '../../../components/ConfigReference.astro';
+
+All core middleware lives in the `middleware` package:
+
+```go
+import "github.com/labstack/echo/v5/middleware"
+```
+
+## HTTPS Redirect
+
+HTTPS redirect middleware redirects HTTP requests to HTTPS. For example,
+`http://labstack.com` is redirected to `https://labstack.com`.
+
+### Usage
+
+```go
+e := echo.New()
+e.Pre(middleware.HTTPSRedirect())
+```
+
+## HTTPS WWW Redirect
+
+HTTPS WWW redirect redirects HTTP requests to www HTTPS. For example,
+`http://labstack.com` is redirected to `https://www.labstack.com`.
+
+### Usage
+
+```go
+e := echo.New()
+e.Pre(middleware.HTTPSWWWRedirect())
+```
+
+## HTTPS NonWWW Redirect
+
+HTTPS NonWWW redirect redirects HTTP requests to non-www HTTPS. For example,
+`http://www.labstack.com` is redirected to `https://labstack.com`.
+
+### Usage
+
+```go
+e := echo.New()
+e.Pre(middleware.HTTPSNonWWWRedirect())
+```
+
+## WWW Redirect
+
+WWW redirect redirects non-www requests to www. For example, `http://labstack.com` is
+redirected to `http://www.labstack.com`.
+
+### Usage
+
+```go
+e := echo.New()
+e.Pre(middleware.WWWRedirect())
+```
+
+## NonWWW Redirect
+
+NonWWW redirect redirects www requests to non-www. For example, `http://www.labstack.com` is
+redirected to `http://labstack.com`.
+
+### Usage
+
+```go
+e := echo.New()
+e.Pre(middleware.NonWWWRedirect())
+```
+
+## Custom configuration
+
+```go
+e := echo.New()
+e.Use(middleware.HTTPSRedirectWithConfig(middleware.RedirectConfig{
+	Code: http.StatusTemporaryRedirect,
+}))
+```
+
+The example above redirects HTTP requests to HTTPS with status code
+`307 - StatusTemporaryRedirect`.
+
+## Configuration
+
+<ConfigReference name="RedirectConfig" />
+
+### Default configuration
+
+```go
+// Effective defaults applied when fields are left unset.
+RedirectConfig{
+	Skipper: DefaultSkipper,
+	Code:    http.StatusMovedPermanently,
+}
+```

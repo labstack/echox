@@ -1,0 +1,35 @@
+name: Documentation checks
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-go@v6
+        with:
+          go-version: '1.27'
+          cache-dependency-path: |
+            go.sum
+            reference/go.sum
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+      - name: Test cookbook
+        run: go test ./...
+      - name: Install site dependencies
+        run: npm ci --ignore-scripts
+        working-directory: site
+      - name: Check source reference and build site
+        run: npm run build
+        working-directory: site
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,44 @@
+---
+title: コンテキストタイムアウト
+description: リクエストコンテキストにタイムアウトを適用し、コンテキスト対応の処理を早期に返せるようにします。
+sidebar:
+  order: 5
+---
+
+import ConfigReference from '../../../../components/ConfigReference.astro';
+
+Context Timeout ミドルウェアは、定義済みの期間内でリクエストコンテキストにタイムアウトを適用し、
+期限を超えたらコンテキスト対応メソッドが早期に返れるようにします。
+
+すべてのコアミドルウェアは `middleware` パッケージに含まれています：
+
+```go
+import "github.com/labstack/echo/v5/middleware"
+```
+
+## 使い方
+
+```go
+e.Use(middleware.ContextTimeout(60 * time.Second))
+```
+
+## カスタム設定
+
+```go
+e.Use(middleware.ContextTimeoutWithConfig(middleware.ContextTimeoutConfig{
+	Timeout: 60 * time.Second,
+}))
+```
+
+## 設定
+
+<ConfigReference name="ContextTimeoutConfig" locale="ja" />
+
+### デフォルト設定
+
+```go
+// Effective defaults applied when fields are left unset (Timeout is required).
+ContextTimeoutConfig{
+	Skipper: DefaultSkipper,
+}
+```

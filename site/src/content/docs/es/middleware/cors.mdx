@@ -1,0 +1,68 @@
+---
+title: CORS
+description: Middleware Cross-Origin Resource Sharing para control de acceso seguro entre dominios.
+sidebar:
+  order: 6
+---
+
+import ConfigReference from '../../../../components/ConfigReference.astro';
+
+El middleware CORS implementa la especificación [CORS](https://fetch.spec.whatwg.org/#http-cors-protocol).
+CORS da a los servidores web controles de acceso entre dominios, lo que permite transferencias de datos seguras entre dominios.
+
+Todo el middleware principal reside en el paquete `middleware`:
+
+```go
+import "github.com/labstack/echo/v5/middleware"
+```
+
+## Uso
+
+```go
+e.Use(middleware.CORS("https://example.com", "https://subdomain.example.com"))
+```
+
+## Configuración personalizada
+
+```go
+e := echo.New()
+e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+	AllowOrigins: []string{"https://labstack.com", "https://labstack.net"},
+	AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
+}))
+```
+
+## Configuración
+
+<ConfigReference name="CORSConfig" locale="es" />
+
+### Configuración por defecto
+
+```go
+// Effective defaults applied when fields are left unset.
+CORSConfig{
+	Skipper:      DefaultSkipper,
+	AllowMethods: []string{http.MethodGet, http.MethodHead, http.MethodPut, http.MethodPatch, http.MethodPost, http.MethodDelete},
+}
+```
+
+## Seguridad
+
+Un origin con wildcard (`AllowOrigins: []string{"*"}`) combinado con `AllowCredentials: true`
+es peligroso: reflejaría el `Origin` de **cualquier** petición en
+`Access-Control-Allow-Origin`, permitiendo que una página de cualquier sitio haga peticiones
+cross-origin con credenciales a tu API (consulta [Exploiting CORS misconfigurations](https://blog.portswigger.net/2016/10/exploiting-cors-misconfigurations-for.html)).
+
+Echo rechaza esta combinación en lugar de construir un middleware inseguro: `CORS` y
+`CORSWithConfig` hacen **panic**, y `CORSConfig.ToMiddleware()` devuelve un error. Para permitir
+peticiones con credenciales, enumera explícitamente los orígenes de confianza:
+
+```go
+e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+	AllowOrigins:     []string{"https://example.com"},
+	AllowCredentials: true,
+}))
+```
+
+Para validación dinámica de origin, usa `UnsafeAllowOriginFunc` y valida cada origin con
+cuidado: los atacantes pueden registrar nombres de (sub)dominio falsos u hostiles.

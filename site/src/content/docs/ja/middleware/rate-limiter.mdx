@@ -1,0 +1,105 @@
+---
+title: レートリミッター
+description: 特定の IP または識別子からのリクエスト数を一定期間内で制限します。
+sidebar:
+  order: 17
+---
+
+import ConfigReference from '../../../../components/ConfigReference.astro';
+
+`RateLimiter` は、特定の IP または識別子からサーバーへ送信されるリクエスト数を一定期間内で
+制限するレートリミッターミドルウェアを提供します。
+
+デフォルトでは、インメモリ store がリクエストを追跡します。デフォルトのインメモリ実装は
+正確性に重点を置いており、大量の同時リクエストや多数の異なる識別子（>16k）には最適ではない場合があります。
+
+すべてのコアミドルウェアは `middleware` パッケージに含まれています：
+
+```go
+import "github.com/labstack/echo/v5/middleware"
+```
+
+## 使い方
+
+アプリケーションにレート制限を追加するには、`RateLimiter` ミドルウェアを追加します。
+次の例では、デフォルトのインメモリ store を使ってアプリケーションを 20 requests/sec に制限します。
+
+```go
+e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(20.0)))
+```
+
+:::note
+指定した rate が浮動小数点数の場合、`Burst` は rate を切り捨てた値として扱われます。
+:::
+
+## カスタム設定
+
+```go
+config := middleware.RateLimiterConfig{
+	Skipper: middleware.DefaultSkipper,
+	Store: middleware.NewRateLimiterMemoryStoreWithConfig(
+		middleware.RateLimiterMemoryStoreConfig{Rate: 10, Burst: 30, ExpiresIn: 3 * time.Minute},
+	),
+	IdentifierExtractor: func(c *echo.Context) (string, error) {
+		id := c.RealIP()
+		return id, nil
+	},
+	ErrorHandler: func(c *echo.Context, err error) error {
+		return c.JSON(http.StatusForbidden, nil)
+	},
+	DenyHandler: func(c *echo.Context, identifier string, err error) error {
+		return c.JSON(http.StatusTooManyRequests, nil)
+	},
+}
+
+e.Use(middleware.RateLimiterWithConfig(config))
+```
+
+### エラー
+
+```go
+var (
+	// ErrRateLimitExceeded denotes an error raised when the rate limit is exceeded.
+	ErrRateLimitExceeded = echo.NewHTTPError(http.StatusTooManyRequests, "rate limit exceeded")
+	// ErrExtractorError denotes an error raised when the extractor function is unsuccessful.
+	ErrExtractorError = echo.NewHTTPError(http.StatusForbidden, "error while extracting identifier")
+)
+```
+
+:::tip
+独自の store を実装するには、`RateLimiterStore` インターフェイスを満たして
+`RateLimiterConfig` に渡してください。
+:::
+
+## 設定
+
+<ConfigReference name="RateLimiterConfig" locale="ja" />
+
+<ConfigReference name="RateLimiterMemoryStoreConfig" locale="ja" />
+
+### デフォルト設定
+
+```go
+// DefaultRateLimiterConfig defines default values for RateLimiterConfig.
+var DefaultRateLimiterConfig = RateLimiterConfig{
+	Skipper: DefaultSkipper,
+	IdentifierExtractor: func(c *echo.Context) (string, error) {
+		id := c.RealIP()
+		return id, nil
+	},
+	ErrorHandler: func(c *echo.Context, err error) error {
+		return &echo.HTTPError{
+			Code:     ErrExtractorError.Code,
+			Message:  ErrExtractorError.Message,
+			Internal: err,
+		}
+	},
+	DenyHandler: func(c *echo.Context, identifier string, err error) error {
+		return &echo.HTTPError{
+			Code:     ErrRateLimitExceeded.Code,
+			Message:  ErrRateLimitExceeded.Message,
+			Internal: err,
+		}
+	},
+}
+```

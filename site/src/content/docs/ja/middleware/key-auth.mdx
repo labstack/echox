@@ -1,0 +1,59 @@
+---
+title: Key Auth
+description: header、query、form、Cookie から API key を検証する key ベース認証ミドルウェアです。
+sidebar:
+  order: 11
+---
+
+import ConfigReference from '../../../../components/ConfigReference.astro';
+
+Key Auth ミドルウェアは key ベース認証を提供します。
+
+- 有効な key の場合、次のハンドラを呼び出します。
+- 無効な key の場合、`401 Unauthorized` レスポンスを送信します。
+- key がない場合、`400 Bad Request` レスポンスを送信します。
+
+すべてのコアミドルウェアは `middleware` パッケージに含まれています：
+
+```go
+import "github.com/labstack/echo/v5/middleware"
+```
+
+## 使い方
+
+```go
+e.Use(middleware.KeyAuth(func(c *echo.Context, key string, source middleware.ExtractorSource) (bool, error) {
+	return key == "valid-key", nil
+}))
+```
+
+## カスタム設定
+
+```go
+e := echo.New()
+e.Use(middleware.KeyAuthWithConfig(middleware.KeyAuthConfig{
+	KeyLookup: "query:api-key",
+	Validator: func(c *echo.Context, key string, source middleware.ExtractorSource) (bool, error) {
+		return key == "valid-key", nil
+	},
+}))
+```
+
+## 設定
+
+<ConfigReference name="KeyAuthConfig" locale="ja" />
+
+`Validator` のシグネチャは次のとおりです。
+
+```go
+type KeyAuthValidator func(c *echo.Context, key string, source ExtractorSource) (bool, error)
+```
+
+### デフォルト設定
+
+```go
+DefaultKeyAuthConfig = KeyAuthConfig{
+	Skipper:   DefaultSkipper,
+	KeyLookup: "header:" + echo.HeaderAuthorization + ":Bearer ",
+}
+```

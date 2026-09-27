@@ -43,6 +43,8 @@ em [json.go](https://github.com/labstack/echo/blob/master/json.go).
 
 [Saiba mais](/pt-br/guide/templates/)
 
+<a id="http-error-handler"></a>
+
 ## Handler de erro HTTP
 
 `Echo#HTTPErrorHandler` registra um handler de erro HTTP customizado.

@@ -1,0 +1,218 @@
+{
+  "jwt": {
+    "module": "github.com/labstack/echo-jwt/v5",
+    "version": "v5.0.2",
+    "configs": {
+      "Config": {
+        "Skipper": {
+          "type": "middleware.Skipper",
+          "deprecated": false
+        },
+        "BeforeFunc": {
+          "type": "middleware.BeforeFunc",
+          "deprecated": false
+        },
+        "SuccessHandler": {
+          "type": "func(c *echo.Context) error",
+          "deprecated": false
+        },
+        "ErrorHandler": {
+          "type": "func(c *echo.Context, err error) error",
+          "deprecated": false
+        },
+        "ContinueOnIgnoredError": {
+          "type": "bool",
+          "deprecated": false
+        },
+        "ContextKey": {
+          "type": "string",
+          "deprecated": false
+        },
+        "SigningKey": {
+          "type": "interface{}",
+          "deprecated": false
+        },
+        "SigningKeys": {
+          "type": "map[string]interface{}",
+          "deprecated": false
+        },
+        "SigningMethod": {
+          "type": "string",
+          "deprecated": false
+        },
+        "KeyFunc": {
+          "type": "jwt.Keyfunc",
+          "deprecated": false
+        },
+        "TokenLookup": {
+          "type": "string",
+          "deprecated": false
+        },
+        "TokenLookupFuncs": {
+          "type": "[]middleware.ValuesExtractor",
+          "deprecated": false
+        },
+        "ParseTokenFunc": {
+          "type": "func(c *echo.Context, auth string) (interface{}, error)",
+          "deprecated": false
+        },
+        "NewClaimsFunc": {
+          "type": "func(c *echo.Context) jwt.Claims",
+          "deprecated": false
+        }
+      }
+    },
+    "functions": {
+      "JWT": "func JWT(signingKey interface{}) echo.MiddlewareFunc",
+      "WithConfig": "func WithConfig(config Config) echo.MiddlewareFunc"
+    }
+  },
+  "prometheus": {
+    "module": "github.com/labstack/echo-prometheus",
+    "version": "v0.0.1",
+    "configs": {
+      "HandlerConfig": {
+        "Gatherer": {
+          "type": "prometheus.Gatherer",
+          "deprecated": false
+        }
+      },
+      "MiddlewareConfig": {
+        "Skipper": {
+          "type": "middleware.Skipper",
+          "deprecated": false
+        },
+        "Namespace": {
+          "type": "string",
+          "deprecated": false
+        },
+        "Subsystem": {
+          "type": "string",
+          "deprecated": false
+        },
+        "LabelFuncs": {
+          "type": "map[string]LabelValueFunc",
+          "deprecated": false
+        },
+        "HistogramOptsFunc": {
+          "type": "func(opts prometheus.HistogramOpts) prometheus.HistogramOpts",
+          "deprecated": false
+        },
+        "CounterOptsFunc": {
+          "type": "func(opts prometheus.CounterOpts) prometheus.CounterOpts",
+          "deprecated": false
+        },
+        "Registerer": {
+          "type": "prometheus.Registerer",
+          "deprecated": false
+        },
+        "BeforeNext": {
+          "type": "func(c *echo.Context)",
+          "deprecated": false
+        },
+        "AfterNext": {
+          "type": "func(c *echo.Context, err error)",
+          "deprecated": false
+        },
+        "DoNotUseRequestPathFor404": {
+          "type": "bool",
+          "deprecated": false
+        }
+      },
+      "PushGatewayConfig": {
+        "PushGatewayURL": {
+          "type": "string",
+          "deprecated": false
+        },
+        "PushInterval": {
+          "type": "time.Duration",
+          "deprecated": false
+        },
+        "Gatherer": {
+          "type": "prometheus.Gatherer",
+          "deprecated": false
+        },
+        "ErrorHandler": {
+          "type": "func(err error) error",
+          "deprecated": false
+        },
+        "ClientTransport": {
+          "type": "http.RoundTripper",
+          "deprecated": false
+        }
+      }
+    },
+    "functions": {
+      "NewHandler": "func NewHandler() echo.HandlerFunc",
+      "NewHandlerWithConfig": "func NewHandlerWithConfig(config HandlerConfig) echo.HandlerFunc",
+      "NewMiddleware": "func NewMiddleware(subsystem string) echo.MiddlewareFunc",
+      "NewMiddlewareWithConfig": "func NewMiddlewareWithConfig(config MiddlewareConfig) echo.MiddlewareFunc",
+      "RunPushGatewayGatherer": "func RunPushGatewayGatherer(ctx context.Context, config PushGatewayConfig) error",
+      "WriteGatheredMetrics": "func WriteGatheredMetrics(writer io.Writer, gatherer prometheus.Gatherer) error"
+    }
+  },
+  "open-telemetry": {
+    "module": "github.com/labstack/echo-opentelemetry",
+    "version": "v0.0.3",
+    "configs": {
+      "Config": {
+        "ServerName": {
+          "type": "string",
+          "deprecated": false
+        },
+        "Skipper": {
+          "type": "middleware.Skipper",
+          "deprecated": false
+        },
+        "OnNextError": {
+          "type": "OnErrorFunc",
+          "deprecated": false
+        },
+        "OnExtractionError": {
+          "type": "OnErrorFunc",
+          "deprecated": false
+        },
+        "TracerProvider": {
+          "type": "oteltrace.TracerProvider",
+          "deprecated": false
+        },
+        "MeterProvider": {
+          "type": "metric.MeterProvider",
+          "deprecated": false
+        },
+        "Propagators": {
+          "type": "propagation.TextMapPropagator",
+          "deprecated": false
+        },
+        "SpanStartOptions": {
+          "type": "[]oteltrace.SpanStartOption",
+          "deprecated": false
+        },
+        "SpanStartAttributes": {
+          "type": "AttributesFunc",
+          "deprecated": false
+        },
+        "SpanEndAttributes": {
+          "type": "AttributesFunc",
+          "deprecated": false
+        },
+        "MetricAttributes": {
+          "type": "MetricAttributesFunc",
+          "deprecated": false
+        },
+        "Metrics": {
+          "type": "MetricsRecorder",
+          "deprecated": false
+        }
+      }
+    },
+    "functions": {
+      "NewMetrics": "func NewMetrics(meter metric.Meter) (*Metrics, error)",
+      "NewMiddleware": "func NewMiddleware(serverName string) echo.MiddlewareFunc",
+      "NewMiddlewareWithConfig": "func NewMiddlewareWithConfig(config Config) echo.MiddlewareFunc",
+      "SpanNameFormatter": "func SpanNameFormatter(v Values) string",
+      "SpanStatus": "func SpanStatus(code int, err error) (codes.Code, string)",
+      "SplitAddress": "func SplitAddress(address string) (host string, port int, err error)"
+    }
+  }
+}

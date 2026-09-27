@@ -45,6 +45,8 @@ e.Logger = slog.New(slog.NewJSONHandler(os.Stdout, nil))
 
 [詳しく見る](/ja/guide/templates/)
 
+<a id="http-error-handler"></a>
+
 ## HTTP エラーハンドラ
 
 `Echo#HTTPErrorHandler` はカスタム HTTP エラーハンドラを登録します。

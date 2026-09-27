@@ -1,0 +1,57 @@
+---
+title: セキュア
+description: XSS、コンテンツスニッフィング、クリックジャッキング、その他のインジェクション攻撃を防ぎます。
+sidebar:
+  order: 22
+---
+
+import ConfigReference from '../../../../components/ConfigReference.astro';
+
+Secure ミドルウェアは、クロスサイトスクリプティング（XSS）、コンテンツタイプスニッフィング、
+クリックジャッキング、安全でない接続、その他のコードインジェクション攻撃への防御を提供します。
+
+すべてのコアミドルウェアは `middleware` パッケージに含まれています：
+
+```go
+import "github.com/labstack/echo/v5/middleware"
+```
+
+## 使い方
+
+```go
+e.Use(middleware.Secure())
+```
+
+## カスタム設定
+
+```go
+e := echo.New()
+e.Use(middleware.SecureWithConfig(middleware.SecureConfig{
+	XSSProtection:         "",
+	ContentTypeNosniff:    "",
+	XFrameOptions:         "",
+	HSTSMaxAge:            3600,
+	ContentSecurityPolicy: "default-src 'self'",
+}))
+```
+
+:::note
+空の `XSSProtection`、`ContentTypeNosniff`、`XFrameOptions`、または
+`ContentSecurityPolicy` を渡すと、その防御が無効になります。
+:::
+
+## 設定
+
+<ConfigReference name="SecureConfig" locale="ja" />
+
+### デフォルト設定
+
+```go
+var DefaultSecureConfig = SecureConfig{
+	Skipper:            DefaultSkipper,
+	XSSProtection:      "1; mode=block",
+	ContentTypeNosniff: "nosniff",
+	XFrameOptions:      "SAMEORIGIN",
+	HSTSPreloadEnabled: false,
+}
+```

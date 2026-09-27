@@ -1,0 +1,20 @@
+{
+  "jwt": {
+    "module": "github.com/labstack/echo-jwt/v5",
+    "version": "v5.0.2",
+    "repository": "https://github.com/labstack/echo-jwt",
+    "package": "echojwt"
+  },
+  "prometheus": {
+    "module": "github.com/labstack/echo-prometheus",
+    "version": "v0.0.1",
+    "repository": "https://github.com/labstack/echo-prometheus",
+    "package": "echoprometheus"
+  },
+  "open-telemetry": {
+    "module": "github.com/labstack/echo-opentelemetry",
+    "version": "v0.0.3",
+    "repository": "https://github.com/labstack/echo-opentelemetry",
+    "package": "echootel"
+  }
+}

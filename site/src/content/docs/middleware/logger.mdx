@@ -1,0 +1,54 @@
+---
+title: Request Logger
+description: Log selected request and response values with your logging library.
+sidebar:
+  order: 12
+---
+
+import { Code } from '@astrojs/starlight/components';
+import ConfigReference from '../../../components/ConfigReference.astro';
+import example from '../../../generated/request-logger.go.txt?raw';
+
+`RequestLogger` passes selected request and response values to a required `LogValuesFunc` callback. Use that callback to write to `slog` or another logger. Each `Log*` field controls which value is collected; for example, `LogStatus: true` populates `v.Status`.
+
+## Examples
+
+### slog ([log/slog](https://pkg.go.dev/log/slog))
+
+This complete program logs the URI and status as JSON. From the `echox` checkout, run `cd reference/request-logger && go run .`, then request `http://localhost:1323/`.
+
+<Code code={example} lang="go" title="request-logger/main.go" />
+
+The page imports the same file that documentation CI compiles. `v.Error` is set when the next handler returns an error; there is no extra configuration field for it. With `HandleError: true`, Echo's global error handler writes the response before `LogValuesFunc` runs, so earlier middleware cannot then change its status or body.
+
+### fmt.Printf
+
+For a small application, `LogValuesFunc` can call `fmt.Printf` instead of `slog`. Keep the same callback signature and enable each value you read with its matching `Log*` field.
+
+### Zerolog ([rs/zerolog](https://github.com/rs/zerolog))
+
+Pass `v.URI`, `v.Status`, and other selected values to your Zerolog logger inside `LogValuesFunc`.
+
+### Zap ([uber-go/zap](https://github.com/uber-go/zap))
+
+Pass the selected values to Zap inside the same callback. Echo does not require a particular logging library.
+
+### Logrus ([sirupsen/logrus](https://github.com/sirupsen/logrus))
+
+Build Logrus fields from `RequestLoggerValues` inside `LogValuesFunc`.
+
+## Configuration
+
+The table is generated from the exported fields in the recorded Echo revision. It does not claim runtime defaults.
+
+<ConfigReference name="RequestLoggerConfig" />
+
+## Troubleshooting
+
+### panic: missing LogValuesFunc callback function for request logger middleware
+
+`LogValuesFunc` is required. Set it before calling `RequestLoggerWithConfig`; the runnable example above includes the callback.
+
+### Parameters in logs are empty
+
+Enable the corresponding extraction field, such as `LogURI: true` for `v.URI` or `LogStatus: true` for `v.Status`. Values not selected in the config remain empty.

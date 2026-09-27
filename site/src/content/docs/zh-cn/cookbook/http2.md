@@ -8,6 +8,8 @@ sidebar:
 HTTP/2 通过请求复用、header 压缩和 server push 改善延迟。Go 的 HTTP 服务器会在 TLS 上自动协商
 HTTP/2，因此使用 Echo 提供 HTTP/2 只需用证书启动服务器。
 
+<a id="1-generate-a-self-signed-x509-tls-certificate"></a>
+
 ## 1. 生成自签名 X.509 TLS 证书
 
 运行以下命令生成 `cert.pem` 和 `key.pem`：

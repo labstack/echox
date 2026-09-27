@@ -1,0 +1,79 @@
+---
+title: Proxy
+description: Middleware de reverse proxy HTTP e WebSocket com load balancing.
+sidebar:
+  order: 16
+---
+
+import ConfigReference from '../../../../components/ConfigReference.astro';
+
+Proxy fornece um middleware de reverse proxy HTTP/WebSocket. Ele encaminha um request para um
+servidor upstream usando uma técnica de load balancing configurada.
+
+Todo o middleware principal fica no pacote `middleware`:
+
+```go
+import "github.com/labstack/echo/v5/middleware"
+```
+
+## Uso
+
+```go
+url1, err := url.Parse("http://localhost:8081")
+if err != nil {
+	e.Logger.Error("failed to parse url", "error", err)
+}
+url2, err := url.Parse("http://localhost:8082")
+if err != nil {
+	e.Logger.Error("failed to parse url", "error", err)
+}
+e.Use(middleware.Proxy(middleware.NewRoundRobinBalancer([]*middleware.ProxyTarget{
+	{
+		URL: url1,
+	},
+	{
+		URL: url2,
+	},
+})))
+```
+
+## Configuração customizada
+
+```go
+e := echo.New()
+e.Use(middleware.ProxyWithConfig(middleware.ProxyConfig{}))
+```
+
+## Configuração
+
+<ConfigReference name="ProxyConfig" locale="pt-br" />
+
+### Configuração padrão
+
+| Nome       | Valor          |
+| ---------- | -------------- |
+| Skipper    | DefaultSkipper |
+| ContextKey | `target`       |
+
+### Regras baseadas em regex
+
+Para reescrita avançada de requests de proxy, as regras também podem ser definidas usando expressões
+regulares. Grupos de captura normais podem ser definidos com `()` e referenciados por índice
+(`$1`, `$2`, ...) no caminho reescrito.
+
+Regras `RegexRewrite` e `Rewrite` normais podem ser combinadas.
+
+```go
+e.Use(middleware.ProxyWithConfig(middleware.ProxyConfig{
+	Balancer: rrb,
+	Rewrite: map[string]string{
+		"^/v1/*": "/v2/$1",
+	},
+	RegexRewrite: map[*regexp.Regexp]string{
+		regexp.MustCompile("^/foo/([0-9].*)"):  "/num/$1",
+		regexp.MustCompile("^/bar/(.+?)/(.*)"): "/baz/$2/$1",
+	},
+}))
+```
+
+Veja a receita de [reverse proxy](/pt-br/cookbook/reverse-proxy/) para um exemplo completo.

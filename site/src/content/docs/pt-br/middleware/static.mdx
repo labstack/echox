@@ -1,0 +1,46 @@
+---
+title: Static
+description: Sirva arquivos de um diretório mantendo caminhos codificados seguros por padrão.
+sidebar:
+  order: 24
+---
+
+import { Code } from '@astrojs/starlight/components';
+import ConfigReference from '../../../../components/ConfigReference.astro';
+import example from '../../../../generated/static.go.txt?raw';
+
+O middleware Static serve arquivos de um diretório raiz. O exemplo serve `public/index.html` em `/`.
+
+## Uso
+
+No repositório do `echox`, execute `cd reference/static && go run .` e abra `http://localhost:1323/`.
+
+<Code code={example} lang="go" title="static/main.go" />
+
+A página importa o mesmo arquivo compilado pela CI da documentação. O exemplo mantém `EnablePathUnescaping` em `false`, o padrão seguro para barras codificadas.
+
+## Configuração customizada
+
+`Root` define o diretório servido. `Browse` habilita a listagem de diretórios, `HTML5` encaminha caminhos não encontrados ao arquivo de índice e `Filesystem` aceita um `fs.FS`. Use `IgnoreBase` quando o prefixo da URL de um grupo não deve entrar no caminho do arquivo.
+
+O fallback varia entre as revisões. O Echo v5.3.0 serve o arquivo de índice quando o próximo handler retorna 404. Na revisão `next` registrada, isso só ocorre para um 404 do roteador; um 404 retornado por uma rota correspondente é preservado. A diferença importa quando uma SPA e rotas de API compartilham o servidor.
+
+#### Exemplo 1
+
+Em um grupo fora da raiz, o Echo normalmente inclui o prefixo da URL do grupo no caminho do arquivo. Use `IgnoreBase: true` se o diretório raiz já incluir esse prefixo. O grupo precisa de uma rota correspondente para executar seu middleware.
+
+#### Exemplo 2
+
+Para servir um sistema de arquivos incorporado, atribua seu `embed.FS` a `Filesystem` e o diretório dos recursos a `Root`. Veja o [cookbook de recursos incorporados](/pt-br/cookbook/embed-resources/).
+
+## Configuração
+
+A tabela vem dos campos exportados da revisão indicada do Echo. Ela marca campos obsoletos, mas não infere padrões nem regras de segurança.
+
+<ConfigReference name="StaticConfig" locale="pt-br" />
+
+### Configuração padrão
+
+`Index` usa `index.html` por padrão. `EnablePathUnescaping` é `false` por padrão: barras codificadas no caminho curinga continuam codificadas. `DisablePathUnescaping` está obsoleto e é ignorado; use `EnablePathUnescaping` quando precisar habilitar a decodificação.
+
+Habilite-a somente se precisar de caracteres codificados em nomes de arquivos e se suas rotas não restringirem o acesso a subdiretórios. Decodificar uma barra após o roteamento pode contornar uma rota de proteção.

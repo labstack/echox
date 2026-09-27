@@ -1,0 +1,62 @@
+---
+title: Basic Auth
+description: ユーザー名とパスワードの認証情報を検証する HTTP Basic 認証ミドルウェアです。
+sidebar:
+  order: 1
+---
+
+import ConfigReference from '../../../../components/ConfigReference.astro';
+
+Basic Auth ミドルウェアは HTTP Basic 認証を提供します。
+
+- 有効な認証情報の場合、次のハンドラを呼び出します。
+- 認証情報がない、または無効な場合は `401 Unauthorized` レスポンスを送信します。
+
+すべてのコアミドルウェアは `middleware` パッケージに含まれています：
+
+```go
+import "github.com/labstack/echo/v5/middleware"
+```
+
+## 使い方
+
+```go
+e.Use(middleware.BasicAuth(func(c *echo.Context, username, password string) (bool, error) {
+	// Use a constant time comparison to prevent timing attacks.
+	if subtle.ConstantTimeCompare([]byte(username), []byte("joe")) == 1 &&
+		subtle.ConstantTimeCompare([]byte(password), []byte("secret")) == 1 {
+		return true, nil
+	}
+	return false, nil
+}))
+```
+
+## カスタム設定
+
+```go
+e.Use(middleware.BasicAuthWithConfig(middleware.BasicAuthConfig{}))
+```
+
+## 設定
+
+<ConfigReference name="BasicAuthConfig" locale="ja" />
+
+`Validator` のシグネチャは次のとおりです。
+
+```go
+type BasicAuthValidator func(c *echo.Context, user string, password string) (bool, error)
+```
+
+### デフォルト設定
+
+```go
+// Effective defaults applied when fields are left unset.
+BasicAuthConfig{
+	Skipper: DefaultSkipper,
+	Realm:   "Restricted",
+}
+```
+
+:::caution[セキュリティ]
+タイミング攻撃を防ぐため、認証情報の比較には必ず `subtle.ConstantTimeCompare` を使ってください。
+:::

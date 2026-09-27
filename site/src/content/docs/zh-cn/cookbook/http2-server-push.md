@@ -73,7 +73,7 @@ if err := sc.StartTLS(context.Background(), e, "cert.pem", "key.pem"); err != ni
   <script src="/app.js"></script>
 </head>
 <body>
-  <img class="echo" src="/echo.png">
+  <img class="echo" src="/echo.png" alt="Echo">
   <h2>The following static files are served via HTTP/2 server push</h2>
   <ul>
     <li><code>/app.css</code></li>

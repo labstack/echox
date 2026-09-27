@@ -2,11 +2,15 @@ import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import { redirects } from './src/redirects.mjs';
 
+const next = process.env.DOCS_CHANNEL === 'next';
+
 // https://astro.build/config
 export default defineConfig({
   site: 'https://echo.labstack.com',
+  base: next ? '/next/' : '/',
+  outDir: next ? './dist-next' : './dist',
   // Preserve every live Docusaurus /docs/* URL at cutover (generated — see ./src/redirects.mjs).
-  redirects,
+  redirects: next ? {} : redirects,
   integrations: [
     starlight({
       title: 'Echo',
@@ -36,6 +40,7 @@ export default defineConfig({
       // Keep Starlight's built-in Pagefind ⌘K search; Search override adds the
       // empty-state launchpad. "Ask AI" is the kapa.ai widget (see head).
       components: {
+        Banner: './src/components/VersionBanner.astro',
         Footer: './src/components/Footer.astro',
         Search: './src/components/Search.astro',
       },
@@ -51,7 +56,7 @@ export default defineConfig({
         // We hide kapa's default floating launcher and open the modal from our
         // own "Ask AI" pill in the header (see Search.astro) so the trigger
         // matches the Terminal chrome instead of kapa's stock button.
-        {
+        ...(!next ? [{
           tag: 'script',
           attrs: {
             async: true,
@@ -70,7 +75,7 @@ export default defineConfig({
             'data-button-hide': 'true',
             'data-modal-override-open-selector': '#echo-ask-ai',
           },
-        },
+        }] : []),
         // Dark-first: default new visitors to dark unless they've chosen otherwise.
         {
           tag: 'script',

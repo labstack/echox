@@ -1,0 +1,114 @@
+---
+title: CSRF
+description: Sec-Fetch-Site メタデータと token 検証を使った Cross-Site Request Forgery 防御です。
+sidebar:
+  order: 7
+---
+
+import ConfigReference from '../../../../components/ConfigReference.astro';
+
+Cross-Site Request Forgery（CSRF、"sea-surf" と発音されることもある、または XSRF）は、
+Web サイトが信頼するユーザーから未承認のコマンドが送信される悪意ある攻撃の一種です。
+
+すべてのコアミドルウェアは `middleware` パッケージに含まれています：
+
+```go
+import "github.com/labstack/echo/v5/middleware"
+```
+
+## 使い方
+
+```go
+e.Use(middleware.CSRF())
+```
+
+## 仕組み
+
+CSRF ミドルウェアは、現代的な多層防御として
+[`Sec-Fetch-Site`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Sec-Fetch-Site)
+header をサポートします。
+[CSRF protection](https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#fetch-metadata-headers)
+のために、従来の token ベース機構と並行して OWASP 推奨の Fetch Metadata API を実装しています。
+
+現代的なブラウザーはすべてのリクエストに `Sec-Fetch-Site` header を自動送信し、
+リクエスト元とターゲットの関係を示します。ミドルウェアはこれを使ってセキュリティ判断を行います。
+
+- **`same-origin`** または **`none`**：許可（完全な同一 origin、またはユーザーの直接ナビゲーション）
+- **`same-site`**：token 検証にフォールバック（例：サブドメインからメインドメイン）
+- **`cross-site`**：安全でないメソッド（POST、PUT、DELETE、PATCH）ではデフォルトで `403` エラーによりブロック
+
+この header を送信しないブラウザー（古いブラウザー）では、従来の token ベース CSRF 防御へシームレスに
+フォールバックします。
+
+`Sec-Fetch-Site` の挙動は 2 つのオプションで調整できます。
+
+- `TrustedOrigins []string`：cross-site リクエストで特定 origin を許可リスト化（OAuth callback、webhook などに有用）
+- `AllowSecFetchSiteFunc func(c *echo.Context) (bool, error)`：same-site/cross-site 検証用のカスタムロジック
+
+```go
+e.Use(middleware.CSRFWithConfig(middleware.CSRFConfig{
+	// Allow OAuth callbacks from a trusted provider.
+	TrustedOrigins: []string{"https://oauth-provider.com"},
+
+	// Custom validation for same-site/cross-site requests.
+	AllowSecFetchSiteFunc: func(c *echo.Context) (bool, error) {
+		// Your custom authorization logic here.
+		return validateCustomAuth(c), nil
+		// return true, err  // blocks the request with an error
+		// return true, nil  // allows the request through
+		// return false, nil // falls back to legacy token logic
+	},
+}))
+```
+
+## token ベース防御
+
+```go
+e := echo.New()
+e.Use(middleware.CSRFWithConfig(middleware.CSRFConfig{
+	TokenLookup: "header:X-XSRF-TOKEN",
+}))
+```
+
+上の例は `X-XSRF-TOKEN` リクエスト header から CSRF token を抽出します。
+
+代わりに Cookie から token を読む場合：
+
+```go
+middleware.CSRFWithConfig(middleware.CSRFConfig{
+	TokenLookup:    "cookie:_csrf",
+	CookiePath:     "/",
+	CookieDomain:   "example.com",
+	CookieSecure:   true,
+	CookieHTTPOnly: true,
+	CookieSameSite: http.SameSiteStrictMode,
+})
+```
+
+## CSRF token へのアクセス
+
+- **サーバー側**：token は `ContextKey` の下でコンテキストから利用でき、テンプレート経由でクライアントへ渡せます。
+- **クライアント側**：token は CSRF Cookie から読み取れます。
+
+## 設定
+
+<ConfigReference name="CSRFConfig" locale="ja" />
+
+### デフォルト設定
+
+```go
+var DefaultCSRFConfig = CSRFConfig{
+	Skipper:        DefaultSkipper,
+	TokenLength:    32,
+	TokenLookup:    "header:" + echo.HeaderXCSRFToken,
+	ContextKey:     "csrf",
+	CookieName:     "_csrf",
+	CookieMaxAge:   86400,
+	CookieSameSite: http.SameSiteDefaultMode,
+}
+```
+
+## 完全な例
+
+完全に実行可能な例は
+[echox cookbook](https://github.com/labstack/echox/blob/master/cookbook/csrf/main.go) にあります。

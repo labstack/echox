@@ -1,0 +1,81 @@
+---
+title: リクエスト ID
+description: 各リクエストに一意の ID を生成します。
+sidebar:
+  order: 20
+---
+
+import ConfigReference from '../../../../components/ConfigReference.astro';
+
+Request ID ミドルウェアはリクエストに一意の ID を生成します。
+
+すべてのコアミドルウェアは `middleware` パッケージに含まれています：
+
+```go
+import "github.com/labstack/echo/v5/middleware"
+```
+
+## 使い方
+
+```go
+e.Use(middleware.RequestID())
+```
+
+例：
+
+```go
+func main() {
+	e := echo.New()
+
+	e.Use(middleware.RequestID())
+
+	e.GET("/", func(c *echo.Context) error {
+		return c.String(http.StatusOK, c.Response().Header().Get(echo.HeaderXRequestID))
+	})
+
+	if err := e.Start(":8080"); err != nil {
+		e.Logger.Error("failed to start server", "error", err)
+	}
+}
+```
+
+## カスタム設定
+
+```go
+e.Use(middleware.RequestIDWithConfig(middleware.RequestIDConfig{
+	Generator: func() string {
+		return customGenerator()
+	},
+}))
+```
+
+## 設定
+
+<ConfigReference name="RequestIDConfig" locale="ja" />
+
+### デフォルト設定
+
+```go
+// Effective defaults applied when fields are left unset.
+RequestIDConfig{
+	Skipper:      DefaultSkipper,
+	Generator:    generator, // random 32-character string
+	TargetHeader: echo.HeaderXRequestID,
+}
+```
+
+## ID を設定する
+
+リクエスト元は `X-Request-ID` header で ID を設定できます。
+
+### リクエスト
+
+```sh
+curl -H "X-Request-ID: 3" --compressed -v "http://localhost:1323/?my=param"
+```
+
+### ログ
+
+```js
+{"time":"2017-11-13T20:26:28.6438003+01:00","id":"3","remote_ip":"::1","host":"localhost:1323","method":"GET","uri":"/?my=param","my":"param","status":200, "latency":0,"latency_human":"0s","bytes_in":0,"bytes_out":13}
+```

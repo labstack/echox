@@ -1,0 +1,32 @@
+---
+import stable from '../../echo-source.json';
+import manifest from '../generated/config-fields.json';
+
+const isNext = process.env.DOCS_CHANNEL === 'next';
+const revision = manifest.revision;
+const path = Astro.url.pathname;
+const locale = path.split('/').find((part) => ['es', 'ja', 'pt-br', 'zh-cn'].includes(part)) || 'en';
+const labels = {
+  en: { release: 'Release docs', next: 'Next docs', source: 'API source', switch: isNext ? 'View stable' : 'View next' },
+  es: { release: 'Documentación estable', next: 'Próxima versión', source: 'Código de la API', switch: isNext ? 'Ver estable' : 'Ver próxima versión' },
+  ja: { release: '安定版ドキュメント', next: '次期版ドキュメント', source: 'API ソース', switch: isNext ? '安定版を見る' : '次期版を見る' },
+  'pt-br': { release: 'Documentação estável', next: 'Próxima versão', source: 'Código da API', switch: isNext ? 'Ver estável' : 'Ver próxima versão' },
+  'zh-cn': { release: '稳定版文档', next: '下一版文档', source: 'API 源码', switch: isNext ? '查看稳定版' : '查看下一版' },
+}[locale];
+const counterpart = /\/(?:404|404\.html)\/?$/.test(path)
+  ? (isNext ? '/' : '/next/')
+  : isNext ? path.replace(/^\/next/, '') || '/' : `/next${path}`;
+---
+
+<nav class="echo-version-banner" aria-label="Documentation version" data-pagefind-ignore>
+  <strong>{isNext ? labels.next : `${labels.release} · Echo ${stable.release}`}</strong>
+  <span>· {labels.source} <a href={`https://github.com/labstack/echo/tree/${revision}`}>{revision.slice(0, 7)}</a></span>
+  <a class="switch" data-version-switch href={counterpart}>{labels.switch} →</a>
+</nav>
+
+<style>
+  .echo-version-banner { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: .4rem; padding: .45rem 1rem; background: var(--sl-color-bg-accent); color: var(--sl-color-text-invert); font-size: var(--sl-text-sm); }
+  .echo-version-banner a { color: inherit; text-decoration: underline; text-underline-offset: .15em; }
+  .echo-version-banner .switch { margin-inline-start: .7rem; font-weight: 700; }
+  .echo-version-banner a:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+</style>

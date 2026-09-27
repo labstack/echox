@@ -1,0 +1,22 @@
+{
+  "basic-auth": ["BasicAuthConfig"],
+  "body-dump": ["BodyDumpConfig"],
+  "body-limit": ["BodyLimitConfig"],
+  "context-timeout": ["ContextTimeoutConfig"],
+  "cors": ["CORSConfig"],
+  "csrf": ["CSRFConfig"],
+  "decompress": ["DecompressConfig"],
+  "gzip": ["GzipConfig"],
+  "key-auth": ["KeyAuthConfig"],
+  "logger": ["RequestLoggerConfig"],
+  "method-override": ["MethodOverrideConfig"],
+  "proxy": ["ProxyConfig"],
+  "rate-limiter": ["RateLimiterConfig", "RateLimiterMemoryStoreConfig"],
+  "recover": ["RecoverConfig"],
+  "redirect": ["RedirectConfig"],
+  "request-id": ["RequestIDConfig"],
+  "rewrite": ["RewriteConfig"],
+  "secure": ["SecureConfig"],
+  "static": ["StaticConfig"],
+  "trailing-slash": ["AddTrailingSlashConfig", "RemoveTrailingSlashConfig"]
+}

@@ -1,0 +1,51 @@
+---
+title: 解凍
+description: gzip エンコードされたリクエストボディを透過的に解凍します。
+sidebar:
+  order: 8
+---
+
+import ConfigReference from '../../../../components/ConfigReference.astro';
+
+Decompress ミドルウェアは、`Content-Encoding` header が `gzip` に設定されている場合に
+HTTP リクエストボディを解凍します。
+
+:::note
+ボディはメモリ内で解凍され、リクエストのライフタイム中（およびガベージコレクションまで）保持されます。
+:::
+
+すべてのコアミドルウェアは `middleware` パッケージに含まれています：
+
+```go
+import "github.com/labstack/echo/v5/middleware"
+```
+
+## 使い方
+
+```go
+e.Use(middleware.Decompress())
+```
+
+## カスタム設定
+
+```go
+e := echo.New()
+e.Use(middleware.DecompressWithConfig(middleware.DecompressConfig{
+	Skipper: middleware.DefaultSkipper,
+}))
+```
+
+## 設定
+
+<ConfigReference name="DecompressConfig" locale="ja" />
+
+### デフォルト設定
+
+```go
+// Effective defaults applied when fields are left unset.
+DecompressConfig{
+	Skipper:             DefaultSkipper,
+	GzipDecompressPool:  &DefaultGzipDecompressPool{},
+	MaxDecompressedSize: 100 * MB,
+}
+```

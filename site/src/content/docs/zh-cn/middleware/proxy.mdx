@@ -1,0 +1,77 @@
+---
+title: 代理
+description: 带负载均衡的 HTTP 和 WebSocket 反向代理中间件。
+sidebar:
+  order: 16
+---
+
+import ConfigReference from '../../../../components/ConfigReference.astro';
+
+Proxy 提供 HTTP/WebSocket 反向代理中间件。它会使用配置的负载均衡技术将请求转发到上游服务器。
+
+所有核心中间件都位于 `middleware` 包中：
+
+```go
+import "github.com/labstack/echo/v5/middleware"
+```
+
+## 用法
+
+```go
+url1, err := url.Parse("http://localhost:8081")
+if err != nil {
+	e.Logger.Error("failed to parse url", "error", err)
+}
+url2, err := url.Parse("http://localhost:8082")
+if err != nil {
+	e.Logger.Error("failed to parse url", "error", err)
+}
+e.Use(middleware.Proxy(middleware.NewRoundRobinBalancer([]*middleware.ProxyTarget{
+	{
+		URL: url1,
+	},
+	{
+		URL: url2,
+	},
+})))
+```
+
+## 自定义配置
+
+```go
+e := echo.New()
+e.Use(middleware.ProxyWithConfig(middleware.ProxyConfig{}))
+```
+
+## 配置
+
+<ConfigReference name="ProxyConfig" locale="zh-cn" />
+
+### 默认配置
+
+| 名称       | 值             |
+| ---------- | -------------- |
+| Skipper    | DefaultSkipper |
+| ContextKey | `target`       |
+
+### 基于正则表达式的规则
+
+对于代理请求的高级重写，也可以使用正则表达式定义规则。可以用 `()` 定义普通捕获组，
+并在重写后的路径中按索引引用（`$1`、`$2` 等）。
+
+`RegexRewrite` 可以和普通 `Rewrite` 规则组合使用。
+
+```go
+e.Use(middleware.ProxyWithConfig(middleware.ProxyConfig{
+	Balancer: rrb,
+	Rewrite: map[string]string{
+		"^/v1/*": "/v2/$1",
+	},
+	RegexRewrite: map[*regexp.Regexp]string{
+		regexp.MustCompile("^/foo/([0-9].*)"):  "/num/$1",
+		regexp.MustCompile("^/bar/(.+?)/(.*)"): "/baz/$2/$1",
+	},
+}))
+```
+
+完整示例请参见[反向代理](/zh-cn/cookbook/reverse-proxy/) cookbook。

@@ -1,0 +1,46 @@
+---
+title: Static
+description: Sirve archivos de un directorio y mantiene seguras las rutas codificadas por defecto.
+sidebar:
+  order: 24
+---
+
+import { Code } from '@astrojs/starlight/components';
+import ConfigReference from '../../../../components/ConfigReference.astro';
+import example from '../../../../generated/static.go.txt?raw';
+
+El middleware Static sirve archivos desde un directorio raíz. Este ejemplo sirve `public/index.html` en `/`.
+
+## Uso
+
+Desde el repositorio de `echox`, ejecuta `cd reference/static && go run .` y abre `http://localhost:1323/`.
+
+<Code code={example} lang="go" title="static/main.go" />
+
+La página importa el mismo archivo que compila la CI de documentación. El ejemplo mantiene `EnablePathUnescaping` en `false`, el valor seguro por defecto para las barras codificadas.
+
+## Configuración personalizada
+
+`Root` indica el directorio que se sirve. `Browse` permite listar directorios, `HTML5` reenvía las rutas no encontradas al archivo índice y `Filesystem` acepta un `fs.FS`. Usa `IgnoreBase` cuando el prefijo URL de un grupo no debe formar parte de la ruta del archivo.
+
+La respuesta alternativa varía según la revisión. Echo v5.3.0 sirve el archivo índice cuando un manejador posterior devuelve 404. En la revisión `next` registrada, solo lo sirve si el 404 procede del enrutador; un 404 de una ruta coincidente se conserva. Esta diferencia importa cuando una SPA y las rutas de API comparten servidor.
+
+#### Ejemplo 1
+
+En un grupo que no está en la raíz, Echo normalmente incluye el prefijo URL del grupo en la ruta del archivo. Usa `IgnoreBase: true` si el directorio raíz ya incluye ese prefijo. El grupo necesita una ruta coincidente para ejecutar su middleware.
+
+#### Ejemplo 2
+
+Para servir un sistema de archivos embebido, asigna tu `embed.FS` a `Filesystem` y el directorio de recursos a `Root`. Consulta el [ejemplo de recursos embebidos](/es/cookbook/embed-resources/).
+
+## Configuración
+
+Esta tabla procede de los campos exportados de la revisión indicada de Echo. Marca los campos obsoletos, pero no deduce valores predeterminados ni reglas de seguridad.
+
+<ConfigReference name="StaticConfig" locale="es" />
+
+### Configuración por defecto
+
+`Index` usa `index.html` por defecto. `EnablePathUnescaping` es `false` por defecto: las barras codificadas en la ruta comodín permanecen codificadas. `DisablePathUnescaping` está obsoleto y se ignora; usa `EnablePathUnescaping` si necesitas habilitar la decodificación.
+
+Habilítala solo si necesitas caracteres codificados en los nombres de archivo y tus rutas no restringen el acceso a subdirectorios. Decodificar una barra después del enrutamiento puede eludir una ruta de protección.

@@ -1,0 +1,45 @@
+---
+title: JWT
+description: 由 echo-jwt module 提供的 JSON Web Token 认证中间件。
+sidebar:
+  order: 10
+---
+
+import ConfigReference from '../../../../components/ConfigReference.astro';
+
+JWT 中间件提供 JSON Web Token（JWT）认证。它位于独立 module：
+[github.com/labstack/echo-jwt](https://github.com/labstack/echo-jwt)。
+
+行为：
+
+- 对于有效 token，它会在上下文中设置用户并调用下一个处理函数。
+- 对于无效 token，它会发送 `401 Unauthorized` 响应。
+- 对于缺失或无效的 `Authorization` header，它会发送 `400 Bad Request` 响应。
+
+## 依赖
+
+```go
+import "github.com/labstack/echo-jwt/v5"
+```
+
+## 用法
+
+```go
+e.Use(echojwt.JWT([]byte("secret")))
+```
+
+## 自定义配置
+
+```go
+e.Use(echojwt.WithConfig(echojwt.Config{
+	SigningKey: []byte("secret"),
+}))
+```
+
+## 配置
+
+<ConfigReference name="Config" source="jwt" locale="zh-cn" />
+
+## 示例
+
+完整示例请参见 [JWT cookbook](/zh-cn/cookbook/jwt/)。

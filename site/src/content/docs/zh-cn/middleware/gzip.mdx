@@ -1,0 +1,59 @@
+---
+title: Gzip
+description: 使用 gzip 压缩方案压缩 HTTP 响应。
+sidebar:
+  order: 9
+---
+
+import ConfigReference from '../../../../components/ConfigReference.astro';
+
+Gzip 中间件使用 gzip 压缩方案压缩 HTTP 响应。
+
+所有核心中间件都位于 `middleware` 包中：
+
+```go
+import "github.com/labstack/echo/v5/middleware"
+```
+
+## 用法
+
+```go
+e.Use(middleware.Gzip())
+```
+
+## 自定义配置
+
+```go
+e := echo.New()
+e.Use(middleware.GzipWithConfig(middleware.GzipConfig{
+	Level: 5,
+}))
+```
+
+:::tip
+传入 skipper 可以对某些 URL 禁用 gzip。
+:::
+
+```go
+e := echo.New()
+e.Use(middleware.GzipWithConfig(middleware.GzipConfig{
+	Skipper: func(c *echo.Context) bool {
+		return strings.Contains(c.Path(), "metrics") // change "metrics" to your own path
+	},
+}))
+```
+
+## 配置
+
+<ConfigReference name="GzipConfig" locale="zh-cn" />
+
+### 默认配置
+
+```go
+// Effective defaults applied when fields are left unset.
+GzipConfig{
+	Skipper:   DefaultSkipper,
+	Level:     -1,
+	MinLength: 0,
+}
+```

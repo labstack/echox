@@ -1,0 +1,54 @@
+---
+title: Request Logger
+description: Registra valores seleccionados de la petición y la respuesta con tu biblioteca de logging.
+sidebar:
+  order: 12
+---
+
+import { Code } from '@astrojs/starlight/components';
+import ConfigReference from '../../../../components/ConfigReference.astro';
+import example from '../../../../generated/request-logger.go.txt?raw';
+
+`RequestLogger` entrega los valores seleccionados de la petición y la respuesta a la función obligatoria `LogValuesFunc`. Puedes usar `slog` u otra biblioteca. Cada campo `Log*` activa la extracción de un valor; por ejemplo, `LogStatus: true` rellena `v.Status`.
+
+## Ejemplos
+
+### slog ([log/slog](https://pkg.go.dev/log/slog))
+
+Este programa completo registra la URI y el estado como JSON. Desde el repositorio de `echox`, ejecuta `cd reference/request-logger && go run .` y solicita `http://localhost:1323/`.
+
+<Code code={example} lang="go" title="request-logger/main.go" />
+
+La página importa el mismo archivo que compila la CI de documentación. `v.Error` recibe el error devuelto por el siguiente handler. Con `HandleError: true`, el manejador global escribe la respuesta antes de ejecutar `LogValuesFunc`; los middleware anteriores ya no pueden cambiar el estado ni el cuerpo.
+
+### fmt.Printf
+
+En una aplicación pequeña, `LogValuesFunc` puede usar `fmt.Printf`. Activa los campos `Log*` de los valores que quieras leer.
+
+### Zerolog ([rs/zerolog](https://github.com/rs/zerolog))
+
+Pasa los valores seleccionados a Zerolog dentro de `LogValuesFunc`.
+
+### Zap ([uber-go/zap](https://github.com/uber-go/zap))
+
+Usa la misma función para enviar los valores a Zap.
+
+### Logrus ([sirupsen/logrus](https://github.com/sirupsen/logrus))
+
+Crea los campos de Logrus a partir de `RequestLoggerValues`.
+
+## Configuración
+
+La tabla se genera a partir de los campos exportados de la revisión indicada de Echo. No presupone valores predeterminados en tiempo de ejecución.
+
+<ConfigReference name="RequestLoggerConfig" locale="es" />
+
+## Solución de problemas
+
+### panic: missing LogValuesFunc callback function for request logger middleware
+
+`LogValuesFunc` es obligatoria. Asígnala antes de llamar a `RequestLoggerWithConfig`; el ejemplo ejecutable incluye esta función.
+
+### Los parámetros en los logs están vacíos
+
+Activa el campo de extracción correspondiente: `LogURI: true` para `v.URI` o `LogStatus: true` para `v.Status`.

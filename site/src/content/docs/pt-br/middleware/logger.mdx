@@ -1,0 +1,54 @@
+---
+title: Request Logger
+description: Registre valores selecionados da requisição e da resposta com sua biblioteca de logs.
+sidebar:
+  order: 12
+---
+
+import { Code } from '@astrojs/starlight/components';
+import ConfigReference from '../../../../components/ConfigReference.astro';
+import example from '../../../../generated/request-logger.go.txt?raw';
+
+`RequestLogger` envia valores selecionados da requisição e da resposta para a função obrigatória `LogValuesFunc`. Use `slog` ou outra biblioteca. Cada campo `Log*` ativa a coleta de um valor; por exemplo, `LogStatus: true` preenche `v.Status`.
+
+## Exemplos
+
+### slog ([log/slog](https://pkg.go.dev/log/slog))
+
+Este programa completo registra a URI e o status em JSON. No repositório do `echox`, execute `cd reference/request-logger && go run .` e acesse `http://localhost:1323/`.
+
+<Code code={example} lang="go" title="request-logger/main.go" />
+
+A página importa o mesmo arquivo compilado pela CI da documentação. `v.Error` recebe o erro retornado pelo próximo handler. Com `HandleError: true`, o tratador global escreve a resposta antes de executar `LogValuesFunc`; middlewares anteriores já não podem alterar o status ou o corpo.
+
+### fmt.Printf
+
+Em uma aplicação pequena, `LogValuesFunc` pode usar `fmt.Printf`. Ative os campos `Log*` correspondentes aos valores lidos.
+
+### Zerolog ([rs/zerolog](https://github.com/rs/zerolog))
+
+Envie os valores selecionados ao Zerolog dentro de `LogValuesFunc`.
+
+### Zap ([uber-go/zap](https://github.com/uber-go/zap))
+
+Use a mesma função para enviar os valores ao Zap.
+
+### Logrus ([sirupsen/logrus](https://github.com/sirupsen/logrus))
+
+Monte os campos do Logrus a partir de `RequestLoggerValues`.
+
+## Configuração
+
+A tabela é gerada dos campos exportados da revisão indicada do Echo. Ela não presume valores padrão em tempo de execução.
+
+<ConfigReference name="RequestLoggerConfig" locale="pt-br" />
+
+## Solução de problemas
+
+### panic: missing LogValuesFunc callback function for request logger middleware
+
+`LogValuesFunc` é obrigatória. Defina a função antes de chamar `RequestLoggerWithConfig`; o exemplo executável inclui essa função.
+
+### Parâmetros nos logs estão vazios
+
+Ative o campo correspondente: `LogURI: true` para `v.URI` ou `LogStatus: true` para `v.Status`.
