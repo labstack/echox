@@ -320,3 +320,7 @@ e.GET("/hooks", func(c *echo.Context) error {
 :::tip
 Você pode registrar várias funções `Before` e `After`.
 :::
+
+## Atualização de segurança do Echo (v5.4.0 / v4.16.0)
+
+`Context#JSONP` aceita callback vazio, identificador JavaScript ou caminho de identificadores separados por pontos. Os demais valores retornam HTTP 400 com `ErrInvalidJSONPCallback`; uma resposta válida inclui `X-Content-Type-Options: nosniff`. Não use JSONP para dados privados: qualquer site pode ler a resposta com os cookies do usuário. Use JSON com CORS.

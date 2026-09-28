@@ -16,6 +16,7 @@ function run(args, channel, sourceDir = '') {
 
 run(['run', 'source:check'], 'stable');
 run(['run', 'translations:status'], 'stable');
+run(['run', 'security-translations:status'], 'stable');
 run(['run', 'astro', '--', 'build'], 'stable');
 run(['run', 'source:check'], 'next', proposedEcho);
 run(['run', 'astro', '--', 'build'], 'next', proposedEcho);

@@ -8,6 +8,16 @@ sidebar:
 Echo can serve static assets such as images, JavaScript, CSS, PDFs, and fonts from
 the filesystem or an embedded filesystem.
 
+In Echo v5.4.0 and v4.16.0, Static middleware uses the same form of the path
+that the router matched; `Echo#Static` and `Echo#StaticFS` already used this
+behavior in earlier updates. Paths with `.`, `..`, or empty segments (such as
+`/assets//app.js`) return 404; HTML5 mode can still serve the index. Non-default
+escaping in file names (such as `%2C`, `%40`, or lowercase hex) needs
+`StaticConfig.EnablePathUnescaping` for middleware or
+`Config.EnablePathUnescapingStaticFiles` (v5) or `Echo#EnablePathUnescapingStaticFiles` (v4) for `Echo#Static` and `Echo#StaticFS`.
+Those options decode encoded slashes as well, so do not combine them with
+route-based access control for subdirectories.
+
 ## Default filesystem
 
 Echo uses `os.DirFS(".")` as its default filesystem, rooted at the current working
@@ -21,6 +31,10 @@ e.Filesystem = os.DirFS("assets")
 ## Using the Static middleware
 
 See [Static middleware](/middleware/static/).
+
+If registered with `e.Use`, Static middleware runs before route and group
+middleware. Route guards do not protect its files. Keep protected files outside
+its root, or use a guarded `Echo#Static` route instead.
 
 ## Using Echo#Static()
 

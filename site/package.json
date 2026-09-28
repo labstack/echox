@@ -12,6 +12,8 @@
     "source:accept": "node scripts/accept-source.mjs",
     "translations:status": "node scripts/translation-status.mjs",
     "translations:accept": "node scripts/accept-translations.mjs",
+    "security-translations:status": "node scripts/security-translation-status.mjs",
+    "security-translations:accept": "node scripts/security-translation-status.mjs --accept",
     "site:check": "node scripts/check-site.mjs",
     "site:accept": "node scripts/check-site.mjs --accept",
     "performance:check": "node scripts/check-performance.mjs",

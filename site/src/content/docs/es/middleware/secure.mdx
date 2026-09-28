@@ -55,3 +55,7 @@ var DefaultSecureConfig = SecureConfig{
 	HSTSPreloadEnabled: false,
 }
 ```
+
+## Actualización de seguridad de Echo (v5.4.0 / v4.16.0)
+
+HSTS se envía cuando `Context#Scheme()` es `https`, no por una cabecera `X-Forwarded-Proto: https` sin verificar. Si un proxy público termina TLS, [confía en su rango](/es/guide/request-scheme/) y haz que sobrescriba esa cabecera; de lo contrario puede faltar HSTS.

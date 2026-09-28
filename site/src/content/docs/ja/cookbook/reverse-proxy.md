@@ -200,3 +200,7 @@ func main() {
 	}
 }
 ```
+
+## Echo のセキュリティ更新 (v5.4.0 / v4.16.0)
+
+Proxy は `Context#Scheme()` から `X-Forwarded-Proto` を設定し、古いスキームヘッダーを削除します。v5 の `X-Real-IP` は `Context#RealIP()` から設定されます。Echo の前段に別のプロキシがある場合は[スキーム](/ja/guide/request-scheme/)と [IP](/ja/guide/ip-address/) の抽出器を設定し、上流へ正しい値を渡してください。

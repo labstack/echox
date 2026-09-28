@@ -9,6 +9,16 @@ JSONP is a technique that allows cross-domain server calls from the browser. Ech
 serves JSONP responses with `c.JSONP()`, which wraps the JSON payload in a call to
 the callback function named in the request.
 
+The callback must be empty, a JavaScript identifier, or a dot-separated path of
+identifiers using ASCII letters, digits, `_`, and `$`. An invalid callback returns
+HTTP 400 with an error wrapping `ErrInvalidJSONPCallback`; Echo writes no JSONP
+body. JSONP responses include `X-Content-Type-Options: nosniff`.
+
+:::caution
+Any website can read a JSONP response using the user's cookies. Never serve
+authenticated or private data with JSONP; use JSON with CORS instead.
+:::
+
 ## Server
 
 ```go

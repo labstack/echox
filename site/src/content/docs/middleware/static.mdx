@@ -23,7 +23,9 @@ The page imports the same file that documentation CI compiles. The example keeps
 
 Set `Root` to the directory to serve. `Browse` enables directory listings, `HTML5` forwards missing paths to the index file for a single-page application, and `Filesystem` lets you provide an `fs.FS`. Use `IgnoreBase` when a group's URL prefix should not become part of the file path.
 
-The fallback differs by revision. Echo v5.3.0 serves the index when a downstream handler returns 404. In the recorded `next` revision, it serves the index only for a router-level 404; a matched route's 404 passes through. This matters when an SPA and API routes share a server.
+In Echo v5.4.0, HTML5 mode serves the index for a router-level 404. A matched
+route's own 404 passes through. This matters when an SPA and API routes share a
+server.
 
 #### Example 1
 
@@ -41,6 +43,22 @@ The table comes from the exported fields in the recorded Echo revision. It ident
 
 ### Default configuration
 
-`Index` defaults to `index.html`. `EnablePathUnescaping` defaults to `false`, so encoded slashes in the wildcard path stay encoded. `DisablePathUnescaping` is deprecated and ignored by current Echo; use `EnablePathUnescaping` when you explicitly need unescaping.
+`Index` defaults to `index.html`. `EnablePathUnescaping` defaults to `false`, so
+encoded slashes in the wildcard path stay encoded. `DisablePathUnescaping` is
+deprecated and ignored by current Echo; use `EnablePathUnescaping` when you
+explicitly need unescaping.
 
-Enable unescaping only when you need URL-encoded characters in filenames and your route rules do not restrict access to subdirectories. Decoding an encoded slash after routing can bypass a route guard that matched the encoded path differently. Review the linked source in the table before enabling it.
+## Security in Echo v5.4.0
+
+By default, files are resolved from the same form of the path that the router
+matched. File names requested with non-default escaping, such as `%2C`, `%40`, or
+lowercase hex, need `EnablePathUnescaping`. Paths containing `.`, `..`, or empty
+segments (for example `/assets//app.js`) return 404; HTML5 mode still serves the
+index. Enabling path unescaping decodes encoded slashes too, so do not combine it
+with route-based access control for subdirectories.
+
+:::caution
+`e.Use(middleware.Static(...))` runs before route and group middleware. Route
+guards do not protect the files it serves. Keep protected files outside its root,
+or serve them with `Echo#Static` behind the guard.
+:::

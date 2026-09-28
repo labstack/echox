@@ -17,10 +17,15 @@ risk being deceived. **This is a security risk.**
 To retrieve the IP reliably and securely, your application must be aware of your
 entire infrastructure. In Echo, you configure this through `Echo#IPExtractor`.
 
-:::caution
-If you do not set `Echo#IPExtractor` explicitly, Echo falls back to legacy behavior,
-which is not a secure default.
-:::
+In v5, `Context#RealIP()` uses the direct peer address by default (since v5.1.0).
+Set `Echo#IPExtractor` only when a trusted proxy supplies the client IP in a header.
+In v4, the default still trusts `X-Forwarded-For` and `X-Real-IP` from any client;
+**always set an extractor** that matches your deployment, especially when using
+rate limiting or Proxy middleware. See the [v4.16.0 release notes](https://github.com/labstack/echo/releases/tag/v4.16.0).
+
+The request's HTTP/HTTPS scheme has a separate trust setting. See
+[Request Scheme and Trusted Proxies](/guide/request-scheme/) when configuring a
+reverse proxy, HTTPS redirect, or HSTS.
 
 Start with two questions to find the right approach:
 
@@ -111,8 +116,9 @@ forge them, opening the door to fraud.
 
 ## Default behavior
 
-By default, Echo considers the first XFF header, the X-Real-IP header, and the IP
-from the network layer all at once.
-
-As this article should make clear, that is not a good choice. It remains the default
-only for backward compatibility.
+Without `Echo#IPExtractor`, **v5 uses the direct peer address** from the network
+layer and ignores client-supplied IP headers. In **v4**, the legacy default can use
+`X-Forwarded-For` or `X-Real-IP` without checking whether the sender is a trusted
+proxy. Configure v4 explicitly, for example with `echo.ExtractIPDirect()` when no
+proxy sits in front of the app, or a header extractor with suitable trust options
+when a proxy does.

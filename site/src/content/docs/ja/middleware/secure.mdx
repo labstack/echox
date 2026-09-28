@@ -55,3 +55,7 @@ var DefaultSecureConfig = SecureConfig{
 	HSTSPreloadEnabled: false,
 }
 ```
+
+## Echo のセキュリティ更新 (v5.4.0 / v4.16.0)
+
+HSTS は `Context#Scheme()` が `https` の場合に送信されます。未検証の `X-Forwarded-Proto: https` だけでは有効になりません。公開プロキシで TLS を終端する場合は[その範囲を信頼](/ja/guide/request-scheme/)し、プロキシがヘッダーを上書きするようにしてください。

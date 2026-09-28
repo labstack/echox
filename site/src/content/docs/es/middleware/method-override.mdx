@@ -49,3 +49,7 @@ DefaultMethodOverrideConfig = MethodOverrideConfig{
 	Getter:  MethodFromHeader(echo.HeaderXHTTPMethodOverride),
 }
 ```
+
+## Actualización de seguridad de Echo (v5.4.0 / v4.16.0)
+
+Registra MethodOverride con `Echo#Pre`, antes del enrutamiento y del middleware CSRF. Un `POST` ya no puede convertirse en `GET`, `HEAD`, `OPTIONS`, `TRACE` ni `CONNECT`; si se solicita uno de esos métodos, la petición sigue siendo `POST`.

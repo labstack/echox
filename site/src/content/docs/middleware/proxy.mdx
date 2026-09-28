@@ -10,6 +10,14 @@ import ConfigReference from '../../../components/ConfigReference.astro';
 Proxy provides an HTTP/WebSocket reverse proxy middleware. It forwards a request to an
 upstream server using a configured load balancing technique.
 
+In Echo v5.4.0 and v4.16.0, Proxy sets `X-Forwarded-Proto` from
+`Context#Scheme()` and removes `X-Forwarded-Ssl`, `X-Forwarded-Protocol`, and
+`X-Url-Scheme` before forwarding. Configure the [scheme extractor](/guide/request-scheme/)
+for your trusted proxy chain. In v5, Proxy also sets `X-Real-IP` from
+`Context#RealIP()` rather than forwarding a client-supplied value. For a chain such
+as nginx → Echo Proxy → upstream, configure `Echo#IPExtractor` for the trusted
+incoming IP header as explained in [IP Address](/guide/ip-address/).
+
 All core middleware lives in the `middleware` package:
 
 ```go

@@ -11,7 +11,9 @@ Method Override middleware reads the overridden method from the request and uses
 instead of the original method.
 
 :::note
-For security reasons, only the `POST` method can be overridden.
+For security reasons, only the `POST` method can be overridden. It cannot be
+overridden to `GET`, `HEAD`, `OPTIONS`, `TRACE`, or `CONNECT`; the request remains
+`POST` if one of those methods is requested.
 :::
 
 All core middleware lives in the `middleware` package:
@@ -25,6 +27,9 @@ import "github.com/labstack/echo/v5/middleware"
 ```go
 e.Pre(middleware.MethodOverride())
 ```
+
+Register Method Override with `Echo#Pre`, before routing and the CSRF middleware.
+This prevents a form or query `_method` value from bypassing a CSRF check.
 
 ## Custom configuration
 

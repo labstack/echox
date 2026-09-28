@@ -15,9 +15,7 @@ Echo 暴露 `Context#RealIP()` 来获取它。
 要可靠且安全地获取 IP，你的应用必须了解整个基础设施。在 Echo 中，你通过
 `Echo#IPExtractor` 配置这一点。
 
-:::caution
-如果没有显式设置 `Echo#IPExtractor`，Echo 会回退到旧行为，而这不是安全的默认值。
-:::
+从 v5.1.0 开始，v5 的 `Context#RealIP()` 默认使用直接对端地址。v4 仍会默认信任任意客户端发送的 `X-Forwarded-For` 和 `X-Real-IP`，因此请按代理拓扑**始终配置 `Echo#IPExtractor`**。HTTP/HTTPS 的判断需另行配置，参见[请求协议与可信代理](/zh-cn/guide/request-scheme/)。
 
 从两个问题开始，找到正确方法：
 
@@ -100,6 +98,4 @@ e.IPExtractor = echo.ExtractIPFromRealIPHeader()
 
 ## 默认行为
 
-默认情况下，Echo 会同时考虑第一个 XFF header、X-Real-IP header 和网络层 IP。
-
-正如本文应当说明的那样，这并不是好的选择。它仅为了向后兼容而保留为默认值。
+未配置 `Echo#IPExtractor` 时，**v5 使用直接对端地址**，忽略客户端提供的 IP 标头。**v4 保留旧行为**，可能在不验证代理的情况下使用 `X-Forwarded-For` 或 `X-Real-IP`。v4 在无代理时使用 `echo.ExtractIPDirect()`；有代理时使用带适当信任选项的标头提取器。

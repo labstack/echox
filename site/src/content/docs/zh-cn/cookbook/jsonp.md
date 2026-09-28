@@ -92,3 +92,7 @@ func main() {
 
 </html>
 ```
+
+## Echo 安全更新 (v5.4.0 / v4.16.0)
+
+回调必须为空、JavaScript 标识符，或由点分隔的标识符路径（ASCII 字母、数字、`_`、`$`）。无效值返回包含 `ErrInvalidJSONPCallback` 的 HTTP 400，且不写入 JSONP 正文。正常响应带有 `X-Content-Type-Options: nosniff`。**任何网站都能携带用户 Cookie 读取 JSONP**；不要用它返回需要认证或私密的数据，应使用带 CORS 的 JSON。

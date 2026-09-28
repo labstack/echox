@@ -198,3 +198,7 @@ func main() {
 	}
 }
 ```
+
+## Echo 安全更新 (v5.4.0 / v4.16.0)
+
+Proxy 从 `Context#Scheme()` 设置 `X-Forwarded-Proto` 并删除旧协议标头。v5 的 `X-Real-IP` 来自 `Context#RealIP()`。如果 Echo 前面还有代理，请配置[协议](/zh-cn/guide/request-scheme/)和 [IP](/zh-cn/guide/ip-address/) 提取器，确保上游收到正确的值。

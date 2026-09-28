@@ -49,3 +49,7 @@ DefaultMethodOverrideConfig = MethodOverrideConfig{
 	Getter:  MethodFromHeader(echo.HeaderXHTTPMethodOverride),
 }
 ```
+
+## Echo のセキュリティ更新 (v5.4.0 / v4.16.0)
+
+MethodOverride はルーティングと CSRF ミドルウェアより前に `Echo#Pre` で登録してください。`POST` を `GET`、`HEAD`、`OPTIONS`、`TRACE`、`CONNECT` に変更することはできません。これらが指定された場合、リクエストは `POST` のままです。

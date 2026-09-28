@@ -52,3 +52,7 @@ El ejemplo anterior agrega una trailing slash al URI del request y redirige con
 <ConfigReference name="AddTrailingSlashConfig" locale="es" />
 
 <ConfigReference name="RemoveTrailingSlashConfig" locale="es" />
+
+## Actualización de seguridad de Echo (v5.4.0 / v4.16.0)
+
+Cuando redirigen, los middlewares de barra final codifican porcentualmente los caracteres de control de la ruta antes de construir la cabecera `Location`.

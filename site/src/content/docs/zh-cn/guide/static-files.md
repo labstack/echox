@@ -83,3 +83,7 @@ e.File("/favicon.ico", "app/assets/favicon.ico") // The file path must not have 
 :::caution
 文件路径中前导 `/` 不适用于大多数 `fs.FS` 实现。请使用相对路径。
 :::
+
+## Echo 安全更新 (v5.4.0 / v4.16.0)
+
+含 `.`、`..` 或空路径段的请求返回 404；`HTML5` 模式仍可返回索引文件。非默认转义的文件名需要中间件的 `StaticConfig.EnablePathUnescaping`，或 `Echo#Static`、`Echo#StaticFS` 的 `Config.EnablePathUnescapingStaticFiles` (v5) 或 `Echo#EnablePathUnescapingStaticFiles` (v4)。这些设置也会解码编码斜杠，请勿与基于路由的访问控制一起使用。`e.Use(middleware.Static(...))` 先于路由保护运行；应将受保护文件放在根目录外，或使用带保护的 `Echo#Static` 路由。

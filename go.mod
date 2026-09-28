@@ -8,7 +8,7 @@ require (
 	github.com/gorilla/websocket v1.5.3
 	github.com/labstack/echo-contrib/v5 v5.0.1
 	github.com/labstack/echo-jwt/v5 v5.0.2
-	github.com/labstack/echo/v5 v5.3.0
+	github.com/labstack/echo/v5 v5.4.0
 	github.com/lestrrat-go/jwx/v3 v3.1.1
 	github.com/prometheus/client_golang v1.23.2
 	github.com/r3labs/sse/v2 v2.10.0

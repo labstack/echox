@@ -87,3 +87,7 @@ e.File("/favicon.ico", "app/assets/favicon.ico") // The file path must not have 
 Um `/` inicial no caminho do arquivo não funciona com a maioria das implementações de `fs.FS`. Use
 um caminho relativo.
 :::
+
+## Atualização de segurança do Echo (v5.4.0 / v4.16.0)
+
+Caminhos com segmentos `.`, `..` ou vazios retornam 404; no modo `HTML5` o índice ainda pode ser servido. Nomes com escape não padrão exigem `StaticConfig.EnablePathUnescaping` no middleware ou `Config.EnablePathUnescapingStaticFiles` (v5) ou `Echo#EnablePathUnescapingStaticFiles` (v4) em `Echo#Static` e `Echo#StaticFS`. Essas opções também decodificam barras codificadas; não as combine com controle de acesso baseado em rotas. `e.Use(middleware.Static(...))` executa antes das proteções de rota e grupo; mantenha arquivos protegidos fora da raiz ou use uma rota `Echo#Static` protegida.

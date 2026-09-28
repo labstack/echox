@@ -70,8 +70,8 @@
       },
       {
         "heading": "Custom configuration",
-        "source": "aff0a36a30fca26a52b57828a9009e13e7925f328842474f3531df689c700c34",
-        "translation": "8c65dde7d33f7ffdf280541469b922a58807f6c9ee0eb93dbb9f11af18d1c929"
+        "source": "78822d82c9cf9601386c75a7a70f5ef2d4d3617390dd06a00c60336a19dc2540",
+        "translation": "e28acaa0f6fa9e34ead172a52f33caf3b79663a6d73042a9171091b556d7d694"
       },
       {
         "heading": "Configuration",
@@ -80,8 +80,13 @@
       },
       {
         "heading": "Default configuration",
-        "source": "4178c79309946e059e92d5a255cd0695542664baccae90f140c4ad326e54159a",
+        "source": "87dd7f64edb5703afeb14e3d5233f40f62da2e9932f3ac1b72286f773754543a",
         "translation": "7379ff2ee6b57d2b8be2c6054b763fcc3d16068ba7a2a3f5e2d56491bef37ca3"
+      },
+      {
+        "heading": "Security in Echo v5.4.0",
+        "source": "67848fc24e49ecc6992ac990d86744c001dfef843d5d075548741d3a4c3fd092",
+        "translation": "44dd2afdd19adb70b4647f4d1ecfc4868d33f221fdf59d46e614e4a295882f6a"
       }
     ],
     "index": [
@@ -173,8 +178,8 @@
       },
       {
         "heading": "Custom configuration",
-        "source": "aff0a36a30fca26a52b57828a9009e13e7925f328842474f3531df689c700c34",
-        "translation": "0f78deb38c9ff5c8f1492e19ba8130d3451db5f4aae93b6564d870bf5add14ec"
+        "source": "78822d82c9cf9601386c75a7a70f5ef2d4d3617390dd06a00c60336a19dc2540",
+        "translation": "1d903fd2553d3d2e68ec202951cc532c958d3e1efd583654d9e05ef14cf665db"
       },
       {
         "heading": "Configuration",
@@ -183,8 +188,13 @@
       },
       {
         "heading": "Default configuration",
-        "source": "4178c79309946e059e92d5a255cd0695542664baccae90f140c4ad326e54159a",
+        "source": "87dd7f64edb5703afeb14e3d5233f40f62da2e9932f3ac1b72286f773754543a",
         "translation": "155968c41190d2e099d7f1b1d075e0db37dd4ad1a22c3dba54e3470d4ec8acff"
+      },
+      {
+        "heading": "Security in Echo v5.4.0",
+        "source": "67848fc24e49ecc6992ac990d86744c001dfef843d5d075548741d3a4c3fd092",
+        "translation": "93c0cf348b27531e4ab29ea99439496fb4f0c25a82bd49c07a70df9b17533936"
       }
     ],
     "index": [
@@ -276,8 +286,8 @@
       },
       {
         "heading": "Custom configuration",
-        "source": "aff0a36a30fca26a52b57828a9009e13e7925f328842474f3531df689c700c34",
-        "translation": "a5da6b6451516398676fc185e6923ced23f8734d3473fb8c78a3ce9eaeb01427"
+        "source": "78822d82c9cf9601386c75a7a70f5ef2d4d3617390dd06a00c60336a19dc2540",
+        "translation": "88362601c99a010274754dded588c510e014fc12c700849d27025cdc489b2c18"
       },
       {
         "heading": "Configuration",
@@ -286,8 +296,13 @@
       },
       {
         "heading": "Default configuration",
-        "source": "4178c79309946e059e92d5a255cd0695542664baccae90f140c4ad326e54159a",
+        "source": "87dd7f64edb5703afeb14e3d5233f40f62da2e9932f3ac1b72286f773754543a",
         "translation": "83052e253e1a91debf48ac4305b0daf4f24897b41f2f4cf301fe0c811461b052"
+      },
+      {
+        "heading": "Security in Echo v5.4.0",
+        "source": "67848fc24e49ecc6992ac990d86744c001dfef843d5d075548741d3a4c3fd092",
+        "translation": "13d890b92c55214864c94b7b344f48cdfe73d6cbdbefc2105152aad0b9b40e7d"
       }
     ],
     "index": [
@@ -379,8 +394,8 @@
       },
       {
         "heading": "Custom configuration",
-        "source": "aff0a36a30fca26a52b57828a9009e13e7925f328842474f3531df689c700c34",
-        "translation": "2ede0c0c72d3ac78b9948b8548de77083a7a89d177b242aaee85579664df4dd8"
+        "source": "78822d82c9cf9601386c75a7a70f5ef2d4d3617390dd06a00c60336a19dc2540",
+        "translation": "af5cf3dfb04bfb8b93fef34b024592b6c4867e80507be03b80a8303250e158ad"
       },
       {
         "heading": "Configuration",
@@ -389,8 +404,13 @@
       },
       {
         "heading": "Default configuration",
-        "source": "4178c79309946e059e92d5a255cd0695542664baccae90f140c4ad326e54159a",
+        "source": "87dd7f64edb5703afeb14e3d5233f40f62da2e9932f3ac1b72286f773754543a",
         "translation": "efc9a058c6b155a27dbc26bd1911399795449ad7e9967a1473eb744fd67c3d44"
+      },
+      {
+        "heading": "Security in Echo v5.4.0",
+        "source": "67848fc24e49ecc6992ac990d86744c001dfef843d5d075548741d3a4c3fd092",
+        "translation": "4333359b1ef72fc7d86087ce1ffae3539ad7736ed7c8fe5e7a24760b0e56a9cf"
       }
     ],
     "index": [

@@ -262,3 +262,7 @@ func TestMiddleware(t *testing.T) {
 Para mais exemplos, veja os [casos de teste de middleware](https://github.com/labstack/echo/tree/master/middleware)
 no código-fonte do Echo.
 :::
+
+## Atualização de segurança do Echo (v5.4.0 / v4.16.0)
+
+`httptest.NewRequest` define `RemoteAddr` como `192.0.2.1:1234`, endereço que o extrator de esquema padrão não considera confiável. Se o teste define `X-Forwarded-Proto: https`, defina também `req.RemoteAddr = "10.0.0.1:1234"` para simular um proxy privado confiável. Use `e.SchemeExtractor = echo.LegacySchemeExtractor()` apenas para testar o comportamento antigo. Veja [Esquema da requisição](/pt-br/guide/request-scheme/).

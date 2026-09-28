@@ -75,3 +75,7 @@ e.Use(middleware.ProxyWithConfig(middleware.ProxyConfig{
 ```
 
 完整示例请参见[反向代理](/zh-cn/cookbook/reverse-proxy/) cookbook。
+
+## Echo 安全更新 (v5.4.0 / v4.16.0)
+
+Proxy 从 `Context#Scheme()` 设置 `X-Forwarded-Proto`，并在转发前删除 `X-Forwarded-Ssl`、`X-Forwarded-Protocol` 和 `X-Url-Scheme`。v5 还从 `Context#RealIP()` 设置 `X-Real-IP`。对于 nginx → Echo Proxy → 上游服务的链路，请按可信代理配置[协议](/zh-cn/guide/request-scheme/)和 [IP](/zh-cn/guide/ip-address/) 提取器。

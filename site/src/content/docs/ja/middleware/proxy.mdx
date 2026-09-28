@@ -77,3 +77,7 @@ e.Use(middleware.ProxyWithConfig(middleware.ProxyConfig{
 ```
 
 完全な例は[リバースプロキシ](/ja/cookbook/reverse-proxy/) cookbook を参照してください。
+
+## Echo のセキュリティ更新 (v5.4.0 / v4.16.0)
+
+Proxy は `Context#Scheme()` から `X-Forwarded-Proto` を設定し、`X-Forwarded-Ssl`、`X-Forwarded-Protocol`、`X-Url-Scheme` を削除して転送します。v5 では `Context#RealIP()` から `X-Real-IP` も設定します。nginx → Echo Proxy → 上流サーバーの構成では、信頼するプロキシに合わせて[スキーム](/ja/guide/request-scheme/)と [IP](/ja/guide/ip-address/) の抽出器を設定してください。

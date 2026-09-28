@@ -77,3 +77,7 @@ e.Use(middleware.ProxyWithConfig(middleware.ProxyConfig{
 ```
 
 Consulta el recetario de [reverse proxy](/es/cookbook/reverse-proxy/) para ver un ejemplo completo.
+
+## Actualización de seguridad de Echo (v5.4.0 / v4.16.0)
+
+Proxy establece `X-Forwarded-Proto` desde `Context#Scheme()` y elimina `X-Forwarded-Ssl`, `X-Forwarded-Protocol` y `X-Url-Scheme` antes de reenviar. En v5 también establece `X-Real-IP` desde `Context#RealIP()`. En una cadena nginx → Echo Proxy → servidor upstream, configura los extractores de [esquema](/es/guide/request-scheme/) e [IP](/es/guide/ip-address/) para los proxies de confianza.
