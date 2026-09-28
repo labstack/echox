@@ -12,9 +12,9 @@
     "package": "echoprometheus"
   },
   "open-telemetry": {
-    "module": "github.com/labstack/echo-opentelemetry",
-    "version": "v0.0.3",
-    "repository": "https://github.com/labstack/echo-opentelemetry",
+    "module": "github.com/labstack/echo-otel/v5",
+    "version": "v5.0.0",
+    "repository": "https://github.com/labstack/echo-otel",
     "package": "echootel"
   }
 }

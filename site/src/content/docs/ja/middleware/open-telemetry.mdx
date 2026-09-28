@@ -7,7 +7,7 @@ sidebar:
 
 import ConfigReference from '../../../../components/ConfigReference.astro';
 
-[Echo OpenTelemetry](https://github.com/labstack/echo-opentelemetry) は、HTTP リクエスト向けの
+[Echo OpenTelemetry](https://github.com/labstack/echo-otel) は、HTTP リクエスト向けの
 OpenTelemetry インストルメンテーションを提供するミドルウェアです。
 
 OpenTelemetry は、クラウドネイティブアプリケーション向けのインストルメンテーションを提供する
@@ -22,14 +22,19 @@ OpenTelemetry は、クラウドネイティブアプリケーション向けの
 Go modules で OpenTelemetry ミドルウェア依存関係を追加します。
 
 ```bash
-go get github.com/labstack/echo-opentelemetry
+go get github.com/labstack/echo-otel/v5
 ```
+
+:::note
+Echo v4 アプリケーションでは `github.com/labstack/echo-otel/v4` を使用します。`github.com/labstack/echo-opentelemetry`
+はこのモジュールの以前の名前で、非推奨です。[Migrating from echo-opentelemetry](https://github.com/labstack/echo-otel#migrating-from-echo-opentelemetry) を参照してください。
+:::
 
 ミドルウェアと OpenTelemetry trace API を import します。
 
 ```go
 import (
-	echootel "github.com/labstack/echo-opentelemetry"
+	echootel "github.com/labstack/echo-otel/v5"
 	"go.opentelemetry.io/otel/trace"
 )
 ```
@@ -54,7 +59,7 @@ e.Use(echootel.NewMiddlewareWithConfig(echootel.Config{
 }))
 ```
 
-設定オプションについては [`Config`](https://github.com/labstack/echo-opentelemetry/blob/main/otel.go#L28) struct を参照してください。
+設定オプションについては [`Config`](https://github.com/labstack/echo-otel/blob/main/otel.go#L31) struct を参照してください。
 
 サーバー名だけを指定する簡略形式でミドルウェアを追加します。
 
@@ -78,8 +83,8 @@ tracer, err := echo.ContextGet[trace.Tracer](c, echootel.TracerKey)
 
 ## 例
 
-[example](https://github.com/labstack/echo-opentelemetry/blob/main/example/main.go) は
-metrics と spans を stdout にエクスポートしますが、任意の exporter（OTLP など）を使えます。
+[example](https://github.com/labstack/echo-otel/blob/main/example/main.go) は
+spans を stdout にエクスポートしますが、任意の exporter（OTLP など）を使えます。
 [OpenTelemetry exporters](https://opentelemetry.io/docs/languages/go/exporters) ドキュメントを参照してください。
 
 ## API リファレンス

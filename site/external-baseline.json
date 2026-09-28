@@ -152,8 +152,8 @@
     }
   },
   "open-telemetry": {
-    "module": "github.com/labstack/echo-opentelemetry",
-    "version": "v0.0.3",
+    "module": "github.com/labstack/echo-otel/v5",
+    "version": "v5.0.0",
     "configs": {
       "Config": {
         "ServerName": {
@@ -207,6 +207,7 @@
       }
     },
     "functions": {
+      "ErrorType": "func ErrorType(code int, err error) string",
       "NewMetrics": "func NewMetrics(meter metric.Meter) (*Metrics, error)",
       "NewMiddleware": "func NewMiddleware(serverName string) echo.MiddlewareFunc",
       "NewMiddlewareWithConfig": "func NewMiddlewareWithConfig(config Config) echo.MiddlewareFunc",

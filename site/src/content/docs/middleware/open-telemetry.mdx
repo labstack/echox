@@ -7,7 +7,7 @@ sidebar:
 
 import ConfigReference from '../../../components/ConfigReference.astro';
 
-[Echo OpenTelemetry](https://github.com/labstack/echo-opentelemetry) is a middleware that
+[Echo OpenTelemetry](https://github.com/labstack/echo-otel) is a middleware that
 provides OpenTelemetry instrumentation for HTTP requests.
 
 OpenTelemetry is a set of open-source tools that provide instrumentation for cloud-native
@@ -22,14 +22,20 @@ applications.
 Add the OpenTelemetry middleware dependency with Go modules:
 
 ```bash
-go get github.com/labstack/echo-opentelemetry
+go get github.com/labstack/echo-otel/v5
 ```
+
+:::note
+Echo v4 applications use `github.com/labstack/echo-otel/v4`. `github.com/labstack/echo-opentelemetry`
+is the deprecated previous name of this module; see
+[Migrating from echo-opentelemetry](https://github.com/labstack/echo-otel#migrating-from-echo-opentelemetry).
+:::
 
 Import the middleware and the OpenTelemetry trace API:
 
 ```go
 import (
-	echootel "github.com/labstack/echo-opentelemetry"
+	echootel "github.com/labstack/echo-otel/v5"
 	"go.opentelemetry.io/otel/trace"
 )
 ```
@@ -54,7 +60,7 @@ e.Use(echootel.NewMiddlewareWithConfig(echootel.Config{
 }))
 ```
 
-For configuration options, see the [`Config`](https://github.com/labstack/echo-opentelemetry/blob/main/otel.go#L28) struct.
+For configuration options, see the [`Config`](https://github.com/labstack/echo-otel/blob/main/otel.go#L31) struct.
 
 Add the middleware in simplified form by providing only the server name:
 
@@ -78,8 +84,8 @@ tracer, err := echo.ContextGet[trace.Tracer](c, echootel.TracerKey)
 
 ## Example
 
-The [example](https://github.com/labstack/echo-opentelemetry/blob/main/example/main.go) exports
-metrics and spans to stdout, but you can use any exporter (OTLP, etc.). See the
+The [example](https://github.com/labstack/echo-otel/blob/main/example/main.go) exports
+spans to stdout, but you can use any exporter (OTLP, etc.). See the
 [OpenTelemetry exporters](https://opentelemetry.io/docs/languages/go/exporters) documentation.
 
 ## API reference

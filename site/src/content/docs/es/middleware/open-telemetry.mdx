@@ -7,7 +7,7 @@ sidebar:
 
 import ConfigReference from '../../../../components/ConfigReference.astro';
 
-[Echo OpenTelemetry](https://github.com/labstack/echo-opentelemetry) es un middleware que
+[Echo OpenTelemetry](https://github.com/labstack/echo-otel) es un middleware que
 proporciona instrumentación OpenTelemetry para requests HTTP.
 
 OpenTelemetry es un conjunto de herramientas open-source que proporcionan instrumentación para
@@ -22,14 +22,20 @@ aplicaciones cloud-native.
 Agrega la dependencia del middleware OpenTelemetry con Go modules:
 
 ```bash
-go get github.com/labstack/echo-opentelemetry
+go get github.com/labstack/echo-otel/v5
 ```
+
+:::note
+Las aplicaciones con Echo v4 usan `github.com/labstack/echo-otel/v4`. `github.com/labstack/echo-opentelemetry`
+es el nombre anterior de este módulo y está obsoleto; consulta
+[Migrating from echo-opentelemetry](https://github.com/labstack/echo-otel#migrating-from-echo-opentelemetry).
+:::
 
 Importa el middleware y la API de tracing de OpenTelemetry:
 
 ```go
 import (
-	echootel "github.com/labstack/echo-opentelemetry"
+	echootel "github.com/labstack/echo-otel/v5"
 	"go.opentelemetry.io/otel/trace"
 )
 ```
@@ -55,7 +61,7 @@ e.Use(echootel.NewMiddlewareWithConfig(echootel.Config{
 ```
 
 Para opciones de configuración, consulta el struct
-[`Config`](https://github.com/labstack/echo-opentelemetry/blob/main/otel.go#L28).
+[`Config`](https://github.com/labstack/echo-otel/blob/main/otel.go#L31).
 
 Agrega el middleware en forma simplificada proporcionando solo el nombre del servidor:
 
@@ -79,8 +85,8 @@ tracer, err := echo.ContextGet[trace.Tracer](c, echootel.TracerKey)
 
 ## Ejemplo
 
-El [ejemplo](https://github.com/labstack/echo-opentelemetry/blob/main/example/main.go) exporta
-metrics y spans a stdout, pero puedes usar cualquier exporter (OTLP, etc.). Consulta la
+El [ejemplo](https://github.com/labstack/echo-otel/blob/main/example/main.go) exporta
+spans a stdout, pero puedes usar cualquier exporter (OTLP, etc.). Consulta la
 documentación de [OpenTelemetry exporters](https://opentelemetry.io/docs/languages/go/exporters).
 
 ## Referencia de la API

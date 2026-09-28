@@ -7,7 +7,7 @@ sidebar:
 
 import ConfigReference from '../../../../components/ConfigReference.astro';
 
-[Echo OpenTelemetry](https://github.com/labstack/echo-opentelemetry) 是一个为 HTTP 请求提供
+[Echo OpenTelemetry](https://github.com/labstack/echo-otel) 是一个为 HTTP 请求提供
 OpenTelemetry 插桩的中间件。
 
 OpenTelemetry 是一组开源工具，为云原生应用提供插桩能力。
@@ -21,14 +21,19 @@ OpenTelemetry 是一组开源工具，为云原生应用提供插桩能力。
 使用 Go modules 添加 OpenTelemetry 中间件依赖：
 
 ```bash
-go get github.com/labstack/echo-opentelemetry
+go get github.com/labstack/echo-otel/v5
 ```
+
+:::note
+Echo v4 应用使用 `github.com/labstack/echo-otel/v4`。`github.com/labstack/echo-opentelemetry`
+是该模块以前的名称，已弃用；请参见 [Migrating from echo-opentelemetry](https://github.com/labstack/echo-otel#migrating-from-echo-opentelemetry)。
+:::
 
 导入中间件和 OpenTelemetry trace API：
 
 ```go
 import (
-	echootel "github.com/labstack/echo-opentelemetry"
+	echootel "github.com/labstack/echo-otel/v5"
 	"go.opentelemetry.io/otel/trace"
 )
 ```
@@ -53,7 +58,7 @@ e.Use(echootel.NewMiddlewareWithConfig(echootel.Config{
 }))
 ```
 
-配置选项请参见 [`Config`](https://github.com/labstack/echo-opentelemetry/blob/main/otel.go#L28) struct。
+配置选项请参见 [`Config`](https://github.com/labstack/echo-otel/blob/main/otel.go#L31) struct。
 
 只提供服务器名称，以简化形式添加中间件：
 
@@ -77,8 +82,8 @@ tracer, err := echo.ContextGet[trace.Tracer](c, echootel.TracerKey)
 
 ## 示例
 
-[example](https://github.com/labstack/echo-opentelemetry/blob/main/example/main.go) 会把
-metrics 和 spans 导出到 stdout，但你可以使用任何 exporter（OTLP 等）。请参见
+[example](https://github.com/labstack/echo-otel/blob/main/example/main.go) 会把
+spans 导出到 stdout，但你可以使用任何 exporter（OTLP 等）。请参见
 [OpenTelemetry exporters](https://opentelemetry.io/docs/languages/go/exporters) 文档。
 
 ## API 参考
