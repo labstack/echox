@@ -16,10 +16,7 @@ corre o risco de ser enganado. **Isso é um risco de segurança.**
 Para recuperar o IP de forma confiável e segura, sua aplicação precisa conhecer toda a sua
 infraestrutura. No Echo, você configura isso por meio de `Echo#IPExtractor`.
 
-:::caution
-Se você não definir `Echo#IPExtractor` explicitamente, Echo recorre ao comportamento legado,
-que não é um padrão seguro.
-:::
+No v5, `Context#RealIP()` usa por padrão o endereço do par direto desde v5.1.0. O v4 ainda confia por padrão em `X-Forwarded-For` e `X-Real-IP` enviados por qualquer cliente; por isso, **sempre configure `Echo#IPExtractor`** conforme seus proxies. O esquema HTTP/HTTPS é configurado separadamente em [Esquema da requisição](/pt-br/guide/request-scheme/).
 
 Comece com duas perguntas para encontrar a abordagem correta:
 
@@ -110,8 +107,4 @@ forjá-los, abrindo espaço para fraude.
 
 ## Comportamento padrão
 
-Por padrão, Echo considera ao mesmo tempo o primeiro header XFF, o header X-Real-IP e o IP
-da camada de rede.
-
-Como este artigo deve deixar claro, essa não é uma boa escolha. Ela continua sendo o padrão
-apenas por compatibilidade retroativa.
+Sem `Echo#IPExtractor`, **o v5 usa o endereço do par direto** e ignora cabeçalhos de IP enviados pelo cliente. **O v4 mantém o comportamento legado**, que pode usar `X-Forwarded-For` ou `X-Real-IP` sem verificar o proxy. No v4, use `echo.ExtractIPDirect()` se não houver proxy, ou um extrator de cabeçalho com opções de confiança adequadas aos seus proxies.

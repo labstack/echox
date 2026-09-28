@@ -23,7 +23,7 @@ La página importa el mismo archivo que compila la CI de documentación. El ejem
 
 `Root` indica el directorio que se sirve. `Browse` permite listar directorios, `HTML5` reenvía las rutas no encontradas al archivo índice y `Filesystem` acepta un `fs.FS`. Usa `IgnoreBase` cuando el prefijo URL de un grupo no debe formar parte de la ruta del archivo.
 
-La respuesta alternativa varía según la revisión. Echo v5.3.0 sirve el archivo índice cuando un manejador posterior devuelve 404. En la revisión `next` registrada, solo lo sirve si el 404 procede del enrutador; un 404 de una ruta coincidente se conserva. Esta diferencia importa cuando una SPA y las rutas de API comparten servidor.
+En Echo v5.4.0, `HTML5` sirve el índice solo ante un 404 del enrutador. Un 404 devuelto por una ruta coincidente se conserva; esto importa cuando una SPA comparte servidor con una API.
 
 #### Ejemplo 1
 
@@ -44,3 +44,7 @@ Esta tabla procede de los campos exportados de la revisión indicada de Echo. Ma
 `Index` usa `index.html` por defecto. `EnablePathUnescaping` es `false` por defecto: las barras codificadas en la ruta comodín permanecen codificadas. `DisablePathUnescaping` está obsoleto y se ignora; usa `EnablePathUnescaping` si necesitas habilitar la decodificación.
 
 Habilítala solo si necesitas caracteres codificados en los nombres de archivo y tus rutas no restringen el acceso a subdirectorios. Decodificar una barra después del enrutamiento puede eludir una ruta de protección.
+
+## Actualización de seguridad de Echo (v5.4.0 / v4.16.0)
+
+Por defecto, Static resuelve archivos desde la misma forma de ruta que usó el enrutador. Los nombres pedidos con codificación no estándar (`%2C`, `%40` o hexadecimales en minúsculas) requieren `EnablePathUnescaping`. Los segmentos `.`, `..` o vacíos (por ejemplo `/assets//app.js`) devuelven 404; `HTML5` aún puede servir el índice. Al activar la decodificación también se decodifican las barras codificadas: no la combines con control de acceso basado en rutas. **`e.Use(middleware.Static(...))` se ejecuta antes que los middlewares de rutas y grupos**; sus guardas no protegen esos archivos. Mantén los archivos protegidos fuera de su raíz o sírvelos mediante `Echo#Static` detrás de una guarda.

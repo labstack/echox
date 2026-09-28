@@ -93,3 +93,7 @@ func main() {
 
 </html>
 ```
+
+## Atualização de segurança do Echo (v5.4.0 / v4.16.0)
+
+O callback deve ser vazio, um identificador JavaScript ou um caminho de identificadores separados por pontos (letras ASCII, dígitos, `_` e `$`). Um valor inválido retorna HTTP 400 com `ErrInvalidJSONPCallback` e não escreve o corpo JSONP. A resposta válida inclui `X-Content-Type-Options: nosniff`. **Qualquer site pode ler JSONP com os cookies do usuário**: não sirva dados privados ou autenticados; use JSON com CORS.

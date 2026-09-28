@@ -262,3 +262,7 @@ func TestMiddleware(t *testing.T) {
 その他の例は、Echo ソース内の
 [ミドルウェアテストケース](https://github.com/labstack/echo/tree/master/middleware)を参照してください。
 :::
+
+## Echo のセキュリティ更新 (v5.4.0 / v4.16.0)
+
+`httptest.NewRequest` の `RemoteAddr` は `192.0.2.1:1234` で、既定のスキーム抽出器は信頼しません。`X-Forwarded-Proto: https` を設定するテストでは、信頼するプライベートプロキシを表す `req.RemoteAddr = "10.0.0.1:1234"` も設定してください。旧動作のテストだけなら `e.SchemeExtractor = echo.LegacySchemeExtractor()` も使えます。詳しくは[リクエストのスキーム](/ja/guide/request-scheme/)を参照してください。

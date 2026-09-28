@@ -54,3 +54,7 @@ var DefaultSecureConfig = SecureConfig{
 	HSTSPreloadEnabled: false,
 }
 ```
+
+## Echo 安全更新 (v5.4.0 / v4.16.0)
+
+只有 `Context#Scheme()` 为 `https` 时才发送 HSTS，未经验证的 `X-Forwarded-Proto: https` 不会启用 HSTS。如果公网代理终止 TLS，请[信任其地址段](/zh-cn/guide/request-scheme/)，并确保代理覆盖该标头。

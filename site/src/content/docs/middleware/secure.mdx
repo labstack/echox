@@ -22,6 +22,11 @@ import "github.com/labstack/echo/v5/middleware"
 e.Use(middleware.Secure())
 ```
 
+HSTS is sent when `Context#Scheme()` is `https`. A raw
+`X-Forwarded-Proto: https` header from an untrusted client does not enable HSTS.
+If a public proxy terminates TLS, [trust its address range](/guide/request-scheme/)
+and make sure it overwrites `X-Forwarded-Proto`; otherwise HSTS may be missing.
+
 ## Custom configuration
 
 ```go

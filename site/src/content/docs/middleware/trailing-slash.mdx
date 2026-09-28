@@ -13,6 +13,9 @@ All core middleware lives in the `middleware` package:
 import "github.com/labstack/echo/v5/middleware"
 ```
 
+When configured to redirect, the trailing slash middlewares percent-encode
+control characters in the path before constructing the `Location` header.
+
 ## Add trailing slash
 
 Add trailing slash middleware adds a trailing slash to the request URI.

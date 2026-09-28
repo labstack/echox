@@ -260,3 +260,7 @@ func TestMiddleware(t *testing.T) {
 更多示例请参见 Echo 源码中的
 [中间件测试用例](https://github.com/labstack/echo/tree/master/middleware)。
 :::
+
+## Echo 安全更新 (v5.4.0 / v4.16.0)
+
+`httptest.NewRequest` 将 `RemoteAddr` 设为 `192.0.2.1:1234`，默认协议提取器不信任此地址。测试设置 `X-Forwarded-Proto: https` 时，还应设 `req.RemoteAddr = "10.0.0.1:1234"` 以模拟可信私有代理。仅测试旧行为时可使用 `e.SchemeExtractor = echo.LegacySchemeExtractor()`。参见[请求协议](/zh-cn/guide/request-scheme/)。

@@ -316,3 +316,7 @@ e.GET("/hooks", func(c *echo.Context) error {
 :::tip
 複数の `Before` 関数と `After` 関数を登録できます。
 :::
+
+## Echo のセキュリティ更新 (v5.4.0 / v4.16.0)
+
+`Context#JSONP` のコールバックは空文字、JavaScript 識別子、またはドット区切りの識別子だけです。不正な値は `ErrInvalidJSONPCallback` を含む HTTP 400 を返し、正常な応答には `X-Content-Type-Options: nosniff` が付きます。JSONP は他サイトからユーザーの Cookie とともに読めるため、非公開データには使わず CORS を設定した JSON を使ってください。

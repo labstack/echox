@@ -9,6 +9,23 @@ Echo handlers and middleware are plain functions over an `echo.Context`, so they
 straightforward to test with the standard `net/http/httptest` package. The
 `echotest` package provides helpers that cut down on boilerplate.
 
+## Testing forwarded schemes
+
+`httptest.NewRequest` sets `RemoteAddr` to `192.0.2.1:1234`, which the default
+scheme extractor does not trust. A test that sets `X-Forwarded-Proto: https`
+therefore sees `http` unless it also represents a trusted proxy:
+
+```go
+req := httptest.NewRequest(http.MethodGet, "/", nil)
+req.RemoteAddr = "10.0.0.1:1234" // Trusted private proxy in this test.
+req.Header.Set(echo.HeaderXForwardedProto, "https")
+```
+
+Alternatively, a test can explicitly set
+`e.SchemeExtractor = echo.LegacySchemeExtractor()`. Use the latter only to test
+legacy behavior; configure trusted proxies in production as described in
+[Request Scheme and Trusted Proxies](/guide/request-scheme/).
+
 ## Testing a handler
 
 Consider two handlers:

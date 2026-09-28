@@ -99,3 +99,7 @@ RedirectConfig{
 	Code:    http.StatusMovedPermanently,
 }
 ```
+
+## Echo 安全更新 (v5.4.0 / v4.16.0)
+
+HTTPS 重定向依赖 `Context#Scheme()`。使用公网地址的代理时，请[配置可信地址段](/zh-cn/guide/request-scheme/)；否则可能出现重定向循环。

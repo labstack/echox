@@ -23,7 +23,7 @@ A página importa o mesmo arquivo compilado pela CI da documentação. O exemplo
 
 `Root` define o diretório servido. `Browse` habilita a listagem de diretórios, `HTML5` encaminha caminhos não encontrados ao arquivo de índice e `Filesystem` aceita um `fs.FS`. Use `IgnoreBase` quando o prefixo da URL de um grupo não deve entrar no caminho do arquivo.
 
-O fallback varia entre as revisões. O Echo v5.3.0 serve o arquivo de índice quando o próximo handler retorna 404. Na revisão `next` registrada, isso só ocorre para um 404 do roteador; um 404 retornado por uma rota correspondente é preservado. A diferença importa quando uma SPA e rotas de API compartilham o servidor.
+No Echo v5.4.0, `HTML5` serve o arquivo de índice apenas para um 404 do roteador. Um 404 retornado por uma rota correspondente é preservado; isso importa quando uma SPA e uma API compartilham o servidor.
 
 #### Exemplo 1
 
@@ -44,3 +44,7 @@ A tabela vem dos campos exportados da revisão indicada do Echo. Ela marca campo
 `Index` usa `index.html` por padrão. `EnablePathUnescaping` é `false` por padrão: barras codificadas no caminho curinga continuam codificadas. `DisablePathUnescaping` está obsoleto e é ignorado; use `EnablePathUnescaping` quando precisar habilitar a decodificação.
 
 Habilite-a somente se precisar de caracteres codificados em nomes de arquivos e se suas rotas não restringirem o acesso a subdiretórios. Decodificar uma barra após o roteamento pode contornar uma rota de proteção.
+
+## Atualização de segurança do Echo (v5.4.0 / v4.16.0)
+
+Por padrão, Static resolve arquivos a partir da mesma forma de caminho usada pelo roteador. Nomes pedidos com escape não padrão (`%2C`, `%40` ou hexadecimal minúsculo) exigem `EnablePathUnescaping`. Segmentos `.`, `..` ou vazios (por exemplo `/assets//app.js`) retornam 404; `HTML5` ainda pode servir o índice. Ativar a decodificação também decodifica barras codificadas: não combine isso com controle de acesso baseado em rotas. **`e.Use(middleware.Static(...))` executa antes dos middlewares de rota e grupo**; suas proteções não cobrem esses arquivos. Mantenha arquivos protegidos fora da raiz ou sirva-os com `Echo#Static` atrás de uma proteção.

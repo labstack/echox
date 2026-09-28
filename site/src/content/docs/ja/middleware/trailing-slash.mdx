@@ -51,3 +51,7 @@ e.Use(middleware.AddTrailingSlashWithConfig(middleware.AddTrailingSlashConfig{
 <ConfigReference name="AddTrailingSlashConfig" locale="ja" />
 
 <ConfigReference name="RemoveTrailingSlashConfig" locale="ja" />
+
+## Echo のセキュリティ更新 (v5.4.0 / v4.16.0)
+
+末尾のスラッシュを変更するミドルウェアは、リダイレクト時にパス内の制御文字をパーセントエンコードしてから `Location` ヘッダーを作成します。

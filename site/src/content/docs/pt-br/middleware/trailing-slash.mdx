@@ -52,3 +52,7 @@ O exemplo acima adiciona uma barra final à URI do request e redireciona com
 <ConfigReference name="AddTrailingSlashConfig" locale="pt-br" />
 
 <ConfigReference name="RemoveTrailingSlashConfig" locale="pt-br" />
+
+## Atualização de segurança do Echo (v5.4.0 / v4.16.0)
+
+Ao redirecionar, os middlewares de barra final codificam os caracteres de controle no caminho em porcentagem antes de criar o cabeçalho `Location`.

@@ -130,6 +130,12 @@ func handler(c *echo.Context) error {
 
 See the [JSONP cookbook](/cookbook/jsonp/).
 
+The callback must be empty, a JavaScript identifier, or a dot-separated path of
+identifiers. Invalid callbacks return HTTP 400 with an error wrapping
+`ErrInvalidJSONPCallback`; JSONP responses include `X-Content-Type-Options: nosniff`.
+Because any site can read JSONP with the user's cookies, do not return private or
+authenticated data through JSONP. Use JSON with CORS for that case.
+
 ## Send XML
 
 `Context#XML(code int, i any)` encodes a Go value as XML and sends it with a status

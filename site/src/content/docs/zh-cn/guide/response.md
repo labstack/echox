@@ -314,3 +314,7 @@ e.GET("/hooks", func(c *echo.Context) error {
 :::tip
 你可以注册多个 `Before` 和 `After` 函数。
 :::
+
+## Echo 安全更新 (v5.4.0 / v4.16.0)
+
+`Context#JSONP` 的回调只能为空、JavaScript 标识符或点分隔的标识符。无效回调返回包含 `ErrInvalidJSONPCallback` 的 HTTP 400；正常响应带有 `X-Content-Type-Options: nosniff`。任何网站都可携带用户 Cookie 读取 JSONP，所以私密数据应使用带 CORS 的 JSON。

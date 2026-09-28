@@ -86,3 +86,7 @@ e.File("/favicon.ico", "app/assets/favicon.ico") // The file path must not have 
 :::caution
 ファイルパス先頭の `/` は、ほとんどの `fs.FS` 実装では機能しません。相対パスを使ってください。
 :::
+
+## Echo のセキュリティ更新 (v5.4.0 / v4.16.0)
+
+`.`、`..`、空のパスセグメントは 404 になり、`HTML5` モードではインデックスを返す場合があります。標準以外のエスケープを使うファイル名には、ミドルウェアで `StaticConfig.EnablePathUnescaping`、`Echo#Static` と `Echo#StaticFS` で `Config.EnablePathUnescapingStaticFiles` が必要です。これらはエンコードされたスラッシュも復元するため、ルート単位のアクセス制御と併用しないでください。`e.Use(middleware.Static(...))` はルートのガードより先に実行されます。保護するファイルはルート外に置くか、ガード付きの `Echo#Static` で配信してください。

@@ -93,3 +93,7 @@ func main() {
 
 </html>
 ```
+
+## Echo のセキュリティ更新 (v5.4.0 / v4.16.0)
+
+コールバックは空文字、JavaScript 識別子、または識別子をドットでつないだ名前に限られます（ASCII 英字、数字、`_`、`$`）。不正な値では `ErrInvalidJSONPCallback` を含む HTTP 400 を返し、JSONP 本文は書き込みません。正常な応答には `X-Content-Type-Options: nosniff` が付きます。**どのサイトもユーザーの Cookie とともに JSONP を読み取れる**ため、認証が必要なデータには使わず、CORS を設定した JSON を使用してください。

@@ -51,3 +51,7 @@ e.Use(middleware.AddTrailingSlashWithConfig(middleware.AddTrailingSlashConfig{
 <ConfigReference name="AddTrailingSlashConfig" locale="zh-cn" />
 
 <ConfigReference name="RemoveTrailingSlashConfig" locale="zh-cn" />
+
+## Echo 安全更新 (v5.4.0 / v4.16.0)
+
+尾部斜杠中间件执行重定向时，会先对路径中的控制字符进行百分号编码，再构造 `Location` 标头。

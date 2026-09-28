@@ -99,3 +99,7 @@ RedirectConfig{
 	Code:    http.StatusMovedPermanently,
 }
 ```
+
+## Echo のセキュリティ更新 (v5.4.0 / v4.16.0)
+
+HTTPS リダイレクトは `Context#Scheme()` に依存します。公開アドレスのプロキシを使う場合は[信頼するアドレス範囲](/ja/guide/request-scheme/)を設定してください。未設定だとリダイレクトがループすることがあります。

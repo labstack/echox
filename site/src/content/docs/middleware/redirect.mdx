@@ -25,6 +25,11 @@ e := echo.New()
 e.Pre(middleware.HTTPSRedirect())
 ```
 
+HTTPS redirects use `Context#Scheme()`. Behind a proxy, configure the
+[scheme extractor and trusted proxy ranges](/guide/request-scheme/) so Echo can
+recognize HTTPS. A public proxy address that has not been trusted can cause a
+redirect loop.
+
 ## HTTPS WWW Redirect
 
 HTTPS WWW redirect redirects HTTP requests to www HTTPS. For example,

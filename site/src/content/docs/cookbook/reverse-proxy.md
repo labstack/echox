@@ -9,6 +9,13 @@ This recipe demonstrates how to use Echo as a reverse proxy and load balancer in
 front of your applications, such as WordPress, Node.js, Java, Python, Ruby, or Go.
 For simplicity, the upstreams here are Go servers that also handle WebSocket.
 
+Proxy forwards `X-Forwarded-Proto` from `Context#Scheme()` and drops the older
+`X-Forwarded-Ssl`, `X-Forwarded-Protocol`, and `X-Url-Scheme` headers. In v5 it
+sets `X-Real-IP` from `Context#RealIP()`. If another proxy sits before Echo, set
+the [scheme extractor](/guide/request-scheme/) and [IP extractor](/guide/ip-address/)
+for that trusted proxy; otherwise the upstream may see the proxy's IP or the wrong
+scheme.
+
 ## 1) Identify upstream target URL(s)
 
 ```go

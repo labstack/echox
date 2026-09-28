@@ -200,3 +200,7 @@ func main() {
 	}
 }
 ```
+
+## Actualización de seguridad de Echo (v5.4.0 / v4.16.0)
+
+Proxy reenvía `X-Forwarded-Proto` desde `Context#Scheme()` y elimina las otras cabeceras de esquema. En v5, `X-Real-IP` procede de `Context#RealIP()`. Si hay otro proxy delante de Echo, configura los extractores de [esquema](/es/guide/request-scheme/) e [IP](/es/guide/ip-address/) para que el upstream reciba valores correctos.

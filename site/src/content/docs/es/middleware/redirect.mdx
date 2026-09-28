@@ -98,3 +98,7 @@ RedirectConfig{
 	Code:    http.StatusMovedPermanently,
 }
 ```
+
+## Actualización de seguridad de Echo (v5.4.0 / v4.16.0)
+
+Las redirecciones HTTPS dependen de `Context#Scheme()`. [Configura los rangos de proxies de confianza](/es/guide/request-scheme/): si el proxy tiene una dirección pública no confiable, puede producirse un bucle de redirección.
