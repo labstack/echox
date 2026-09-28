@@ -8,8 +8,9 @@ sidebar:
 Echo can serve static assets such as images, JavaScript, CSS, PDFs, and fonts from
 the filesystem or an embedded filesystem.
 
-Since Echo v5.4.0 and v4.16.0, static files use the same form of the path that
-the router matched. Paths with `.`, `..`, or empty segments (such as
+In Echo v5.4.0 and v4.16.0, Static middleware uses the same form of the path
+that the router matched; `Echo#Static` and `Echo#StaticFS` already used this
+behavior in earlier updates. Paths with `.`, `..`, or empty segments (such as
 `/assets//app.js`) return 404; HTML5 mode can still serve the index. Non-default
 escaping in file names (such as `%2C`, `%40`, or lowercase hex) needs
 `StaticConfig.EnablePathUnescaping` for middleware or
