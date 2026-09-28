@@ -65,6 +65,10 @@ Content is Markdown/MDX under `site/src/content/docs/` (`guide/`, `middleware/`,
 generated from each page's `sidebar.order` frontmatter. Every page needs a
 `title` and `description`.
 
+The build also publishes `/llms.txt` and `/next/llms.txt`. Their page links and
+descriptions come from that same content, and each index identifies its pinned
+Echo source revision. `site:check` verifies both files and their site links.
+
 ## Cookbook recipes
 
 Each folder under `cookbook/` is a self-contained example. Run one with:

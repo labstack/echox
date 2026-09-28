@@ -98,5 +98,18 @@ for (const locale of ['es', 'ja', 'pt-br', 'zh-cn']) {
 for (const path of ['sitemap-index.xml', 'pagefind/pagefind.js']) {
   if (!existsSync(join(distDir, path))) problems.push(`Missing ${path}`);
 }
+for (const path of ['llms.txt', 'next/llms.txt']) {
+  const file = join(distDir, path);
+  if (!existsSync(file)) { problems.push(`Missing ${path}`); continue; }
+  const content = readFileSync(file, 'utf8');
+  if (!content.startsWith('# Echo\n')) problems.push(`${path}: missing Echo heading`);
+  for (const [, link] of content.matchAll(/\]\((https:\/\/echo\.labstack\.com\/[^)]+)\)/g)) {
+    const pathname = new URL(link).pathname;
+    const resolved = resolve(distDir, `.${pathname}`);
+    const target = extname(resolved) ? resolved : join(resolved, 'index.html');
+    if (!existsSync(target)) problems.push(`${path}: missing ${link}`);
+    checked++;
+  }
+}
 if (problems.length) throw new Error(`${problems.length} site check failure(s):\n${problems.join('\n')}`);
 console.log(`Checked ${routes.length} routes and ${checked} internal links/assets; all resolve`);
