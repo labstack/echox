@@ -13,7 +13,7 @@ the router matched. Paths with `.`, `..`, or empty segments (such as
 `/assets//app.js`) return 404; HTML5 mode can still serve the index. Non-default
 escaping in file names (such as `%2C`, `%40`, or lowercase hex) needs
 `StaticConfig.EnablePathUnescaping` for middleware or
-`Config.EnablePathUnescapingStaticFiles` for `Echo#Static` and `Echo#StaticFS`.
+`Config.EnablePathUnescapingStaticFiles` (v5) or `Echo#EnablePathUnescapingStaticFiles` (v4) for `Echo#Static` and `Echo#StaticFS`.
 Those options decode encoded slashes as well, so do not combine them with
 route-based access control for subdirectories.
 
