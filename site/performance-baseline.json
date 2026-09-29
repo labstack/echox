@@ -9,6 +9,7 @@
       "gzip": 19546
     },
     "externalDomains": [
+      "blacksmith.sh",
       "encore.dev",
       "fonts.googleapis.com",
       "fonts.gstatic.com",
@@ -48,6 +49,7 @@
       "gzip": 19549
     },
     "externalDomains": [
+      "blacksmith.sh",
       "encore.dev",
       "fonts.googleapis.com",
       "fonts.gstatic.com",
