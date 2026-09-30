@@ -14,7 +14,7 @@ import (
 func newTestServer(t *testing.T) *echo.Echo {
 	t.Helper()
 	lock.Lock()
-	users = map[int]*user{}
+	users = map[int]user{}
 	seq = 1
 	lock.Unlock()
 
@@ -92,22 +92,62 @@ func TestDeleteUser(t *testing.T) {
 	expectStatus(t, request(t, e, http.MethodGet, "/users/1", ""), http.StatusNotFound)
 }
 
-func TestUserNotFoundAndInvalidID(t *testing.T) {
+func TestListUsers(t *testing.T) {
 	e := newTestServer(t)
+	for _, name := range []string{"a", "b", "c"} {
+		expectStatus(t, request(t, e, http.MethodPost, "/users", `{"name":"`+name+`"}`), http.StatusCreated)
+	}
+
+	rec := request(t, e, http.MethodGet, "/users", "")
+	expectStatus(t, rec, http.StatusOK)
+	var list []user
+	if err := json.Unmarshal(rec.Body.Bytes(), &list); err != nil {
+		t.Fatalf("decode users: %v (body %q)", err, rec.Body.String())
+	}
+	if len(list) != 3 || list[0].ID != 1 || list[1].ID != 2 || list[2].ID != 3 {
+		t.Fatalf("expected users 1, 2, 3 in order, got %+v", list)
+	}
+}
+
+func TestErrors(t *testing.T) {
+	e := newTestServer(t)
+	expectStatus(t, request(t, e, http.MethodPost, "/users", `{"name":"keep"}`), http.StatusCreated)
+
 	tests := []struct {
 		method, path, body string
-		want               int
+		status             int
+		message            string
 	}{
-		{http.MethodGet, "/users/9999", "", http.StatusNotFound},
-		{http.MethodPut, "/users/9999", `{"name":"x"}`, http.StatusNotFound},
-		{http.MethodDelete, "/users/9999", "", http.StatusNotFound},
-		{http.MethodGet, "/users/abc", "", http.StatusBadRequest},
-		{http.MethodPut, "/users/abc", `{"name":"x"}`, http.StatusBadRequest},
-		{http.MethodDelete, "/users/abc", "", http.StatusBadRequest},
+		{http.MethodGet, "/users/9999", "", http.StatusNotFound, "user not found"},
+		{http.MethodPut, "/users/9999", `{"name":"x"}`, http.StatusNotFound, "user not found"},
+		{http.MethodDelete, "/users/9999", "", http.StatusNotFound, "user not found"},
+		{http.MethodGet, "/users/abc", "", http.StatusBadRequest, "invalid user id"},
+		{http.MethodPut, "/users/abc", `{"name":"x"}`, http.StatusBadRequest, "invalid user id"},
+		{http.MethodDelete, "/users/abc", "", http.StatusBadRequest, "invalid user id"},
+		{http.MethodPost, "/users", `{}`, http.StatusBadRequest, "name is required"},
+		{http.MethodPut, "/users/1", "", http.StatusBadRequest, "name is required"},
+		{http.MethodPut, "/users/1", `{}`, http.StatusBadRequest, "name is required"},
 	}
 	for _, tt := range tests {
-		t.Run(tt.method+" "+tt.path, func(t *testing.T) {
-			expectStatus(t, request(t, e, tt.method, tt.path, tt.body), tt.want)
+		t.Run(tt.method+" "+tt.path+" "+tt.body, func(t *testing.T) {
+			rec := request(t, e, tt.method, tt.path, tt.body)
+			expectStatus(t, rec, tt.status)
+			var got struct {
+				Message string `json:"message"`
+			}
+			if err := json.Unmarshal(rec.Body.Bytes(), &got); err != nil || got.Message != tt.message {
+				t.Fatalf("expected message %q, got body %q", tt.message, rec.Body.String())
+			}
 		})
+	}
+
+	// malformed JSON is rejected by Bind
+	expectStatus(t, request(t, e, http.MethodPost, "/users", `{"name":`), http.StatusBadRequest)
+
+	// the failed requests left user 1 unchanged
+	rec := request(t, e, http.MethodGet, "/users/1", "")
+	expectStatus(t, rec, http.StatusOK)
+	if got := decodeUser(t, rec); got.Name != "keep" {
+		t.Fatalf("expected stored name %q, got %q", "keep", got.Name)
 	}
 }

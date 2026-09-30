@@ -1,0 +1,121 @@
+---
+title: CRUD
+description: Create, read, update, and delete resources with Echo and JSON binding.
+sidebar:
+  order: 2
+---
+
+import { Code } from '@astrojs/starlight/components';
+import server from '../../../generated/crud-server.go.txt?raw';
+
+A complete CRUD (create, read, update, delete) API backed by an in-memory store.
+Handlers bind JSON request bodies into a struct, access the store under a lock, and
+return JSON. A missing user returns `404`, and an invalid id or an empty name returns `400`.
+
+## Server
+
+<Code code={server} lang="go" title="cookbook/crud/server.go" />
+
+## Client
+
+### Create user
+
+Request:
+
+```sh
+curl -X POST \
+  -H 'Content-Type: application/json' \
+  -d '{"name":"Joe Smith"}' \
+  localhost:1323/users
+```
+
+Response:
+
+```json
+{
+  "id": 1,
+  "name": "Joe Smith"
+}
+```
+
+### Get user
+
+Request:
+
+```sh
+curl localhost:1323/users/1
+```
+
+Response:
+
+```json
+{
+  "id": 1,
+  "name": "Joe Smith"
+}
+```
+
+### List users
+
+Request:
+
+```sh
+curl localhost:1323/users
+```
+
+Response:
+
+```json
+[
+  {
+    "id": 1,
+    "name": "Joe Smith"
+  }
+]
+```
+
+### Update user
+
+Request:
+
+```sh
+curl -X PUT \
+  -H 'Content-Type: application/json' \
+  -d '{"name":"Joe"}' \
+  localhost:1323/users/1
+```
+
+Response:
+
+```json
+{
+  "id": 1,
+  "name": "Joe"
+}
+```
+
+### Delete user
+
+Request:
+
+```sh
+curl -X DELETE localhost:1323/users/1
+```
+
+Response: `204 No Content`.
+
+### Missing user
+
+Request:
+
+```sh
+curl localhost:1323/users/9999
+```
+
+Response (`404 Not Found`):
+
+```json
+{
+  "message": "user not found"
+}
+```

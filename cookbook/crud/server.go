@@ -1,8 +1,10 @@
 package main
 
 import (
+	"cmp"
 	"context"
 	"net/http"
+	"slices"
 	"sync"
 
 	"github.com/labstack/echo/v5"
@@ -17,7 +19,7 @@ type (
 )
 
 var (
-	users = map[int]*user{}
+	users = map[int]user{}
 	seq   = 1
 	lock  = sync.Mutex{}
 )
@@ -26,28 +28,33 @@ var (
 // Handlers
 //----------
 
+// The store holds user values, so handlers copy a user under the lock and write the response after unlocking.
+
 func createUser(c *echo.Context) error {
-	u := new(user)
-	if err := c.Bind(u); err != nil {
+	var u user
+	if err := c.Bind(&u); err != nil {
 		return err
 	}
+	if u.Name == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, "name is required")
+	}
 	lock.Lock()
-	defer lock.Unlock()
 	// Assign the ID after binding so an "id" in the request body cannot overwrite another user.
 	u.ID = seq
 	users[u.ID] = u
 	seq++
+	lock.Unlock()
 	return c.JSON(http.StatusCreated, u)
 }
 
 func getUser(c *echo.Context) error {
-	id, err := echo.PathParam[int](c, "id")
+	id, err := userID(c)
 	if err != nil {
-		return err // 400 Bad Request for a non-numeric id
+		return err
 	}
 	lock.Lock()
-	defer lock.Unlock()
 	u, ok := users[id]
+	lock.Unlock()
 	if !ok {
 		return echo.NewHTTPError(http.StatusNotFound, "user not found")
 	}
@@ -55,43 +62,63 @@ func getUser(c *echo.Context) error {
 }
 
 func updateUser(c *echo.Context) error {
-	id, err := echo.PathParam[int](c, "id")
+	id, err := userID(c)
 	if err != nil {
 		return err
 	}
-	// Bind before taking the lock so a slow request body does not block other requests.
-	u := new(user)
-	if err := c.Bind(u); err != nil {
+	var u user
+	if err := c.Bind(&u); err != nil {
 		return err
 	}
+	if u.Name == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, "name is required")
+	}
 	lock.Lock()
-	defer lock.Unlock()
-	existingUser, ok := users[id]
+	existing, ok := users[id]
+	if ok {
+		existing.Name = u.Name
+		users[id] = existing
+	}
+	lock.Unlock()
 	if !ok {
 		return echo.NewHTTPError(http.StatusNotFound, "user not found")
 	}
-	existingUser.Name = u.Name
-	return c.JSON(http.StatusOK, existingUser)
+	return c.JSON(http.StatusOK, existing)
 }
 
 func deleteUser(c *echo.Context) error {
-	id, err := echo.PathParam[int](c, "id")
+	id, err := userID(c)
 	if err != nil {
 		return err
 	}
 	lock.Lock()
-	defer lock.Unlock()
-	if _, ok := users[id]; !ok {
+	_, ok := users[id]
+	delete(users, id)
+	lock.Unlock()
+	if !ok {
 		return echo.NewHTTPError(http.StatusNotFound, "user not found")
 	}
-	delete(users, id)
 	return c.NoContent(http.StatusNoContent)
 }
 
 func getAllUsers(c *echo.Context) error {
 	lock.Lock()
-	defer lock.Unlock()
-	return c.JSON(http.StatusOK, users)
+	list := make([]user, 0, len(users))
+	for _, u := range users {
+		list = append(list, u)
+	}
+	lock.Unlock()
+	slices.SortFunc(list, func(a, b user) int { return cmp.Compare(a.ID, b.ID) })
+	return c.JSON(http.StatusOK, list)
+}
+
+// userID returns the :id path parameter, or a 400 error when it is not a number.
+func userID(c *echo.Context) (int, error) {
+	id, err := echo.PathParam[int](c, "id")
+	if err != nil {
+		return 0, echo.NewHTTPError(http.StatusBadRequest, "invalid user id")
+	}
+	return id, nil
 }
 
 func newServer() *echo.Echo {
