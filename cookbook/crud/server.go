@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"net/http"
-	"strconv"
 	"sync"
 
 	"github.com/labstack/echo/v5"
@@ -28,34 +27,45 @@ var (
 //----------
 
 func createUser(c *echo.Context) error {
-	lock.Lock()
-	defer lock.Unlock()
-	u := &user{
-		ID: seq,
-	}
+	u := new(user)
 	if err := c.Bind(u); err != nil {
 		return err
 	}
+	lock.Lock()
+	defer lock.Unlock()
+	// Assign the ID after binding so an "id" in the request body cannot overwrite another user.
+	u.ID = seq
 	users[u.ID] = u
 	seq++
 	return c.JSON(http.StatusCreated, u)
 }
 
 func getUser(c *echo.Context) error {
+	id, err := echo.PathParam[int](c, "id")
+	if err != nil {
+		return err // 400 Bad Request for a non-numeric id
+	}
 	lock.Lock()
 	defer lock.Unlock()
-	id, _ := strconv.Atoi(c.Param("id"))
-	return c.JSON(http.StatusOK, users[id])
+	u, ok := users[id]
+	if !ok {
+		return echo.NewHTTPError(http.StatusNotFound, "user not found")
+	}
+	return c.JSON(http.StatusOK, u)
 }
 
 func updateUser(c *echo.Context) error {
-	lock.Lock()
-	defer lock.Unlock()
+	id, err := echo.PathParam[int](c, "id")
+	if err != nil {
+		return err
+	}
+	// Bind before taking the lock so a slow request body does not block other requests.
 	u := new(user)
 	if err := c.Bind(u); err != nil {
 		return err
 	}
-	id, _ := strconv.Atoi(c.Param("id"))
+	lock.Lock()
+	defer lock.Unlock()
 	existingUser, ok := users[id]
 	if !ok {
 		return echo.NewHTTPError(http.StatusNotFound, "user not found")
@@ -65,9 +75,15 @@ func updateUser(c *echo.Context) error {
 }
 
 func deleteUser(c *echo.Context) error {
+	id, err := echo.PathParam[int](c, "id")
+	if err != nil {
+		return err
+	}
 	lock.Lock()
 	defer lock.Unlock()
-	id, _ := strconv.Atoi(c.Param("id"))
+	if _, ok := users[id]; !ok {
+		return echo.NewHTTPError(http.StatusNotFound, "user not found")
+	}
 	delete(users, id)
 	return c.NoContent(http.StatusNoContent)
 }
@@ -78,7 +94,7 @@ func getAllUsers(c *echo.Context) error {
 	return c.JSON(http.StatusOK, users)
 }
 
-func main() {
+func newServer() *echo.Echo {
 	e := echo.New()
 
 	// Middleware
@@ -91,6 +107,11 @@ func main() {
 	e.GET("/users/:id", getUser)
 	e.PUT("/users/:id", updateUser)
 	e.DELETE("/users/:id", deleteUser)
+	return e
+}
+
+func main() {
+	e := newServer()
 
 	// Start server
 	sc := echo.StartConfig{Address: ":1323"}
