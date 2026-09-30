@@ -3,6 +3,7 @@ package main
 import (
 	"log/slog"
 	"net/http"
+	"os"
 
 	"github.com/casbin/casbin/v3"
 	"github.com/golang-jwt/jwt/v5"
@@ -10,6 +11,7 @@ import (
 	"github.com/labstack/echo/v5"
 )
 
+// docs:start middleware
 // NewCasbinMiddleware returns middleware for [Casbin](https://casbin.org/).
 func NewCasbinMiddleware(enforcer *casbin.Enforcer, userGetter func(*echo.Context) (string, error)) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
@@ -28,6 +30,8 @@ func NewCasbinMiddleware(enforcer *casbin.Enforcer, userGetter func(*echo.Contex
 	}
 }
 
+// docs:end middleware
+
 /*
 Test with:
 curl -v "http://localhost:8080/dataset1/any" -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ"
@@ -35,10 +39,13 @@ curl -v "http://localhost:8080/dataset1/any" -H "Authorization: Bearer eyJhbGciO
 func main() {
 	e := echo.New()
 
+	// docs:start enforcer
 	ce, err := casbin.NewEnforcer("auth_model.conf", "auth_policy.csv")
 	if err != nil {
 		slog.Error("failed to initialize Casbin enforcer", "error", err)
+		os.Exit(1)
 	}
+	// docs:end enforcer
 
 	// BasicAuth middleware does authentication
 	// - should pass `curl -v -u "alice:password" http://localhost:8080/dataset1/any`
@@ -53,6 +60,7 @@ func main() {
 	//}
 	//e.Use(NewCasbinMiddleware(ce, basicAuthUser)) // Casbin does authorization
 
+	// docs:start jwt
 	e.Use(echojwt.JWT([]byte("secret")))               // JWT middleware does authentication
 	jwtUser := func(c *echo.Context) (string, error) { // JWT user getter for Casbin authorization
 		token, err := echo.ContextGet[*jwt.Token](c, "user")
@@ -62,6 +70,7 @@ func main() {
 		return token.Claims.GetSubject()
 	}
 	e.Use(NewCasbinMiddleware(ce, jwtUser)) // Casbin does authorization
+	// docs:end jwt
 
 	e.GET("/*", func(c *echo.Context) error {
 		return c.String(http.StatusOK, "Hello, World!")

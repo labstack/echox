@@ -66,7 +66,12 @@ function readSnippet(specifier, root) {
   } catch (error) {
     throw new Error(`Cannot include ${path}: ${error.message}`);
   }
-  const lines = source.split('\n');
+  return sourceSnippet(source, region, path);
+}
+
+/** Extract the same source regions from Vite raw imports and Markdown includes. */
+export function sourceSnippet(source, region, path = 'source') {
+  const lines = source.replace(/\r\n/g, '\n').split('\n');
   if (region !== undefined) {
     const starts = [];
     const ends = [];

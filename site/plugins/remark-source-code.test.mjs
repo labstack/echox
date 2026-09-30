@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { unified } from 'unified';
-import remarkSourceCode, { sourceReference, withSourceCode } from './remark-source-code.mjs';
+import remarkSourceCode, { sourceReference, sourceSnippet, withSourceCode } from './remark-source-code.mjs';
 import { parseSourceDocument, visitCode } from './source-document.mjs';
 import { localePrefixes } from '../src/locales.mjs';
 
@@ -210,5 +210,26 @@ test('every cookbook page in every locale displays source-owned programs and exc
         assert.doesNotMatch(code[index].value, /\/\/\s*docs:(?:start|end)\b/);
       }
     }
+  }
+});
+
+test('raw component imports and Markdown includes share source excerpts; Casbin middleware appears once per locale', () => {
+  const root = fileURLToPath(new URL('../..', import.meta.url));
+  const path = 'cookbook/hello-world/server.go';
+  const code = sourceSnippet(readFileSync(join(root, path), 'utf8'), 'hero', path);
+  const [included] = programFences(render(`\x60\x60\x60go file=${path}#hero\n\x60\x60\x60`, root));
+  assert.equal(code, included.value);
+  assert.match(code, /e\.GET\("\/"/);
+  assert.doesNotMatch(code, /docs:(start|end)/);
+  for (const locale of localePrefixes) {
+    const page = join(root, 'site/src/content/docs', locale, 'middleware/casbin-auth.md');
+    const rendered = render(readFileSync(page, 'utf8'), root, page);
+    const fences = programFences(rendered);
+    const declarations = fences.flatMap((fence) => [...fence.value.matchAll(/^func NewCasbinMiddleware\b/gm)]);
+    assert.equal(declarations.length, 1, `${locale}Casbin middleware has a single source-backed definition`);
+    assert.ok(fences.some((fence) => fence.value.includes('enforcer.Enforce(')));
+    assert.ok(fences.some((fence) => fence.value.includes('casbin.NewEnforcer(')), `${locale}the enforcer used by the excerpts is defined`);
+    assert.ok(fences.some((fence) => fence.value.includes('echojwt.JWT(')));
+    assert.ok(!fences.some((fence) => /^package main\b/m.test(fence.value)), 'the full server is linked rather than duplicated');
   }
 });

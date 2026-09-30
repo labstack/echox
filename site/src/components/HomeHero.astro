@@ -1,10 +1,16 @@
 ---
 // Living Terminal hero: code window + a terminal pane that types `curl`
-// and streams Echo's JSON response. Animation is client-side, with a
-// static final-state fallback for reduced-motion / no-JS.
+// and shows the runnable example's response. Animation is client-side, with a
+// static final-state fallback for reduced motion.
 import { starsLabel } from '../data/github.ts';
 import stable from '../generated/echo-source.json';
+import { Code } from 'astro:components';
+import helloWorldSource from '../../../cookbook/hello-world/server.go?raw';
+import { sourceSnippet } from '../../plugins/remark-source-code.mjs';
 const next = process.env.DOCS_CHANNEL === 'next';
+const helloWorldCode = sourceSnippet(helloWorldSource, 'hero', 'cookbook/hello-world/server.go');
+// The code window is aria-hidden, so Shiki's <pre> must not be a tab stop.
+const notFocusable = { pre(node: { properties: Record<string, unknown> }) { delete node.properties.tabindex; } };
 ---
 
 <section class="hh">
@@ -28,19 +34,9 @@ const next = process.env.DOCS_CHANNEL === 'next';
   <div class="hh-win" aria-hidden="true">
     <div class="bar">
       <i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i>
-      <span class="fn">main.go</span>
+      <span class="fn">server.go · excerpt</span>
     </div>
-    <pre><span class="kw">package</span> main
-
-<span class="kw">import</span> <span class="str">"github.com/labstack/echo/v5"</span>
-
-<span class="kw">func</span> <span class="fnn">main</span>() &#123;
-    e := echo.<span class="fnn">New</span>()
-    e.<span class="fnn">GET</span>(<span class="str">"/"</span>, <span class="kw">func</span>(c *echo.Context) <span class="kw">error</span> &#123;
-        <span class="kw">return</span> c.<span class="fnn">JSON</span>(<span class="str">200</span>, <span class="kw">map</span>[<span class="kw">string</span>]<span class="kw">string</span>&#123;<span class="str">"message"</span>: <span class="str">"Hello, World!"</span>&#125;)
-    &#125;)
-    e.<span class="fnn">Start</span>(<span class="str">":1323"</span>)
-&#125;</pre>
+    <Code code={helloWorldCode} lang="go" style="background: transparent" transformers={[notFocusable]} />
     <div class="hh-term" data-term>
       <div><span class="pr">~/echo $</span> <span data-cmd></span><span class="hh-cur" data-cur></span></div>
       <div data-out></div>
@@ -77,8 +73,8 @@ const next = process.env.DOCS_CHANNEL === 'next';
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     const response =
-      '<span class="dim">HTTP/1.1 200 OK · 0 allocations</span>\n' +
-      '<span class="json">{ "message": "Hello, World!" }</span>';
+      '<span class="dim">HTTP/1.1 200 OK</span>\n' +
+      '<span class="json">Hello, World!</span>';
     const cmd = 'curl localhost:1323';
 
     const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));

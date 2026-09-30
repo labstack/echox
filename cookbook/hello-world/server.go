@@ -10,6 +10,7 @@ import (
 
 func main() {
 	// Echo instance
+	// docs:start hero
 	e := echo.New()
 
 	// Middleware
@@ -20,6 +21,7 @@ func main() {
 	e.GET("/", func(c *echo.Context) error {
 		return c.String(http.StatusOK, "Hello, World!\n")
 	})
+	// docs:end hero
 
 	// Start server
 	sc := echo.StartConfig{Address: ":1323"}
