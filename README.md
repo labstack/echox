@@ -29,6 +29,12 @@ are checked against `site/external-baseline.json`. Shared Echo/JWT versions
 must agree between the two Go modules. Dependabot groups Go dependency updates
 across both directories into one PR.
 
+Released external middleware packages are compiled against stable Echo with
+the `docs_external` build tag. Next and `ECHO_SOURCE_DIR` workspaces validate
+the Echo examples and extract the external API facts from their selected module
+versions. Dependabot has separate groups for Go version and security updates
+across both directories.
+
 ```bash
 cd site
 npm install

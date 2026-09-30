@@ -1,15 +1,16 @@
 import assert from 'node:assert/strict';
-import { copyFileSync, mkdtempSync, mkdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+import { copyFileSync, mkdtempSync, mkdirSync, readFileSync, realpathSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
-import { echoSource, moduleSources, preparedSource, createWorkspace, run } from './module-sources.mjs';
+import { checkReference, echoSource, moduleSources, preparedSource, createWorkspace, run } from './module-sources.mjs';
 import { reportApiChanges } from './report-api.mjs';
+import { formatRevision } from '../src/data/source.mjs';
 
 function fixture(t, referenceVersion = 'v5.4.0') {
-  const repo = mkdtempSync(join(tmpdir(), 'echox-modules-'));
+  const repo = realpathSync(mkdtempSync(join(tmpdir(), 'echox-modules-')));
   t.after(() => rmSync(repo, { recursive: true, force: true }));
   const site = join(repo, 'site');
   const reference = join(repo, 'reference');
@@ -73,6 +74,30 @@ test('Go creates a workspace for the actual modules, replacing an old workspace'
   const data = JSON.parse(run('go', ['work', 'edit', '-json'], workspace, { GOWORK: path }));
   assert.deepEqual(data.Use.map((entry) => entry.DiskPath).sort(), [repo, reference].sort());
   assert.ok(data.Go);
+});
+
+test('next reference checks skip external middleware incompatible with the Echo workspace', (t) => {
+  const { repo, reference } = fixture(t);
+  mkdirSync(join(reference, 'example'));
+  writeFileSync(join(reference, 'example/main.go'), 'package main\n\nfunc main() {}\n');
+  copyFileSync(new URL('../../reference/modules.go', import.meta.url), join(reference, 'modules.go'));
+  const modules = ['github.com/labstack/echo-jwt/v5', 'github.com/labstack/echo-otel/v5', 'github.com/labstack/echo-prometheus'];
+  for (const [i, module] of modules.entries()) {
+    const directory = join(repo, `external-${i}`);
+    mkdirSync(directory);
+    writeFileSync(join(directory, 'go.mod'), `module ${module}\n\ngo 1.25.0\n`);
+    writeFileSync(join(directory, 'external.go'), i === 0 ? 'package external\n\nvar _ = removedEchoAPI\n' : 'package external\n');
+    run('go', ['mod', 'edit', `-require=${module}@${module.endsWith('/v5') ? 'v5.0.0' : 'v0.0.1'}`, `-replace=${module}=${directory}`], reference);
+  }
+  const environment = { GOWORK: createWorkspace(join(repo, '.cache/work'), repo, reference) };
+  checkReference('next', reference, environment);
+  assert.throws(() => checkReference('stable', reference, environment), /undefined: removedEchoAPI/);
+});
+
+test('display full release/prerelease tags and shorten only hexadecimal commit refs', () => {
+  for (const tag of ['v5.4.0', 'v5.10.10', 'v5.5.0-rc.1', 'release-preview']) assert.equal(formatRevision(tag), tag);
+  assert.equal(formatRevision('5196b9b0ad8f683fa4bf7172a37805f4651a7975'), '5196b9b');
+  assert.equal(formatRevision('5196b9b0ad8f'), '5196b9b');
 });
 
 test('API summary reports success and retains the actionable diff on failure', (t) => {

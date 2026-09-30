@@ -11,6 +11,10 @@ updates:
       go-dependencies:
         patterns:
           - "*"
+      go-security-dependencies:
+        applies-to: security-updates
+        patterns:
+          - "*"
 
   # Astro docs site (site/). Group everything into a single weekly PR so the
   # advisory stream is one reviewed change, not nonstop noise. No auto-merge —

@@ -1,8 +1,11 @@
+//go:build docs_external
+
 // SPDX-License-Identifier: MIT
 
 // Package reference keeps the middleware packages used by the documentation's
-// API extractor in the Go module graph. CI compiles them with the examples, and
-// Dependabot updates their versions in reference/go.mod.
+// API extractor in the Go module graph. Source preparation enables docs_external
+// to compile them against stable Echo. Next and proposed Echo workspaces compile
+// only the Echo examples and extractor; Dependabot tracks all module versions.
 package reference
 
 import (

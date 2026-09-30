@@ -74,6 +74,12 @@ export function createWorkspace(workspaceDir, sourceDir, referenceDir) {
   return workspaceFile;
 }
 
+export function checkReference(channel, referenceDir, environment) {
+  const tags = channel === 'stable' ? ['-tags=docs_external'] : [];
+  run('go', ['vet', ...tags, './...'], referenceDir, environment);
+  run('go', ['test', '-race', ...tags, './...'], referenceDir, environment);
+}
+
 export function preparedSource(siteDir) {
   const channel = process.env.DOCS_CHANNEL === 'next' ? 'next' : 'stable';
   const sources = moduleSources(siteDir);

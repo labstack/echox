@@ -1,7 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { createWorkspace, downloadModule, echoSource, moduleSources, run } from './module-sources.mjs';
+import { checkReference, createWorkspace, downloadModule, echoSource, moduleSources, run } from './module-sources.mjs';
 
 const siteDir = fileURLToPath(new URL('..', import.meta.url));
 const repoDir = dirname(siteDir);
@@ -43,8 +43,7 @@ const manifest = JSON.parse(manifestText);
 if (manifest.revision !== revision || !manifest.configs.some((config) => config.name === 'RequestLoggerConfig') || !manifest.configs.some((config) => config.name === 'StaticConfig')) {
   throw new Error('Echo source extractor returned an incomplete or mismatched manifest');
 }
-run('go', ['vet', './...'], referenceDir, goEnvironment);
-run('go', ['test', '-race', './...'], referenceDir, goEnvironment);
+checkReference(channel, referenceDir, goEnvironment);
 mkdirSync(generatedDir, { recursive: true });
 writeFileSync(join(generatedDir, 'config-fields.json'), `${JSON.stringify(manifest, null, 2)}\n`);
 writeFileSync(join(generatedDir, 'echo-source.json'), `${JSON.stringify({ ...pin, revision }, null, 2)}\n`);

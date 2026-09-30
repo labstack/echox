@@ -1,6 +1,7 @@
 ---
 import stable from '../generated/echo-source.json';
 import manifest from '../generated/config-fields.json';
+import { formatRevision } from '../data/source.mjs';
 
 const isNext = process.env.DOCS_CHANNEL === 'next';
 const revision = manifest.revision;
@@ -20,7 +21,7 @@ const counterpart = /\/(?:404|404\.html)\/?$/.test(path)
 
 <nav class="echo-version-banner" aria-label="Documentation version" data-pagefind-ignore>
   <strong>{isNext ? labels.next : `${labels.release} · Echo ${stable.release}`}</strong>
-  <span>· {labels.source} <a href={`https://github.com/labstack/echo/tree/${revision}`}>{revision.slice(0, 7)}</a></span>
+  <span>· {labels.source} <a href={`https://github.com/labstack/echo/tree/${revision}`}>{formatRevision(revision)}</a></span>
   <a class="switch" data-version-switch href={counterpart}>{labels.switch} →</a>
 </nav>
 
