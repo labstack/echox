@@ -1,0 +1,120 @@
+---
+title: CRUD
+description: 使用 Echo 和 JSON 绑定创建、读取、更新和删除资源。
+sidebar:
+  order: 2
+---
+
+import { Code } from '@astrojs/starlight/components';
+import server from '../../../../generated/crud-server.go.txt?raw';
+
+一个由内存 store 支撑的完整 CRUD（create, read, update, delete）API。处理函数把 JSON
+请求体绑定到 struct，在锁保护下访问 store，并返回 JSON。用户不存在时返回 `404`，id 无效或 name 为空时返回 `400`。
+
+## 服务器
+
+<Code code={server} lang="go" title="cookbook/crud/server.go" />
+
+## 客户端
+
+### 创建用户
+
+请求：
+
+```sh
+curl -X POST \
+  -H 'Content-Type: application/json' \
+  -d '{"name":"Joe Smith"}' \
+  localhost:1323/users
+```
+
+响应：
+
+```json
+{
+  "id": 1,
+  "name": "Joe Smith"
+}
+```
+
+### 获取用户
+
+请求：
+
+```sh
+curl localhost:1323/users/1
+```
+
+响应：
+
+```json
+{
+  "id": 1,
+  "name": "Joe Smith"
+}
+```
+
+### 列出用户
+
+请求：
+
+```sh
+curl localhost:1323/users
+```
+
+响应：
+
+```json
+[
+  {
+    "id": 1,
+    "name": "Joe Smith"
+  }
+]
+```
+
+### 更新用户
+
+请求：
+
+```sh
+curl -X PUT \
+  -H 'Content-Type: application/json' \
+  -d '{"name":"Joe"}' \
+  localhost:1323/users/1
+```
+
+响应：
+
+```json
+{
+  "id": 1,
+  "name": "Joe"
+}
+```
+
+### 删除用户
+
+请求：
+
+```sh
+curl -X DELETE localhost:1323/users/1
+```
+
+响应：`204 No Content`。
+
+### 用户不存在
+
+请求：
+
+```sh
+curl localhost:1323/users/9999
+```
+
+响应（`404 Not Found`）：
+
+```json
+{
+  "message": "user not found"
+}
+```

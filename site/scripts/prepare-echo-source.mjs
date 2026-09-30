@@ -69,4 +69,5 @@ for (const [slug, source] of Object.entries(externalSources)) {
 }
 copyFileSync(join(referenceDir, 'request-logger', 'main.go'), join(generatedDir, 'request-logger.go.txt'));
 copyFileSync(join(referenceDir, 'static', 'main.go'), join(generatedDir, 'static.go.txt'));
+copyFileSync(join(repoDir, 'cookbook', 'crud', 'server.go'), join(generatedDir, 'crud-server.go.txt'));
 console.log(`Prepared Echo source ${revision}`);
