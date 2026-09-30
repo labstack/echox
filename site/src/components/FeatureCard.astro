@@ -1,0 +1,49 @@
+---
+// Starlight's <Card> with an <h3> title: Card renders its title as a <p>,
+// which drops homepage feature titles out of the heading outline.
+import { Icon } from '@astrojs/starlight/components';
+import type { StarlightIcon } from '@astrojs/starlight/types';
+
+interface Props {
+	icon: StarlightIcon;
+	title: string;
+}
+
+const { icon, title } = Astro.props;
+---
+
+<article class="card sl-flex">
+	<h3 class="title sl-flex">
+		<Icon name={icon} class="icon" size="1.333em" />
+		<span>{title}</span>
+	</h3>
+	<div class="body"><slot /></div>
+</article>
+
+<style>
+	/* Card's base layout, in Card's layer so terminal.css theme overrides still win. */
+	@layer starlight.components {
+		.card {
+			border: 1px solid var(--sl-color-gray-5);
+			background-color: var(--sl-color-black);
+			padding: clamp(1rem, calc(0.125rem + 3vw), 2.5rem);
+			flex-direction: column;
+			gap: clamp(0.5rem, calc(0.125rem + 1vw), 1rem);
+		}
+		.title {
+			font-weight: 600;
+			font-size: var(--sl-text-h4);
+			color: var(--sl-color-white);
+			line-height: var(--sl-line-height-headings);
+			gap: 1rem;
+			align-items: center;
+		}
+		.card .icon {
+			flex-shrink: 0;
+		}
+		.card .body {
+			margin: 0;
+			font-size: clamp(var(--sl-text-sm), calc(0.5rem + 1vw), var(--sl-text-body));
+		}
+	}
+</style>

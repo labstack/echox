@@ -196,7 +196,7 @@ site-search button { border-radius: 8px !important; }
 .echo-stats span { font-size: 0.8rem; color: var(--sl-color-gray-4); }
 .echo-features { margin-top: 28px; }
 .echo-features .card { border-color: var(--sl-color-hairline); background: var(--sl-color-bg-sidebar); border-radius: 13px; padding: 20px; }
-.echo-features .card .title { font-family: var(--sl-font); font-size: 1.05rem; gap: .7rem; }
+.echo-features .card .title { font-family: var(--sl-font); font-weight: 600; letter-spacing: normal; font-size: 1.05rem; gap: .7rem; }
 .echo-features .card .icon { padding: 0; border: 0; background: none; color: var(--echo-cyan-text); }
 .echo-features .card .body { color: var(--sl-color-gray-3); font-size: .9rem; line-height: 1.62; }
 .echo-features .card-grid, .echo-eco .card-grid { grid-template-columns: minmax(0, 1fr); gap: 14px; }

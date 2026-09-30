@@ -14,9 +14,10 @@ hero:
 tableOfContents: false
 ---
 
+import FeatureCard from '../../components/FeatureCard.astro';
 import HomeHero from '../../components/HomeHero.astro';
 import { starsLabel } from '../../data/github.ts';
-import { Card, CardGrid, Code, LinkButton, LinkCard, Steps } from '@astrojs/starlight/components';
+import { CardGrid, Code, LinkButton, LinkCard, Steps } from '@astrojs/starlight/components';
 import { Image } from 'astro:assets';
 import helloWorldSource from '../../../../cookbook/hello-world/server.go?raw';
 import { sourceSnippet } from '../../../plugins/remark-source-code.mjs';
@@ -36,12 +37,12 @@ export const helloWorldRoute = sourceSnippet(helloWorldSource, 'route', 'cookboo
 
 <div class="echo-features not-content">
   <CardGrid>
-    <Card title="Optimized Router" icon="rocket">Radix-tree routing with zero dynamic allocation and smart route prioritization.</Card>
-    <Card title="Batteries-included Middleware" icon="setting">CORS, JWT, rate-limit, gzip, recover, request logging — 25+ built in.</Card>
-    <Card title="Data Binding" icon="document">Bind JSON, XML, form, query &amp; path params into typed structs, with validation.</Card>
-    <Card title="Automatic TLS" icon="padlock">HTTPS out of the box via Let's Encrypt, plus HTTP/2 support.</Card>
-    <Card title="Extensible" icon="puzzle">Composable middleware and a clean, minimal interface for total control.</Card>
-    <Card title="Templates" icon="window">Plug in any Go template engine for fast, flexible HTML rendering.</Card>
+    <FeatureCard title="Optimized Router" icon="rocket">Radix-tree routing with zero dynamic allocation and smart route prioritization.</FeatureCard>
+    <FeatureCard title="Batteries-included Middleware" icon="setting">CORS, JWT, rate-limit, gzip, recover, request logging — 25+ built in.</FeatureCard>
+    <FeatureCard title="Data Binding" icon="document">Bind JSON, XML, form, query &amp; path params into typed structs, with validation.</FeatureCard>
+    <FeatureCard title="Automatic TLS" icon="padlock">HTTPS out of the box via Let's Encrypt, plus HTTP/2 support.</FeatureCard>
+    <FeatureCard title="Extensible" icon="puzzle">Composable middleware and a clean, minimal interface for total control.</FeatureCard>
+    <FeatureCard title="Templates" icon="window">Plug in any Go template engine for fast, flexible HTML rendering.</FeatureCard>
   </CardGrid>
 </div>
 
@@ -52,8 +53,8 @@ export const helloWorldRoute = sourceSnippet(helloWorldSource, 'route', 'cookboo
     <ol>
       <li>
         <h3>Install</h3>
-        <p>Add Echo to your module.</p>
-        <Code code="go get github.com/labstack/echo/v5" lang="bash" frame="none" wrap />
+        <p>Create a module and add Echo.</p>
+        <Code code={'go mod init myapp\ngo get github.com/labstack/echo/v5'} lang="bash" frame="none" wrap />
       </li>
       <li>
         <h3>Write</h3>
