@@ -52,7 +52,7 @@ func main() {
 func configureBlogProxy(e *echo.Echo, targets []*middleware.ProxyTarget) {
 	// docs:start grouped-proxy
 	// Canonicalize the group root so relative WebSocket URLs stay under /blog/.
-	e.GET("/blog", func(c *echo.Context) error {
+	e.Any("/blog", func(c *echo.Context) error {
 		location := "/blog/"
 		if query := c.Request().URL.RawQuery; query != "" {
 			location += "?" + query
