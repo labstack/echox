@@ -56,8 +56,12 @@ func updateUser(c *echo.Context) error {
 		return err
 	}
 	id, _ := strconv.Atoi(c.Param("id"))
-	users[id].Name = u.Name
-	return c.JSON(http.StatusOK, users[id])
+	existingUser, ok := users[id]
+	if !ok {
+		return echo.NewHTTPError(http.StatusNotFound, "user not found")
+	}
+	existingUser.Name = u.Name
+	return c.JSON(http.StatusOK, existingUser)
 }
 
 func deleteUser(c *echo.Context) error {
