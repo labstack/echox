@@ -23,7 +23,9 @@ func login(c *echo.Context) error {
 	username := c.FormValue("username")
 	password := c.FormValue("password")
 
-	// Throws unauthorized error
+	// Demo only: hard-coded credentials compared in plain text. In production,
+	// look up the user and verify a hashed password with a constant-time compare
+	// (e.g. golang.org/x/crypto/bcrypt's CompareHashAndPassword) to avoid timing attacks.
 	if username != "jon" || password != "shhh!" {
 		return echo.ErrUnauthorized
 	}

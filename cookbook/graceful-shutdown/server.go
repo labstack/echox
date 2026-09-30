@@ -1,3 +1,4 @@
+// docs:start primary-server
 package main
 
 import (
@@ -32,6 +33,9 @@ func main() {
 	}
 }
 
+// docs:end primary-server
+
+// docs:start custom-server
 func mainWithHTTPServer() {
 	// Setup
 	e := echo.New()
@@ -60,3 +64,5 @@ func mainWithHTTPServer() {
 		e.Logger.Error("failed to stop server", "error", err)
 	}
 }
+
+// docs:end custom-server

@@ -5,15 +5,13 @@ sidebar:
   order: 2
 ---
 
-import { Code } from '@astrojs/starlight/components';
-import server from '../../../../generated/crud-server.go.txt?raw';
-
 一个由内存 store 支撑的完整 CRUD（create, read, update, delete）API。处理函数把 JSON
 请求体绑定到 struct，在锁保护下访问 store，并返回 JSON。用户不存在时返回 `404`，id 无效或 name 为空时返回 `400`。
 
 ## 服务器
 
-<Code code={server} lang="go" title="cookbook/crud/server.go" />
+```go file=cookbook/crud/server.go title="cookbook/crud/server.go"
+```
 
 ## 客户端
 

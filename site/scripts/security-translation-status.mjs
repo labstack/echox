@@ -20,7 +20,6 @@ const pages = [
   'middleware/static.mdx',
   'middleware/trailing-slash.mdx',
   'cookbook/reverse-proxy.md',
-  'cookbook/jsonp.md',
 ];
 
 function hash(path) {

@@ -26,47 +26,19 @@ um certificado de uma [certificate authority](https://en.wikipedia.org/wiki/Cert
 
 ## 2. Criar um handler que ecoa informações do request
 
-```go
-e.GET("/request", func(c *echo.Context) error {
-	req := c.Request()
-	format := `
-		<code>
-			Protocol: %s<br>
-			Host: %s<br>
-			Remote Address: %s<br>
-			Method: %s<br>
-			Path: %s<br>
-		</code>
-	`
-	return c.HTML(http.StatusOK, fmt.Sprintf(format, req.Proto, req.Host, req.RemoteAddr, req.Method, req.URL.Path))
-})
+```go file=cookbook/http2/server.go#handler
 ```
 
 ## 3. Iniciar o servidor TLS
 
 Inicie o servidor com o certificado e a chave gerados:
 
-```go
-sc := echo.StartConfig{Address: ":1323"}
-if err := sc.StartTLS(context.Background(), e, "cert.pem", "key.pem"); err != nil {
-	e.Logger.Error("failed to start server", "error", err)
-}
+```go file=cookbook/http2/server.go#start-tls
 ```
 
 Como alternativa, use um `http.Server` customizado com seu próprio `tls.Config`:
 
-```go
-s := http.Server{
-  Addr:    ":8443",
-  Handler: e, // set Echo as handler
-  TLSConfig: &tls.Config{
-    //Certificates: nil, // <-- s.ListenAndServeTLS will populate this field
-  },
-  //ReadTimeout: 30 * time.Second, // use custom timeouts
-}
-if err := s.ListenAndServeTLS("cert.pem", "key.pem"); err != http.ErrServerClosed {
-  log.Fatal(err)
-}
+```go file=cookbook/http2/server.go#custom-server
 ```
 
 ## 4. Verificar
@@ -84,35 +56,5 @@ Path: /
 
 ## Código-fonte
 
-```go
-package main
-
-import (
-	"context"
-	"fmt"
-	"net/http"
-
-	"github.com/labstack/echo/v5"
-)
-
-func main() {
-	e := echo.New()
-	e.GET("/request", func(c *echo.Context) error {
-		req := c.Request()
-		format := `
-			<code>
-				Protocol: %s<br>
-				Host: %s<br>
-				Remote Address: %s<br>
-				Method: %s<br>
-				Path: %s<br>
-			</code>
-		`
-		return c.HTML(http.StatusOK, fmt.Sprintf(format, req.Proto, req.Host, req.RemoteAddr, req.Method, req.URL.Path))
-	})
-	sc := echo.StartConfig{Address: ":1323"}
-	if err := sc.StartTLS(context.Background(), e, "cert.pem", "key.pem"); err != nil {
-		e.Logger.Error("failed to start server", "error", err)
-	}
-}
+```go file=cookbook/http2/server.go
 ```

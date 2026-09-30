@@ -9,8 +9,8 @@
       "translation": "b0d013a4815b476b79bec8b4d0d31b6fe3af791dc174b3974ab6008d53e83f37"
     },
     "guide/response.md": {
-      "source": "762d690e149acfab27231c767db5a55f6019c39c7899f160e9ae7b6fe408d385",
-      "translation": "3659f9bf0527d65ee19b6c05472122b718c291c2faa16e70430981be8de334aa"
+      "source": "3744474f5a64f99faaeafeae850340fc6064fdc0a062f8d714d6da70b622122a",
+      "translation": "1897466d7225e6e46de0cb419c08bc375d19dd1b3475bd271527e2c388b259a8"
     },
     "guide/static-files.md": {
       "source": "e806b7ae28bd328dcedb61d4a52f52da96d310a139989540459c12c9894078ef",
@@ -45,12 +45,8 @@
       "translation": "1000ae874beea68b73adc5fd2bf4d57d355d7c20c6f4fff237b0ad6a2343b973"
     },
     "cookbook/reverse-proxy.md": {
-      "source": "e7e9a24046aa733ba091c6dd74bc77172c43c2e0a0fbbcff22414351a36be56c",
-      "translation": "f48815712e93087a351a7e2b9862578225af48e7c7633608e3f9202731c65266"
-    },
-    "cookbook/jsonp.md": {
-      "source": "97aa36ed1fdd95d22c65143cfa792463f9194cee05526856b418e6022a7d69f8",
-      "translation": "8e69468d19f85ccf66ddf5030d6af65e3513b0ca278f7c00f34f34a5978d6bd8"
+      "source": "f7d74bbf621d0fc034237debc213b4224d8375cf8782f9e2c36f9b89d33433be",
+      "translation": "eea7667e779088e79371f40643bc7fa09276bc03f27efaea177bdf30074758e9"
     }
   },
   "ja": {
@@ -63,8 +59,8 @@
       "translation": "dc08bf5dba081f97bd330eded3e6670b84221385276f9d0ab86f255974e4118d"
     },
     "guide/response.md": {
-      "source": "762d690e149acfab27231c767db5a55f6019c39c7899f160e9ae7b6fe408d385",
-      "translation": "16e25e3222975a3215c7f3038056eb37f84430cdecaabc9445f3b515edd0a0fa"
+      "source": "3744474f5a64f99faaeafeae850340fc6064fdc0a062f8d714d6da70b622122a",
+      "translation": "c5e4e9bab5017fee6efab8671f80017258b7cb32f4f2f653b540aa04d33d0547"
     },
     "guide/static-files.md": {
       "source": "e806b7ae28bd328dcedb61d4a52f52da96d310a139989540459c12c9894078ef",
@@ -99,12 +95,8 @@
       "translation": "27b4cf00b4d74eb47e428b675911add9b52fd485612f11a6474f770e8f7b4a6d"
     },
     "cookbook/reverse-proxy.md": {
-      "source": "e7e9a24046aa733ba091c6dd74bc77172c43c2e0a0fbbcff22414351a36be56c",
-      "translation": "650913efffc3c072798b000db4e07e5451c2446752763f3928c7903e66d5635f"
-    },
-    "cookbook/jsonp.md": {
-      "source": "97aa36ed1fdd95d22c65143cfa792463f9194cee05526856b418e6022a7d69f8",
-      "translation": "055df4301b6609bce245493493017416b8f2dce8d602ed6a3d8d0f55550a4d76"
+      "source": "f7d74bbf621d0fc034237debc213b4224d8375cf8782f9e2c36f9b89d33433be",
+      "translation": "f89189a0978893bf4f5b9f70045a3ffa614d8aa06609d0734ca3e0fad0cac00d"
     }
   },
   "pt-br": {
@@ -117,8 +109,8 @@
       "translation": "11cb3bd839085831d7e1c6411bbeb7f3a41955bb9b860dc4a8ffc22562e594e5"
     },
     "guide/response.md": {
-      "source": "762d690e149acfab27231c767db5a55f6019c39c7899f160e9ae7b6fe408d385",
-      "translation": "363131a48dfa60947c3657855240e5e87b7346878e79f579e26727bc15c3b75f"
+      "source": "3744474f5a64f99faaeafeae850340fc6064fdc0a062f8d714d6da70b622122a",
+      "translation": "ff22f0c49cf66158252f11f82a76cbdeeb718834c9fdc5fbb4972c012a9e11ac"
     },
     "guide/static-files.md": {
       "source": "e806b7ae28bd328dcedb61d4a52f52da96d310a139989540459c12c9894078ef",
@@ -153,12 +145,8 @@
       "translation": "dc1c527c81f4cce0bdb165c75327692db4b0ec09b09a9d4c8f4b094ab159b077"
     },
     "cookbook/reverse-proxy.md": {
-      "source": "e7e9a24046aa733ba091c6dd74bc77172c43c2e0a0fbbcff22414351a36be56c",
-      "translation": "269e8af6257653675c6740500bfbc23b68e42cb267cd9db88ec4ed2d2a3d6a57"
-    },
-    "cookbook/jsonp.md": {
-      "source": "97aa36ed1fdd95d22c65143cfa792463f9194cee05526856b418e6022a7d69f8",
-      "translation": "e0445348fb29c72e06c817229ae37d3743e1de14779fff074375f2626b645078"
+      "source": "f7d74bbf621d0fc034237debc213b4224d8375cf8782f9e2c36f9b89d33433be",
+      "translation": "a6670049ce1aa08d593d2119b6916867c471eb22f7da127ff7a662c701247edc"
     }
   },
   "zh-cn": {
@@ -171,8 +159,8 @@
       "translation": "6203b83359a9ce3616690ff504617845b1c2b079d47548117e99b919321eb96d"
     },
     "guide/response.md": {
-      "source": "762d690e149acfab27231c767db5a55f6019c39c7899f160e9ae7b6fe408d385",
-      "translation": "9a73fdb1d34581919c7e0b7850ac68e18fc7d3b82db97a3a615bfe247c39ec32"
+      "source": "3744474f5a64f99faaeafeae850340fc6064fdc0a062f8d714d6da70b622122a",
+      "translation": "1103073a1e20babf0c11950df4c8286154b14a01c433607a596335fb7dbd306b"
     },
     "guide/static-files.md": {
       "source": "e806b7ae28bd328dcedb61d4a52f52da96d310a139989540459c12c9894078ef",
@@ -207,12 +195,8 @@
       "translation": "88a96458914bf772e223d3d17581de947ceb0f13f2176fa958ddcd2d2f2ec7e0"
     },
     "cookbook/reverse-proxy.md": {
-      "source": "e7e9a24046aa733ba091c6dd74bc77172c43c2e0a0fbbcff22414351a36be56c",
-      "translation": "b8c7702e1a3f6c2a4832c96d622eff00a47d778d00ab19443266d2ceeaf77d20"
-    },
-    "cookbook/jsonp.md": {
-      "source": "97aa36ed1fdd95d22c65143cfa792463f9194cee05526856b418e6022a7d69f8",
-      "translation": "51e6aee7b7983a9e5af900e585726ceba2365bdab9594e97676bcfeae4a854b6"
+      "source": "f7d74bbf621d0fc034237debc213b4224d8375cf8782f9e2c36f9b89d33433be",
+      "translation": "63a177f79552028aadc31a0799a34f183812a6fed7ec70eab4883eafe742276f"
     }
   }
 }

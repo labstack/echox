@@ -1,3 +1,4 @@
+// docs:start primary-server
 package main
 
 import (
@@ -46,6 +47,9 @@ func main() {
 	}
 }
 
+// docs:end primary-server
+
+// docs:start custom-server
 func customHTTPServer() {
 	e := echo.New()
 	e.Use(middleware.Recover())
@@ -77,3 +81,5 @@ func customHTTPServer() {
 		e.Logger.Error("failed to start server", "error", err)
 	}
 }
+
+// docs:end custom-server

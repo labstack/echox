@@ -127,7 +127,7 @@ func handler(c *echo.Context) error {
 }
 ```
 
-Consulta el [recetario de JSONP](/es/cookbook/jsonp/).
+Para solicitudes entre orígenes, usa [JSON con CORS](/es/cookbook/cors/).
 
 ## Enviar XML
 

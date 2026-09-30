@@ -1,6 +1,8 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
-import { redirects } from './src/redirects.mjs';
+import { unified } from '@astrojs/markdown-remark';
+import { redirects, retiredCookbookRedirects } from './src/redirects.mjs';
+import remarkSourceCode from './plugins/remark-source-code.mjs';
 
 const next = process.env.DOCS_CHANNEL === 'next';
 
@@ -9,8 +11,9 @@ export default defineConfig({
   site: 'https://echo.labstack.com',
   base: next ? '/next/' : '/',
   outDir: next ? './dist-next' : './dist',
+  markdown: { processor: unified({ remarkPlugins: [remarkSourceCode] }) },
   // Preserve every live Docusaurus /docs/* URL at cutover (generated — see ./src/redirects.mjs).
-  redirects: next ? {} : redirects,
+  redirects: next ? retiredCookbookRedirects('/next/') : redirects,
   integrations: [
     starlight({
       title: 'Echo',

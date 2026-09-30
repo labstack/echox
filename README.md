@@ -65,6 +65,29 @@ Content is Markdown/MDX under `site/src/content/docs/` (`guide/`, `middleware/`,
 generated from each page's `sidebar.order` frontmatter. Every page needs a
 `title` and `description`.
 
+Use an empty `file=` code fence to display a runnable example directly from its
+source file. Paths are relative to the repository root, so the same fence works
+in every locale:
+
+````markdown
+```go file=cookbook/jwt/custom-claims/server.go
+```
+````
+
+This works in Markdown and MDX, for Go, HTML, and other code languages. Keep
+explanations in the page and edit the program in its source file. The next build
+refreshes the displayed code even if only that source file changed. A missing
+file or an invalid region fails the build.
+
+For an excerpt, use `file=path#region` and surround the source lines with
+`// docs:start region` and `// docs:end region`. Region markers are omitted from
+the excerpt. Existing code-fence options such as `title="server.go"` and line
+highlights can be combined with `file=`. Excerpts have their common indentation
+removed, and region markers are hidden in both excerpts and full-file examples.
+Run `cd site && npm test` to check the include behavior and all cookbook pages.
+The build runs `npm run cookbook:check`, which rejects pasted Go programs and
+complete HTML examples and validates every included file and region.
+
 The build also publishes `/llms.txt` and `/next/llms.txt`. Their page links and
 descriptions come from that same content, and each index identifies its pinned
 Echo source revision. `site:check` verifies both files and their site links.

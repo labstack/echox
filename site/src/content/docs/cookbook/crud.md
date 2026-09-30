@@ -1,24 +1,22 @@
 ---
 title: CRUD
-description: Crea, lee, actualiza y elimina recursos con Echo y binding JSON.
+description: Create, read, update, and delete resources with Echo and JSON binding.
 sidebar:
   order: 2
 ---
 
-import { Code } from '@astrojs/starlight/components';
-import server from '../../../../generated/crud-server.go.txt?raw';
+A complete CRUD (create, read, update, delete) API backed by an in-memory store.
+Handlers bind JSON request bodies into a struct, access the store under a lock, and
+return JSON. A missing user returns `404`, and an invalid id or an empty name returns `400`.
 
-Una API CRUD (create, read, update, delete) completa respaldada por un store en memoria.
-Los handlers vinculan el body JSON del request a un struct, acceden al store bajo un lock y
-devuelven JSON. Un usuario inexistente devuelve `404`, y un id inválido o un nombre vacío devuelve `400`.
+## Server
 
-## Servidor
+```go file=cookbook/crud/server.go title="cookbook/crud/server.go"
+```
 
-<Code code={server} lang="go" title="cookbook/crud/server.go" />
+## Client
 
-## Cliente
-
-### Crear usuario
+### Create user
 
 Request:
 
@@ -38,7 +36,7 @@ Response:
 }
 ```
 
-### Obtener usuario
+### Get user
 
 Request:
 
@@ -55,7 +53,7 @@ Response:
 }
 ```
 
-### Listar usuarios
+### List users
 
 Request:
 
@@ -74,7 +72,7 @@ Response:
 ]
 ```
 
-### Actualizar usuario
+### Update user
 
 Request:
 
@@ -94,7 +92,7 @@ Response:
 }
 ```
 
-### Eliminar usuario
+### Delete user
 
 Request:
 
@@ -104,7 +102,7 @@ curl -X DELETE localhost:1323/users/1
 
 Response: `204 No Content`.
 
-### Usuario inexistente
+### Missing user
 
 Request:
 
