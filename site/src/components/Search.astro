@@ -39,14 +39,16 @@ if (!labels[locale]) throw new Error(`Search.astro: add launchpad labels for loc
   if (search && !inject()) {
     const obs = new MutationObserver(() => { if (inject()) obs.disconnect(); });
     obs.observe(search, { childList: true, subtree: true });
-    // No time bound: idle callbacks can wait until a background tab is shown, and
-    // watching only <site-search> costs nothing while Pagefind is not mounted.
-    if (import.meta.env.DEV) {
-      setTimeout(() => {
-        if (!document.querySelector('.echo-search-empty')) {
-          console.warn('[search] empty-state panel not injected — .pagefind-ui selectors may have changed');
-        }
-      }, 10000);
-    }
+    // Bound the observer to 10s of visible time: Pagefind mounts on idle, which a
+    // background tab may not reach until it is shown. If it never mounts (disabled
+    // in dev, or Starlight markup changed), stop watching; search still works.
+    const bound = () => setTimeout(() => {
+      obs.disconnect();
+      if (import.meta.env.DEV && !document.querySelector('.echo-search-empty')) {
+        console.warn('[search] empty-state panel not injected — .pagefind-ui selectors may have changed');
+      }
+    }, 10000);
+    if (document.visibilityState === 'visible') bound();
+    else document.addEventListener('visibilitychange', bound, { once: true });
   }
 </script>

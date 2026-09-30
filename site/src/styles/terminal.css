@@ -42,7 +42,7 @@
   --sl-color-white: #142432;
   --sl-color-gray-1: #1d2f3d;
   --sl-color-gray-2: #344b5e;
-  --sl-color-gray-3: #526575;
+  --sl-color-gray-3: #42566a;
   --sl-color-gray-4: #5a6d7d;
   --sl-color-gray-5: #d4e0e8;
   --sl-color-gray-6: #eaf1f5;
@@ -343,6 +343,7 @@ starlight-toc a[aria-current='true'] { color: var(--echo-cyan-text); border-inli
 .hh-btn.pri:hover { box-shadow: 0 10px 26px -8px var(--echo-cyan); }
 .hh-btn.sec { border: 1px solid var(--sl-color-hairline-light); color: var(--sl-color-white); background: var(--sl-color-bg-sidebar); }
 .hh-btn.sec:hover { border-color: var(--echo-cyan); }
+.hh-btn svg { font-size: 1.2em; }
 .hh-install { max-width: 26rem; }
 .hh-install .expressive-code { --ec-codeFontSize: .85rem; }
 .hh-eyebrow svg { flex-shrink: 0; }
