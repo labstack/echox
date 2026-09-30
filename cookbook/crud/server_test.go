@@ -5,7 +5,9 @@ import (
 	"log/slog"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"strings"
+	"sync"
 	"testing"
 
 	"github.com/labstack/echo/v5"
@@ -94,11 +96,17 @@ func TestDeleteUser(t *testing.T) {
 
 func TestListUsers(t *testing.T) {
 	e := newTestServer(t)
+	rec := request(t, e, http.MethodGet, "/users", "")
+	expectStatus(t, rec, http.StatusOK)
+	if got := strings.TrimSpace(rec.Body.String()); got != "[]" {
+		t.Fatalf("expected empty list [], got %s", got)
+	}
+
 	for _, name := range []string{"a", "b", "c"} {
 		expectStatus(t, request(t, e, http.MethodPost, "/users", `{"name":"`+name+`"}`), http.StatusCreated)
 	}
 
-	rec := request(t, e, http.MethodGet, "/users", "")
+	rec = request(t, e, http.MethodGet, "/users", "")
 	expectStatus(t, rec, http.StatusOK)
 	var list []user
 	if err := json.Unmarshal(rec.Body.Bytes(), &list); err != nil {
@@ -127,6 +135,7 @@ func TestErrors(t *testing.T) {
 		{http.MethodPost, "/users", `{}`, http.StatusBadRequest, "name is required"},
 		{http.MethodPut, "/users/1", "", http.StatusBadRequest, "name is required"},
 		{http.MethodPut, "/users/1", `{}`, http.StatusBadRequest, "name is required"},
+		{http.MethodPut, "/users/1", `{"name":"  "}`, http.StatusBadRequest, "name is required"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.method+" "+tt.path+" "+tt.body, func(t *testing.T) {
@@ -150,4 +159,24 @@ func TestErrors(t *testing.T) {
 	if got := decodeUser(t, rec); got.Name != "keep" {
 		t.Fatalf("expected stored name %q, got %q", "keep", got.Name)
 	}
+}
+
+func TestConcurrentRequests(t *testing.T) {
+	// Run with -race: handlers read and write the store from many goroutines at once.
+	e := newTestServer(t)
+	expectStatus(t, request(t, e, http.MethodPost, "/users", `{"name":"base"}`), http.StatusCreated)
+
+	var wg sync.WaitGroup
+	for i := range 20 {
+		wg.Go(func() {
+			request(t, e, http.MethodPost, "/users", `{"name":"u"}`)
+			request(t, e, http.MethodPut, "/users/1", `{"name":"n`+strconv.Itoa(i)+`"}`)
+			request(t, e, http.MethodGet, "/users/1", "")
+			request(t, e, http.MethodGet, "/users", "")
+			request(t, e, http.MethodDelete, "/users/"+strconv.Itoa(i+2), "")
+		})
+	}
+	wg.Wait()
+
+	expectStatus(t, request(t, e, http.MethodGet, "/users/1", ""), http.StatusOK)
 }

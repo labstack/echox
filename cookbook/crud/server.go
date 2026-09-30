@@ -5,6 +5,7 @@ import (
 	"context"
 	"net/http"
 	"slices"
+	"strings"
 	"sync"
 
 	"github.com/labstack/echo/v5"
@@ -31,12 +32,9 @@ var (
 // The store holds user values, so handlers copy a user under the lock and write the response after unlocking.
 
 func createUser(c *echo.Context) error {
-	var u user
-	if err := c.Bind(&u); err != nil {
+	u, err := bindUser(c)
+	if err != nil {
 		return err
-	}
-	if u.Name == "" {
-		return echo.NewHTTPError(http.StatusBadRequest, "name is required")
 	}
 	lock.Lock()
 	// Assign the ID after binding so an "id" in the request body cannot overwrite another user.
@@ -66,12 +64,9 @@ func updateUser(c *echo.Context) error {
 	if err != nil {
 		return err
 	}
-	var u user
-	if err := c.Bind(&u); err != nil {
+	u, err := bindUser(c)
+	if err != nil {
 		return err
-	}
-	if u.Name == "" {
-		return echo.NewHTTPError(http.StatusBadRequest, "name is required")
 	}
 	lock.Lock()
 	existing, ok := users[id]
@@ -103,13 +98,25 @@ func deleteUser(c *echo.Context) error {
 
 func getAllUsers(c *echo.Context) error {
 	lock.Lock()
-	list := make([]user, 0, len(users))
+	list := make([]user, 0, len(users)) // non-nil, so an empty store returns [] rather than null
 	for _, u := range users {
 		list = append(list, u)
 	}
 	lock.Unlock()
 	slices.SortFunc(list, func(a, b user) int { return cmp.Compare(a.ID, b.ID) })
 	return c.JSON(http.StatusOK, list)
+}
+
+// bindUser binds the JSON request body and requires a non-blank name.
+func bindUser(c *echo.Context) (user, error) {
+	var u user
+	if err := c.Bind(&u); err != nil {
+		return u, err
+	}
+	if strings.TrimSpace(u.Name) == "" {
+		return u, echo.NewHTTPError(http.StatusBadRequest, "name is required")
+	}
+	return u, nil
 }
 
 // userID returns the :id path parameter, or a 400 error when it is not a number.
