@@ -58,6 +58,7 @@ func main() {
 Execute:
 
 ```bash
+go mod tidy
 go run main.go
 ```
 
