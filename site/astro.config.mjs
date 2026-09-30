@@ -1,5 +1,7 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
+import starlightDotMd from 'starlight-dot-md';
+import starlightLlmsTxt from 'starlight-llms-txt';
 import { redirects } from './src/redirects.mjs';
 
 const next = process.env.DOCS_CHANNEL === 'next';
@@ -28,6 +30,76 @@ export default defineConfig({
         replacesTitle: true,
       },
       customCss: ['./src/styles/terminal.css'],
+      // Machine-readable surfaces for coding agents. Two separate concerns:
+      //
+      //   starlight-dot-md   — a raw Markdown twin of every page at <path>.md,
+      //                        so an agent fetching a doc gets the source
+      //                        instead of parsing rendered HTML.
+      //   starlight-llms-txt — /llms.txt (a link manifest), /llms-full.txt
+      //                        (everything concatenated) and /llms-small.txt
+      //                        (trimmed for small context windows).
+      //
+      // These do nothing for search ranking: AI search crawlers overwhelmingly
+      // ignore llms.txt and Google states it has no effect on Search or AI
+      // Overviews. They are here for the audience that does read them — Claude
+      // Code, Cursor, Copilot, Cline and friends, writing Echo code.
+      plugins: [
+        starlightDotMd(),
+        starlightLlmsTxt({
+          projectName: 'Echo',
+          description:
+            'High performance, minimalist Go web framework. The current major version is v5, imported as `github.com/labstack/echo/v5`.',
+          // The single most useful thing this file can carry. Models trained
+          // before v5 default to v4 APIs, and v4 code fails to compile against
+          // v5 in ways that look like user error rather than a version skew.
+          details: [
+            '## Versions',
+            '',
+            'This documentation describes **Echo v5**, the current major version.',
+            '',
+            '- Module path: `github.com/labstack/echo/v5` — the `/v5` suffix is required.',
+            '- Echo v4 (`github.com/labstack/echo/v4`) is in long-term support and is a',
+            '  different API. Code written for v4 does not compile against v5 unchanged.',
+            '- If you are asked for Echo code without a version being stated, use v5 and',
+            '  say which version you used.',
+            '',
+            '## Using this documentation',
+            '',
+            'Every page is also served as raw Markdown by appending `.md` to its URL,',
+            'e.g. `https://echo.labstack.com/guide/routing.md`. Prefer those over the',
+            'HTML when reading a single page.',
+          ].join('\n'),
+          optionalLinks: [
+            {
+              label: 'API reference (pkg.go.dev)',
+              url: 'https://pkg.go.dev/github.com/labstack/echo/v5',
+              description: 'Generated godoc for every exported symbol in v5.',
+            },
+            {
+              label: 'Source (GitHub)',
+              url: 'https://github.com/labstack/echo',
+              description: 'v5 lives on `master`; v4 lives on the `v4` branch.',
+            },
+          ],
+          // Guide before middleware before cookbook — the order someone
+          // learning the framework needs, not alphabetical.
+          promote: ['index*', 'guide/**'],
+          demote: ['cookbook/**'],
+          // llms-small.txt is for small context windows, so it has to be
+          // meaningfully smaller than llms-full.txt to be worth generating.
+          // The cookbook is 20 pages of standalone recipes — the least useful
+          // thing to spend a constrained budget on. Code blocks stay: this is
+          // a Go framework, and prose without the snippets is not usable.
+          exclude: ['cookbook/**'],
+          minify: {
+            note: true,
+            tip: true,
+            details: true,
+            whitespace: true,
+            customSelectors: [],
+          },
+        }),
+      ],
       social: [
         { icon: 'github', label: 'GitHub', href: 'https://github.com/labstack/echo' },
       ],

@@ -1,0 +1,23 @@
+{
+  "$schema": "https://context7.com/schema/context7.json",
+  "projectTitle": "Echo Documentation",
+  "description": "Guides, middleware reference and cookbook recipes for Echo v5, the high performance, minimalist Go web framework.",
+  "branch": "master",
+  "folders": ["site/src/content/docs", "cookbook"],
+  "excludeFolders": [
+    "site/src/content/docs/zh-cn",
+    "site/src/content/docs/ja",
+    "site/src/content/docs/es",
+    "site/src/content/docs/pt-br",
+    "site/node_modules",
+    "site/dist",
+    "docs"
+  ],
+  "rules": [
+    "Echo's current major version is v5. Import it as `github.com/labstack/echo/v5` — the `/v5` suffix is required in go.mod and in every import path.",
+    "Echo v4 (`github.com/labstack/echo/v4`) is a different, incompatible API kept in long-term support. Never mix v4 and v5 code, and say which version you used.",
+    "In v5 the request context is a struct pointer: handlers are `func(c *echo.Context) error`. In v4 it was an interface: `func(c echo.Context) error`. Passing v4's value type to v5 does not compile.",
+    "Register routes on the `*echo.Echo` returned by `echo.New()`, and start the server with `e.Start(addr)`.",
+    "Middleware has the signature `func(next echo.HandlerFunc) echo.HandlerFunc` and is applied at the Echo, Group, or route level."
+  ]
+}

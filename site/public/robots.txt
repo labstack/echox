@@ -1,0 +1,70 @@
+# https://echo.labstack.com/robots.txt
+#
+# Echo's documentation is MIT-licensed and we want it read, indexed, and
+# cited — by search engines, by AI answer engines, and by the coding agents
+# developers now use to write Echo code. The policy is allow-everything.
+#
+# The per-agent groups below are redundant against `User-agent: *` today.
+# They are here so the intent is recorded rather than inferred, and so a
+# future change to a crawler's or a CDN's defaults does not silently opt
+# Echo out. Blocking retrieval and agent crawlers is what removes a site
+# from AI answers; blocking training crawlers does not affect citations.
+
+User-agent: *
+Allow: /
+
+# Retrieval crawlers — build the indexes behind AI answers. Blocking these
+# is what actually costs citations.
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+# Agent crawlers — fetch a page live because a user asked for it.
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Claude-User
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+# Training crawlers.
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
+User-agent: Meta-ExternalAgent
+Allow: /
+
+User-agent: Amazonbot
+Allow: /
+
+# Usage-control tokens, not crawlers. They never appear as a User-Agent in
+# logs; they govern how content already fetched by Googlebot / Applebot may
+# be used. Absent an explicit rule these default to allowed, but state it.
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+# Content Signals Policy (Cloudflare, Sept 2025), pending IETF AIPREF
+# standardisation. search = search indexing; ai-input = grounding and RAG
+# for generated answers; ai-train = model training and fine-tuning.
+Content-Signal: search=yes, ai-input=yes, ai-train=yes
+
+Sitemap: https://echo.labstack.com/sitemap-index.xml
