@@ -30,3 +30,7 @@ Si necesitas control total sobre `http.Server`, conecta el manager autocert a un
 
 ```go file=cookbook/auto-tls/server.go#custom-server
 ```
+
+```sh
+go run . -custom-server
+```

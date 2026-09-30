@@ -37,16 +37,16 @@
       "translation": "ca8aa2747af797cf0cbee69fc58db39367984bd38b5b18d3bcd234b87549be05"
     },
     "middleware/static.mdx": {
-      "source": "b66aaa717fe8ad1b3d72dd67584a5412b5f8a1d877e0434faaa06e9ef7e2ab2b",
-      "translation": "ab19c296698dd296ed6d394bb4c1c3f63708b2ca2b75d16bc40d9ec1aff93011"
+      "source": "d82003b1cba2e64e6c86c65d4913a15f274cec3b013f42a570ab3a55556f37a4",
+      "translation": "39b21b8c931d606719b8e6ec04ed2f67cbcae9db12def2204f465e827f31ac9c"
     },
     "middleware/trailing-slash.mdx": {
       "source": "6b9e0e2174a325d36dbcd94ef51490fdda626e1166d439d1cbad64fccc485396",
       "translation": "1000ae874beea68b73adc5fd2bf4d57d355d7c20c6f4fff237b0ad6a2343b973"
     },
     "cookbook/reverse-proxy.md": {
-      "source": "f7d74bbf621d0fc034237debc213b4224d8375cf8782f9e2c36f9b89d33433be",
-      "translation": "eea7667e779088e79371f40643bc7fa09276bc03f27efaea177bdf30074758e9"
+      "source": "7feefd76800a726ec4a0cf437835299eb13c99efed9aadcd9244c778573c9d5a",
+      "translation": "c5e3433af531752b87ece5766cdf8901f1ad3532b8c817a39cd16cb00b9f6e2a"
     }
   },
   "ja": {
@@ -87,16 +87,16 @@
       "translation": "6f3e9b7d61237a1ff8807f2d843ca18b80dacc4976c13f16c2ac5fed1c9675be"
     },
     "middleware/static.mdx": {
-      "source": "b66aaa717fe8ad1b3d72dd67584a5412b5f8a1d877e0434faaa06e9ef7e2ab2b",
-      "translation": "cb235433118488fa6cd70fc360d43c1527a517b8dacad44f5b4ba5c094ec4360"
+      "source": "d82003b1cba2e64e6c86c65d4913a15f274cec3b013f42a570ab3a55556f37a4",
+      "translation": "de500fc500f170bfdee5455d127b64d4716571ce9f046fe829017a15d533d64b"
     },
     "middleware/trailing-slash.mdx": {
       "source": "6b9e0e2174a325d36dbcd94ef51490fdda626e1166d439d1cbad64fccc485396",
       "translation": "27b4cf00b4d74eb47e428b675911add9b52fd485612f11a6474f770e8f7b4a6d"
     },
     "cookbook/reverse-proxy.md": {
-      "source": "f7d74bbf621d0fc034237debc213b4224d8375cf8782f9e2c36f9b89d33433be",
-      "translation": "f89189a0978893bf4f5b9f70045a3ffa614d8aa06609d0734ca3e0fad0cac00d"
+      "source": "7feefd76800a726ec4a0cf437835299eb13c99efed9aadcd9244c778573c9d5a",
+      "translation": "cbc8aabc436d11bd4c94b3f073fa3fb7b140ba27fc7ce2d0e5f8d921b696361c"
     }
   },
   "pt-br": {
@@ -137,16 +137,16 @@
       "translation": "215de80a0506d8dc89c716ca5933f86ad905bf043e270eb86dd3f88e2c30460d"
     },
     "middleware/static.mdx": {
-      "source": "b66aaa717fe8ad1b3d72dd67584a5412b5f8a1d877e0434faaa06e9ef7e2ab2b",
-      "translation": "b6784c53a7589035165eb27b3daab7b2c78b26fff3c3224458b9c88531c61229"
+      "source": "d82003b1cba2e64e6c86c65d4913a15f274cec3b013f42a570ab3a55556f37a4",
+      "translation": "ff17bd6651bdf268487c433ff028b987e460ae9177c123d1819eb2e7644d056a"
     },
     "middleware/trailing-slash.mdx": {
       "source": "6b9e0e2174a325d36dbcd94ef51490fdda626e1166d439d1cbad64fccc485396",
       "translation": "dc1c527c81f4cce0bdb165c75327692db4b0ec09b09a9d4c8f4b094ab159b077"
     },
     "cookbook/reverse-proxy.md": {
-      "source": "f7d74bbf621d0fc034237debc213b4224d8375cf8782f9e2c36f9b89d33433be",
-      "translation": "a6670049ce1aa08d593d2119b6916867c471eb22f7da127ff7a662c701247edc"
+      "source": "7feefd76800a726ec4a0cf437835299eb13c99efed9aadcd9244c778573c9d5a",
+      "translation": "8df8c04f1544f46146f6226100785968301710dbabc8fc26122f7df1c76e2eda"
     }
   },
   "zh-cn": {
@@ -187,16 +187,16 @@
       "translation": "8f198271f1b87620d9ad75e9482bcf904d5a90d7835315205c3bc8edf01a6928"
     },
     "middleware/static.mdx": {
-      "source": "b66aaa717fe8ad1b3d72dd67584a5412b5f8a1d877e0434faaa06e9ef7e2ab2b",
-      "translation": "dd310934b23267a58dc4b8249519ca672611cb306d3fd537e543e5c9dc55bd0c"
+      "source": "d82003b1cba2e64e6c86c65d4913a15f274cec3b013f42a570ab3a55556f37a4",
+      "translation": "7a5eef1b9b463810a71c04ed3193793d9bdc7fa10092182bfcfacbd30352e1ed"
     },
     "middleware/trailing-slash.mdx": {
       "source": "6b9e0e2174a325d36dbcd94ef51490fdda626e1166d439d1cbad64fccc485396",
       "translation": "88a96458914bf772e223d3d17581de947ceb0f13f2176fa958ddcd2d2f2ec7e0"
     },
     "cookbook/reverse-proxy.md": {
-      "source": "f7d74bbf621d0fc034237debc213b4224d8375cf8782f9e2c36f9b89d33433be",
-      "translation": "63a177f79552028aadc31a0799a34f183812a6fed7ec70eab4883eafe742276f"
+      "source": "7feefd76800a726ec4a0cf437835299eb13c99efed9aadcd9244c778573c9d5a",
+      "translation": "00a77a7111a23fae0cb460e39a7503678e0971a2e15bf1405f4ec876d59ee40a"
     }
   }
 }

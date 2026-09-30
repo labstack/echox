@@ -3,6 +3,7 @@ import starlight from '@astrojs/starlight';
 import { unified } from '@astrojs/markdown-remark';
 import { redirects, retiredCookbookRedirects } from './src/redirects.mjs';
 import remarkSourceCode from './plugins/remark-source-code.mjs';
+import { locales } from './src/locales.mjs';
 
 const next = process.env.DOCS_CHANNEL === 'next';
 
@@ -18,13 +19,7 @@ export default defineConfig({
     starlight({
       title: 'Echo',
       defaultLocale: 'root',
-      locales: {
-        root: { label: 'English', lang: 'en' },
-        'zh-cn': { label: '简体中文', lang: 'zh-CN' },
-        ja: { label: '日本語', lang: 'ja' },
-        es: { label: 'Español', lang: 'es' },
-        'pt-br': { label: 'Português', lang: 'pt-BR' },
-      },
+      locales,
       logo: {
         light: './src/assets/logo-light.svg',
         dark: './src/assets/logo-dark.svg',

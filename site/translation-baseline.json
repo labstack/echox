@@ -3,8 +3,8 @@
     "logger": [
       {
         "heading": "Introduction",
-        "source": "94523fd94aa50fbaa0768814844b27851c8cf6001e34caa65777c4fca336da64",
-        "translation": "2f52c52bdd41e8e7ce8cfcdcfb9851bb996776484cf62ed1afc6bba1b9cea78c"
+        "source": "3c8ec7897dd9f0f430eb8a1725a1bfbb7cdf605cacc41774ebd6088b32e8fcd1",
+        "translation": "57a0e94a50c9226b9653da85896a54eb71674f4884e1199649c3f84526df37fd"
       },
       {
         "heading": "Examples",
@@ -13,8 +13,8 @@
       },
       {
         "heading": "slog ([log/slog](https://pkg.go.dev/log/slog))",
-        "source": "17dff52662407b82e908d67654d26b42524278afe0abc92e025be91d44a248f5",
-        "translation": "7ee303042efd029b99ba1ee8480a3de81a26072c539e059cf5f49a4e075fe270"
+        "source": "e79e3a3faec2bc8dde01ac2edcfea4796cc3b445bd6d378a69997d08baa93b4a",
+        "translation": "d75cd35375f2c997edf2d22197a27e9decec138692951f75cc46035e4c35db12"
       },
       {
         "heading": "fmt.Printf",
@@ -60,13 +60,13 @@
     "static": [
       {
         "heading": "Introduction",
-        "source": "422369bde81e0c74f5e4f1c1d8ebfe2e3efb64152dc6f5501c0bc0dcfd999978",
-        "translation": "e0c5e49622351ea620b8ead8baf0af05a3e385e4b3a58f17a834a36ac0552dd2"
+        "source": "291454ccbdecd7bb10ce24bf4058d795d3d18023905566ae6cd8ff5120d91a87",
+        "translation": "e184285ad2c3271e2890bc288e786a4eb906fdb18503f2714cd6c175ce2d12b2"
       },
       {
         "heading": "Usage",
-        "source": "b00701c744a826049dc4ed3647c207de58e09679a83b148fbb21d910f78ab45a",
-        "translation": "1e8fbc8d34821c2bec17ab5faca3609061f561beae0ad7e337b4dc6a9ca69e4d"
+        "source": "b43ea4dfea7faa04fb676b9f87328e3b70ca95213ff541ca30e05ce19a60b836",
+        "translation": "a49161483bb65aed18a00311597e46bc8f1d00d1582791cb24b7cc95ab6b06de"
       },
       {
         "heading": "Custom configuration",
@@ -111,8 +111,8 @@
     "logger": [
       {
         "heading": "Introduction",
-        "source": "94523fd94aa50fbaa0768814844b27851c8cf6001e34caa65777c4fca336da64",
-        "translation": "5b4126f9db71921e2d0b05a5ecca6dbf1ae196ee5701d9fed6bff7391323dd22"
+        "source": "3c8ec7897dd9f0f430eb8a1725a1bfbb7cdf605cacc41774ebd6088b32e8fcd1",
+        "translation": "3635e7171a7b698929e28b384c2a389a7b395f9190fc93a0d1cc2aaae865e966"
       },
       {
         "heading": "Examples",
@@ -121,8 +121,8 @@
       },
       {
         "heading": "slog ([log/slog](https://pkg.go.dev/log/slog))",
-        "source": "17dff52662407b82e908d67654d26b42524278afe0abc92e025be91d44a248f5",
-        "translation": "e8e7050ec9460cd3e94b8d9e243b4f94845d5d77fa212335e55c6a61744d1cbf"
+        "source": "e79e3a3faec2bc8dde01ac2edcfea4796cc3b445bd6d378a69997d08baa93b4a",
+        "translation": "c11f180a900b24c76c2f3a64e6d033923ac95dfe1405a78e1f8758243528a9b3"
       },
       {
         "heading": "fmt.Printf",
@@ -168,13 +168,13 @@
     "static": [
       {
         "heading": "Introduction",
-        "source": "422369bde81e0c74f5e4f1c1d8ebfe2e3efb64152dc6f5501c0bc0dcfd999978",
-        "translation": "55475394a371f6b393b9d715cceb6c2d19ac2d7528126f26a0a8901ac843b3c7"
+        "source": "291454ccbdecd7bb10ce24bf4058d795d3d18023905566ae6cd8ff5120d91a87",
+        "translation": "c4368888ffce29b1ee5256467019ff9028cf68da36e5050e58594e5185e7862f"
       },
       {
         "heading": "Usage",
-        "source": "b00701c744a826049dc4ed3647c207de58e09679a83b148fbb21d910f78ab45a",
-        "translation": "ba4ad065d9f1c586c25485328168f6112befae5ef5b164b8c59eead6bf93b8cc"
+        "source": "b43ea4dfea7faa04fb676b9f87328e3b70ca95213ff541ca30e05ce19a60b836",
+        "translation": "7ebccde432b8a983ac2fdc9b5692675da1c25e4341586d9bade613fbc46e53de"
       },
       {
         "heading": "Custom configuration",
@@ -219,8 +219,8 @@
     "logger": [
       {
         "heading": "Introduction",
-        "source": "94523fd94aa50fbaa0768814844b27851c8cf6001e34caa65777c4fca336da64",
-        "translation": "cc0601e0ba7331abc93180a16dcb8963b8d6c2326018690bbb4c793e40034389"
+        "source": "3c8ec7897dd9f0f430eb8a1725a1bfbb7cdf605cacc41774ebd6088b32e8fcd1",
+        "translation": "48bd2b86a4243135f068b7775b2baabd3c92377f4650eb6b148ca2d835b310e3"
       },
       {
         "heading": "Examples",
@@ -229,8 +229,8 @@
       },
       {
         "heading": "slog ([log/slog](https://pkg.go.dev/log/slog))",
-        "source": "17dff52662407b82e908d67654d26b42524278afe0abc92e025be91d44a248f5",
-        "translation": "fbbe0be70d5b1ebde3781553f78ce6306c44f082901606d1078e4decbbb3b8ed"
+        "source": "e79e3a3faec2bc8dde01ac2edcfea4796cc3b445bd6d378a69997d08baa93b4a",
+        "translation": "3bc32910864bfe27121da51b40ebeceae5405e039a25d293cff5d6bdf035fe26"
       },
       {
         "heading": "fmt.Printf",
@@ -276,13 +276,13 @@
     "static": [
       {
         "heading": "Introduction",
-        "source": "422369bde81e0c74f5e4f1c1d8ebfe2e3efb64152dc6f5501c0bc0dcfd999978",
-        "translation": "37c7b44aec45fe06c34a5b85ee84a017df647430da307c06ad9e6462ac338661"
+        "source": "291454ccbdecd7bb10ce24bf4058d795d3d18023905566ae6cd8ff5120d91a87",
+        "translation": "69e13de3b2033fb50fc31d7956ba2acbe269b56480dcef31d592a72590605dbc"
       },
       {
         "heading": "Usage",
-        "source": "b00701c744a826049dc4ed3647c207de58e09679a83b148fbb21d910f78ab45a",
-        "translation": "2b3a3f074dd6a18a7af7b2bd316893e740da095a80a7fabc6541e2bad5da7bb5"
+        "source": "b43ea4dfea7faa04fb676b9f87328e3b70ca95213ff541ca30e05ce19a60b836",
+        "translation": "289767daeb3c6801d0fc8af427d269380173be5f0e1d4fb4ce7a5fbd7055260a"
       },
       {
         "heading": "Custom configuration",
@@ -327,8 +327,8 @@
     "logger": [
       {
         "heading": "Introduction",
-        "source": "94523fd94aa50fbaa0768814844b27851c8cf6001e34caa65777c4fca336da64",
-        "translation": "7e6938c1543b621e1642026cef54788a37142f9a5af8ad72a7ba95cd9c262c58"
+        "source": "3c8ec7897dd9f0f430eb8a1725a1bfbb7cdf605cacc41774ebd6088b32e8fcd1",
+        "translation": "b1d60cabf2965ba4a387fb5f88f435d01748f1383a84ce8bd0dbf1b63f903ff2"
       },
       {
         "heading": "Examples",
@@ -337,8 +337,8 @@
       },
       {
         "heading": "slog ([log/slog](https://pkg.go.dev/log/slog))",
-        "source": "17dff52662407b82e908d67654d26b42524278afe0abc92e025be91d44a248f5",
-        "translation": "ef77cb5c07205c71695a925391f08c930aacc47c505eb1d0cfb781f1f0d76a2a"
+        "source": "e79e3a3faec2bc8dde01ac2edcfea4796cc3b445bd6d378a69997d08baa93b4a",
+        "translation": "526a4dae1a43ce70c2f0f9625135bbb37467b204f5f9cbbe32103015f7137107"
       },
       {
         "heading": "fmt.Printf",
@@ -384,13 +384,13 @@
     "static": [
       {
         "heading": "Introduction",
-        "source": "422369bde81e0c74f5e4f1c1d8ebfe2e3efb64152dc6f5501c0bc0dcfd999978",
-        "translation": "6827b7d640c2233454c3e10937b2528fe881e122d34cf2a4b59591100ad90626"
+        "source": "291454ccbdecd7bb10ce24bf4058d795d3d18023905566ae6cd8ff5120d91a87",
+        "translation": "303e99fb40913e19e0a03f7d99113583c76b0f8003ae3f7b141047aa0901e9c9"
       },
       {
         "heading": "Usage",
-        "source": "b00701c744a826049dc4ed3647c207de58e09679a83b148fbb21d910f78ab45a",
-        "translation": "170d1256c50f5c08f79548dd1dfce76393e89ecf195168cca880c4a63fcba28b"
+        "source": "b43ea4dfea7faa04fb676b9f87328e3b70ca95213ff541ca30e05ce19a60b836",
+        "translation": "cb35c98fe13b0f4466d9d9ddf1fdcfc5630262b45e3f92150b319af2846c02a7"
       },
       {
         "heading": "Custom configuration",

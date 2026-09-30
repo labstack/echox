@@ -5,9 +5,7 @@ sidebar:
   order: 24
 ---
 
-import { Code } from '@astrojs/starlight/components';
 import ConfigReference from '../../../components/ConfigReference.astro';
-import example from '../../../generated/static.go.txt?raw';
 
 Static middleware serves files from a root directory. The example below serves `public/index.html` at `/`.
 
@@ -15,9 +13,10 @@ Static middleware serves files from a root directory. The example below serves `
 
 From the `echox` checkout, run `cd reference/static && go run .`, then open `http://localhost:1323/`.
 
-<Code code={example} lang="go" title="static/main.go" />
+```go file=reference/static/main.go title="static/main.go"
+```
 
-The page imports the same file that documentation CI compiles. The example keeps `EnablePathUnescaping` false, the safe default for encoded slashes.
+The page displays the same file that documentation CI compiles. The example keeps `EnablePathUnescaping` false, the safe default for encoded slashes.
 
 ## Custom configuration
 

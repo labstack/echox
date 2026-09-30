@@ -23,3 +23,7 @@ contexto de sinal e então chame `Shutdown` com um timeout:
 
 ```go file=cookbook/graceful-shutdown/server.go#custom-server
 ```
+
+```sh
+go run . -custom-server
+```

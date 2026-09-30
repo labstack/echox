@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"errors"
+	"flag"
 	"fmt"
 	"net/http"
 
@@ -11,6 +12,8 @@ import (
 )
 
 func main() {
+	customServer := flag.Bool("custom-server", false, "use a standard http.Server")
+	flag.Parse()
 	e := echo.New()
 	// docs:start handler
 	e.GET("/request", func(c *echo.Context) error {
@@ -27,6 +30,10 @@ func main() {
 		return c.HTML(http.StatusOK, fmt.Sprintf(format, req.Proto, req.Host, req.RemoteAddr, req.Method, req.URL.Path))
 	})
 	// docs:end handler
+	if *customServer {
+		customHTTPServer(e)
+		return
+	}
 	// docs:start start-tls
 	sc := echo.StartConfig{Address: ":1323"}
 	if err := sc.StartTLS(context.Background(), e, "cert.pem", "key.pem"); err != nil {
@@ -39,10 +46,10 @@ func main() {
 func customHTTPServer(e *echo.Echo) {
 	// docs:start custom-server
 	s := http.Server{
-		Addr:      ":8443",
-		Handler:   e,
+		Addr:    ":1323",
+		Handler: e,
 		TLSConfig: &tls.Config{
-			// ListenAndServeTLS loads the certificates below.
+			MinVersion: tls.VersionTLS12,
 		},
 		// ReadTimeout: 30 * time.Second, // use custom timeouts
 	}

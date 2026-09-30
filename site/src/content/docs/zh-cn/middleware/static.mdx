@@ -5,9 +5,7 @@ sidebar:
   order: 24
 ---
 
-import { Code } from '@astrojs/starlight/components';
 import ConfigReference from '../../../../components/ConfigReference.astro';
-import example from '../../../../generated/static.go.txt?raw';
 
 Static 中间件从根目录提供文件。下面的示例在 `/` 提供 `public/index.html`。
 
@@ -15,9 +13,10 @@ Static 中间件从根目录提供文件。下面的示例在 `/` 提供 `public
 
 在 `echox` 源码目录运行 `cd reference/static && go run .`，然后打开 `http://localhost:1323/`。
 
-<Code code={example} lang="go" title="static/main.go" />
+```go file=reference/static/main.go title="static/main.go"
+```
 
-本页直接导入文档 CI 编译的同一个文件。示例将 `EnablePathUnescaping` 保持为 `false`，这是处理编码斜杠的安全默认值。
+本页直接显示文档 CI 编译的同一个文件。示例将 `EnablePathUnescaping` 保持为 `false`，这是处理编码斜杠的安全默认值。
 
 ## 自定义配置
 

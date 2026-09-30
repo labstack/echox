@@ -27,6 +27,10 @@ WebSocket も処理する Go サーバーです。
 ```go file=cookbook/reverse-proxy/server.go#grouped-proxy
 ```
 
+```sh
+go run . -grouped
+```
+
 ## 3) 上流サーバーを起動する
 
 ```sh

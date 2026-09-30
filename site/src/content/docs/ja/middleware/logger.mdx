@@ -5,9 +5,7 @@ sidebar:
   order: 12
 ---
 
-import { Code } from '@astrojs/starlight/components';
 import ConfigReference from '../../../../components/ConfigReference.astro';
-import example from '../../../../generated/request-logger.go.txt?raw';
 
 `RequestLogger` は、選択したリクエストとレスポンスの値を必須の `LogValuesFunc` に渡します。この関数で `slog` などに記録できます。各 `Log*` フィールドは対応する値の取得を有効にします。たとえば `LogStatus: true` を設定すると `v.Status` に値が入ります。
 
@@ -17,7 +15,8 @@ import example from '../../../../generated/request-logger.go.txt?raw';
 
 この完全なプログラムは URI とステータスを JSON で記録します。`echox` のソースディレクトリで `cd reference/request-logger && go run .` を実行し、`http://localhost:1323/` にアクセスしてください。
 
-<Code code={example} lang="go" title="request-logger/main.go" />
+```go file=reference/request-logger/main.go title="request-logger/main.go"
+```
 
 このページはドキュメントの CI がコンパイルするファイルをそのまま読み込みます。次のハンドラーがエラーを返すと `v.Error` に値が入ります。`HandleError: true` の場合、`LogValuesFunc` より前にグローバルエラーハンドラーがレスポンスを書き込むため、上流のミドルウェアはそのステータスや本文を変更できません。
 

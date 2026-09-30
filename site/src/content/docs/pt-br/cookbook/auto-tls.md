@@ -30,3 +30,7 @@ Se você precisar de controle total sobre o `http.Server`, conecte o gerenciador
 
 ```go file=cookbook/auto-tls/server.go#custom-server
 ```
+
+```sh
+go run . -custom-server
+```

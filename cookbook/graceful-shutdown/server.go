@@ -4,6 +4,7 @@ package main
 import (
 	"context"
 	"errors"
+	"flag"
 	"net/http"
 	"os"
 	"os/signal"
@@ -14,6 +15,12 @@ import (
 )
 
 func main() {
+	customServer := flag.Bool("custom-server", false, "use a standard http.Server")
+	flag.Parse()
+	if *customServer {
+		mainWithHTTPServer()
+		return
+	}
 	// Setup
 	e := echo.New()
 	e.GET("/", func(c *echo.Context) error {

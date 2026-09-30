@@ -1,10 +1,11 @@
 import { readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import { localePrefixes } from './locales.mjs';
 
 // Old Docusaurus URLs -> new locations, generated so astro.config stays small.
 // The old site served docs under /docs/ with guide pages flattened (slug
 // overrides). On GitHub Pages each entry still emits its own static
-// meta-refresh page (no server-side wildcards) — that's why there are ~60.
+// meta-refresh page (no server-side wildcards).
 // On a wildcard-capable host (Cloudflare/Netlify) these collapse to a handful
 // of `_redirects` lines.
 
@@ -28,7 +29,6 @@ const retiredRecipes = {
   jsonp: 'cors',
   'load-balancing': 'reverse-proxy',
 };
-const localePrefixes = ['', 'es/', 'ja/', 'pt-br/', 'zh-cn/'];
 
 export function retiredCookbookRedirects(base = '/') {
   return Object.fromEntries(localePrefixes.flatMap((locale) =>
@@ -38,9 +38,11 @@ export function retiredCookbookRedirects(base = '/') {
   ));
 }
 
-const retiredLegacyRedirects = Object.fromEntries(localePrefixes.flatMap((locale) =>
-  Object.entries(retiredRecipes).map(([from, to]) =>
-    [`/${locale}docs/cookbook/${from}`, `/${locale}cookbook/${to}/`],
+// Docusaurus used different locale names, and French now falls back to English.
+export const legacyCookbookLocales = { '': '', 'zh-Hans/': 'zh-cn/', 'ja/': 'ja/', 'es/': 'es/', 'fr/': '' };
+const legacyCookbookRedirects = Object.fromEntries(Object.entries(legacyCookbookLocales).flatMap(([fromLocale, toLocale]) =>
+  [...pages('cookbook'), ...Object.keys(retiredRecipes)].map((from) =>
+    [`/${fromLocale}docs/cookbook/${from}`, `/${toLocale}cookbook/${retiredRecipes[from] ?? from}/`],
   ),
 ));
 
@@ -59,5 +61,5 @@ export const redirects = {
   ...fromList('middleware/', 'middleware/', pages('middleware').filter((name) => name !== 'index')),
   ...fromList('cookbook/', 'cookbook/', pages('cookbook')),
   ...retiredCookbookRedirects(),
-  ...retiredLegacyRedirects,
+  ...legacyCookbookRedirects,
 };

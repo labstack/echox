@@ -27,3 +27,7 @@ sidebar:
 
 ```go file=cookbook/auto-tls/server.go#custom-server
 ```
+
+```sh
+go run . -custom-server
+```

@@ -1,6 +1,9 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { parseSourceDocument, visitCode } from '../plugins/source-document.mjs';
+import { sourceReference } from '../plugins/remark-source-code.mjs';
+import { localePrefixes } from '../src/locales.mjs';
 
 const siteDir = fileURLToPath(new URL('..', import.meta.url));
 const channel = process.env.DOCS_CHANNEL === 'next' ? 'next' : 'stable';
@@ -66,7 +69,7 @@ for (const name of manifest.configs.map((entry) => entry.name)) {
     throw new Error(`${name} must be mapped to exactly one middleware page`);
   }
 }
-for (const locale of ['', 'es/', 'ja/', 'pt-br/', 'zh-cn/']) {
+for (const locale of localePrefixes) {
   for (const [page, configs] of Object.entries(pages)) {
     const file = join(siteDir, 'src/content/docs', locale, 'middleware', `${page}.mdx`);
     const content = readFileSync(file, 'utf8');
@@ -75,9 +78,15 @@ for (const locale of ['', 'es/', 'ja/', 'pt-br/', 'zh-cn/']) {
         throw new Error(`${file} must display the source-backed ${config} reference without a copied struct`);
       }
     }
-    const example = { logger: 'request-logger.go', static: 'static.go' }[page];
-    if (example && (!content.includes(example) || (page === 'logger' && content.includes('LogError')))) {
-      throw new Error(`${file} must import the compiled ${example} example without removed fields`);
+    const example = { logger: 'reference/request-logger/main.go', static: 'reference/static/main.go' }[page];
+    if (example) {
+      let included = false;
+      visitCode(parseSourceDocument(content, file), (node) => {
+        if (node.lang === 'go' && sourceReference(node)?.specifier === example) included = true;
+      });
+      if (!included || (page === 'logger' && content.includes('LogError'))) {
+        throw new Error(`${file} must include the compiled ${example} example without removed fields`);
+      }
     }
   }
   for (const [page, configs] of Object.entries({ jwt: ['Config'], prometheus: ['MiddlewareConfig', 'HandlerConfig', 'PushGatewayConfig'], 'open-telemetry': ['Config'] })) {

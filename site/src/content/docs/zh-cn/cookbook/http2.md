@@ -5,7 +5,7 @@ sidebar:
   order: 9
 ---
 
-HTTP/2 通过请求复用、header 压缩和 server push 改善延迟。Go 的 HTTP 服务器会在 TLS 上自动协商
+HTTP/2 通过请求复用和 header 压缩改善延迟。Go 的 HTTP 服务器会在 TLS 上自动协商
 HTTP/2，因此使用 Echo 提供 HTTP/2 只需用证书启动服务器。
 
 <a id="1-generate-a-self-signed-x509-tls-certificate"></a>
@@ -38,6 +38,10 @@ go run $GOROOT/src/crypto/tls/generate_cert.go --host localhost
 或者使用带自定义 `tls.Config` 的自定义 `http.Server`：
 
 ```go file=cookbook/http2/server.go#custom-server
+```
+
+```sh
+go run . -custom-server
 ```
 
 ## 4. 验证

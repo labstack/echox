@@ -83,7 +83,8 @@ For an excerpt, use `file=path#region` and surround the source lines with
 `// docs:start region` and `// docs:end region`. Region markers are omitted from
 the excerpt. Existing code-fence options such as `title="server.go"` and line
 highlights can be combined with `file=`. Excerpts have their common indentation
-removed, and region markers are hidden in both excerpts and full-file examples.
+removed and boundary blank lines trimmed. Region markers are hidden in both
+excerpts and full-file examples, with surrounding blank separators kept to one.
 Run `cd site && npm test` to check the include behavior and all cookbook pages.
 The build runs `npm run cookbook:check`, which rejects pasted Go programs and
 complete HTML examples and validates every included file and region.

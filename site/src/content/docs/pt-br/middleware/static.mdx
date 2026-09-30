@@ -5,9 +5,7 @@ sidebar:
   order: 24
 ---
 
-import { Code } from '@astrojs/starlight/components';
 import ConfigReference from '../../../../components/ConfigReference.astro';
-import example from '../../../../generated/static.go.txt?raw';
 
 O middleware Static serve arquivos de um diretório raiz. O exemplo serve `public/index.html` em `/`.
 
@@ -15,9 +13,10 @@ O middleware Static serve arquivos de um diretório raiz. O exemplo serve `publi
 
 No repositório do `echox`, execute `cd reference/static && go run .` e abra `http://localhost:1323/`.
 
-<Code code={example} lang="go" title="static/main.go" />
+```go file=reference/static/main.go title="static/main.go"
+```
 
-A página importa o mesmo arquivo compilado pela CI da documentação. O exemplo mantém `EnablePathUnescaping` em `false`, o padrão seguro para barras codificadas.
+A página mostra o mesmo arquivo compilado pela CI da documentação. O exemplo mantém `EnablePathUnescaping` em `false`, o padrão seguro para barras codificadas.
 
 ## Configuração customizada
 

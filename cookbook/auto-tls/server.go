@@ -5,6 +5,7 @@ import (
 	"context"
 	"crypto/tls"
 	"errors"
+	"flag"
 	"log/slog"
 	"net/http"
 	"os"
@@ -17,6 +18,12 @@ import (
 )
 
 func main() {
+	customServer := flag.Bool("custom-server", false, "use a standard http.Server")
+	flag.Parse()
+	if *customServer {
+		customHTTPServer()
+		return
+	}
 	e := echo.New()
 	e.Logger = slog.New(slog.NewJSONHandler(os.Stdout, nil))
 

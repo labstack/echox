@@ -5,9 +5,7 @@ sidebar:
   order: 12
 ---
 
-import { Code } from '@astrojs/starlight/components';
 import ConfigReference from '../../../../components/ConfigReference.astro';
-import example from '../../../../generated/request-logger.go.txt?raw';
 
 `RequestLogger` envia valores selecionados da requisição e da resposta para a função obrigatória `LogValuesFunc`. Use `slog` ou outra biblioteca. Cada campo `Log*` ativa a coleta de um valor; por exemplo, `LogStatus: true` preenche `v.Status`.
 
@@ -17,9 +15,10 @@ import example from '../../../../generated/request-logger.go.txt?raw';
 
 Este programa completo registra a URI e o status em JSON. No repositório do `echox`, execute `cd reference/request-logger && go run .` e acesse `http://localhost:1323/`.
 
-<Code code={example} lang="go" title="request-logger/main.go" />
+```go file=reference/request-logger/main.go title="request-logger/main.go"
+```
 
-A página importa o mesmo arquivo compilado pela CI da documentação. `v.Error` recebe o erro retornado pelo próximo handler. Com `HandleError: true`, o tratador global escreve a resposta antes de executar `LogValuesFunc`; middlewares anteriores já não podem alterar o status ou o corpo.
+A página mostra o mesmo arquivo compilado pela CI da documentação. `v.Error` recebe o erro retornado pelo próximo handler. Com `HandleError: true`, o tratador global escreve a resposta antes de executar `LogValuesFunc`; middlewares anteriores já não podem alterar o status ou o corpo.
 
 ### fmt.Printf
 

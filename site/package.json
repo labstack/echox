@@ -25,6 +25,8 @@
     "@astrojs/markdown-remark": "^7.2.0",
     "@astrojs/starlight": "^0.40.0",
     "astro": "^6.4.7",
+    "remark-frontmatter": "^5.0.0",
+    "remark-mdx": "^3.1.1",
     "remark-parse": "^11.0.0",
     "sharp": "^0.35.1",
     "unified": "^11.0.5"

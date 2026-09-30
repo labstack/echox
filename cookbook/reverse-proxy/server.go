@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"net/url"
 
 	"github.com/labstack/echo/v5"
@@ -9,6 +10,8 @@ import (
 )
 
 func main() {
+	grouped := flag.Bool("grouped", false, "limit the proxy to the /blog route group")
+	flag.Parse()
 	e := echo.New()
 	e.Use(middleware.RequestLogger())
 	e.Use(middleware.Recover())
@@ -30,9 +33,13 @@ func main() {
 		{URL: url2},
 	}
 	// docs:end targets
-	// docs:start middleware
-	e.Use(middleware.Proxy(middleware.NewRoundRobinBalancer(targets)))
-	// docs:end middleware
+	if *grouped {
+		configureBlogProxy(e, targets)
+	} else {
+		// docs:start middleware
+		e.Use(middleware.Proxy(middleware.NewRoundRobinBalancer(targets)))
+		// docs:end middleware
+	}
 
 	sc := echo.StartConfig{Address: ":1323"}
 	if err := sc.Start(context.Background(), e); err != nil {
@@ -44,6 +51,11 @@ func main() {
 func configureBlogProxy(e *echo.Echo, targets []*middleware.ProxyTarget) {
 	// docs:start grouped-proxy
 	g := e.Group("/blog")
-	g.Use(middleware.Proxy(middleware.NewRoundRobinBalancer(targets)))
+	g.Use(middleware.ProxyWithConfig(middleware.ProxyConfig{
+		Balancer: middleware.NewRoundRobinBalancer(targets),
+		Rewrite:  map[string]string{"/blog/*": "/$1"},
+	}))
+	// Group middleware needs a matching route. The proxy handles the response.
+	g.Any("/*", func(c *echo.Context) error { return echo.ErrNotFound })
 	// docs:end grouped-proxy
 }

@@ -27,6 +27,10 @@ Para configurar un proxy para una subruta, usa `Echo#Group()`.
 ```go file=cookbook/reverse-proxy/server.go#grouped-proxy
 ```
 
+```sh
+go run . -grouped
+```
+
 ## 3) Iniciar servidores upstream
 
 ```sh

@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -67,6 +67,4 @@ for (const [slug, source] of Object.entries(externalSources)) {
   }
   writeFileSync(join(generatedDir, `${slug}.json`), `${JSON.stringify(extracted, null, 2)}\n`);
 }
-copyFileSync(join(referenceDir, 'request-logger', 'main.go'), join(generatedDir, 'request-logger.go.txt'));
-copyFileSync(join(referenceDir, 'static', 'main.go'), join(generatedDir, 'static.go.txt'));
 console.log(`Prepared Echo source ${revision}`);

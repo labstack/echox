@@ -21,3 +21,7 @@ sidebar:
 
 ```go file=cookbook/graceful-shutdown/server.go#custom-server
 ```
+
+```sh
+go run . -custom-server
+```

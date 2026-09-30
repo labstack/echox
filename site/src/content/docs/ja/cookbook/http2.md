@@ -5,7 +5,7 @@ sidebar:
   order: 9
 ---
 
-HTTP/2 はリクエスト多重化、header 圧縮、server push によりレイテンシーを改善します。
+HTTP/2 はリクエスト多重化と header 圧縮によりレイテンシーを改善します。
 Go の HTTP サーバーは TLS 上で HTTP/2 を自動的にネゴシエートするため、Echo で HTTP/2 を配信するには
 証明書付きでサーバーを起動すれば済みます。
 
@@ -39,6 +39,10 @@ go run $GOROOT/src/crypto/tls/generate_cert.go --host localhost
 または、独自の `tls.Config` を持つカスタム `http.Server` を使います。
 
 ```go file=cookbook/http2/server.go#custom-server
+```
+
+```sh
+go run . -custom-server
 ```
 
 ## 4. 検証する

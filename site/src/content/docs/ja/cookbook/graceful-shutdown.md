@@ -22,3 +22,7 @@ Echo は新しい接続の受け付けを停止し、アクティブなリクエ
 
 ```go file=cookbook/graceful-shutdown/server.go#custom-server
 ```
+
+```sh
+go run . -custom-server
+```

@@ -25,6 +25,10 @@ sidebar:
 ```go file=cookbook/reverse-proxy/server.go#grouped-proxy
 ```
 
+```sh
+go run . -grouped
+```
+
 ## 3) 启动上游服务器
 
 ```sh

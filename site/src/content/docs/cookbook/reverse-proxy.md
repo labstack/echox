@@ -34,6 +34,10 @@ To set up a proxy for a sub-route, use `Echo#Group()`.
 ```go file=cookbook/reverse-proxy/server.go#grouped-proxy
 ```
 
+```sh
+go run . -grouped
+```
+
 ## 3) Start upstream servers
 
 ```sh

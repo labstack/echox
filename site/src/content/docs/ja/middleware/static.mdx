@@ -5,9 +5,7 @@ sidebar:
   order: 24
 ---
 
-import { Code } from '@astrojs/starlight/components';
 import ConfigReference from '../../../../components/ConfigReference.astro';
-import example from '../../../../generated/static.go.txt?raw';
 
 Static ミドルウェアはルートディレクトリからファイルを配信します。この例では `/` で `public/index.html` を配信します。
 
@@ -15,7 +13,8 @@ Static ミドルウェアはルートディレクトリからファイルを配�
 
 `echox` のソースディレクトリで `cd reference/static && go run .` を実行し、`http://localhost:1323/` を開いてください。
 
-<Code code={example} lang="go" title="static/main.go" />
+```go file=reference/static/main.go title="static/main.go"
+```
 
 このページはドキュメントの CI がコンパイルするファイルをそのまま読み込みます。この例の `EnablePathUnescaping` は `false` で、エンコードされたスラッシュに対する安全な既定値です。
 

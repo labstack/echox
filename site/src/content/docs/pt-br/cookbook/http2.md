@@ -5,8 +5,7 @@ sidebar:
   order: 9
 ---
 
-HTTP/2 melhora a latência por meio de multiplexação de requests, compressão de headers e
-server push. O servidor HTTP do Go negocia HTTP/2 automaticamente sobre TLS, então servir
+HTTP/2 melhora a latência por meio de multiplexação de requests e compressão de headers. O servidor HTTP do Go negocia HTTP/2 automaticamente sobre TLS, então servir
 HTTP/2 com Echo é uma questão de iniciar o servidor com um certificado.
 
 <a id="1-generate-a-self-signed-x509-tls-certificate"></a>
@@ -39,6 +38,10 @@ Inicie o servidor com o certificado e a chave gerados:
 Como alternativa, use um `http.Server` customizado com seu próprio `tls.Config`:
 
 ```go file=cookbook/http2/server.go#custom-server
+```
+
+```sh
+go run . -custom-server
 ```
 
 ## 4. Verificar
