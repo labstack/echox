@@ -2,6 +2,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { gzipSync } from 'node:zlib';
+import { externalDomains } from './performance-origins.mjs';
 
 const siteDir = fileURLToPath(new URL('..', import.meta.url));
 const distDir = join(siteDir, 'dist');
@@ -23,9 +24,7 @@ function metrics(route) {
     const size = bytes(join(distDir, path));
     return { raw: sum.raw + size.raw, gzip: sum.gzip + size.gzip };
   }, { raw: 0, gzip: 0 });
-  const domains = [...new Set([...html.matchAll(/(?:src|href)="(https?:\/\/[^"?#]+)"/g)]
-    .map((match) => new URL(match[1]).hostname).filter((host) => host !== 'echo.labstack.com'))].sort();
-  return { html: bytes(htmlFile), firstLoadAssets: assetBytes, externalDomains: domains };
+  return { html: bytes(htmlFile), firstLoadAssets: assetBytes, externalDomains: externalDomains(html) };
 }
 
 const current = Object.fromEntries(routes.map((route) => [route, metrics(route)]));

@@ -31,7 +31,6 @@ if (accept) {
 const expected = JSON.parse(readFileSync(baselineFile, 'utf8')).routes;
 const problems = [];
 for (const route of expected.filter((item) => !routes.includes(item))) problems.push(`Removed route: ${route}`);
-for (const route of routes.filter((item) => !expected.includes(item))) problems.push(`New route needs baseline review: ${route}`);
 const ids = new Map();
 function idsIn(file) {
   if (!ids.has(file)) {

@@ -3,7 +3,7 @@
   "type": "module",
   "version": "0.1.0",
   "scripts": {
-    "test": "node --test plugins/*.test.mjs",
+    "test": "node --test plugins/*.test.mjs scripts/*.test.mjs",
     "dev": "npm run source:prepare && astro dev",
     "build": "node scripts/build-site.mjs",
     "preview": "astro preview",

@@ -9,15 +9,10 @@
       "gzip": 19546
     },
     "externalDomains": [
-      "blacksmith.sh",
-      "encore.dev",
       "fonts.googleapis.com",
-      "fonts.gstatic.com",
-      "github.com",
-      "pkg.go.dev",
       "unpkg.com",
       "widget.kapa.ai",
-      "x.com"
+      "www.googletagmanager.com"
     ]
   },
   "/middleware/cors/": {
@@ -30,13 +25,10 @@
       "gzip": 26052
     },
     "externalDomains": [
-      "blog.portswigger.net",
       "fonts.googleapis.com",
-      "fonts.gstatic.com",
-      "github.com",
       "unpkg.com",
       "widget.kapa.ai",
-      "x.com"
+      "www.googletagmanager.com"
     ]
   },
   "/next/": {
@@ -49,15 +41,9 @@
       "gzip": 19549
     },
     "externalDomains": [
-      "blacksmith.sh",
-      "encore.dev",
       "fonts.googleapis.com",
-      "fonts.gstatic.com",
-      "github.com",
-      "pkg.go.dev",
       "unpkg.com",
-      "widget.kapa.ai",
-      "x.com"
+      "www.googletagmanager.com"
     ]
   },
   "/next/middleware/cors/": {
@@ -70,13 +56,9 @@
       "gzip": 26055
     },
     "externalDomains": [
-      "blog.portswigger.net",
       "fonts.googleapis.com",
-      "fonts.gstatic.com",
-      "github.com",
       "unpkg.com",
-      "widget.kapa.ai",
-      "x.com"
+      "www.googletagmanager.com"
     ]
   }
 }

@@ -4,18 +4,15 @@ import { fileURLToPath } from 'node:url';
 import { parseSourceDocument, visitCode } from '../plugins/source-document.mjs';
 import { sourceReferenceAt } from '../plugins/remark-source-code.mjs';
 import { localePrefixes } from '../src/locales.mjs';
+import { preparedSource } from './module-sources.mjs';
+import { reportApiChanges } from './report-api.mjs';
 
 const siteDir = fileURLToPath(new URL('..', import.meta.url));
 const channel = process.env.DOCS_CHANNEL === 'next' ? 'next' : 'stable';
 const baselineFile = channel === 'next' ? 'next-reference-baseline.json' : 'reference-baseline.json';
-const manifest = JSON.parse(readFileSync(join(siteDir, 'src/generated/config-fields.json'), 'utf8'));
-const pin = JSON.parse(readFileSync(join(siteDir, channel === 'next' ? 'next-source.json' : 'echo-source.json'), 'utf8'));
-if (!process.env.ECHO_SOURCE_DIR && manifest.revision !== pin.revision) {
-  throw new Error(`Generated Echo source is ${manifest.revision}; expected ${channel} revision ${pin.revision}. Run source:prepare for this channel first.`);
-}
+const { manifest, external: externalSources } = preparedSource(siteDir);
 const baseline = JSON.parse(readFileSync(join(siteDir, baselineFile), 'utf8'));
 const pages = JSON.parse(readFileSync(join(siteDir, 'reference-pages.json'), 'utf8'));
-const externalSources = JSON.parse(readFileSync(join(siteDir, 'external-sources.json'), 'utf8'));
 const externalBaseline = JSON.parse(readFileSync(join(siteDir, 'external-baseline.json'), 'utf8'));
 
 function fieldsByConfig(configs) {
@@ -42,9 +39,12 @@ for (const name of new Set([...Object.keys(baseline.functions), ...Object.keys(f
 for (const [slug, source] of Object.entries(externalSources)) {
   const external = JSON.parse(readFileSync(join(siteDir, `src/generated/${slug}.json`), 'utf8'));
   const before = externalBaseline[slug];
-  if (!before || external.module !== source.module || external.revision !== source.version || before.version !== source.version) {
+  if (!before || external.module !== source.module || external.revision !== source.version) {
     differences.push(`${slug}: source module/version differs from reviewed baseline`);
     continue;
+  }
+  if (before.module !== source.module || before.version !== source.version) {
+    differences.push(`${slug}: ${before.module}@${before.version} -> ${source.module}@${source.version}`);
   }
   const fields = fieldsByConfig(external.configs);
   for (const config of new Set([...Object.keys(before.configs), ...Object.keys(fields)])) {
@@ -59,6 +59,7 @@ for (const [slug, source] of Object.entries(externalSources)) {
     if (before.functions[name] !== api[name]) differences.push(`${slug}.${name}: ${JSON.stringify(before.functions[name] ?? null)} -> ${JSON.stringify(api[name] ?? null)}`);
   }
 }
+reportApiChanges(channel, manifest.revision, differences);
 if (differences.length) {
   throw new Error(`${channel} middleware API changed. Review the affected pages, then update ${baselineFile}:\n${differences.join('\n')}`);
 }
