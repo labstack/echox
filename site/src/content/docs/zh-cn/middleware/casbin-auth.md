@@ -26,11 +26,15 @@ sidebar:
 
 ```bash
 go get github.com/casbin/casbin/v3
+go get github.com/labstack/echo-jwt/v5
+go get github.com/golang-jwt/jwt/v5
 ```
 
 ```go
 import (
 	"github.com/casbin/casbin/v3"
+	"github.com/golang-jwt/jwt/v5"
+	echojwt "github.com/labstack/echo-jwt/v5"
 )
 ```
 
@@ -51,6 +55,11 @@ Echo 不自带 Casbin 中间件；该集成是对 Casbin enforcer 的一层小�
 创建 Casbin 策略文件 `auth_policy.csv`：
 
 ```csv file=cookbook/casbin/auth_policy.csv
+```
+
+将模型和策略加载到 Casbin enforcer：
+
+```go file=cookbook/casbin/server.go#enforcer
 ```
 
 认证和授权是不同的关注点。使用另一个中间件（如 JWT 或 Basic Auth）认证用户，

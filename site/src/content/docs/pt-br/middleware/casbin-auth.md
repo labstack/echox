@@ -26,11 +26,15 @@ Veja a [visão geral da API](https://casbin.org/docs/api-overview) e a
 
 ```bash
 go get github.com/casbin/casbin/v3
+go get github.com/labstack/echo-jwt/v5
+go get github.com/golang-jwt/jwt/v5
 ```
 
 ```go
 import (
 	"github.com/casbin/casbin/v3"
+	"github.com/golang-jwt/jwt/v5"
+	echojwt "github.com/labstack/echo-jwt/v5"
 )
 ```
 
@@ -52,6 +56,11 @@ Crie um arquivo de modelo Casbin `auth_model.conf`:
 Crie um arquivo de política Casbin `auth_policy.csv`:
 
 ```csv file=cookbook/casbin/auth_policy.csv
+```
+
+Carregue o modelo e a política em um enforcer do Casbin:
+
+```go file=cookbook/casbin/server.go#enforcer
 ```
 
 Autenticação e autorização são preocupações separadas. Autentique o usuário com

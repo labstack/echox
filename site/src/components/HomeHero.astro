@@ -9,6 +9,8 @@ import helloWorldSource from '../../../cookbook/hello-world/server.go?raw';
 import { sourceSnippet } from '../../plugins/remark-source-code.mjs';
 const next = process.env.DOCS_CHANNEL === 'next';
 const helloWorldCode = sourceSnippet(helloWorldSource, 'hero', 'cookbook/hello-world/server.go');
+// The code window is aria-hidden, so Shiki's <pre> must not be a tab stop.
+const notFocusable = { pre(node: { properties: Record<string, unknown> }) { delete node.properties.tabindex; } };
 ---
 
 <section class="hh">
@@ -34,7 +36,7 @@ const helloWorldCode = sourceSnippet(helloWorldSource, 'hero', 'cookbook/hello-w
       <i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i>
       <span class="fn">server.go · excerpt</span>
     </div>
-    <Code code={helloWorldCode} lang="go" style="background: transparent" />
+    <Code code={helloWorldCode} lang="go" style="background: transparent" transformers={[notFocusable]} />
     <div class="hh-term" data-term>
       <div><span class="pr">~/echo $</span> <span data-cmd></span><span class="hh-cur" data-cur></span></div>
       <div data-out></div>

@@ -3,6 +3,7 @@ package main
 import (
 	"log/slog"
 	"net/http"
+	"os"
 
 	"github.com/casbin/casbin/v3"
 	"github.com/golang-jwt/jwt/v5"
@@ -38,10 +39,13 @@ curl -v "http://localhost:8080/dataset1/any" -H "Authorization: Bearer eyJhbGciO
 func main() {
 	e := echo.New()
 
+	// docs:start enforcer
 	ce, err := casbin.NewEnforcer("auth_model.conf", "auth_policy.csv")
 	if err != nil {
 		slog.Error("failed to initialize Casbin enforcer", "error", err)
+		os.Exit(1)
 	}
+	// docs:end enforcer
 
 	// BasicAuth middleware does authentication
 	// - should pass `curl -v -u "alice:password" http://localhost:8080/dataset1/any`

@@ -228,6 +228,7 @@ test('raw component imports and Markdown includes share source excerpts; Casbin 
     const declarations = fences.flatMap((fence) => [...fence.value.matchAll(/^func NewCasbinMiddleware\b/gm)]);
     assert.equal(declarations.length, 1, `${locale}Casbin middleware has a single source-backed definition`);
     assert.ok(fences.some((fence) => fence.value.includes('enforcer.Enforce(')));
+    assert.ok(fences.some((fence) => fence.value.includes('casbin.NewEnforcer(')), `${locale}the enforcer used by the excerpts is defined`);
     assert.ok(fences.some((fence) => fence.value.includes('echojwt.JWT(')));
     assert.ok(!fences.some((fence) => /^package main\b/m.test(fence.value)), 'the full server is linked rather than duplicated');
   }

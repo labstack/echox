@@ -26,11 +26,15 @@ sidebar:
 
 ```bash
 go get github.com/casbin/casbin/v3
+go get github.com/labstack/echo-jwt/v5
+go get github.com/golang-jwt/jwt/v5
 ```
 
 ```go
 import (
 	"github.com/casbin/casbin/v3"
+	"github.com/golang-jwt/jwt/v5"
+	echojwt "github.com/labstack/echo-jwt/v5"
 )
 ```
 
@@ -51,6 +55,11 @@ Casbin モデルファイル `auth_model.conf` を作成します。
 Casbin ポリシーファイル `auth_policy.csv` を作成します。
 
 ```csv file=cookbook/casbin/auth_policy.csv
+```
+
+モデルとポリシーを Casbin enforcer に読み込みます。
+
+```go file=cookbook/casbin/server.go#enforcer
 ```
 
 認証と認可は別の関心事です。JWT や Basic Auth など別のミドルウェアでユーザーを認証し、
