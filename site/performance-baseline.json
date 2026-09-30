@@ -1,65 +1,61 @@
 {
   "/": {
     "html": {
-      "raw": 27523,
-      "gzip": 8601
+      "raw": 48300,
+      "gzip": 11466
     },
     "firstLoadAssets": {
-      "raw": 94854,
-      "gzip": 19546
+      "raw": 116830,
+      "gzip": 24929
     },
     "externalDomains": [
       "fonts.googleapis.com",
       "github.com",
-      "unpkg.com",
       "widget.kapa.ai",
       "www.googletagmanager.com"
     ]
   },
   "/middleware/cors/": {
     "html": {
-      "raw": 60522,
-      "gzip": 11390
+      "raw": 69902,
+      "gzip": 14312
     },
     "firstLoadAssets": {
-      "raw": 118355,
-      "gzip": 26052
+      "raw": 119554,
+      "gzip": 26305
     },
     "externalDomains": [
       "fonts.googleapis.com",
-      "unpkg.com",
       "widget.kapa.ai",
       "www.googletagmanager.com"
     ]
   },
   "/next/": {
     "html": {
-      "raw": 27645,
-      "gzip": 8615
+      "raw": 47422,
+      "gzip": 11306
     },
     "firstLoadAssets": {
-      "raw": 94869,
-      "gzip": 19549
+      "raw": 116845,
+      "gzip": 24932
     },
     "externalDomains": [
       "fonts.googleapis.com",
       "github.com",
-      "unpkg.com",
       "www.googletagmanager.com"
     ]
   },
   "/next/middleware/cors/": {
     "html": {
-      "raw": 60976,
-      "gzip": 11405
+      "raw": 69740,
+      "gzip": 13971
     },
     "firstLoadAssets": {
-      "raw": 118370,
-      "gzip": 26055
+      "raw": 119569,
+      "gzip": 26308
     },
     "externalDomains": [
       "fonts.googleapis.com",
-      "unpkg.com",
       "www.googletagmanager.com"
     ]
   }

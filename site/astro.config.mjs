@@ -88,13 +88,6 @@ export default defineConfig({
             href: 'https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Fragment+Mono&display=swap',
           },
         },
-        {
-          tag: 'link',
-          attrs: {
-            rel: 'stylesheet',
-            href: 'https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css',
-          },
-        },
         // Default social card. Starlight already emits og:title/description/url
         // and twitter:card=summary_large_image, but no image — add a site-wide
         // default so shares aren't imageless. Absolute URLs are required by

@@ -1,5 +1,6 @@
 ---
 import Default from '@astrojs/starlight/components/Footer.astro';
+import { Icon } from '@astrojs/starlight/components';
 
 const year = new Date().getFullYear();
 ---
@@ -8,10 +9,10 @@ const year = new Date().getFullYear();
   <span>© {year} LabStack LLC. Released under the MIT License.</span>
   <div class="echo-social">
     <a href="https://x.com/labstack" target="_blank" rel="noopener noreferrer" aria-label="LabStack on X">
-      <i class="ph ph-x-logo"></i>
+      <Icon name="x.com" />
     </a>
     <a href="https://github.com/labstack/echo" target="_blank" rel="noopener noreferrer" aria-label="Echo on GitHub">
-      <i class="ph ph-github-logo"></i>
+      <Icon name="github" />
     </a>
   </div>
 </footer>

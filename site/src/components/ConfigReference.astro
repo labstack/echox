@@ -5,6 +5,7 @@ import prometheusManifest from '../generated/prometheus.json';
 import telemetryManifest from '../generated/open-telemetry.json';
 import externalSources from '../../external-sources.json';
 import { formatRevision } from '../data/source.mjs';
+import { Badge } from '@astrojs/starlight/components';
 
 interface Props {
   name: string;
@@ -43,7 +44,7 @@ const sourceUrl = (file: string, line: number) => `${repository}/blob/${manifest
       <thead><tr><th scope="col">{labels.field}</th><th scope="col">{labels.type}</th><th scope="col">{labels.description}</th><th scope="col">{labels.source}</th></tr></thead>
       <tbody>
         {config.fields.map((field) => <tr>
-          <th scope="row"><code>{field.name}</code>{field.deprecated && <span class="deprecated">{labels.deprecated}</span>}</th>
+          <th scope="row"><code>{field.name}</code>{field.deprecated && <Badge text={labels.deprecated} variant="caution" size="small" class="deprecated" />}</th>
           <td><code>{field.type}</code></td>
           <td class="field-description">{field.doc || '—'}</td>
           <td><a href={sourceUrl(config.file, field.line)} aria-label={`${field.name} ${labels.source}`}>L{field.line}</a></td>
@@ -76,5 +77,5 @@ const sourceUrl = (file: string, line: number) => `${repository}/blob/${manifest
   tbody th { font-weight: 500; }
   code { overflow-wrap: anywhere; white-space: pre-wrap; }
   .field-description { min-width: 16rem; white-space: pre-line; overflow-wrap: anywhere; }
-  .deprecated { display: inline-block; margin-inline-start: .5rem; font-size: .75em; color: var(--sl-color-text-accent); }
+  .deprecated { margin-inline-start: .5rem; }
 </style>
