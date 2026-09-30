@@ -18,7 +18,6 @@ import FeatureCard from '../../components/FeatureCard.astro';
 import HomeHero from '../../components/HomeHero.astro';
 import { starsLabel } from '../../data/github.ts';
 import { CardGrid, Code, LinkButton, LinkCard, Steps } from '@astrojs/starlight/components';
-import { Image } from 'astro:assets';
 
 <HomeHero />
 
@@ -62,8 +61,8 @@ import { Image } from 'astro:assets';
       </li>
       <li>
         <h3>Run</h3>
-        <p>Start serving on port 1323.</p>
-        <Code code="go run server.go" lang="bash" frame="none" wrap />
+        <p>Fetch dependencies and start serving on port 1323.</p>
+        <Code code={'go mod tidy\ngo run server.go'} lang="bash" frame="none" wrap />
       </li>
     </ol>
   </Steps>
@@ -83,19 +82,19 @@ import { Image } from 'astro:assets';
 <div class="echo-h"><span class="ey">Sponsors</span><h2>Backed by teams who build on Echo.</h2></div>
 
 <a class="sp-featured" href="https://blacksmith.sh" target="_blank" rel="noopener noreferrer">
-  <Image src="https://github.com/useblacksmith.png?size=88" alt="Blacksmith" width={44} height={44} loading="lazy" />
+  <img src="https://github.com/useblacksmith.png?size=88" alt="Blacksmith" width="44" height="44" loading="lazy" decoding="async" />
   <span class="t"><b>Blacksmith</b><span>Faster, drop-in GitHub Actions runners.</span></span>
 </a>
 
 <a class="sp-featured" href="https://encore.dev" target="_blank" rel="noopener noreferrer">
-  <Image src="https://github.com/encoredev.png?size=88" alt="Encore" width={44} height={44} loading="lazy" />
+  <img src="https://github.com/encoredev.png?size=88" alt="Encore" width="44" height="44" loading="lazy" decoding="async" />
   <span class="t"><b>Encore</b><span>The platform for building Go-based cloud backends.</span></span>
 </a>
 
 <div class="sp-grid">
-  <a class="sp-card" href="https://github.com/customerio" target="_blank" rel="noopener noreferrer"><Image src="https://github.com/customerio.png?size=52" alt="Customer.io" width={26} height={26} loading="lazy" /><span>Customer.io</span></a>
-  <a class="sp-card" href="https://github.com/gravitycarbon" target="_blank" rel="noopener noreferrer"><Image src="https://github.com/gravitycarbon.png?size=52" alt="Gravity Carbon" width={26} height={26} loading="lazy" /><span>Gravity Carbon</span></a>
-  <a class="sp-card" href="https://github.com/Codeerror" target="_blank" rel="noopener noreferrer"><Image src="https://github.com/Codeerror.png?size=52" alt="Codeerror" width={26} height={26} loading="lazy" /><span>Codeerror</span></a>
+  <a class="sp-card" href="https://github.com/customerio" target="_blank" rel="noopener noreferrer"><img src="https://github.com/customerio.png?size=52" alt="Customer.io" width="26" height="26" loading="lazy" decoding="async" /><span>Customer.io</span></a>
+  <a class="sp-card" href="https://github.com/gravitycarbon" target="_blank" rel="noopener noreferrer"><img src="https://github.com/gravitycarbon.png?size=52" alt="Gravity Carbon" width="26" height="26" loading="lazy" decoding="async" /><span>Gravity Carbon</span></a>
+  <a class="sp-card" href="https://github.com/Codeerror" target="_blank" rel="noopener noreferrer"><img src="https://github.com/Codeerror.png?size=52" alt="Codeerror" width="26" height="26" loading="lazy" decoding="async" /><span>Codeerror</span></a>
 </div>
 
 <div class="sp-cta"><LinkButton href="https://github.com/sponsors/labstack" variant="secondary" icon="heart" iconPlacement="start" target="_blank" rel="noopener noreferrer">Become a sponsor</LinkButton></div>

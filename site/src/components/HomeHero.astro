@@ -46,7 +46,7 @@ const helloWorldCode = sourceSnippet(helloWorldSource, 'hero', 'cookbook/hello-w
     const curEl = term.querySelector('[data-cur]') as HTMLElement;
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    const cmd = 'curl localhost:1323';
+    const cmd = cmdEl.textContent ?? '';
 
     const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 

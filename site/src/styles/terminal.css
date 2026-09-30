@@ -195,10 +195,6 @@ site-search button { border-radius: 8px !important; }
 .echo-stats b { display: block; font-family: var(--sl-font); font-weight: 700; font-size: 1.6rem; color: var(--sl-color-white); letter-spacing: -0.02em; }
 .echo-stats span { font-size: 0.8rem; color: var(--sl-color-gray-4); }
 .echo-features { margin-top: 28px; }
-.echo-features .card { border-color: var(--sl-color-hairline); background: var(--sl-color-bg-sidebar); border-radius: 13px; padding: 20px; }
-.echo-features .card .title { font-family: var(--sl-font); font-weight: 600; letter-spacing: normal; font-size: 1.05rem; gap: .7rem; }
-.echo-features .card .icon { color: var(--echo-cyan-text); }
-.echo-features .card .body { color: var(--sl-color-gray-3); font-size: .9rem; line-height: 1.62; }
 .echo-features .card-grid, .echo-eco .card-grid { grid-template-columns: minmax(0, 1fr); gap: 14px; }
 @media (min-width: 40rem) { .echo-features .card-grid, .echo-eco .card-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (min-width: 64rem) { .echo-features .card-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } .echo-eco .card-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
@@ -360,8 +356,10 @@ starlight-toc a[aria-current='true'] { color: var(--echo-cyan-text); border-inli
    An inline script sets data-js during parsing; no-JS and reduced-motion visitors
    still see the static state. */
 @media (prefers-reduced-motion: no-preference) {
-  .hh-term[data-js]:not([data-typing]) :is([data-cmd], [data-out]) { visibility: hidden; }
+  /* If the script never starts, reveal the static state after 2s instead of staying blank. */
+  .hh-term[data-js]:not([data-typing]) :is([data-cmd], [data-out]) { visibility: hidden; animation: hh-reveal 0s 2s forwards; }
 }
+@keyframes hh-reveal { to { visibility: visible; } }
 .hh-term .pr { color: var(--echo-cyan-text); }
 .hh-term .dim { color: var(--sl-color-gray-3); }
 .hh-term .response { color: var(--echo-cyan-text); }

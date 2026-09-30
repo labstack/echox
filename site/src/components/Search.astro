@@ -27,12 +27,10 @@ if (!labels[locale]) throw new Error(`Search.astro: add launchpad labels for loc
     const form = ui.querySelector('.pagefind-ui__form');
     if (!form) return false;
     form.insertAdjacentHTML('afterend', launchpadHTML(locale, docsBase));
-    ui.querySelectorAll<HTMLAnchorElement>('.ess-link').forEach((link) => {
-      link.addEventListener('click', (event) => {
-        // Modified clicks open a new tab or window; keep the palette open for them.
-        if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-        search?.querySelector('dialog')?.close();
-      });
+    // Starlight closes the dialog only when the click target itself has an href;
+    // close it for clicks on a link's icon or section label too.
+    ui.querySelectorAll('.ess-link').forEach((link) => {
+      link.addEventListener('click', () => search?.querySelector('dialog')?.close());
     });
     return true;
   }
@@ -41,14 +39,14 @@ if (!labels[locale]) throw new Error(`Search.astro: add launchpad labels for loc
   if (search && !inject()) {
     const obs = new MutationObserver(() => { if (inject()) obs.disconnect(); });
     obs.observe(search, { childList: true, subtree: true });
-    // Bound the observer: if Pagefind never mounts (disabled in dev, or the
-    // Starlight markup changed on upgrade), stop watching so it can't run for
-    // the page's lifetime. Losing the launchpad is harmless; search still works.
-    setTimeout(() => {
-      obs.disconnect();
-      if (import.meta.env.DEV && !document.querySelector('.echo-search-empty')) {
-        console.warn('[search] empty-state panel not injected — .pagefind-ui selectors may have changed');
-      }
-    }, 10000);
+    // No time bound: idle callbacks can wait until a background tab is shown, and
+    // watching only <site-search> costs nothing while Pagefind is not mounted.
+    if (import.meta.env.DEV) {
+      setTimeout(() => {
+        if (!document.querySelector('.echo-search-empty')) {
+          console.warn('[search] empty-state panel not injected — .pagefind-ui selectors may have changed');
+        }
+      }, 10000);
+    }
   }
 </script>

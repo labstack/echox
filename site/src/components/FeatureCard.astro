@@ -1,5 +1,5 @@
 ---
-// Starlight's <Card> with an <h3> title: Card renders its title as a <p>,
+// Starlight's <Card> markup with an <h3> title: Card renders its title as a <p>,
 // which drops homepage feature titles out of the heading outline.
 import { Icon } from '@astrojs/starlight/components';
 import type { StarlightIcon } from '@astrojs/starlight/types';
@@ -21,29 +21,33 @@ const { icon, title } = Astro.props;
 </article>
 
 <style>
-	/* Card's base layout, in Card's layer so terminal.css theme overrides still win. */
-	@layer starlight.components {
-		.card {
-			border: 1px solid var(--sl-color-gray-5);
-			background-color: var(--sl-color-black);
-			padding: clamp(1rem, calc(0.125rem + 3vw), 2.5rem);
-			flex-direction: column;
-			gap: clamp(0.5rem, calc(0.125rem + 1vw), 1rem);
-		}
-		.title {
-			font-weight: 600;
-			font-size: var(--sl-text-h4);
-			color: var(--sl-color-white);
-			line-height: var(--sl-line-height-headings);
-			gap: 1rem;
-			align-items: center;
-		}
-		.card .icon {
-			flex-shrink: 0;
-		}
-		.card .body {
-			margin: 0;
-			font-size: clamp(var(--sl-text-sm), calc(0.5rem + 1vw), var(--sl-text-body));
-		}
+	/* .card .title outranks the theme's global .sl-markdown-content heading rule. */
+	.card {
+		flex-direction: column;
+		gap: clamp(0.5rem, calc(0.125rem + 1vw), 1rem);
+		border: 1px solid var(--sl-color-hairline);
+		border-radius: 13px;
+		background: var(--sl-color-bg-sidebar);
+		padding: 20px;
+	}
+	.card .title {
+		align-items: center;
+		gap: 0.7rem;
+		font-family: var(--sl-font);
+		font-size: 1.05rem;
+		font-weight: 600;
+		letter-spacing: normal;
+		line-height: var(--sl-line-height-headings);
+		color: var(--sl-color-white);
+	}
+	.icon {
+		flex-shrink: 0;
+		color: var(--echo-cyan-text);
+	}
+	.body {
+		margin: 0;
+		font-size: 0.9rem;
+		line-height: 1.62;
+		color: var(--sl-color-gray-3);
 	}
 </style>
