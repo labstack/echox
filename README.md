@@ -16,6 +16,9 @@ the runnable cookbook recipes the docs reference.
 ## Documentation site
 
 Requires [Node.js](https://nodejs.org) (LTS), the Go version in `go.mod`, and Git.
+The `toolchain` directive selects the preferred compiler; the `go` directive
+remains the minimum. CI and publishing use that file and enable automatic
+toolchain upgrades when reference dependencies or next Echo need a newer Go.
 The build publishes the stable docs at `/` and a next preview at `/next/`, each
 with its own search index and source revision. Stable source comes from the Echo version
 selected by `go.mod`, downloaded through Go's module cache and verified against
@@ -66,9 +69,13 @@ The generated files in `site/src/generated/` are never edited or committed.
 `npm run site:check` checks routes, local links and fragments, image text,
 search assets, and locale coverage. `npm run performance:check` catches large
 HTML or first-load asset growth on representative stable and next pages, plus
-new external script/stylesheet origins. Plain external links do not count as
-loaded resources. New routes pass without baseline acceptance; removed routes
-still require review, and new pages receive the same link/accessibility checks.
+new external resource origins, including scripts, stylesheets, preloads, icons,
+images and embedded content. Plain external links and preconnect hints do not
+count as loaded resources. New routes pass without baseline acceptance and
+receive the same link/accessibility checks. The check warns about new routes
+that are not yet in `route-baseline.json`; run `npm run site:accept` and commit
+that baseline to protect them from later removal. Removing a baseline route
+still requires review.
 
 The single PR workflow runs `go vet`, Go tests with race detection, Node tests,
 and the complete site build/checks. API checks also write their result and any

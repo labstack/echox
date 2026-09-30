@@ -111,4 +111,8 @@ for (const path of ['llms.txt', 'next/llms.txt']) {
   }
 }
 if (problems.length) throw new Error(`${problems.length} site check failure(s):\n${problems.join('\n')}`);
+const added = routes.filter((route) => !expected.includes(route));
+if (added.length) {
+  console.warn(`Warning: ${added.length} new route(s) are not yet protected by the removal guard:\n${added.join('\n')}\nRun npm run site:accept and commit route-baseline.json to protect these routes from future removal. This warning does not block new pages.`);
+}
 console.log(`Checked ${routes.length} routes and ${checked} internal links/assets; all resolve`);

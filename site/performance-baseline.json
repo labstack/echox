@@ -10,6 +10,7 @@
     },
     "externalDomains": [
       "fonts.googleapis.com",
+      "github.com",
       "unpkg.com",
       "widget.kapa.ai",
       "www.googletagmanager.com"
@@ -42,6 +43,7 @@
     },
     "externalDomains": [
       "fonts.googleapis.com",
+      "github.com",
       "unpkg.com",
       "www.googletagmanager.com"
     ]

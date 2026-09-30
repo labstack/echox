@@ -76,6 +76,15 @@ test('Go creates a workspace for the actual modules, replacing an old workspace'
   assert.ok(data.Go);
 });
 
+test('automatic toolchain selection handles a reference module newer than the root minimum', (t) => {
+  const { reference } = fixture(t);
+  writeFileSync(join(reference, 'go.mod'), 'module example.test/reference\n\ngo 1.26.0\n');
+  writeFileSync(join(reference, 'main.go'), 'package main\n\nimport ("fmt"; "runtime")\n\nfunc main() { fmt.Println(runtime.Version()) }\n');
+  assert.throws(() => run('go', ['run', '.'], reference, { GOWORK: 'off', GOTOOLCHAIN: 'go1.25.0' }), /requires go >= 1.26.0/);
+  const version = run('go', ['run', '.'], reference, { GOWORK: 'off', GOTOOLCHAIN: 'go1.25.0+auto' });
+  assert.ok(Number(version.match(/^go1\.(\d+)\./)?.[1]) >= 26, version);
+});
+
 test('next reference checks skip external middleware incompatible with the Echo workspace', (t) => {
   const { repo, reference } = fixture(t);
   mkdirSync(join(reference, 'example'));

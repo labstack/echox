@@ -38,6 +38,10 @@ jobs:
             go.sum
             reference/go.sum
 
+      # setup-go defaults to local; reference/next may require a newer toolchain.
+      - name: Enable Go toolchain upgrades
+        run: echo "GOTOOLCHAIN=auto" >> "$GITHUB_ENV"
+
       - uses: actions/setup-node@v6
         with:
           node-version: 24
