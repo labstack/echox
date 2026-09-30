@@ -14,6 +14,7 @@ function run(args, channel, sourceDir = '') {
   });
 }
 
+run(['run', 'cookbook:check'], 'stable');
 run(['run', 'source:check'], 'stable');
 run(['run', 'translations:status'], 'stable');
 run(['run', 'security-translations:status'], 'stable');

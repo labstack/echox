@@ -12,53 +12,12 @@ Echo 提供三个返回文件的上下文辅助方法：`c.File` 使用浏览器
 
 ### 服务器
 
-```go
-package main
-
-import (
-	"context"
-
-	"github.com/labstack/echo/v5"
-	"github.com/labstack/echo/v5/middleware"
-)
-
-func main() {
-	e := echo.New()
-
-	e.Use(middleware.RequestLogger())
-	e.Use(middleware.Recover())
-
-	e.GET("/", func(c *echo.Context) error {
-		return c.File("index.html")
-	})
-	e.GET("/file", func(c *echo.Context) error {
-		return c.File("echo.svg")
-	})
-
-	sc := echo.StartConfig{Address: ":1323"}
-	if err := sc.Start(context.Background(), e); err != nil {
-		e.Logger.Error("failed to start server", "error", err)
-	}
-}
+```go file=cookbook/file-download/server.go
 ```
 
 ### 客户端
 
-```html
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <title>File download</title>
-</head>
-<body>
-
-    <p>
-        <a href="/file">File download</a>
-    </p>
-
-</body>
-</html>
+```html file=cookbook/file-download/index.html
 ```
 
 ## 以内联方式下载文件
@@ -68,53 +27,12 @@ func main() {
 
 ### 服务器
 
-```go
-package main
-
-import (
-	"context"
-
-	"github.com/labstack/echo/v5"
-	"github.com/labstack/echo/v5/middleware"
-)
-
-func main() {
-	e := echo.New()
-
-	e.Use(middleware.RequestLogger())
-	e.Use(middleware.Recover())
-
-	e.GET("/", func(c *echo.Context) error {
-		return c.File("index.html")
-	})
-	e.GET("/inline", func(c *echo.Context) error {
-		return c.Inline("inline.txt", "inline.txt")
-	})
-
-	sc := echo.StartConfig{Address: ":1323"}
-	if err := sc.Start(context.Background(), e); err != nil {
-		e.Logger.Error("failed to start server", "error", err)
-	}
-}
+```go file=cookbook/file-download/inline/server.go
 ```
 
 ### 客户端
 
-```html
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <title>File download</title>
-</head>
-<body>
-
-    <p>
-        <a href="/inline">Inline file download</a>
-    </p>
-
-</body>
-</html>
+```html file=cookbook/file-download/inline/index.html
 ```
 
 ## 以附件方式下载文件
@@ -123,51 +41,10 @@ func main() {
 
 ### 服务器
 
-```go
-package main
-
-import (
-	"context"
-
-	"github.com/labstack/echo/v5"
-	"github.com/labstack/echo/v5/middleware"
-)
-
-func main() {
-	e := echo.New()
-
-	e.Use(middleware.RequestLogger())
-	e.Use(middleware.Recover())
-
-	e.GET("/", func(c *echo.Context) error {
-		return c.File("index.html")
-	})
-	e.GET("/attachment", func(c *echo.Context) error {
-		return c.Attachment("attachment.txt", "attachment.txt")
-	})
-
-	sc := echo.StartConfig{Address: ":1323"}
-	if err := sc.Start(context.Background(), e); err != nil {
-		e.Logger.Error("failed to start server", "error", err)
-	}
-}
+```go file=cookbook/file-download/attachment/server.go
 ```
 
 ### 客户端
 
-```html
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <title>File download</title>
-</head>
-<body>
-
-    <p>
-        <a href="/attachment">Attachment file download</a>
-    </p>
-
-</body>
-</html>
+```html file=cookbook/file-download/attachment/index.html
 ```

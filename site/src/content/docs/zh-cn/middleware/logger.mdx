@@ -5,9 +5,7 @@ sidebar:
   order: 12
 ---
 
-import { Code } from '@astrojs/starlight/components';
 import ConfigReference from '../../../../components/ConfigReference.astro';
-import example from '../../../../generated/request-logger.go.txt?raw';
 
 `RequestLogger` 将选定的请求和响应数据传给必填的 `LogValuesFunc` 回调。你可以在回调中使用 `slog` 或其他日志库。每个 `Log*` 字段控制对应数据的提取；例如，`LogStatus: true` 会填充 `v.Status`。
 
@@ -17,9 +15,10 @@ import example from '../../../../generated/request-logger.go.txt?raw';
 
 下面的完整程序以 JSON 格式记录 URI 和状态码。在 `echox` 源码目录运行 `cd reference/request-logger && go run .`，然后访问 `http://localhost:1323/`。
 
-<Code code={example} lang="go" title="request-logger/main.go" />
+```go file=reference/request-logger/main.go title="request-logger/main.go"
+```
 
-本页直接导入文档 CI 编译的同一个文件。下一个处理器返回错误时，`v.Error` 会包含该错误。设置 `HandleError: true` 后，全局错误处理器会先写入响应，再调用 `LogValuesFunc`；上游中间件此时无法更改状态码或响应体。
+本页直接显示文档 CI 编译的同一个文件。下一个处理器返回错误时，`v.Error` 会包含该错误。设置 `HandleError: true` 后，全局错误处理器会先写入响应，再调用 `LogValuesFunc`；上游中间件此时无法更改状态码或响应体。
 
 ### fmt.Printf
 

@@ -3,12 +3,14 @@
   "type": "module",
   "version": "0.1.0",
   "scripts": {
+    "test": "node --test plugins/*.test.mjs",
     "dev": "npm run source:prepare && astro dev",
     "build": "node scripts/build-site.mjs",
     "preview": "astro preview",
     "astro": "astro",
     "source:prepare": "node scripts/prepare-echo-source.mjs",
     "source:check": "npm run source:prepare && node scripts/check-source.mjs",
+    "cookbook:check": "node scripts/check-cookbook.mjs",
     "source:accept": "node scripts/accept-source.mjs",
     "translations:status": "node scripts/translation-status.mjs",
     "translations:accept": "node scripts/accept-translations.mjs",
@@ -20,8 +22,13 @@
     "performance:accept": "node scripts/check-performance.mjs --accept"
   },
   "dependencies": {
+    "@astrojs/markdown-remark": "^7.2.0",
     "@astrojs/starlight": "^0.40.0",
     "astro": "^6.4.7",
-    "sharp": "^0.35.1"
+    "remark-frontmatter": "^5.0.0",
+    "remark-mdx": "^3.1.1",
+    "remark-parse": "^11.0.0",
+    "sharp": "^0.35.1",
+    "unified": "^11.0.5"
   }
 }

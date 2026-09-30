@@ -128,7 +128,7 @@ func handler(c *echo.Context) error {
 }
 ```
 
-See the [JSONP cookbook](/cookbook/jsonp/).
+For cross-origin requests, use [JSON with CORS](/cookbook/cors/).
 
 The callback must be empty, a JavaScript identifier, or a dot-separated path of
 identifiers. Invalid callbacks return HTTP 400 with an error wrapping

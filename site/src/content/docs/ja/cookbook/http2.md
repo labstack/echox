@@ -5,7 +5,7 @@ sidebar:
   order: 9
 ---
 
-HTTP/2 はリクエスト多重化、header 圧縮、server push によりレイテンシーを改善します。
+HTTP/2 はリクエスト多重化と header 圧縮によりレイテンシーを改善します。
 Go の HTTP サーバーは TLS 上で HTTP/2 を自動的にネゴシエートするため、Echo で HTTP/2 を配信するには
 証明書付きでサーバーを起動すれば済みます。
 
@@ -26,47 +26,23 @@ go run $GOROOT/src/crypto/tls/generate_cert.go --host localhost
 
 ## 2. リクエスト情報を echo するハンドラを作成する
 
-```go
-e.GET("/request", func(c *echo.Context) error {
-	req := c.Request()
-	format := `
-		<code>
-			Protocol: %s<br>
-			Host: %s<br>
-			Remote Address: %s<br>
-			Method: %s<br>
-			Path: %s<br>
-		</code>
-	`
-	return c.HTML(http.StatusOK, fmt.Sprintf(format, req.Proto, req.Host, req.RemoteAddr, req.Method, req.URL.Path))
-})
+```go file=cookbook/http2/server.go#handler
 ```
 
 ## 3. TLS サーバーを起動する
 
 生成した証明書と key でサーバーを起動します。
 
-```go
-sc := echo.StartConfig{Address: ":1323"}
-if err := sc.StartTLS(context.Background(), e, "cert.pem", "key.pem"); err != nil {
-	e.Logger.Error("failed to start server", "error", err)
-}
+```go file=cookbook/http2/server.go#start-tls
 ```
 
 または、独自の `tls.Config` を持つカスタム `http.Server` を使います。
 
-```go
-s := http.Server{
-  Addr:    ":8443",
-  Handler: e, // set Echo as handler
-  TLSConfig: &tls.Config{
-    //Certificates: nil, // <-- s.ListenAndServeTLS will populate this field
-  },
-  //ReadTimeout: 30 * time.Second, // use custom timeouts
-}
-if err := s.ListenAndServeTLS("cert.pem", "key.pem"); err != http.ErrServerClosed {
-  log.Fatal(err)
-}
+```go file=cookbook/http2/server.go#custom-server
+```
+
+```sh
+go run . -custom-server
 ```
 
 ## 4. 検証する
@@ -83,35 +59,5 @@ Path: /
 
 ## ソースコード
 
-```go
-package main
-
-import (
-	"context"
-	"fmt"
-	"net/http"
-
-	"github.com/labstack/echo/v5"
-)
-
-func main() {
-	e := echo.New()
-	e.GET("/request", func(c *echo.Context) error {
-		req := c.Request()
-		format := `
-			<code>
-				Protocol: %s<br>
-				Host: %s<br>
-				Remote Address: %s<br>
-				Method: %s<br>
-				Path: %s<br>
-			</code>
-		`
-		return c.HTML(http.StatusOK, fmt.Sprintf(format, req.Proto, req.Host, req.RemoteAddr, req.Method, req.URL.Path))
-	})
-	sc := echo.StartConfig{Address: ":1323"}
-	if err := sc.StartTLS(context.Background(), e, "cert.pem", "key.pem"); err != nil {
-		e.Logger.Error("failed to start server", "error", err)
-	}
-}
+```go file=cookbook/http2/server.go
 ```

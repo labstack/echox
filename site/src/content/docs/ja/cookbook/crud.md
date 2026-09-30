@@ -5,16 +5,14 @@ sidebar:
   order: 2
 ---
 
-import { Code } from '@astrojs/starlight/components';
-import server from '../../../../generated/crud-server.go.txt?raw';
-
 インメモリ store を使った完全な CRUD（create, read, update, delete）API です。
 ハンドラは JSON リクエストボディを struct にバインドし、ロック下で store にアクセスして、
 JSON を返します。存在しないユーザーには `404` を、不正な id や空の name には `400` を返します。
 
 ## サーバー
 
-<Code code={server} lang="go" title="cookbook/crud/server.go" />
+```go file=cookbook/crud/server.go title="cookbook/crud/server.go"
+```
 
 ## クライアント
 

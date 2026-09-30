@@ -127,7 +127,7 @@ func handler(c *echo.Context) error {
 }
 ```
 
-参见 [JSONP cookbook](/zh-cn/cookbook/jsonp/)。
+对于跨源请求，请使用 [JSON 与 CORS](/zh-cn/cookbook/cors/)。
 
 ## 发送 XML
 

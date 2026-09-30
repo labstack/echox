@@ -127,7 +127,7 @@ func handler(c *echo.Context) error {
 }
 ```
 
-[JSONP cookbook](/ja/cookbook/jsonp/)を参照してください。
+クロスオリジンのリクエストには [JSON と CORS](/ja/cookbook/cors/)を使用してください。
 
 ## XML を送信する
 

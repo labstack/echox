@@ -34,7 +34,9 @@ var index = `
 		<h1>WebSocket</h1>
 		<p id="output"></p>
 		<script>
-			var ws = new WebSocket('ws://localhost:1323/ws')
+			var wsURL = new URL('ws', window.location.href)
+			wsURL.protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+			var ws = new WebSocket(wsURL)
 
 			ws.onmessage = function(evt) {
 				var out = document.getElementById('output');

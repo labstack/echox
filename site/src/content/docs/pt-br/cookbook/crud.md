@@ -5,16 +5,14 @@ sidebar:
   order: 2
 ---
 
-import { Code } from '@astrojs/starlight/components';
-import server from '../../../../generated/crud-server.go.txt?raw';
-
 Uma API CRUD completa (create, read, update, delete) baseada em um store em memória.
 Os handlers fazem binding do body JSON do request em uma struct, acessam o store sob um
 lock e retornam JSON. Um usuário inexistente retorna `404`, e um id inválido ou um nome vazio retorna `400`.
 
 ## Servidor
 
-<Code code={server} lang="go" title="cookbook/crud/server.go" />
+```go file=cookbook/crud/server.go title="cookbook/crud/server.go"
+```
 
 ## Cliente
 

@@ -10,52 +10,39 @@ sidebar:
 
 ## 1) 确定上游目标 URL
 
-```go
-url1, err := url.Parse("http://localhost:8081")
-if err != nil {
-  e.Logger.Error("failed parse url", "error", err)
-}
-url2, err := url.Parse("http://localhost:8082")
-if err != nil {
-  e.Logger.Error("failed parse url", "error", err)
-}
-targets := []*middleware.ProxyTarget{
-  {
-    URL: url1,
-  },
-  {
-    URL: url2,
-  },
-}
+```go file=cookbook/reverse-proxy/server.go#targets
 ```
 
 ## 2) 使用上游目标设置代理中间件
 
 下面的片段使用轮询负载均衡。你也可以使用 `middleware.NewRandomBalancer()`。
 
-```go
-e.Use(middleware.Proxy(middleware.NewRoundRobinBalancer(targets)))
+```go file=cookbook/reverse-proxy/server.go#middleware
 ```
 
 要为子路由设置代理，请使用 `Echo#Group()`。
 
-```go
-g := e.Group("/blog")
-g.Use(middleware.Proxy(...))
+```go file=cookbook/reverse-proxy/server.go#grouped-proxy
 ```
 
 ## 3) 启动上游服务器
 
+在 `cookbook/reverse-proxy` 目录中，分别在两个终端启动上游服务器：
+
 ```sh
-cd upstream
-go run server.go server1 :8081
-go run server.go server2 :8082
+go run ./upstream server1 :8081
+```
+
+```sh
+go run ./upstream server2 :8082
 ```
 
 ## 4) 启动代理服务器
 
+在第三个终端中，同样进入 `cookbook/reverse-proxy` 目录，启动代理：
+
 ```sh
-go run server.go
+go run .
 ```
 
 访问 `http://localhost:1323`，你应该会看到网页中 HTTP 请求由 "server 1" 提供，
@@ -73,130 +60,24 @@ Hello from upstream server server2!
 Hello from upstream server server2!
 ```
 
+如需使用分组模式，请停止默认代理，然后运行：
+
+```sh
+go run . -grouped
+```
+
+访问 `http://localhost:1323/blog/`。代理会移除 `/blog` 后再转发请求；页面的相对 WebSocket URL 会保持在 `/blog/` 下。
+
 ## 源码
 
 ### 上游服务器
 
-```go
-package main
-
-import (
-	"context"
-	"fmt"
-	"net/http"
-	"os"
-	"time"
-
-	"github.com/labstack/echo/v5"
-	"github.com/labstack/echo/v5/middleware"
-	"golang.org/x/net/websocket"
-)
-
-var index = `
-	<!DOCTYPE html>
-	<html lang="en">
-	<head>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<meta http-equiv="X-UA-Compatible" content="ie=edge">
-		<title>Upstream Server</title>
-		<style>
-			h1, p {
-				font-weight: 300;
-			}
-		</style>
-	</head>
-	<body>
-		<h1>HTTP</h1>
-		<p>
-			Hello from upstream server %s
-		</p>
-		<h1>WebSocket</h1>
-		<p id="output"></p>
-		<script>
-			var ws = new WebSocket('ws://localhost:1323/ws')
-
-			ws.onmessage = function(evt) {
-				var out = document.getElementById('output');
-				out.innerHTML += evt.data + '<br>';
-			}
-		</script>
-	</body>
-	</html>
-`
-
-func main() {
-	name := os.Args[1]
-	port := os.Args[2]
-	e := echo.New()
-
-	e.Use(middleware.RequestLogger())
-	e.Use(middleware.Recover())
-
-	e.GET("/", func(c *echo.Context) error {
-		return c.HTML(http.StatusOK, fmt.Sprintf(index, name))
-	})
-
-	// WebSocket handler
-	e.GET("/ws", func(c *echo.Context) error {
-		websocket.Handler(func(ws *websocket.Conn) {
-			defer ws.Close()
-			for {
-				// Write
-				err := websocket.Message.Send(ws, fmt.Sprintf("Hello from upstream server %s!", name))
-				if err != nil {
-					e.Logger.Error("failed to send message", "error", err)
-				}
-				select {
-				case <-ws.Request().Context().Done():
-					return
-				case <-time.After(1 * time.Second):
-					continue
-				}
-			}
-		}).ServeHTTP(c.Response(), c.Request())
-		return nil
-	})
-
-	sc := echo.StartConfig{Address: port}
-	if err := sc.Start(context.Background(), e); err != nil {
-		e.Logger.Error("failed to start server", "error", err)
-	}
-}
+```go file=cookbook/reverse-proxy/upstream/server.go
 ```
 
 ### 代理服务器
 
-```go
-package main
-
-import (
-	"context"
-	"net/url"
-
-	"github.com/labstack/echo/v5"
-	"github.com/labstack/echo/v5/middleware"
-)
-
-func main() {
-	e := echo.New()
-	e.Use(middleware.RequestLogger())
-	e.Use(middleware.Recover())
-
-	// Setup proxy
-	url1, _ := url.Parse("http://localhost:8081")
-	url2, _ := url.Parse("http://localhost:8082")
-	targets := []*middleware.ProxyTarget{
-		{URL: url1},
-		{URL: url2},
-	}
-	e.Use(middleware.Proxy(middleware.NewRoundRobinBalancer(targets)))
-
-	sc := echo.StartConfig{Address: ":1323"}
-	if err := sc.Start(context.Background(), e); err != nil {
-		e.Logger.Error("failed to start server", "error", err)
-	}
-}
+```go file=cookbook/reverse-proxy/server.go
 ```
 
 ## Echo 安全更新 (v5.4.0 / v4.16.0)

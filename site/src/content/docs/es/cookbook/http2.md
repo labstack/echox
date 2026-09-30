@@ -5,8 +5,7 @@ sidebar:
   order: 9
 ---
 
-HTTP/2 mejora la latencia mediante multiplexing de requests, compresión de headers y
-server push. El servidor HTTP de Go negocia HTTP/2 automáticamente sobre TLS, por lo que
+HTTP/2 mejora la latencia mediante multiplexing de requests y compresión de headers. El servidor HTTP de Go negocia HTTP/2 automáticamente sobre TLS, por lo que
 servir HTTP/2 con Echo consiste en iniciar el servidor con un certificado.
 
 <a id="1-generate-a-self-signed-x509-tls-certificate"></a>
@@ -26,47 +25,23 @@ un certificado de una [certificate authority](https://en.wikipedia.org/wiki/Cert
 
 ## 2. Crear un handler que refleje información del request
 
-```go
-e.GET("/request", func(c *echo.Context) error {
-	req := c.Request()
-	format := `
-		<code>
-			Protocol: %s<br>
-			Host: %s<br>
-			Remote Address: %s<br>
-			Method: %s<br>
-			Path: %s<br>
-		</code>
-	`
-	return c.HTML(http.StatusOK, fmt.Sprintf(format, req.Proto, req.Host, req.RemoteAddr, req.Method, req.URL.Path))
-})
+```go file=cookbook/http2/server.go#handler
 ```
 
 ## 3. Iniciar el servidor TLS
 
 Inicia el servidor con el certificado y la key generados:
 
-```go
-sc := echo.StartConfig{Address: ":1323"}
-if err := sc.StartTLS(context.Background(), e, "cert.pem", "key.pem"); err != nil {
-	e.Logger.Error("failed to start server", "error", err)
-}
+```go file=cookbook/http2/server.go#start-tls
 ```
 
 Alternativamente, usa un `http.Server` personalizado con tu propio `tls.Config`:
 
-```go
-s := http.Server{
-  Addr:    ":8443",
-  Handler: e, // set Echo as handler
-  TLSConfig: &tls.Config{
-    //Certificates: nil, // <-- s.ListenAndServeTLS will populate this field
-  },
-  //ReadTimeout: 30 * time.Second, // use custom timeouts
-}
-if err := s.ListenAndServeTLS("cert.pem", "key.pem"); err != http.ErrServerClosed {
-  log.Fatal(err)
-}
+```go file=cookbook/http2/server.go#custom-server
+```
+
+```sh
+go run . -custom-server
 ```
 
 ## 4. Verificar
@@ -84,35 +59,5 @@ Path: /
 
 ## Código fuente
 
-```go
-package main
-
-import (
-	"context"
-	"fmt"
-	"net/http"
-
-	"github.com/labstack/echo/v5"
-)
-
-func main() {
-	e := echo.New()
-	e.GET("/request", func(c *echo.Context) error {
-		req := c.Request()
-		format := `
-			<code>
-				Protocol: %s<br>
-				Host: %s<br>
-				Remote Address: %s<br>
-				Method: %s<br>
-				Path: %s<br>
-			</code>
-		`
-		return c.HTML(http.StatusOK, fmt.Sprintf(format, req.Proto, req.Host, req.RemoteAddr, req.Method, req.URL.Path))
-	})
-	sc := echo.StartConfig{Address: ":1323"}
-	if err := sc.StartTLS(context.Background(), e, "cert.pem", "key.pem"); err != nil {
-		e.Logger.Error("failed to start server", "error", err)
-	}
-}
+```go file=cookbook/http2/server.go
 ```

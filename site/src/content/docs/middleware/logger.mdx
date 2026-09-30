@@ -5,9 +5,7 @@ sidebar:
   order: 12
 ---
 
-import { Code } from '@astrojs/starlight/components';
 import ConfigReference from '../../../components/ConfigReference.astro';
-import example from '../../../generated/request-logger.go.txt?raw';
 
 `RequestLogger` passes selected request and response values to a required `LogValuesFunc` callback. Use that callback to write to `slog` or another logger. Each `Log*` field controls which value is collected; for example, `LogStatus: true` populates `v.Status`.
 
@@ -17,9 +15,10 @@ import example from '../../../generated/request-logger.go.txt?raw';
 
 This complete program logs the URI and status as JSON. From the `echox` checkout, run `cd reference/request-logger && go run .`, then request `http://localhost:1323/`.
 
-<Code code={example} lang="go" title="request-logger/main.go" />
+```go file=reference/request-logger/main.go title="request-logger/main.go"
+```
 
-The page imports the same file that documentation CI compiles. `v.Error` is set when the next handler returns an error; there is no extra configuration field for it. With `HandleError: true`, Echo's global error handler writes the response before `LogValuesFunc` runs, so earlier middleware cannot then change its status or body.
+The page displays the same file that documentation CI compiles. `v.Error` is set when the next handler returns an error; there is no extra configuration field for it. With `HandleError: true`, Echo's global error handler writes the response before `LogValuesFunc` runs, so earlier middleware cannot then change its status or body.
 
 ### fmt.Printf
 

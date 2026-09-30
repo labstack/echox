@@ -46,7 +46,7 @@ for (const file of htmlFiles) {
   const html = readFileSync(file, 'utf8');
   const markup = html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, '').replace(/<pre\b[^>]*>[\s\S]*?<\/pre>/gi, '');
   const route = routes.find((item) => file === join(distDir, item, 'index.html') || file === join(distDir, item));
-  const redirect = route.startsWith('/docs/') || route === '/docs/' || route === '/search/';
+  const redirect = /<meta\b[^>]*http-equiv="refresh"/i.test(html);
   if (route === '/' && (!html.includes('widget.kapa.ai') || !html.includes('id="echo-ask-ai"'))) {
     problems.push('Release docs lost Ask AI');
   }

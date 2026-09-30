@@ -11,23 +11,7 @@ WebSocket も処理する Go サーバーです。
 
 ## 1) 上流ターゲット URL を特定する
 
-```go
-url1, err := url.Parse("http://localhost:8081")
-if err != nil {
-  e.Logger.Error("failed parse url", "error", err)
-}
-url2, err := url.Parse("http://localhost:8082")
-if err != nil {
-  e.Logger.Error("failed parse url", "error", err)
-}
-targets := []*middleware.ProxyTarget{
-  {
-    URL: url1,
-  },
-  {
-    URL: url2,
-  },
-}
+```go file=cookbook/reverse-proxy/server.go#targets
 ```
 
 ## 2) 上流ターゲットでプロキシミドルウェアを設定する
@@ -35,29 +19,32 @@ targets := []*middleware.ProxyTarget{
 下のスニペットは round-robin ロードバランシングを使います。
 `middleware.NewRandomBalancer()` も使えます。
 
-```go
-e.Use(middleware.Proxy(middleware.NewRoundRobinBalancer(targets)))
+```go file=cookbook/reverse-proxy/server.go#middleware
 ```
 
 サブルートにプロキシを設定するには、`Echo#Group()` を使います。
 
-```go
-g := e.Group("/blog")
-g.Use(middleware.Proxy(...))
+```go file=cookbook/reverse-proxy/server.go#grouped-proxy
 ```
 
 ## 3) 上流サーバーを起動する
 
+`cookbook/reverse-proxy` で、各上流サーバーを別々のターミナルで起動します。
+
 ```sh
-cd upstream
-go run server.go server1 :8081
-go run server.go server2 :8082
+go run ./upstream server1 :8081
+```
+
+```sh
+go run ./upstream server2 :8082
 ```
 
 ## 4) プロキシサーバーを起動する
 
+3 つ目のターミナルでも `cookbook/reverse-proxy` に移動し、プロキシを起動します。
+
 ```sh
-go run server.go
+go run .
 ```
 
 `http://localhost:1323` にアクセスすると、HTTP リクエストは "server 1" から、
@@ -75,130 +62,24 @@ Hello from upstream server server2!
 Hello from upstream server server2!
 ```
 
+グループモードを使う場合は、通常モードのプロキシを停止して次を実行します。
+
+```sh
+go run . -grouped
+```
+
+`http://localhost:1323/blog/` にアクセスします。プロキシは `/blog` を除いてリクエストを転送し、ページの相対 WebSocket URL は `/blog/` 内に保たれます。
+
 ## ソースコード
 
 ### 上流サーバー
 
-```go
-package main
-
-import (
-	"context"
-	"fmt"
-	"net/http"
-	"os"
-	"time"
-
-	"github.com/labstack/echo/v5"
-	"github.com/labstack/echo/v5/middleware"
-	"golang.org/x/net/websocket"
-)
-
-var index = `
-	<!DOCTYPE html>
-	<html lang="en">
-	<head>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<meta http-equiv="X-UA-Compatible" content="ie=edge">
-		<title>Upstream Server</title>
-		<style>
-			h1, p {
-				font-weight: 300;
-			}
-		</style>
-	</head>
-	<body>
-		<h1>HTTP</h1>
-		<p>
-			Hello from upstream server %s
-		</p>
-		<h1>WebSocket</h1>
-		<p id="output"></p>
-		<script>
-			var ws = new WebSocket('ws://localhost:1323/ws')
-
-			ws.onmessage = function(evt) {
-				var out = document.getElementById('output');
-				out.innerHTML += evt.data + '<br>';
-			}
-		</script>
-	</body>
-	</html>
-`
-
-func main() {
-	name := os.Args[1]
-	port := os.Args[2]
-	e := echo.New()
-
-	e.Use(middleware.RequestLogger())
-	e.Use(middleware.Recover())
-
-	e.GET("/", func(c *echo.Context) error {
-		return c.HTML(http.StatusOK, fmt.Sprintf(index, name))
-	})
-
-	// WebSocket handler
-	e.GET("/ws", func(c *echo.Context) error {
-		websocket.Handler(func(ws *websocket.Conn) {
-			defer ws.Close()
-			for {
-				// Write
-				err := websocket.Message.Send(ws, fmt.Sprintf("Hello from upstream server %s!", name))
-				if err != nil {
-					e.Logger.Error("failed to send message", "error", err)
-				}
-				select {
-				case <-ws.Request().Context().Done():
-					return
-				case <-time.After(1 * time.Second):
-					continue
-				}
-			}
-		}).ServeHTTP(c.Response(), c.Request())
-		return nil
-	})
-
-	sc := echo.StartConfig{Address: port}
-	if err := sc.Start(context.Background(), e); err != nil {
-		e.Logger.Error("failed to start server", "error", err)
-	}
-}
+```go file=cookbook/reverse-proxy/upstream/server.go
 ```
 
 ### プロキシサーバー
 
-```go
-package main
-
-import (
-	"context"
-	"net/url"
-
-	"github.com/labstack/echo/v5"
-	"github.com/labstack/echo/v5/middleware"
-)
-
-func main() {
-	e := echo.New()
-	e.Use(middleware.RequestLogger())
-	e.Use(middleware.Recover())
-
-	// Setup proxy
-	url1, _ := url.Parse("http://localhost:8081")
-	url2, _ := url.Parse("http://localhost:8082")
-	targets := []*middleware.ProxyTarget{
-		{URL: url1},
-		{URL: url2},
-	}
-	e.Use(middleware.Proxy(middleware.NewRoundRobinBalancer(targets)))
-
-	sc := echo.StartConfig{Address: ":1323"}
-	if err := sc.Start(context.Background(), e); err != nil {
-		e.Logger.Error("failed to start server", "error", err)
-	}
-}
+```go file=cookbook/reverse-proxy/server.go
 ```
 
 ## Echo のセキュリティ更新 (v5.4.0 / v4.16.0)
