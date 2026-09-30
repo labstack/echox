@@ -91,7 +91,7 @@ site-search button { border-radius: 8px !important; }
 
 /* "Ask AI" pill — opens the kapa.ai modal (Search.astro + astro.config). Sits
    beside the search box and mirrors its chrome (40px, dark, 8px radius) so the
-   two read as one control group. Cyan sparkle marks it as the AI entrypoint. */
+   two read as one control group. Cyan star marks it as the AI entrypoint. */
 .echo-search-row { display: flex; align-items: center; gap: 8px; flex: 1 1 auto; min-width: 0; }
 /* site-search is display:contents, so size its actual trigger button: let it grow
    to fill the row (capped at Starlight's 352px max-width, restoring its old size). */
@@ -110,7 +110,7 @@ site-search button { border-radius: 8px !important; }
   border-color: var(--echo-cyan); background: var(--echo-soft);
   color: var(--sl-color-white);
 }
-/* Tight headers (mobile): drop the label, keep the sparkle as an icon button. */
+/* Tight headers (mobile): drop the label, keep the star as an icon button. */
 @media (max-width: 50rem) {
   .echo-ask-ai { padding: 0 11px; }
   .echo-ask-ai__label { display: none; }
@@ -197,7 +197,7 @@ site-search button { border-radius: 8px !important; }
 .echo-features { margin-top: 28px; }
 .echo-features .card { border-color: var(--sl-color-hairline); background: var(--sl-color-bg-sidebar); border-radius: 13px; padding: 20px; }
 .echo-features .card .title { font-family: var(--sl-font); font-weight: 600; letter-spacing: normal; font-size: 1.05rem; gap: .7rem; }
-.echo-features .card .icon { padding: 0; border: 0; background: none; color: var(--echo-cyan-text); }
+.echo-features .card .icon { color: var(--echo-cyan-text); }
 .echo-features .card .body { color: var(--sl-color-gray-3); font-size: .9rem; line-height: 1.62; }
 .echo-features .card-grid, .echo-eco .card-grid { grid-template-columns: minmax(0, 1fr); gap: 14px; }
 @media (min-width: 40rem) { .echo-features .card-grid, .echo-eco .card-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
@@ -217,7 +217,11 @@ site-search button { border-radius: 8px !important; }
 .echo-steps h3 { font-size: 1rem; margin: 0 0 6px; }
 .echo-steps p { color: var(--sl-color-gray-3); font-size: .9rem; margin: 0 0 14px; }
 .echo-steps .expressive-code { --ec-codeFontSize: .78rem; }
-@media (min-width: 64rem) { .echo-steps .sl-steps { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+/* Wide: Install and Run stack beside the full server in Write. */
+@media (min-width: 64rem) {
+  .echo-steps .sl-steps { grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); }
+  .echo-steps .sl-steps > li:nth-child(2) { grid-column: 2; grid-row: 1 / span 2; }
+}
 
 /* footer */
 .echo-foot { margin-top: 64px; border-top: 1px solid var(--sl-color-hairline); padding-top: 34px; display: flex; flex-wrap: wrap; gap: 30px 56px; }
@@ -324,10 +328,9 @@ starlight-toc a[aria-current='true'] { color: var(--echo-cyan-text); border-inli
 :where(.hero) { display: none; }
 
 /* Starlight adds margin-top to every adjacent sibling inside .sl-markdown-content,
-   which knocks the 2nd+ item of each flex/grid row out of alignment. Our home rows
-   manage their own spacing via gap/explicit margins — neutralise the injected margin. */
-.hh > *, .hh-left > *, .hh-win > *,
-.echo-stats > *, .echo-features > *, .echo-steps > *, .echo-eco > *,
+   which knocks the 2nd+ item of each flex/grid row out of alignment. Home rows outside
+   .not-content manage their own spacing via gap/explicit margins — neutralise it. */
+.echo-stats > *, .echo-steps > *,
 .sp-featured > *, .sp-card > *, .sp-grid > *,
 .echo-foot > .brand, .echo-foot > .col { margin-top: 0; }
 
@@ -354,6 +357,11 @@ starlight-toc a[aria-current='true'] { color: var(--echo-cyan-text); border-inli
 .hh-win .expressive-code { --ec-brdRad: 0; --ec-brdCol: transparent; --ec-codeFontSize: .82rem; margin: 0; }
 .hh-term { border-top: 1px solid var(--sl-color-hairline); background: color-mix(in srgb, var(--echo-cyan) 4%, var(--sl-color-bg-sidebar)); color: var(--sl-color-text); padding: 16px 18px; font-size: .82rem; line-height: 1.85; min-height: 118px; }
 .hh-term [data-out] { margin-top: .65rem; }
+/* Keep the static final state from flashing before the typing script clears it;
+   no-JS and reduced-motion visitors still see it. */
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  .hh-term:not([data-typing]) :is([data-cmd], [data-out]) { visibility: hidden; }
+}
 .hh-term .pr { color: var(--echo-cyan-text); }
 .hh-term .dim { color: var(--sl-color-gray-3); }
 .hh-term .response { color: var(--echo-cyan-text); }
@@ -377,7 +385,8 @@ starlight-toc a[aria-current='true'] { color: var(--echo-cyan-text); border-inli
 .sp-cta a:hover { background: var(--echo-soft); }
 
 /* ===================== Ecosystem ===================== */
-.echo-eco .sl-link-card { border-color: var(--sl-color-hairline); background: var(--sl-color-bg-sidebar); border-radius: 11px; box-shadow: none; }
+.echo-eco .sl-link-card { border-color: var(--sl-color-hairline); background: var(--sl-color-bg-sidebar); border-radius: 11px; box-shadow: none; transition: border-color .15s, background .15s; }
+.echo-eco .sl-link-card:hover { border-color: var(--echo-cyan); background: var(--echo-soft); }
 .echo-eco .title { font-family: var(--sl-font-mono); font-size: .9rem; color: var(--echo-cyan-text); }
 .echo-eco .description { font-size: .86rem; }
 .echo-eco .sl-link-card:focus-within { outline: 2px solid var(--echo-cyan-text); outline-offset: 3px; }

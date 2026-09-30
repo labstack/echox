@@ -70,6 +70,7 @@ const helloWorldCode = sourceSnippet(helloWorldSource, 'hero', 'cookbook/hello-w
       cmdEl.textContent = cmd;
       curEl.style.display = 'none';
     } else {
+      term.setAttribute('data-typing', '');
       run();
     }
   }

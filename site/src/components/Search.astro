@@ -3,15 +3,16 @@ import Default from '@astrojs/starlight/components/Search.astro';
 import { Icon } from '@astrojs/starlight/components';
 const isNext = process.env.DOCS_CHANNEL === 'next';
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
-const locale = Astro.url.pathname.match(/^\/(?:next\/)?(es|ja|pt-br|zh-cn)(?:\/|$)/)?.[1] || 'en';
+const locale = Astro.locals.starlightRoute.locale ?? 'en';
 const docsBase = `${base}${locale === 'en' ? '' : `/${locale}`}`;
-const labels = {
+const labels = ({
   en: { start: 'Start here', popular: 'Popular', quickstart: 'Quickstart', routing: 'Routing', binding: 'Binding', guide: 'Guide', middleware: 'Middleware', cookbook: 'Cookbook', open: 'open', navigate: 'navigate', close: 'close' },
   es: { start: 'Empieza aquí', popular: 'Popular', quickstart: 'Inicio rápido', routing: 'Rutas', binding: 'Binding', guide: 'Guía', middleware: 'Middleware', cookbook: 'Recetario', open: 'abrir', navigate: 'navegar', close: 'cerrar' },
   ja: { start: 'はじめに', popular: 'よく見るページ', quickstart: 'クイックスタート', routing: 'ルーティング', binding: 'バインディング', guide: 'ガイド', middleware: 'ミドルウェア', cookbook: 'クックブック', open: '開く', navigate: '移動', close: '閉じる' },
   'pt-br': { start: 'Comece aqui', popular: 'Populares', quickstart: 'Guia de início', routing: 'Roteamento', binding: 'Binding', guide: 'Guia', middleware: 'Middleware', cookbook: 'Receitas', open: 'abrir', navigate: 'navegar', close: 'fechar' },
   'zh-cn': { start: '从这里开始', popular: '热门内容', quickstart: '快速入门', routing: '路由', binding: '数据绑定', guide: '指南', middleware: '中间件', cookbook: '示例', open: '打开', navigate: '导航', close: '关闭' },
-}[locale as 'en' | 'es' | 'ja' | 'pt-br' | 'zh-cn'];
+} as Record<string, Record<string, string>>)[locale];
+if (!labels) throw new Error(`Search.astro: add launchpad labels for locale "${locale}"`);
 ---
 <div class="echo-search-row">
   <Default />

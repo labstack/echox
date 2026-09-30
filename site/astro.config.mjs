@@ -64,7 +64,7 @@ export default defineConfig({
             // Modal header title (defaults to "Echo Docs AI" from the project name).
             'data-modal-title': 'Ask AI',
             'data-project-color': '#00afd1',
-            // Modal header logo — the same sparkle as the "Ask AI" header pill
+            // Modal header logo — the same star as the "Ask AI" header pill
             // (not the Echo cube). The floating launcher that also used this is hidden.
             'data-project-logo': '/ask-ai.svg',
             // Sync the widget's light/dark with the site (we set data-theme on <html>).

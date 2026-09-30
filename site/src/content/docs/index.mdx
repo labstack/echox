@@ -22,7 +22,7 @@ import { Image } from 'astro:assets';
 import helloWorldSource from '../../../../cookbook/hello-world/server.go?raw';
 import { sourceSnippet } from '../../../plugins/remark-source-code.mjs';
 
-export const helloWorldRoute = sourceSnippet(helloWorldSource, 'route', 'cookbook/hello-world/server.go');
+export const helloWorldServer = sourceSnippet(helloWorldSource, undefined, 'cookbook/hello-world/server.go');
 
 <HomeHero />
 
@@ -58,8 +58,8 @@ export const helloWorldRoute = sourceSnippet(helloWorldSource, 'route', 'cookboo
       </li>
       <li>
         <h3>Write</h3>
-        <p>Register a route. See the <a href="/cookbook/hello-world/">complete server</a>.</p>
-        <Code code={helloWorldRoute} lang="go" frame="none" wrap />
+        <p>Save the <a href="/cookbook/hello-world/">Hello World server</a> as <code>server.go</code>.</p>
+        <Code code={helloWorldServer} lang="go" frame="none" wrap />
       </li>
       <li>
         <h3>Run</h3>
