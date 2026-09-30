@@ -64,7 +64,7 @@ export default defineConfig({
             // Modal header title (defaults to "Echo Docs AI" from the project name).
             'data-modal-title': 'Ask AI',
             'data-project-color': '#00afd1',
-            // Modal header logo — the same sparkle as the "Ask AI" header pill
+            // Modal header logo — the same star as the "Ask AI" header pill
             // (not the Echo cube). The floating launcher that also used this is hidden.
             'data-project-logo': '/ask-ai.svg',
             // Sync the widget's light/dark with the site (we set data-theme on <html>).
@@ -86,13 +86,6 @@ export default defineConfig({
           attrs: {
             rel: 'stylesheet',
             href: 'https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Fragment+Mono&display=swap',
-          },
-        },
-        {
-          tag: 'link',
-          attrs: {
-            rel: 'stylesheet',
-            href: 'https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css',
           },
         },
         // Default social card. Starlight already emits og:title/description/url

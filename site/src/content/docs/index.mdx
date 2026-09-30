@@ -14,8 +14,10 @@ hero:
 tableOfContents: false
 ---
 
+import FeatureCard from '../../components/FeatureCard.astro';
 import HomeHero from '../../components/HomeHero.astro';
 import { starsLabel } from '../../data/github.ts';
+import { CardGrid, Code, LinkButton, LinkCard, Steps } from '@astrojs/starlight/components';
 
 <HomeHero />
 
@@ -28,76 +30,97 @@ import { starsLabel } from '../../data/github.ts';
 
 <div class="echo-h"><span class="ey">Why Echo</span><h2>Everything you need. Nothing you don't.</h2></div>
 
-<div class="echo-features">
-  <div class="echo-card"><i class="ph ph-lightning"></i><h3>Optimized Router</h3><p>Radix-tree routing with zero dynamic allocation and smart route prioritization.</p></div>
-  <div class="echo-card"><i class="ph ph-stack"></i><h3>Batteries-included Middleware</h3><p>CORS, JWT, rate-limit, gzip, recover, request logging — 25+ built in.</p></div>
-  <div class="echo-card"><i class="ph ph-link"></i><h3>Data Binding</h3><p>Bind JSON, XML, form, query &amp; path params into typed structs, with validation.</p></div>
-  <div class="echo-card"><i class="ph ph-lock-key"></i><h3>Automatic TLS</h3><p>HTTPS out of the box via Let's Encrypt, plus HTTP/2 support.</p></div>
-  <div class="echo-card"><i class="ph ph-puzzle-piece"></i><h3>Extensible</h3><p>Composable middleware and a clean, minimal interface for total control.</p></div>
-  <div class="echo-card"><i class="ph ph-code"></i><h3>Templates</h3><p>Plug in any Go template engine for fast, flexible HTML rendering.</p></div>
+<div class="echo-features not-content">
+  <CardGrid>
+    <FeatureCard title="Optimized Router" icon="rocket">Radix-tree routing with zero dynamic allocation and smart route prioritization.</FeatureCard>
+    <FeatureCard title="Batteries-included Middleware" icon="setting">CORS, JWT, rate-limit, gzip, recover, request logging — 25+ built in.</FeatureCard>
+    <FeatureCard title="Data Binding" icon="document">Bind JSON, XML, form, query &amp; path params into typed structs, with validation.</FeatureCard>
+    <FeatureCard title="Automatic TLS" icon="padlock">HTTPS out of the box via Let's Encrypt, plus HTTP/2 support.</FeatureCard>
+    <FeatureCard title="Extensible" icon="puzzle">Composable middleware and a clean, minimal interface for total control.</FeatureCard>
+    <FeatureCard title="Templates" icon="window">Plug in any Go template engine for fast, flexible HTML rendering.</FeatureCard>
+  </CardGrid>
 </div>
 
 <div class="echo-h"><span class="ey">Get Started</span><h2>A running server in three steps.</h2></div>
 
 <div class="echo-steps">
-  <div class="echo-step"><span class="n">01</span><h4>Install</h4><p>Add Echo to your module.</p><pre>go get github.com/labstack/echo/v5</pre></div>
-  <div class="echo-step"><span class="n">02</span><h4>Write</h4><p>Register a route.</p><pre>e := echo.New()
-e.GET("/", hello)
-e.Start(":1323")</pre></div>
-  <div class="echo-step"><span class="n">03</span><h4>Run</h4><p>Start serving.</p><pre>go run main.go
-⇨ :1323</pre></div>
+  <Steps>
+    <ol>
+      <li>
+        <h3>Install</h3>
+        <p>Create a module and add Echo.</p>
+        <Code code={'go mod init myapp\ngo get github.com/labstack/echo/v5'} lang="bash" frame="none" wrap />
+      </li>
+      <li>
+        <h3>Write</h3>
+        <p>Save the <a href="/cookbook/hello-world/">Hello World server</a> as <code>server.go</code>.</p>
+
+        ```go file=cookbook/hello-world/server.go frame="none" wrap
+        ```
+
+      </li>
+      <li>
+        <h3>Run</h3>
+        <p>Fetch dependencies and start serving on port 1323.</p>
+        <Code code={'go mod tidy\ngo run server.go'} lang="bash" frame="none" wrap />
+      </li>
+    </ol>
+  </Steps>
 </div>
 
 <div class="echo-h"><span class="ey">Ecosystem</span><h2>Official packages, ready to plug in.</h2></div>
 
-<div class="echo-eco">
-  <a class="eco-card" href="https://github.com/labstack/echo-jwt" target="_blank" rel="noopener noreferrer"><h4>echo-jwt</h4><p>JWT authentication middleware backed by golang-jwt.</p></a>
-  <a class="eco-card" href="https://github.com/labstack/echo-contrib" target="_blank" rel="noopener noreferrer"><h4>echo-contrib</h4><p>Prometheus, Casbin, Jaeger, pprof, Zipkin &amp; session helpers.</p></a>
-  <a class="eco-card" href="https://github.com/swaggo/echo-swagger" target="_blank" rel="noopener noreferrer"><h4>echo-swagger</h4><p>Generate and serve interactive Swagger / OpenAPI docs.</p></a>
-  <a class="eco-card" href="https://pkg.go.dev/github.com/labstack/echo/v5" target="_blank" rel="noopener noreferrer"><h4>API Reference</h4><p>Full package documentation on pkg.go.dev.</p></a>
+<div class="echo-eco not-content">
+  <CardGrid>
+    <LinkCard title="echo-jwt" description="JWT authentication middleware backed by golang-jwt." href="https://github.com/labstack/echo-jwt" target="_blank" rel="noopener noreferrer" />
+    <LinkCard title="echo-contrib" description="Prometheus, Casbin, Jaeger, pprof, Zipkin &amp; session helpers." href="https://github.com/labstack/echo-contrib" target="_blank" rel="noopener noreferrer" />
+    <LinkCard title="echo-swagger" description="Generate and serve interactive Swagger / OpenAPI docs." href="https://github.com/swaggo/echo-swagger" target="_blank" rel="noopener noreferrer" />
+    <LinkCard title="API Reference" description="Full package documentation on pkg.go.dev." href="https://pkg.go.dev/github.com/labstack/echo/v5" target="_blank" rel="noopener noreferrer" />
+  </CardGrid>
 </div>
 
 <div class="echo-h"><span class="ey">Sponsors</span><h2>Backed by teams who build on Echo.</h2></div>
 
 <a class="sp-featured" href="https://blacksmith.sh" target="_blank" rel="noopener noreferrer">
-  <img src="https://github.com/useblacksmith.png?size=88" alt="Blacksmith" />
+  <img src="https://github.com/useblacksmith.png?size=88" alt="Blacksmith" width="44" height="44" loading="lazy" decoding="async" />
   <span class="t"><b>Blacksmith</b><span>Faster, drop-in GitHub Actions runners.</span></span>
 </a>
 
 <a class="sp-featured" href="https://encore.dev" target="_blank" rel="noopener noreferrer">
-  <img src="https://github.com/encoredev.png?size=88" alt="Encore" />
+  <img src="https://github.com/encoredev.png?size=88" alt="Encore" width="44" height="44" loading="lazy" decoding="async" />
   <span class="t"><b>Encore</b><span>The platform for building Go-based cloud backends.</span></span>
 </a>
 
 <div class="sp-grid">
-  <a class="sp-card" href="https://github.com/customerio" target="_blank" rel="noopener noreferrer"><img src="https://github.com/customerio.png?size=52" alt="Customer.io" /><span>Customer.io</span></a>
-  <a class="sp-card" href="https://github.com/gravitycarbon" target="_blank" rel="noopener noreferrer"><img src="https://github.com/gravitycarbon.png?size=52" alt="Gravity Carbon" /><span>Gravity Carbon</span></a>
-  <a class="sp-card" href="https://github.com/Codeerror" target="_blank" rel="noopener noreferrer"><img src="https://github.com/Codeerror.png?size=52" alt="Codeerror" /><span>Codeerror</span></a>
+  <a class="sp-card" href="https://github.com/customerio" target="_blank" rel="noopener noreferrer"><img src="https://github.com/customerio.png?size=52" alt="Customer.io" width="26" height="26" loading="lazy" decoding="async" /><span>Customer.io</span></a>
+  <a class="sp-card" href="https://github.com/gravitycarbon" target="_blank" rel="noopener noreferrer"><img src="https://github.com/gravitycarbon.png?size=52" alt="Gravity Carbon" width="26" height="26" loading="lazy" decoding="async" /><span>Gravity Carbon</span></a>
+  <a class="sp-card" href="https://github.com/Codeerror" target="_blank" rel="noopener noreferrer"><img src="https://github.com/Codeerror.png?size=52" alt="Codeerror" width="26" height="26" loading="lazy" decoding="async" /><span>Codeerror</span></a>
 </div>
 
-<div class="sp-cta"><a href="https://github.com/sponsors/labstack" target="_blank" rel="noopener noreferrer"><i class="ph ph-heart"></i> Become a sponsor</a></div>
+<div class="sp-cta"><LinkButton href="https://github.com/sponsors/labstack" variant="secondary" icon="heart" iconPlacement="start" target="_blank" rel="noopener noreferrer">Become a sponsor</LinkButton></div>
 
 <div class="echo-foot">
+  <h2 class="sr-only">Site links</h2>
   <div class="brand">
     <span class="n">echo</span>
     <p>High performance, extensible, minimalist Go web framework.</p>
   </div>
   <div class="col">
-    <h4>Docs</h4>
+    <h3>Docs</h3>
     <a href="/guide/quickstart/">Quickstart</a>
     <a href="/guide/routing/">Routing</a>
     <a href="/middleware/">Middleware</a>
     <a href="/cookbook/hello-world/">Cookbook</a>
   </div>
   <div class="col">
-    <h4>Project</h4>
+    <h3>Project</h3>
     <a href="https://github.com/labstack/echo" target="_blank" rel="noopener noreferrer">GitHub</a>
     <a href="https://github.com/labstack/echo/releases" target="_blank" rel="noopener noreferrer">Releases</a>
     <a href="https://github.com/labstack/echo/discussions" target="_blank" rel="noopener noreferrer">Discussions</a>
     <a href="https://github.com/labstack/echo/blob/master/.github/CONTRIBUTING.md" target="_blank" rel="noopener noreferrer">Contributing</a>
   </div>
   <div class="col">
-    <h4>Resources</h4>
+    <h3>Resources</h3>
     <a href="https://pkg.go.dev/github.com/labstack/echo/v5" target="_blank" rel="noopener noreferrer">API Reference</a>
     <a href="https://github.com/sponsors/labstack" target="_blank" rel="noopener noreferrer">Sponsor</a>
     <a href="https://github.com/labstack/echo/blob/master/LICENSE" target="_blank" rel="noopener noreferrer">MIT License</a>

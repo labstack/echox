@@ -1,70 +1,54 @@
 ---
 import Default from '@astrojs/starlight/components/Search.astro';
+import { Icon } from '@astrojs/starlight/components';
+import { labels } from './search-launchpad';
 const isNext = process.env.DOCS_CHANNEL === 'next';
+const locale = Astro.locals.starlightRoute.locale ?? 'en';
+if (!labels[locale]) throw new Error(`Search.astro: add launchpad labels for locale "${locale}"`);
 ---
-<div class="echo-search-row">
+<div class="echo-search-row" data-locale={locale}>
   <Default />
   {/* The kapa.ai index covers release docs; next pages use their own Pagefind index. */}
   {!isNext && <button id="echo-ask-ai" class="echo-ask-ai" type="button" aria-label="Ask AI about Echo">
-    <i class="ph ph-sparkle" aria-hidden="true"></i>
+    <Icon name="star" />
     <span class="echo-ask-ai__label">Ask AI</span>
   </button>}
 </div>
 
 <script>
-  const base = import.meta.env.BASE_URL.replace(/\/$/, '');
-  const locale = window.location.pathname.match(/^\/(?:next\/)?(es|ja|pt-br|zh-cn)(?:\/|$)/)?.[1] || 'en';
-  const docsBase = `${base}${locale === 'en' ? '' : `/${locale}`}`;
-  const labels = {
-    en: { start: 'Start here', popular: 'Popular', quickstart: 'Quickstart', routing: 'Routing', binding: 'Binding', guide: 'Guide', middleware: 'Middleware', cookbook: 'Cookbook', open: 'open', navigate: 'navigate', close: 'close' },
-    es: { start: 'Empieza aquí', popular: 'Popular', quickstart: 'Inicio rápido', routing: 'Rutas', binding: 'Binding', guide: 'Guía', middleware: 'Middleware', cookbook: 'Recetario', open: 'abrir', navigate: 'navegar', close: 'cerrar' },
-    ja: { start: 'はじめに', popular: 'よく見るページ', quickstart: 'クイックスタート', routing: 'ルーティング', binding: 'バインディング', guide: 'ガイド', middleware: 'ミドルウェア', cookbook: 'クックブック', open: '開く', navigate: '移動', close: '閉じる' },
-    'pt-br': { start: 'Comece aqui', popular: 'Populares', quickstart: 'Guia de início', routing: 'Roteamento', binding: 'Binding', guide: 'Guia', middleware: 'Middleware', cookbook: 'Receitas', open: 'abrir', navigate: 'navegar', close: 'fechar' },
-    'zh-cn': { start: '从这里开始', popular: '热门内容', quickstart: '快速入门', routing: '路由', binding: '数据绑定', guide: '指南', middleware: '中间件', cookbook: '示例', open: '打开', navigate: '导航', close: '关闭' },
-  }[locale as 'en' | 'es' | 'ja' | 'pt-br' | 'zh-cn'];
-  // Command-palette empty state: inject quick links + a shortcut footer into the
-  // Pagefind modal once it mounts. terminal.css shows it only while the query is
-  // empty (the results drawer carries .pagefind-ui__hidden then).
-  const PANEL = `
-    <div class="echo-search-empty">
-      <div class="ess-group">
-        <div class="ess-label">${labels.start}</div>
-        <a class="ess-link" href="${docsBase}/guide/quickstart/"><i aria-hidden="true" class="ph ph-rocket-launch"></i> ${labels.quickstart} <span class="ess-sec">${labels.guide}</span></a>
-        <a class="ess-link" href="${docsBase}/guide/routing/"><i aria-hidden="true" class="ph ph-signpost"></i> ${labels.routing} <span class="ess-sec">${labels.guide}</span></a>
-        <a class="ess-link" href="${docsBase}/guide/binding/"><i aria-hidden="true" class="ph ph-brackets-curly"></i> ${labels.binding} <span class="ess-sec">${labels.guide}</span></a>
-      </div>
-      <div class="ess-group">
-        <div class="ess-label">${labels.popular}</div>
-        <a class="ess-link" href="${docsBase}/middleware/jwt/"><i aria-hidden="true" class="ph ph-lock-key"></i> JWT <span class="ess-sec">${labels.middleware}</span></a>
-        <a class="ess-link" href="${docsBase}/middleware/cors/"><i aria-hidden="true" class="ph ph-globe"></i> CORS <span class="ess-sec">${labels.middleware}</span></a>
-        <a class="ess-link" href="${docsBase}/cookbook/hello-world/"><i aria-hidden="true" class="ph ph-cube"></i> Hello World <span class="ess-sec">${labels.cookbook}</span></a>
-      </div>
-      <div class="ess-foot">
-        <span><kbd>↵</kbd>${labels.open}</span><span><kbd>↑</kbd><kbd>↓</kbd>${labels.navigate}</span><span><kbd>esc</kbd>${labels.close}</span>
-      </div>
-    </div>`;
+  import { launchpadHTML } from './search-launchpad';
 
+  const search = document.querySelector('site-search');
+  const locale = document.querySelector<HTMLElement>('.echo-search-row')?.dataset.locale ?? 'en';
+  const docsBase = `${import.meta.env.BASE_URL.replace(/\/$/, '')}${locale === 'en' ? '' : `/${locale}`}`;
   function inject() {
-    const ui = document.querySelector('.pagefind-ui');
+    const ui = search?.querySelector('.pagefind-ui');
     if (!ui || ui.querySelector('.echo-search-empty')) return !!ui;
     const form = ui.querySelector('.pagefind-ui__form');
     if (!form) return false;
-    form.insertAdjacentHTML('afterend', PANEL);
+    form.insertAdjacentHTML('afterend', launchpadHTML(locale, docsBase));
+    // Starlight closes the dialog only when the click target itself has an href;
+    // close it for clicks on a link's icon or section label too.
+    ui.querySelectorAll('.ess-link').forEach((link) => {
+      link.addEventListener('click', () => search?.querySelector('dialog')?.close());
+    });
     return true;
   }
 
-  // Pagefind mounts lazily when the dialog first opens — watch for it, then stop.
-  if (!inject()) {
+  // Starlight mounts Pagefind on idle — watch its search subtree, then stop.
+  if (search && !inject()) {
     const obs = new MutationObserver(() => { if (inject()) obs.disconnect(); });
-    obs.observe(document.body, { childList: true, subtree: true });
-    // Bound the observer: if Pagefind never mounts (disabled in dev, or the
-    // Starlight markup changed on upgrade), stop watching so it can't run for
-    // the page's lifetime. Losing the launchpad is harmless; search still works.
-    setTimeout(() => {
+    obs.observe(search, { childList: true, subtree: true });
+    // Bound the observer to 10s of visible time: Pagefind mounts on idle, which a
+    // background tab may not reach until it is shown. If it never mounts (disabled
+    // in dev, or Starlight markup changed), stop watching; search still works.
+    const bound = () => setTimeout(() => {
       obs.disconnect();
       if (import.meta.env.DEV && !document.querySelector('.echo-search-empty')) {
         console.warn('[search] empty-state panel not injected — .pagefind-ui selectors may have changed');
       }
     }, 10000);
+    if (document.visibilityState === 'visible') bound();
+    else document.addEventListener('visibilitychange', bound, { once: true });
   }
 </script>

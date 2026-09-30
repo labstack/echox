@@ -4,18 +4,16 @@
 // static final-state fallback for reduced motion.
 import { starsLabel } from '../data/github.ts';
 import stable from '../generated/echo-source.json';
-import { Code } from 'astro:components';
+import { Code, Icon, LinkButton } from '@astrojs/starlight/components';
 import helloWorldSource from '../../../cookbook/hello-world/server.go?raw';
 import { sourceSnippet } from '../../plugins/remark-source-code.mjs';
 const next = process.env.DOCS_CHANNEL === 'next';
 const helloWorldCode = sourceSnippet(helloWorldSource, 'hero', 'cookbook/hello-world/server.go');
-// The code window is aria-hidden, so Shiki's <pre> must not be a tab stop.
-const notFocusable = { pre(node: { properties: Record<string, unknown> }) { delete node.properties.tabindex; } };
 ---
 
-<section class="hh">
+<section class="hh not-content">
   <div class="hh-left">
-    <span class="hh-eyebrow"><i class="ph ph-sparkle"></i> {next ? 'Echo next — preview documentation' : `Echo ${stable.release} — release documentation`}</span>
+    <span class="hh-eyebrow"><Icon name="star" /> {next ? 'Echo next — preview documentation' : `Echo ${stable.release} — release documentation`}</span>
     <h1>Build fast Go APIs.<br /><span class="g">Without the bloat.</span></h1>
     <p class="hh-sub">
       A high-performance, minimalist Go web framework — a zero-allocation
@@ -23,47 +21,23 @@ const notFocusable = { pre(node: { properties: Record<string, unknown> }) { dele
       production services in minutes.
     </p>
     <div class="hh-cta">
-      <a class="hh-btn pri" href="/guide/quickstart/">Get Started <i class="ph ph-arrow-right"></i></a>
-      <a class="hh-btn sec" href="https://github.com/labstack/echo" target="_blank" rel="noopener noreferrer"><i class="ph ph-star"></i> {starsLabel} on GitHub</a>
+      <LinkButton class="hh-btn pri" href="/guide/quickstart/" icon="right-arrow">Get Started</LinkButton>
+      <LinkButton class="hh-btn sec" variant="secondary" icon="github" iconPlacement="start" href="https://github.com/labstack/echo" target="_blank" rel="noopener noreferrer">{starsLabel} on GitHub</LinkButton>
     </div>
-    <button class="hh-install" type="button" data-copy="go get github.com/labstack/echo/v5" aria-label="Copy install command">
-      <span class="p">$</span> go get github.com/labstack/echo/v5 <i class="ph ph-copy cp"></i>
-    </button>
+    <div class="hh-install"><Code code="go get github.com/labstack/echo/v5" lang="bash" frame="none" wrap /></div>
   </div>
 
-  <div class="hh-win" aria-hidden="true">
-    <div class="bar">
-      <i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i>
-      <span class="fn">server.go · excerpt</span>
-    </div>
-    <Code code={helloWorldCode} lang="go" style="background: transparent" transformers={[notFocusable]} />
-    <div class="hh-term" data-term>
-      <div><span class="pr">~/echo $</span> <span data-cmd></span><span class="hh-cur" data-cur></span></div>
-      <div data-out></div>
+  <div class="hh-win">
+    <Code code={helloWorldCode} lang="go" title="server.go · excerpt" frame="code" wrap />
+    <div class="hh-term" data-term aria-hidden="true">
+      <script is:inline>document.currentScript.parentElement.setAttribute('data-js', '');</script>
+      <div><span class="pr">~/echo $</span> <span data-cmd>curl localhost:1323</span><span class="hh-cur" data-cur style="display:none"></span></div>
+      <div data-out><div class="dim">HTTP/1.1 200 OK</div><div class="response">Hello, World!</div></div>
     </div>
   </div>
 </section>
 
 <script>
-  // --- install copy button ---
-  document.querySelectorAll<HTMLButtonElement>('.hh-install').forEach((btn) => {
-    btn.addEventListener('click', async () => {
-      const text = btn.dataset.copy || '';
-      try {
-        await navigator.clipboard.writeText(text);
-        const icon = btn.querySelector('.cp');
-        if (icon) {
-          icon.classList.remove('ph-copy');
-          icon.classList.add('ph-check');
-          setTimeout(() => {
-            icon.classList.remove('ph-check');
-            icon.classList.add('ph-copy');
-          }, 1400);
-        }
-      } catch {}
-    });
-  });
-
   // --- terminal typing animation ---
   const term = document.querySelector('[data-term]');
   if (term) {
@@ -72,17 +46,14 @@ const notFocusable = { pre(node: { properties: Record<string, unknown> }) { dele
     const curEl = term.querySelector('[data-cur]') as HTMLElement;
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    const response =
-      '<span class="dim">HTTP/1.1 200 OK</span>\n' +
-      '<span class="json">Hello, World!</span>';
-    const cmd = 'curl localhost:1323';
+    const cmd = cmdEl.textContent ?? '';
 
     const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
     async function run() {
       while (true) {
         cmdEl.textContent = '';
-        outEl.innerHTML = '';
+        outEl.hidden = true;
         curEl.style.display = 'inline-block';
         await sleep(900);
         for (const ch of cmd) {
@@ -91,7 +62,7 @@ const notFocusable = { pre(node: { properties: Record<string, unknown> }) { dele
         }
         await sleep(450);
         curEl.style.display = 'none';
-        outEl.innerHTML = '<pre style="margin:6px 0 0;padding:0;background:none;font:inherit">' + response + '</pre>';
+        outEl.hidden = false;
         await sleep(3600);
       }
     }
@@ -99,8 +70,8 @@ const notFocusable = { pre(node: { properties: Record<string, unknown> }) { dele
     if (reduce) {
       cmdEl.textContent = cmd;
       curEl.style.display = 'none';
-      outEl.innerHTML = '<pre style="margin:6px 0 0;padding:0;background:none;font:inherit">' + response + '</pre>';
     } else {
+      term.setAttribute('data-typing', '');
       run();
     }
   }
