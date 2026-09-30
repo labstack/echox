@@ -1,5 +1,21 @@
 version: 2
 updates:
+  # Update shared Go dependencies together across both modules.
+  - package-ecosystem: gomod
+    directories:
+      - /
+      - /reference
+    schedule:
+      interval: weekly
+    groups:
+      go-dependencies:
+        patterns:
+          - "*"
+      go-security-dependencies:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
   # Astro docs site (site/). Group everything into a single weekly PR so the
   # advisory stream is one reviewed change, not nonstop noise. No auto-merge —
   # updates are deliberate (see the supply-chain hardening discussion in #378).

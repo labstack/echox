@@ -1,7 +1,6 @@
 import { getCollection } from 'astro:content';
 import type { APIRoute } from 'astro';
-import stableSource from '../../echo-source.json';
-import nextSource from '../../next-source.json';
+import source from '../generated/echo-source.json';
 
 export const prerender = true;
 
@@ -14,7 +13,6 @@ const sections = [
 
 export const GET: APIRoute = async () => {
   const base = import.meta.env.BASE_URL;
-  const source = base === '/next/' ? nextSource : stableSource;
   const pages = await getCollection('docs');
   const englishPages = pages.filter(({ id }) =>
     !/^(?:es|ja|pt-br|zh-cn)\//.test(id),

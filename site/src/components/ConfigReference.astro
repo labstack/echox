@@ -4,6 +4,7 @@ import jwtManifest from '../generated/jwt.json';
 import prometheusManifest from '../generated/prometheus.json';
 import telemetryManifest from '../generated/open-telemetry.json';
 import externalSources from '../../external-sources.json';
+import { formatRevision } from '../data/source.mjs';
 
 interface Props {
   name: string;
@@ -34,7 +35,7 @@ const sourceUrl = (file: string, line: number) => `${repository}/blob/${manifest
 ---
 
 <div class="echo-config-reference">
-  <p class="revision"><a href={sourceUrl(config.file, config.line)}>{config.name}</a> · <a href={`${repository}/tree/${manifest.revision}`}>{manifest.module}@{source === 'echo' ? manifest.revision.slice(0, 7) : manifest.revision}</a></p>
+  <p class="revision"><a href={sourceUrl(config.file, config.line)}>{config.name}</a> · <a href={`${repository}/tree/${manifest.revision}`}>{manifest.module}@{source === 'echo' ? formatRevision(manifest.revision) : manifest.revision}</a></p>
   {labels.note && <p class="revision">{labels.note}</p>}
   <div class="table-scroll">
     <table>

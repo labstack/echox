@@ -1,30 +1,43 @@
-name: Documentation checks
+name: CI
 
 on:
   pull_request:
+    branches: [master]
+  push:
+    branches: [master]
   workflow_dispatch:
 
 permissions:
   contents: read
 
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   docs:
+    name: Go tests and documentation
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-go@v6
         with:
-          go-version: '1.27'
+          go-version-file: go.mod
           cache-dependency-path: |
             go.sum
             reference/go.sum
+      # setup-go defaults to local; reference/next may require a newer toolchain.
+      - name: Enable Go toolchain upgrades
+        run: echo "GOTOOLCHAIN=auto" >> "$GITHUB_ENV"
       - uses: actions/setup-node@v6
         with:
           node-version: '24'
           cache: npm
           cache-dependency-path: site/package-lock.json
-      - name: Test cookbook
-        run: go test ./...
+      - name: Vet cookbook
+        run: go vet ./...
+      - name: Test cookbook with race detection
+        run: go test -race ./...
       - name: Install site dependencies
         run: npm ci --ignore-scripts
         working-directory: site

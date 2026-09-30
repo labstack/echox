@@ -2,6 +2,8 @@ module github.com/labstack/echox
 
 go 1.25.0
 
+toolchain go1.27.1
+
 require (
 	github.com/casbin/casbin/v3 v3.10.0
 	github.com/golang-jwt/jwt/v5 v5.3.1

@@ -31,7 +31,6 @@ if (accept) {
 const expected = JSON.parse(readFileSync(baselineFile, 'utf8')).routes;
 const problems = [];
 for (const route of expected.filter((item) => !routes.includes(item))) problems.push(`Removed route: ${route}`);
-for (const route of routes.filter((item) => !expected.includes(item))) problems.push(`New route needs baseline review: ${route}`);
 const ids = new Map();
 function idsIn(file) {
   if (!ids.has(file)) {
@@ -112,4 +111,8 @@ for (const path of ['llms.txt', 'next/llms.txt']) {
   }
 }
 if (problems.length) throw new Error(`${problems.length} site check failure(s):\n${problems.join('\n')}`);
+const added = routes.filter((route) => !expected.includes(route));
+if (added.length) {
+  console.warn(`Warning: ${added.length} new route(s) are not yet protected by the removal guard:\n${added.join('\n')}\nRun npm run site:accept and commit route-baseline.json to protect these routes from future removal. This warning does not block new pages.`);
+}
 console.log(`Checked ${routes.length} routes and ${checked} internal links/assets; all resolve`);

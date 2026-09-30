@@ -15,15 +15,28 @@ the runnable cookbook recipes the docs reference.
 
 ## Documentation site
 
-Requires [Node.js](https://nodejs.org) (LTS), Go 1.27, and Git. The build
-publishes the stable docs at `/` and a next preview at `/next/`, each with its
-own search index and source revision. Those revisions are pinned in
-`site/echo-source.json` and `site/next-source.json`. The build compiles the
-`reference/` examples against both, extracts middleware fields and function
+Requires [Node.js](https://nodejs.org) (LTS), the Go version in `go.mod`, and Git.
+The `toolchain` directive selects the preferred compiler; the `go` directive
+remains the minimum. CI and publishing use that file and enable automatic
+toolchain upgrades when reference dependencies or next Echo need a newer Go.
+The build publishes the stable docs at `/` and a next preview at `/next/`, each
+with its own search index and source revision. Stable source comes from the Echo version
+selected by `go.mod`, downloaded through Go's module cache and verified against
+`go.sum`. The preview revision remains pinned in `site/next-source.json`.
+The build compiles the `reference/` examples against both, extracts middleware fields and function
 signatures, and checks stable against `site/reference-baseline.json` and next
 against `site/next-reference-baseline.json`. JWT,
-Prometheus, and OpenTelemetry are extracted from their own pinned modules in
-`site/external-sources.json` and checked against `site/external-baseline.json`.
+Prometheus, and OpenTelemetry use the versions selected by `reference/go.mod`;
+`site/external-sources.json` only maps packages and repository URLs. Their APIs
+are checked against `site/external-baseline.json`. Shared Echo/JWT versions
+must agree between the two Go modules. Dependabot groups Go dependency updates
+across both directories into one PR.
+
+Released external middleware packages are compiled against stable Echo with
+the `docs_external` build tag. Next and `ECHO_SOURCE_DIR` workspaces validate
+the Echo examples and extract the external API facts from their selected module
+versions. Dependabot has separate groups for Go version and security updates
+across both directories.
 
 ```bash
 cd site
@@ -33,8 +46,15 @@ npm run build    # production build to site/dist
 npm run preview  # preview the production build
 ```
 
-The first build fetches pinned source into `.cache/`. To test a proposed next
-Echo checkout, set `ECHO_SOURCE_DIR` to its absolute path when running
+To update stable Echo, update the dependency in both Go modules in the same PR.
+Run `npm run source:prepare` from `site/`, review the affected docs and API
+differences, then run `npm run source:accept` and review the baseline diff.
+Rerun the full build. External middleware updates follow the same review flow;
+the baselines record reviewed API facts and versions, rather than selecting
+which source is downloaded.
+
+The first build downloads stable/external modules and fetches preview source
+into `.cache/`. To test a proposed next Echo checkout, set `ECHO_SOURCE_DIR` to its absolute path when running
 `npm run build`. The build reports changed API facts and stops. Review the
 affected pages and behavior, then prepare and accept the **next** baseline:
 
@@ -48,7 +68,19 @@ revision, and rerun the full build. The release baseline remains independent.
 The generated files in `site/src/generated/` are never edited or committed.
 `npm run site:check` checks routes, local links and fragments, image text,
 search assets, and locale coverage. `npm run performance:check` catches large
-HTML or first-load asset growth on representative stable and next pages.
+HTML or first-load asset growth on representative stable and next pages, plus
+new external resource origins, including scripts, stylesheets, preloads, icons,
+images and embedded content. Plain external links and preconnect hints do not
+count as loaded resources. New routes pass without baseline acceptance and
+receive the same link/accessibility checks. The check warns about new routes
+that are not yet in `route-baseline.json`; run `npm run site:accept` and commit
+that baseline to protect them from later removal. Removing a baseline route
+still requires review.
+
+The single PR workflow runs `go vet`, Go tests with race detection, Node tests,
+and the complete site build/checks. API checks also write their result and any
+differences to the GitHub Actions step summary. The publishing workflow remains
+separate.
 
 Generated field descriptions come from the pinned Go source comments and remain
 in English on localized pages; the surrounding task guidance is authored per
@@ -104,7 +136,7 @@ go run .
 
 ## Deployment
 
-The site auto-deploys to GitHub Pages on every push to `master` (and once daily,
+The site auto-deploys to GitHub Pages on every push to `master` (and once weekly,
 to refresh build-time data such as the GitHub star count) via
 [`.github/workflows/deploy.yaml`](.github/workflows/deploy.yaml). Dependencies
 are installed with `npm ci --ignore-scripts` and pinned via the committed
