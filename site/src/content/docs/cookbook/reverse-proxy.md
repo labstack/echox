@@ -34,22 +34,24 @@ To set up a proxy for a sub-route, use `Echo#Group()`.
 ```go file=cookbook/reverse-proxy/server.go#grouped-proxy
 ```
 
-```sh
-go run . -grouped
-```
-
 ## 3) Start upstream servers
 
+From `cookbook/reverse-proxy`, start each upstream in its own terminal:
+
 ```sh
-cd upstream
-go run server.go server1 :8081
-go run server.go server2 :8082
+go run ./upstream server1 :8081
+```
+
+```sh
+go run ./upstream server2 :8082
 ```
 
 ## 4) Start the proxy server
 
+In a third terminal, also in `cookbook/reverse-proxy`, start the proxy:
+
 ```sh
-go run server.go
+go run .
 ```
 
 Browse to `http://localhost:1323`, and you should see a webpage with an HTTP
@@ -66,6 +68,14 @@ Hello from upstream server server2!
 Hello from upstream server server2!
 Hello from upstream server server2!
 ```
+
+To use grouped mode instead, stop the default proxy and run:
+
+```sh
+go run . -grouped
+```
+
+Browse to `http://localhost:1323/blog/`. The proxy strips `/blog` before forwarding requests; the page’s relative WebSocket URL stays under `/blog/`.
 
 ## Source code
 

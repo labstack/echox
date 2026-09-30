@@ -21,6 +21,14 @@ export function sourceReference(node) {
   return { specifier, start: matches[0].index, end: matches[0].index + matches[0][0].length };
 }
 
+export function sourceReferenceAt(node, path) {
+  try {
+    return sourceReference(node);
+  } catch (error) {
+    throw new Error(`${path}:${node.position.start.line}: ${error.message}`, { cause: error });
+  }
+}
+
 function withoutMarkers(lines) {
   const result = [];
   let removed = false;

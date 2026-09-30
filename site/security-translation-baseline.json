@@ -45,8 +45,8 @@
       "translation": "1000ae874beea68b73adc5fd2bf4d57d355d7c20c6f4fff237b0ad6a2343b973"
     },
     "cookbook/reverse-proxy.md": {
-      "source": "7feefd76800a726ec4a0cf437835299eb13c99efed9aadcd9244c778573c9d5a",
-      "translation": "c5e3433af531752b87ece5766cdf8901f1ad3532b8c817a39cd16cb00b9f6e2a"
+      "source": "9169f564a62223a4abd22376914235ceebc1d5f7d87a9dc55639a20fcdb9525f",
+      "translation": "1c83c1aa0ab01fc8a74480fc5cab633c20beebe3d730229950e312d23f6b8135"
     }
   },
   "ja": {
@@ -95,8 +95,8 @@
       "translation": "27b4cf00b4d74eb47e428b675911add9b52fd485612f11a6474f770e8f7b4a6d"
     },
     "cookbook/reverse-proxy.md": {
-      "source": "7feefd76800a726ec4a0cf437835299eb13c99efed9aadcd9244c778573c9d5a",
-      "translation": "cbc8aabc436d11bd4c94b3f073fa3fb7b140ba27fc7ce2d0e5f8d921b696361c"
+      "source": "9169f564a62223a4abd22376914235ceebc1d5f7d87a9dc55639a20fcdb9525f",
+      "translation": "170def11799a165aa2acf78543a3b525f4d1ae3b9b90c161615dffd4ce49afed"
     }
   },
   "pt-br": {
@@ -145,8 +145,8 @@
       "translation": "dc1c527c81f4cce0bdb165c75327692db4b0ec09b09a9d4c8f4b094ab159b077"
     },
     "cookbook/reverse-proxy.md": {
-      "source": "7feefd76800a726ec4a0cf437835299eb13c99efed9aadcd9244c778573c9d5a",
-      "translation": "8df8c04f1544f46146f6226100785968301710dbabc8fc26122f7df1c76e2eda"
+      "source": "9169f564a62223a4abd22376914235ceebc1d5f7d87a9dc55639a20fcdb9525f",
+      "translation": "8eb19a61cd9568a01b4ca0573e306572dd9b7edecf487df5c1e799cafe244040"
     }
   },
   "zh-cn": {
@@ -195,8 +195,8 @@
       "translation": "88a96458914bf772e223d3d17581de947ceb0f13f2176fa958ddcd2d2f2ec7e0"
     },
     "cookbook/reverse-proxy.md": {
-      "source": "7feefd76800a726ec4a0cf437835299eb13c99efed9aadcd9244c778573c9d5a",
-      "translation": "00a77a7111a23fae0cb460e39a7503678e0971a2e15bf1405f4ec876d59ee40a"
+      "source": "9169f564a62223a4abd22376914235ceebc1d5f7d87a9dc55639a20fcdb9525f",
+      "translation": "7de177edd1ed369b5288806588f0a3b51580ae55250b3017e67c6d9ef008eaa2"
     }
   }
 }

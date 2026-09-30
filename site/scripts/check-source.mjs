@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseSourceDocument, visitCode } from '../plugins/source-document.mjs';
-import { sourceReference } from '../plugins/remark-source-code.mjs';
+import { sourceReferenceAt } from '../plugins/remark-source-code.mjs';
 import { localePrefixes } from '../src/locales.mjs';
 
 const siteDir = fileURLToPath(new URL('..', import.meta.url));
@@ -82,7 +82,8 @@ for (const locale of localePrefixes) {
     if (example) {
       let included = false;
       visitCode(parseSourceDocument(content, file), (node) => {
-        if (node.lang === 'go' && sourceReference(node)?.specifier === example) included = true;
+        const reference = sourceReferenceAt(node, file);
+        if (node.lang === 'go' && reference?.specifier === example) included = true;
       });
       if (!included || (page === 'logger' && content.includes('LogError'))) {
         throw new Error(`${file} must include the compiled ${example} example without removed fields`);

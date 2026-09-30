@@ -19,16 +19,16 @@ sidebar:
 
 ## サーバー
 
-```go file=cookbook/auto-tls/server.go#primary-server
+```go file=cookbook/auto-tls/server.go
 ```
 
 ## カスタム HTTP サーバーを使う
 
 `http.Server` を完全に制御したい場合は、代わりに autocert manager をカスタム `tls.Config` に接続します。
 
-```go file=cookbook/auto-tls/server.go#custom-server
+```go file=cookbook/auto-tls/custom-server/server.go
 ```
 
 ```sh
-go run . -custom-server
+go run ./custom-server
 ```

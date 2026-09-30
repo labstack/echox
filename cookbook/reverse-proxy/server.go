@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"flag"
+	"net/http"
 	"net/url"
 
 	"github.com/labstack/echo/v5"
@@ -50,6 +51,14 @@ func main() {
 // configureBlogProxy limits the proxy middleware to a route group.
 func configureBlogProxy(e *echo.Echo, targets []*middleware.ProxyTarget) {
 	// docs:start grouped-proxy
+	// Canonicalize the group root so relative WebSocket URLs stay under /blog/.
+	e.GET("/blog", func(c *echo.Context) error {
+		location := "/blog/"
+		if query := c.Request().URL.RawQuery; query != "" {
+			location += "?" + query
+		}
+		return c.Redirect(http.StatusPermanentRedirect, location)
+	})
 	g := e.Group("/blog")
 	g.Use(middleware.ProxyWithConfig(middleware.ProxyConfig{
 		Balancer: middleware.NewRoundRobinBalancer(targets),

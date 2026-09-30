@@ -20,7 +20,7 @@ a welcome message served over TLS.
 
 ## Server
 
-```go file=cookbook/auto-tls/server.go#primary-server
+```go file=cookbook/auto-tls/server.go
 ```
 
 ## Using a custom HTTP server
@@ -28,9 +28,9 @@ a welcome message served over TLS.
 If you need full control over the `http.Server`, wire the autocert manager into a
 custom `tls.Config` instead:
 
-```go file=cookbook/auto-tls/server.go#custom-server
+```go file=cookbook/auto-tls/custom-server/server.go
 ```
 
 ```sh
-go run . -custom-server
+go run ./custom-server
 ```

@@ -87,14 +87,17 @@ test('regions trim boundary blanks and marker removal keeps one separator betwee
   writeFileSync(join(root, 'server.go'), '// docs:start first\n\nfunc first() {}\n\n// docs:end first\n\n// docs:start second\nfunc second() {}\n\n// docs:end second\n');
   assert.equal(render('```go file=server.go#first\n```', root).children[0].value, 'func first() {}');
   assert.equal(render('```go file=server.go\n```', root).children[0].value, 'func first() {}\n\nfunc second() {}');
+});
+
+test('Auto TLS and graceful shutdown render standalone programs without variant dispatch', () => {
+  const repo = fileURLToPath(new URL('../..', import.meta.url));
   for (const recipe of ['auto-tls', 'graceful-shutdown']) {
-    const repo = fileURLToPath(new URL('../..', import.meta.url));
-    for (const region of ['primary-server', 'custom-server']) {
-      const code = render(`\x60\x60\x60go file=cookbook/${recipe}/server.go#${region}\n\x60\x60\x60`, repo).children[0].value;
-      assert.doesNotMatch(code, /^\s*\n|\n\s*$/);
+    for (const path of ['server.go', 'custom-server/server.go']) {
+      const code = render(`\x60\x60\x60go file=cookbook/${recipe}/${path}\n\x60\x60\x60`, repo).children[0].value;
+      assert.match(code, /^package main\n/);
+      assert.match(code, /func main\(\)/);
+      assert.doesNotMatch(code, /flag\.|customHTTPServer|mainWithHTTPServer|\n\n\n|\n$/);
     }
-    const code = render(`\x60\x60\x60go file=cookbook/${recipe}/server.go\n\x60\x60\x60`, repo).children[0].value;
-    assert.doesNotMatch(code, /\n\n\n|\n$/);
   }
 });
 

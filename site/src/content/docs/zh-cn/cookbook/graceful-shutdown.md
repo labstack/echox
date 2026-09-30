@@ -11,7 +11,7 @@ sidebar:
 
 ## 服务器
 
-```go file=cookbook/graceful-shutdown/server.go#primary-server
+```go file=cookbook/graceful-shutdown/server.go
 ```
 
 ## 使用自定义 HTTP 服务器
@@ -19,9 +19,9 @@ sidebar:
 如果你自己管理 `http.Server`，请在 goroutine 中启动它，等待 signal context，
 然后带超时调用 `Shutdown`：
 
-```go file=cookbook/graceful-shutdown/server.go#custom-server
+```go file=cookbook/graceful-shutdown/custom-server/server.go
 ```
 
 ```sh
-go run . -custom-server
+go run ./custom-server
 ```

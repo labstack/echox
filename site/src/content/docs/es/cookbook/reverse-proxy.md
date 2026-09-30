@@ -27,22 +27,24 @@ Para configurar un proxy para una subruta, usa `Echo#Group()`.
 ```go file=cookbook/reverse-proxy/server.go#grouped-proxy
 ```
 
-```sh
-go run . -grouped
-```
-
 ## 3) Iniciar servidores upstream
 
+Desde `cookbook/reverse-proxy`, inicia cada upstream en su propia terminal:
+
 ```sh
-cd upstream
-go run server.go server1 :8081
-go run server.go server2 :8082
+go run ./upstream server1 :8081
+```
+
+```sh
+go run ./upstream server2 :8082
 ```
 
 ## 4) Iniciar el servidor proxy
 
+En una tercera terminal, también en `cookbook/reverse-proxy`, inicia el proxy:
+
 ```sh
-go run server.go
+go run .
 ```
 
 Abre `http://localhost:1323`, y deberías ver una página web con un request HTTP
@@ -59,6 +61,14 @@ Hello from upstream server server2!
 Hello from upstream server server2!
 Hello from upstream server server2!
 ```
+
+Para usar el modo de grupo, detén el proxy predeterminado y ejecuta:
+
+```sh
+go run . -grouped
+```
+
+Abre `http://localhost:1323/blog/`. El proxy elimina `/blog` antes de reenviar las solicitudes; la URL relativa de WebSocket de la página permanece bajo `/blog/`.
 
 ## Código fuente
 

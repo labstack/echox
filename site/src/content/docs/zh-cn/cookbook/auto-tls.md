@@ -18,16 +18,16 @@ sidebar:
 
 ## 服务器
 
-```go file=cookbook/auto-tls/server.go#primary-server
+```go file=cookbook/auto-tls/server.go
 ```
 
 ## 使用自定义 HTTP 服务器
 
 如果你需要完全控制 `http.Server`，请改为把 autocert manager 接入自定义 `tls.Config`：
 
-```go file=cookbook/auto-tls/server.go#custom-server
+```go file=cookbook/auto-tls/custom-server/server.go
 ```
 
 ```sh
-go run . -custom-server
+go run ./custom-server
 ```

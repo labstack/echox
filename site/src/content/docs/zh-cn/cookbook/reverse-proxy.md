@@ -25,22 +25,24 @@ sidebar:
 ```go file=cookbook/reverse-proxy/server.go#grouped-proxy
 ```
 
-```sh
-go run . -grouped
-```
-
 ## 3) 启动上游服务器
 
+在 `cookbook/reverse-proxy` 目录中，分别在两个终端启动上游服务器：
+
 ```sh
-cd upstream
-go run server.go server1 :8081
-go run server.go server2 :8082
+go run ./upstream server1 :8081
+```
+
+```sh
+go run ./upstream server2 :8082
 ```
 
 ## 4) 启动代理服务器
 
+在第三个终端中，同样进入 `cookbook/reverse-proxy` 目录，启动代理：
+
 ```sh
-go run server.go
+go run .
 ```
 
 访问 `http://localhost:1323`，你应该会看到网页中 HTTP 请求由 "server 1" 提供，
@@ -57,6 +59,14 @@ Hello from upstream server server2!
 Hello from upstream server server2!
 Hello from upstream server server2!
 ```
+
+如需使用分组模式，请停止默认代理，然后运行：
+
+```sh
+go run . -grouped
+```
+
+访问 `http://localhost:1323/blog/`。代理会移除 `/blog` 后再转发请求；页面的相对 WebSocket URL 会保持在 `/blog/` 下。
 
 ## 源码
 

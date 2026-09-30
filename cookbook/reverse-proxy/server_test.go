@@ -22,6 +22,26 @@ func TestGroupedProxy(t *testing.T) {
 	}
 	e := echo.New()
 	configureBlogProxy(e, []*middleware.ProxyTarget{{URL: target}})
+	for _, path := range []string{"/blog", "/blog?draft=1"} {
+		response := httptest.NewRecorder()
+		e.ServeHTTP(response, httptest.NewRequest(http.MethodGet, path, nil))
+		want := "/blog/" + path[len("/blog"):]
+		if response.Code != http.StatusPermanentRedirect || response.Header().Get("Location") != want {
+			t.Fatalf("%s: got %d %q, want 308 %q", path, response.Code, response.Header().Get("Location"), want)
+		}
+		canonical, err := url.Parse(want)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if socketPath := canonical.ResolveReference(&url.URL{Path: "ws"}).Path; socketPath != "/blog/ws" {
+			t.Fatalf("relative WebSocket URL: got %q, want /blog/ws", socketPath)
+		}
+		followed := httptest.NewRecorder()
+		e.ServeHTTP(followed, httptest.NewRequest(http.MethodGet, want, nil))
+		if followed.Code != http.StatusOK || followed.Body.String() != "/" {
+			t.Fatalf("%s: redirected request got %d %q, want 200 /", path, followed.Code, followed.Body.String())
+		}
+	}
 	for _, path := range []string{"/blog/", "/blog/ws"} {
 		response := httptest.NewRecorder()
 		e.ServeHTTP(response, httptest.NewRequest(http.MethodGet, path, nil))

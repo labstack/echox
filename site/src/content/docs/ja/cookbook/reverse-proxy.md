@@ -27,22 +27,24 @@ WebSocket も処理する Go サーバーです。
 ```go file=cookbook/reverse-proxy/server.go#grouped-proxy
 ```
 
-```sh
-go run . -grouped
-```
-
 ## 3) 上流サーバーを起動する
 
+`cookbook/reverse-proxy` で、各上流サーバーを別々のターミナルで起動します。
+
 ```sh
-cd upstream
-go run server.go server1 :8081
-go run server.go server2 :8082
+go run ./upstream server1 :8081
+```
+
+```sh
+go run ./upstream server2 :8082
 ```
 
 ## 4) プロキシサーバーを起動する
 
+3 つ目のターミナルでも `cookbook/reverse-proxy` に移動し、プロキシを起動します。
+
 ```sh
-go run server.go
+go run .
 ```
 
 `http://localhost:1323` にアクセスすると、HTTP リクエストは "server 1" から、
@@ -59,6 +61,14 @@ Hello from upstream server server2!
 Hello from upstream server server2!
 Hello from upstream server server2!
 ```
+
+グループモードを使う場合は、通常モードのプロキシを停止して次を実行します。
+
+```sh
+go run . -grouped
+```
+
+`http://localhost:1323/blog/` にアクセスします。プロキシは `/blog` を除いてリクエストを転送し、ページの相対 WebSocket URL は `/blog/` 内に保たれます。
 
 ## ソースコード
 

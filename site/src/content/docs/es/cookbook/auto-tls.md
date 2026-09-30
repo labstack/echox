@@ -20,7 +20,7 @@ un mensaje de bienvenida servido sobre TLS.
 
 ## Servidor
 
-```go file=cookbook/auto-tls/server.go#primary-server
+```go file=cookbook/auto-tls/server.go
 ```
 
 ## Usar un servidor HTTP personalizado
@@ -28,9 +28,9 @@ un mensaje de bienvenida servido sobre TLS.
 Si necesitas control total sobre `http.Server`, conecta el manager autocert a un
 `tls.Config` personalizado:
 
-```go file=cookbook/auto-tls/server.go#custom-server
+```go file=cookbook/auto-tls/custom-server/server.go
 ```
 
 ```sh
-go run . -custom-server
+go run ./custom-server
 ```

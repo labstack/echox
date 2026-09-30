@@ -13,7 +13,7 @@ terminem.
 
 ## Servidor
 
-```go file=cookbook/graceful-shutdown/server.go#primary-server
+```go file=cookbook/graceful-shutdown/server.go
 ```
 
 ## Usando um servidor HTTP customizado
@@ -21,9 +21,9 @@ terminem.
 Se você gerencia o `http.Server` por conta própria, inicie-o em uma goroutine, aguarde no
 contexto de sinal e então chame `Shutdown` com um timeout:
 
-```go file=cookbook/graceful-shutdown/server.go#custom-server
+```go file=cookbook/graceful-shutdown/custom-server/server.go
 ```
 
 ```sh
-go run . -custom-server
+go run ./custom-server
 ```

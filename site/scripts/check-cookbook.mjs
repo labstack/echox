@@ -2,7 +2,7 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { unified } from 'unified';
-import remarkSourceCode, { sourceReference } from '../plugins/remark-source-code.mjs';
+import remarkSourceCode, { sourceReferenceAt } from '../plugins/remark-source-code.mjs';
 import { parseSourceDocument, visitCode } from '../plugins/source-document.mjs';
 import { localePrefixes } from '../src/locales.mjs';
 
@@ -11,7 +11,7 @@ const processor = unified().use(remarkSourceCode);
 
 export function checkCookbookCode(tree, path) {
   visitCode(tree, (node) => {
-    if (!sourceReference(node)) {
+    if (!sourceReferenceAt(node, path)) {
       const program = node.lang === 'go' && (node.value.split('\n').length > 15 || /^\s*package\s/.test(node.value));
       const html = node.lang === 'html' && /^\s*(?:<!doctype\b|<html\b)/i.test(node.value);
       if (program || html) {

@@ -12,7 +12,7 @@ Echo は新しい接続の受け付けを停止し、アクティブなリクエ
 
 ## サーバー
 
-```go file=cookbook/graceful-shutdown/server.go#primary-server
+```go file=cookbook/graceful-shutdown/server.go
 ```
 
 ## カスタム HTTP サーバーを使う
@@ -20,9 +20,9 @@ Echo は新しい接続の受け付けを停止し、アクティブなリクエ
 `http.Server` を自分で管理する場合は、goroutine で起動し、signal context を待ってから、
 タイムアウト付きで `Shutdown` を呼び出します。
 
-```go file=cookbook/graceful-shutdown/server.go#custom-server
+```go file=cookbook/graceful-shutdown/custom-server/server.go
 ```
 
 ```sh
-go run . -custom-server
+go run ./custom-server
 ```

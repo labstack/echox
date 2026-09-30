@@ -9,9 +9,19 @@ import { checkCookbookCode } from '../scripts/check-cookbook.mjs';
 import { redirects, retiredCookbookRedirects, legacyCookbookLocales } from '../src/redirects.mjs';
 import { localePrefixes } from '../src/locales.mjs';
 import { parseSourceDocument } from './source-document.mjs';
+import { sourceReferenceAt } from './remark-source-code.mjs';
 
 const parser = unified().use(remarkParse);
 const root = fileURLToPath(new URL('../..', import.meta.url));
+
+test('malformed source fences report the page and fence line in both checks', () => {
+  for (const fence of ['```go file=server.go\npasted\n```', '```go file=one.go file=two.go\n```']) {
+    const tree = parser.parse(`Introduction\n\n${fence}`);
+    assert.throws(() => checkCookbookCode(tree, 'cookbook/recipe.md'), /cookbook\/recipe.md:3: /);
+    const code = tree.children.find((node) => node.type === 'code');
+    assert.throws(() => sourceReferenceAt(code, 'middleware/logger.mdx'), /middleware\/logger.mdx:3: /);
+  }
+});
 
 test('cookbook check rejects pasted Go programs and long excerpts', () => {
   const program = '```go\npackage main\nfunc main() {}\n```';
