@@ -10,6 +10,7 @@ import (
 	"github.com/labstack/echo/v5"
 )
 
+// docs:start middleware
 // NewCasbinMiddleware returns middleware for [Casbin](https://casbin.org/).
 func NewCasbinMiddleware(enforcer *casbin.Enforcer, userGetter func(*echo.Context) (string, error)) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
@@ -27,6 +28,8 @@ func NewCasbinMiddleware(enforcer *casbin.Enforcer, userGetter func(*echo.Contex
 		}
 	}
 }
+
+// docs:end middleware
 
 /*
 Test with:
@@ -53,6 +56,7 @@ func main() {
 	//}
 	//e.Use(NewCasbinMiddleware(ce, basicAuthUser)) // Casbin does authorization
 
+	// docs:start jwt
 	e.Use(echojwt.JWT([]byte("secret")))               // JWT middleware does authentication
 	jwtUser := func(c *echo.Context) (string, error) { // JWT user getter for Casbin authorization
 		token, err := echo.ContextGet[*jwt.Token](c, "user")
@@ -62,6 +66,7 @@ func main() {
 		return token.Claims.GetSubject()
 	}
 	e.Use(NewCasbinMiddleware(ce, jwtUser)) // Casbin does authorization
+	// docs:end jwt
 
 	e.GET("/*", func(c *echo.Context) error {
 		return c.String(http.StatusOK, "Hello, World!")

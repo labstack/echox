@@ -39,58 +39,19 @@ import (
 Echo no incluye un middleware Casbin; la integración es un wrapper pequeño alrededor del
 enforcer de Casbin:
 
-```go
-// NewCasbinMiddleware returns middleware for Casbin (https://casbin.org/).
-func NewCasbinMiddleware(enforcer *casbin.Enforcer, userGetter func(*echo.Context) (string, error)) echo.MiddlewareFunc {
-	return func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c *echo.Context) error {
-			username, err := userGetter(c)
-			if err != nil {
-				return echo.ErrUnauthorized.Wrap(err)
-			}
-			if pass, err := enforcer.Enforce(username, c.Request().URL.Path, c.Request().Method); err != nil {
-				return echo.ErrInternalServerError.Wrap(err)
-			} else if !pass {
-				return echo.NewHTTPError(http.StatusForbidden, "access denied")
-			}
-			return next(c)
-		}
-	}
-}
+```go file=cookbook/casbin/server.go#middleware
 ```
 
 ## Ejemplo
 
 Crea un archivo de modelo Casbin `auth_model.conf`:
 
-```ini
-[request_definition]
-r = sub, obj, act
-
-[policy_definition]
-p = sub, obj, act
-
-[role_definition]
-g = _, _
-
-[policy_effect]
-e = some(where (p.eft == allow))
-
-[matchers]
-m = g(r.sub, p.sub) && keyMatch(r.obj, p.obj) && (r.act == p.act || p.act == "*")
+```ini file=cookbook/casbin/auth_model.conf
 ```
 
 Crea un archivo de policy Casbin `auth_policy.csv`:
 
-```csv
-p, 1234567890, /dataset1/*, GET
-p, alice, /dataset1/*, GET
-p, alice, /dataset1/resource1, POST
-p, bob, /dataset2/resource1, *
-p, bob, /dataset2/resource2, GET
-p, bob, /dataset2/folder1/*, POST
-p, dataset1_admin, /dataset1/*, *
-g, cathy, dataset1_admin
+```csv file=cookbook/casbin/auth_policy.csv
 ```
 
 La autenticación y la autorización son responsabilidades separadas. Autentica al usuario con
@@ -99,16 +60,7 @@ pueda autorizar el request.
 
 ### Con JWT
 
-```go
-e.Use(echojwt.JWT([]byte("secret")))               // JWT middleware does authentication
-jwtUser := func(c *echo.Context) (string, error) { // JWT user getter for Casbin authorization
-	token, err := echo.ContextGet[*jwt.Token](c, "user")
-	if err != nil {
-		return "", err
-	}
-	return token.Claims.GetSubject()
-}
-e.Use(NewCasbinMiddleware(ce, jwtUser)) // Casbin does authorization
+```go file=cookbook/casbin/server.go#jwt
 ```
 
 Pruébalo con:
@@ -143,61 +95,4 @@ curl -v -u "alice:password" http://localhost:8080/dataset2/resource2
 
 ### Ejemplo completo de Casbin + JWT
 
-```go
-package main
-
-import (
-	"log/slog"
-	"net/http"
-
-	"github.com/casbin/casbin/v3"
-	"github.com/golang-jwt/jwt/v5"
-	echojwt "github.com/labstack/echo-jwt/v5"
-	"github.com/labstack/echo/v5"
-)
-
-// NewCasbinMiddleware returns middleware for Casbin (https://casbin.org/).
-func NewCasbinMiddleware(enforcer *casbin.Enforcer, userGetter func(*echo.Context) (string, error)) echo.MiddlewareFunc {
-	return func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c *echo.Context) error {
-			username, err := userGetter(c)
-			if err != nil {
-				return echo.ErrUnauthorized.Wrap(err)
-			}
-			if pass, err := enforcer.Enforce(username, c.Request().URL.Path, c.Request().Method); err != nil {
-				return echo.ErrInternalServerError.Wrap(err)
-			} else if !pass {
-				return echo.NewHTTPError(http.StatusForbidden, "access denied")
-			}
-			return next(c)
-		}
-	}
-}
-
-func main() {
-	e := echo.New()
-
-	ce, err := casbin.NewEnforcer("auth_model.conf", "auth_policy.csv")
-	if err != nil {
-		slog.Error("failed to initialize Casbin enforcer", "error", err)
-	}
-
-	e.Use(echojwt.JWT([]byte("secret")))               // JWT middleware does authentication
-	jwtUser := func(c *echo.Context) (string, error) { // JWT user getter for Casbin authorization
-		token, err := echo.ContextGet[*jwt.Token](c, "user")
-		if err != nil {
-			return "", err
-		}
-		return token.Claims.GetSubject()
-	}
-	e.Use(NewCasbinMiddleware(ce, jwtUser)) // Casbin does authorization
-
-	e.GET("/*", func(c *echo.Context) error {
-		return c.String(http.StatusOK, "Hello, World!")
-	})
-
-	if err := e.Start(":8080"); err != nil {
-		e.Logger.Error("failed to start server", "error", err)
-	}
-}
-```
+Ejecuta el [ejemplo completo de Casbin + JWT](https://github.com/labstack/echox/tree/master/cookbook/casbin) con los archivos de modelo y política anteriores.
