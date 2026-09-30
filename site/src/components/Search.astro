@@ -1,20 +1,12 @@
 ---
 import Default from '@astrojs/starlight/components/Search.astro';
 import { Icon } from '@astrojs/starlight/components';
+import { labels } from './search-launchpad';
 const isNext = process.env.DOCS_CHANNEL === 'next';
-const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const locale = Astro.locals.starlightRoute.locale ?? 'en';
-const docsBase = `${base}${locale === 'en' ? '' : `/${locale}`}`;
-const labels = ({
-  en: { start: 'Start here', popular: 'Popular', quickstart: 'Quickstart', routing: 'Routing', binding: 'Binding', guide: 'Guide', middleware: 'Middleware', cookbook: 'Cookbook', open: 'open', navigate: 'navigate', close: 'close' },
-  es: { start: 'Empieza aquí', popular: 'Popular', quickstart: 'Inicio rápido', routing: 'Rutas', binding: 'Binding', guide: 'Guía', middleware: 'Middleware', cookbook: 'Recetario', open: 'abrir', navigate: 'navegar', close: 'cerrar' },
-  ja: { start: 'はじめに', popular: 'よく見るページ', quickstart: 'クイックスタート', routing: 'ルーティング', binding: 'バインディング', guide: 'ガイド', middleware: 'ミドルウェア', cookbook: 'クックブック', open: '開く', navigate: '移動', close: '閉じる' },
-  'pt-br': { start: 'Comece aqui', popular: 'Populares', quickstart: 'Guia de início', routing: 'Roteamento', binding: 'Binding', guide: 'Guia', middleware: 'Middleware', cookbook: 'Receitas', open: 'abrir', navigate: 'navegar', close: 'fechar' },
-  'zh-cn': { start: '从这里开始', popular: '热门内容', quickstart: '快速入门', routing: '路由', binding: '数据绑定', guide: '指南', middleware: '中间件', cookbook: '示例', open: '打开', navigate: '导航', close: '关闭' },
-} as Record<string, Record<string, string>>)[locale];
-if (!labels) throw new Error(`Search.astro: add launchpad labels for locale "${locale}"`);
+if (!labels[locale]) throw new Error(`Search.astro: add launchpad labels for locale "${locale}"`);
 ---
-<div class="echo-search-row">
+<div class="echo-search-row" data-locale={locale}>
   <Default />
   {/* The kapa.ai index covers release docs; next pages use their own Pagefind index. */}
   {!isNext && <button id="echo-ask-ai" class="echo-ask-ai" type="button" aria-label="Ask AI about Echo">
@@ -23,43 +15,30 @@ if (!labels) throw new Error(`Search.astro: add launchpad labels for locale "${l
   </button>}
 </div>
 
-<template id="echo-search-links" data-pagefind-ignore>
-    <div class="echo-search-empty" data-pagefind-ignore>
-      <div class="ess-group">
-        <div class="ess-label">{labels.start}</div>
-        <a class="ess-link" href={`${docsBase}/guide/quickstart/`}><Icon name="rocket" /> {labels.quickstart} <span class="ess-sec">{labels.guide}</span></a>
-        <a class="ess-link" href={`${docsBase}/guide/routing/`}><Icon name="random" /> {labels.routing} <span class="ess-sec">{labels.guide}</span></a>
-        <a class="ess-link" href={`${docsBase}/guide/binding/`}><Icon name="document" /> {labels.binding} <span class="ess-sec">{labels.guide}</span></a>
-      </div>
-      <div class="ess-group">
-        <div class="ess-label">{labels.popular}</div>
-        <a class="ess-link" href={`${docsBase}/middleware/jwt/`}><Icon name="padlock" /> JWT <span class="ess-sec">{labels.middleware}</span></a>
-        <a class="ess-link" href={`${docsBase}/middleware/cors/`}><Icon name="random" /> CORS <span class="ess-sec">{labels.middleware}</span></a>
-        <a class="ess-link" href={`${docsBase}/cookbook/hello-world/`}><Icon name="open-book" /> Hello World <span class="ess-sec">{labels.cookbook}</span></a>
-      </div>
-      <div class="ess-foot">
-        <span><kbd>↵</kbd>{labels.open}</span><span><kbd>Tab</kbd>{labels.navigate}</span><span><kbd>esc</kbd>{labels.close}</span>
-      </div>
-    </div>
-</template>
-
 <script>
+  import { launchpadHTML } from './search-launchpad';
+
   const search = document.querySelector('site-search');
-  const template = document.querySelector<HTMLTemplateElement>('#echo-search-links');
+  const locale = document.querySelector<HTMLElement>('.echo-search-row')?.dataset.locale ?? 'en';
+  const docsBase = `${import.meta.env.BASE_URL.replace(/\/$/, '')}${locale === 'en' ? '' : `/${locale}`}`;
   function inject() {
     const ui = search?.querySelector('.pagefind-ui');
     if (!ui || ui.querySelector('.echo-search-empty')) return !!ui;
     const form = ui.querySelector('.pagefind-ui__form');
-    if (!form || !template) return false;
-    form.after(template.content.cloneNode(true));
-    ui.querySelectorAll('.ess-link').forEach((link) => {
-      link.addEventListener('click', () => search?.querySelector('dialog')?.close());
+    if (!form) return false;
+    form.insertAdjacentHTML('afterend', launchpadHTML(locale, docsBase));
+    ui.querySelectorAll<HTMLAnchorElement>('.ess-link').forEach((link) => {
+      link.addEventListener('click', (event) => {
+        // Modified clicks open a new tab or window; keep the palette open for them.
+        if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+        search?.querySelector('dialog')?.close();
+      });
     });
     return true;
   }
 
   // Starlight mounts Pagefind on idle — watch its search subtree, then stop.
-  if (search && template && !inject()) {
+  if (search && !inject()) {
     const obs = new MutationObserver(() => { if (inject()) obs.disconnect(); });
     obs.observe(search, { childList: true, subtree: true });
     // Bound the observer: if Pagefind never mounts (disabled in dev, or the

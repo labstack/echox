@@ -19,10 +19,6 @@ import HomeHero from '../../components/HomeHero.astro';
 import { starsLabel } from '../../data/github.ts';
 import { CardGrid, Code, LinkButton, LinkCard, Steps } from '@astrojs/starlight/components';
 import { Image } from 'astro:assets';
-import helloWorldSource from '../../../../cookbook/hello-world/server.go?raw';
-import { sourceSnippet } from '../../../plugins/remark-source-code.mjs';
-
-export const helloWorldServer = sourceSnippet(helloWorldSource, undefined, 'cookbook/hello-world/server.go');
 
 <HomeHero />
 
@@ -59,7 +55,10 @@ export const helloWorldServer = sourceSnippet(helloWorldSource, undefined, 'cook
       <li>
         <h3>Write</h3>
         <p>Save the <a href="/cookbook/hello-world/">Hello World server</a> as <code>server.go</code>.</p>
-        <Code code={helloWorldServer} lang="go" frame="none" wrap />
+
+        ```go file=cookbook/hello-world/server.go frame="none" wrap
+        ```
+
       </li>
       <li>
         <h3>Run</h3>
@@ -102,6 +101,7 @@ export const helloWorldServer = sourceSnippet(helloWorldSource, undefined, 'cook
 <div class="sp-cta"><LinkButton href="https://github.com/sponsors/labstack" variant="secondary" icon="heart" iconPlacement="start" target="_blank" rel="noopener noreferrer">Become a sponsor</LinkButton></div>
 
 <div class="echo-foot">
+  <h2 class="sr-only">Site links</h2>
   <div class="brand">
     <span class="n">echo</span>
     <p>High performance, extensible, minimalist Go web framework.</p>

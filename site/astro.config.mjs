@@ -13,6 +13,8 @@ export default defineConfig({
   base: next ? '/next/' : '/',
   outDir: next ? './dist-next' : './dist',
   markdown: { processor: unified({ remarkPlugins: [remarkSourceCode] }) },
+  // Sponsor avatars: github.com/<org>.png redirects to avatars.githubusercontent.com.
+  image: { domains: ['github.com', 'avatars.githubusercontent.com'] },
   // Preserve every live Docusaurus /docs/* URL at cutover (generated — see ./src/redirects.mjs).
   redirects: next ? retiredCookbookRedirects('/next/') : redirects,
   integrations: [

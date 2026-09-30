@@ -30,6 +30,7 @@ const helloWorldCode = sourceSnippet(helloWorldSource, 'hero', 'cookbook/hello-w
   <div class="hh-win">
     <Code code={helloWorldCode} lang="go" title="server.go · excerpt" frame="code" wrap />
     <div class="hh-term" data-term aria-hidden="true">
+      <script is:inline>document.currentScript.parentElement.setAttribute('data-js', '');</script>
       <div><span class="pr">~/echo $</span> <span data-cmd>curl localhost:1323</span><span class="hh-cur" data-cur style="display:none"></span></div>
       <div data-out><div class="dim">HTTP/1.1 200 OK</div><div class="response">Hello, World!</div></div>
     </div>

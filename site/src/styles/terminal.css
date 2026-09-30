@@ -131,7 +131,7 @@ site-search button { border-radius: 8px !important; }
   display: flex; align-items: center; gap: 11px; padding: 9px 12px; border-radius: 9px;
   text-decoration: none; color: var(--sl-color-white); font-size: 0.9rem; line-height: 1;
 }
-.ess-link svg { font-size: 1.05rem; color: var(--echo-cyan-text); width: 1.2em; text-align: center; }
+.ess-link svg { flex: none; width: 1.05rem; height: 1.05rem; color: var(--echo-cyan-text); }
 .ess-link .ess-sec { margin-left: auto; font-family: var(--sl-font-mono); font-size: 0.7rem; color: var(--sl-color-gray-4); }
 .ess-link:hover { background: var(--echo-soft); }
 .ess-link:focus-visible { background: var(--echo-soft); outline: 2px solid var(--echo-cyan-text); outline-offset: 2px; }
@@ -342,14 +342,13 @@ starlight-toc a[aria-current='true'] { color: var(--echo-cyan-text); border-inli
 .hh h1 .g { color: var(--echo-cyan-text); }
 .hh-sub { font-family: var(--sl-font-mono); font-size: 1rem; line-height: 1.72; color: var(--sl-color-text); max-width: 48ch; margin-bottom: 26px; }
 .hh-cta { display: flex; gap: 11px; flex-wrap: wrap; align-items: center; margin-bottom: 20px; }
-.hh-btn { display: inline-flex; align-items: center; gap: 8px; font-family: var(--sl-font); font-weight: 600; font-size: 0.92rem; border-radius: 10px; padding: 11px 18px; cursor: pointer; text-decoration: none; transition: all .16s; }
+.hh-btn { display: inline-flex; align-items: center; gap: 8px; font-family: var(--sl-font); font-weight: 600; font-size: 0.92rem; border-radius: 10px; padding: 11px 18px; cursor: pointer; text-decoration: none; transition: all .16s; margin: 0; min-height: 44px; }
 .hh-btn.pri { background: linear-gradient(145deg, #00afd1, #4ae1ff); color: #04110c; }
 .hh-btn.pri:hover { box-shadow: 0 10px 26px -8px var(--echo-cyan); }
 .hh-btn.sec { border: 1px solid var(--sl-color-hairline-light); color: var(--sl-color-white); background: var(--sl-color-bg-sidebar); }
 .hh-btn.sec:hover { border-color: var(--echo-cyan); }
 .hh-install { max-width: 26rem; }
 .hh-install .expressive-code { --ec-codeFontSize: .85rem; }
-.hh-btn { margin: 0 !important; border-radius: 10px; min-height: 44px; }
 .hh-eyebrow svg { flex-shrink: 0; }
 
 /* Expressive Code owns the title, syntax and copy controls; the terminal shares its surface. */
@@ -357,10 +356,11 @@ starlight-toc a[aria-current='true'] { color: var(--echo-cyan-text); border-inli
 .hh-win .expressive-code { --ec-brdRad: 0; --ec-brdCol: transparent; --ec-codeFontSize: .82rem; margin: 0; }
 .hh-term { border-top: 1px solid var(--sl-color-hairline); background: color-mix(in srgb, var(--echo-cyan) 4%, var(--sl-color-bg-sidebar)); color: var(--sl-color-text); padding: 16px 18px; font-size: .82rem; line-height: 1.85; min-height: 118px; }
 .hh-term [data-out] { margin-top: .65rem; }
-/* Keep the static final state from flashing before the typing script clears it;
-   no-JS and reduced-motion visitors still see it. */
-@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
-  .hh-term:not([data-typing]) :is([data-cmd], [data-out]) { visibility: hidden; }
+/* Keep the static final state from flashing before the typing script clears it.
+   An inline script sets data-js during parsing; no-JS and reduced-motion visitors
+   still see the static state. */
+@media (prefers-reduced-motion: no-preference) {
+  .hh-term[data-js]:not([data-typing]) :is([data-cmd], [data-out]) { visibility: hidden; }
 }
 .hh-term .pr { color: var(--echo-cyan-text); }
 .hh-term .dim { color: var(--sl-color-gray-3); }
@@ -381,8 +381,9 @@ starlight-toc a[aria-current='true'] { color: var(--echo-cyan-text); border-inli
 .sp-card img { width: 26px; height: 26px; border-radius: 50%; }
 .sp-card span { font-family: var(--sl-font-mono); font-size: 0.9rem; color: var(--sl-color-gray-3); }
 .sp-cta { text-align: center; }
-.sp-cta a { font-family: var(--sl-font-mono); font-size: 0.82rem; color: var(--echo-cyan-text); text-decoration: none; border: 1px solid rgba(0,175,209,.3); border-radius: 9px; padding: 8px 16px; }
+.sp-cta a { margin: 0; font-family: var(--sl-font-mono); font-size: 0.82rem; color: var(--echo-cyan-text); text-decoration: none; border: 1px solid rgba(0,175,209,.3); border-radius: 9px; padding: 8px 16px; }
 .sp-cta a:hover { background: var(--echo-soft); }
+.sp-cta a svg { font-size: 1em; }
 
 /* ===================== Ecosystem ===================== */
 .echo-eco .sl-link-card { border-color: var(--sl-color-hairline); background: var(--sl-color-bg-sidebar); border-radius: 11px; box-shadow: none; transition: border-color .15s, background .15s; }
