@@ -58,6 +58,7 @@ func main() {
 実行します。
 
 ```bash
+go mod tidy
 go run main.go
 ```
 

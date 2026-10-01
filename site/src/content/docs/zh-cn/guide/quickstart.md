@@ -57,6 +57,7 @@ func main() {
 运行它：
 
 ```bash
+go mod tidy
 go run main.go
 ```
 
