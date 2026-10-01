@@ -1,6 +1,6 @@
 // Build-time GitHub stats. Fetched once during `astro build` and inlined into the
 // static HTML — no client JS, no runtime rate limits. The daily deploy cron
-// (.github/workflows/deploy.yaml) re-runs the build so the number stays fresh.
+// (.github/workflows/deploy.yml) re-runs the build so the number stays fresh.
 // Falls back gracefully so an offline / rate-limited build never fails.
 const REPO = 'labstack/echo';
 const FALLBACK_STARS = 32400;

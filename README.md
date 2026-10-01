@@ -138,7 +138,7 @@ go run .
 
 The site auto-deploys to GitHub Pages on every push to `master` (and once weekly,
 to refresh build-time data such as the GitHub star count) via
-[`.github/workflows/deploy.yaml`](.github/workflows/deploy.yaml). Dependencies
+[`.github/workflows/deploy.yml`](.github/workflows/deploy.yml). Dependencies
 are installed with `npm ci --ignore-scripts` and pinned via the committed
 lockfile.
 
