@@ -25,12 +25,14 @@ func hello(c *echo.Context) error {
 		err := ws.WriteMessage(websocket.TextMessage, []byte("Hello, Client!"))
 		if err != nil {
 			c.Logger().Error("failed to write WS message", "error", err)
+			return nil
 		}
 
 		// Read
 		_, msg, err := ws.ReadMessage()
 		if err != nil {
 			c.Logger().Error("failed to read WS message", "error", err)
+			return nil
 		}
 		fmt.Printf("%s\n", msg)
 	}
