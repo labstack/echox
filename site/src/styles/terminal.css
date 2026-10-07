@@ -328,6 +328,7 @@ starlight-toc a[aria-current='true'] { color: var(--echo-cyan-text); border-inli
    .not-content manage their own spacing via gap/explicit margins — neutralise it. */
 .echo-stats > *, .echo-steps > *,
 .sp-featured > *, .sp-card > *, .sp-grid > *,
+.ub-grid > *, .ub-card > *,
 .echo-foot > .brand, .echo-foot > .col { margin-top: 0; }
 
 .hh { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 48px; align-items: start; padding: 28px 0 8px; }
@@ -382,7 +383,19 @@ starlight-toc a[aria-current='true'] { color: var(--echo-cyan-text); border-inli
 .sp-cta { text-align: center; }
 .sp-cta a { margin: 0; font-family: var(--sl-font-mono); font-size: 0.82rem; color: var(--echo-cyan-text); text-decoration: none; border: 1px solid rgba(0,175,209,.3); border-radius: 9px; padding: 8px 16px; }
 .sp-cta a:hover { background: var(--echo-soft); }
-.sp-cta a svg { font-size: 1em; }
+.sp-cta a svg { font-size: 1em; color: #db61a2; }
+
+/* ===================== Used by ===================== */
+.ub-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; margin-bottom: 18px; }
+@media (min-width: 40rem) { .ub-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 64rem) { .ub-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.ub-card { display: flex; flex-direction: column; gap: 4px; border: 1px solid var(--sl-color-hairline); background: var(--sl-color-bg-sidebar); border-radius: 11px; padding: 12px 16px; text-decoration: none; transition: border-color .15s, background .15s; }
+.ub-card:hover { border-color: var(--echo-cyan); background: var(--echo-soft); }
+.ub-card b { font-family: var(--sl-font-mono); font-size: .9rem; font-weight: 600; color: var(--echo-cyan-text); }
+.ub-card span { font-size: .84rem; color: var(--sl-color-gray-3); }
+.ub-more { text-align: center; font-family: var(--sl-font-mono); font-size: .82rem; }
+.ub-more a { color: var(--echo-cyan-text); text-decoration: none; }
+.ub-more a:hover { text-decoration: underline; }
 
 /* ===================== Ecosystem ===================== */
 .echo-eco .sl-link-card { border-color: var(--sl-color-hairline); background: var(--sl-color-bg-sidebar); border-radius: 11px; box-shadow: none; transition: border-color .15s, background .15s; }
@@ -390,4 +403,4 @@ starlight-toc a[aria-current='true'] { color: var(--echo-cyan-text); border-inli
 .echo-eco .title { font-family: var(--sl-font-mono); font-size: .9rem; color: var(--echo-cyan-text); }
 .echo-eco .description { font-size: .86rem; }
 .echo-eco .sl-link-card:focus-within { outline: 2px solid var(--echo-cyan-text); outline-offset: 3px; }
-:where(.hh-btn, .echo-social a, .sp-featured, .sp-card, .sp-cta a):focus-visible { outline: 2px solid var(--echo-cyan-text); outline-offset: 3px; }
+:where(.hh-btn, .echo-social a, .sp-featured, .sp-card, .sp-cta a, .ub-card, .ub-more a):focus-visible { outline: 2px solid var(--echo-cyan-text); outline-offset: 3px; }

@@ -73,11 +73,30 @@ import { CardGrid, Code, LinkButton, LinkCard, Steps } from '@astrojs/starlight/
 <div class="echo-eco not-content">
   <CardGrid>
     <LinkCard title="echo-jwt" description="JWT authentication middleware backed by golang-jwt." href="https://github.com/labstack/echo-jwt" target="_blank" rel="noopener noreferrer" />
-    <LinkCard title="echo-contrib" description="Prometheus, Casbin, Jaeger, pprof, Zipkin &amp; session helpers." href="https://github.com/labstack/echo-contrib" target="_blank" rel="noopener noreferrer" />
-    <LinkCard title="echo-swagger" description="Generate and serve interactive Swagger / OpenAPI docs." href="https://github.com/swaggo/echo-swagger" target="_blank" rel="noopener noreferrer" />
-    <LinkCard title="API Reference" description="Full package documentation on pkg.go.dev." href="https://pkg.go.dev/github.com/labstack/echo/v5" target="_blank" rel="noopener noreferrer" />
+    <LinkCard title="echo-otel" description="OpenTelemetry tracing and metrics middleware." href="https://github.com/labstack/echo-otel" target="_blank" rel="noopener noreferrer" />
+    <LinkCard title="echo-prometheus" description="Prometheus metrics middleware." href="https://github.com/labstack/echo-prometheus" target="_blank" rel="noopener noreferrer" />
+    <LinkCard title="echo-contrib" description="Casbin, sessions, pprof and tracing helpers." href="https://github.com/labstack/echo-contrib" target="_blank" rel="noopener noreferrer" />
   </CardGrid>
 </div>
+
+<div class="echo-h"><span class="ey">In production</span><h2>Built on Echo.</h2></div>
+
+<div class="ub-grid">
+  <a class="ub-card" href="https://github.com/bluesky-social/indigo" target="_blank" rel="noopener noreferrer"><b>Bluesky indigo</b><span>AT Protocol Relay</span></a>
+  <a class="ub-card" href="https://github.com/temporalio/ui" target="_blank" rel="noopener noreferrer"><b>Temporal UI</b><span>Web UI server</span></a>
+  <a class="ub-card" href="https://github.com/NVIDIA/nvcf" target="_blank" rel="noopener noreferrer"><b>NVIDIA Cloud Functions</b><span>LLM API gateway</span></a>
+  <a class="ub-card" href="https://github.com/Azure/azure-container-networking" target="_blank" rel="noopener noreferrer"><b>Azure Container Networking</b><span>CNS REST API</span></a>
+  <a class="ub-card" href="https://github.com/osbuild/osbuild-composer" target="_blank" rel="noopener noreferrer"><b>osbuild-composer</b><span>Red Hat Image Builder API</span></a>
+  <a class="ub-card" href="https://github.com/docker/docker-agent" target="_blank" rel="noopener noreferrer"><b>Docker Agent</b><span>Agent and A2A servers</span></a>
+  <a class="ub-card" href="https://github.com/yugabyte/yugabyte-db" target="_blank" rel="noopener noreferrer"><b>YugabyteDB</b><span>yugabyted UI API</span></a>
+  <a class="ub-card" href="https://github.com/PostHog/posthog" target="_blank" rel="noopener noreferrer"><b>PostHog</b><span>Livestream service</span></a>
+  <a class="ub-card" href="https://github.com/bytebase/bytebase" target="_blank" rel="noopener noreferrer"><b>Bytebase</b><span>Backend and API</span></a>
+  <a class="ub-card" href="https://github.com/hatchet-dev/hatchet" target="_blank" rel="noopener noreferrer"><b>Hatchet</b><span>API server</span></a>
+  <a class="ub-card" href="https://github.com/IceWhaleTech/CasaOS" target="_blank" rel="noopener noreferrer"><b>CasaOS</b><span>API server</span></a>
+  <a class="ub-card" href="https://github.com/teamhanko/hanko" target="_blank" rel="noopener noreferrer"><b>Hanko</b><span>Authentication backend</span></a>
+</div>
+
+<p class="ub-more"><a href="https://github.com/labstack/echo/blob/master/ADOPTERS.md" target="_blank" rel="noopener noreferrer">See all adopters</a> · <a href="https://github.com/labstack/echo/blob/master/ADOPTERS.md#add-your-project" target="_blank" rel="noopener noreferrer">Add your project</a></p>
 
 <div class="echo-h"><span class="ey">Sponsors</span><h2>Backed by teams who build on Echo.</h2></div>
 
@@ -97,7 +116,7 @@ import { CardGrid, Code, LinkButton, LinkCard, Steps } from '@astrojs/starlight/
   <a class="sp-card" href="https://github.com/Codeerror" target="_blank" rel="noopener noreferrer"><img src="https://github.com/Codeerror.png?size=52" alt="Codeerror" width="26" height="26" loading="lazy" decoding="async" /><span>Codeerror</span></a>
 </div>
 
-<div class="sp-cta"><LinkButton href="https://github.com/sponsors/labstack" variant="secondary" icon="heart" iconPlacement="start" target="_blank" rel="noopener noreferrer">Become a sponsor</LinkButton></div>
+<div class="sp-cta"><LinkButton href="https://github.com/sponsors/labstack" variant="secondary" target="_blank" rel="noopener noreferrer"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>Become a sponsor</LinkButton></div>
 
 <div class="echo-foot">
   <h2 class="sr-only">Site links</h2>
@@ -117,7 +136,7 @@ import { CardGrid, Code, LinkButton, LinkCard, Steps } from '@astrojs/starlight/
     <a href="https://github.com/labstack/echo" target="_blank" rel="noopener noreferrer">GitHub</a>
     <a href="https://github.com/labstack/echo/releases" target="_blank" rel="noopener noreferrer">Releases</a>
     <a href="https://github.com/labstack/echo/discussions" target="_blank" rel="noopener noreferrer">Discussions</a>
-    <a href="https://github.com/labstack/echo/blob/master/.github/CONTRIBUTING.md" target="_blank" rel="noopener noreferrer">Contributing</a>
+    <a href="https://github.com/labstack/echo#contributing" target="_blank" rel="noopener noreferrer">Contributing</a>
   </div>
   <div class="col">
     <h3>Resources</h3>
