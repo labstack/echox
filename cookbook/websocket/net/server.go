@@ -22,7 +22,7 @@ func hello(c *echo.Context) error {
 			// Read
 			msg := ""
 			if err := websocket.Message.Receive(ws, &msg); err != nil {
-				c.Logger().Error("failed to write WS message", "error", err)
+				c.Logger().Error("failed to read WS message", "error", err)
 				return
 			}
 			fmt.Printf("%s\n", msg)

@@ -22,20 +22,19 @@ func TestHelloReturnsAfterClientDisconnect(t *testing.T) {
 	})
 
 	server := httptest.NewServer(e)
+	defer server.Close()
+
 	wsURL := "ws" + strings.TrimPrefix(server.URL, "http") + "/ws"
 	ws, err := websocket.Dial(wsURL, "", server.URL)
 	if err != nil {
-		server.Close()
 		t.Fatalf("failed to connect websocket client: %v", err)
 	}
 	if err := ws.Close(); err != nil {
-		server.CloseClientConnections()
 		t.Fatalf("failed to close websocket client: %v", err)
 	}
 
 	select {
 	case <-handlerReturned:
-		server.Close()
 	case <-time.After(2 * time.Second):
 		t.Fatal("websocket handler did not return after client disconnected")
 	}
