@@ -383,7 +383,7 @@ starlight-toc a[aria-current='true'] { color: var(--echo-cyan-text); border-inli
 .sp-cta { text-align: center; }
 .sp-cta a { margin: 0; font-family: var(--sl-font-mono); font-size: 0.82rem; color: var(--echo-cyan-text); text-decoration: none; border: 1px solid rgba(0,175,209,.3); border-radius: 9px; padding: 8px 16px; }
 .sp-cta a:hover { background: var(--echo-soft); }
-.sp-cta a svg { font-size: 1em; }
+.sp-cta a svg { font-size: 1em; color: #db61a2; }
 
 /* ===================== Used by ===================== */
 .ub-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; margin-bottom: 18px; }
