@@ -55,11 +55,8 @@ func customHTTPErrorHandler(c *echo.Context, err error) {
 	}
 
 	code := http.StatusInternalServerError
-	var sc echo.HTTPStatusCoder
-	if errors.As(err, &sc) {
-		if tmp := sc.StatusCode(); tmp != 0 {
-			code = tmp
-		}
+	if tmp := echo.StatusCode(err); tmp != 0 {
+		code = tmp
 	}
 
 	var cErr error
