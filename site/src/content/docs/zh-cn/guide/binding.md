@@ -74,7 +74,7 @@ if err := c.Bind(&f); err != nil {
 一个字段可以声明多个来源。数据会按下面的顺序绑定，每一步都会覆盖前一步的值：
 
 1. 路径参数
-2. 查询参数（仅 GET / DELETE）
+2. 查询参数（仅 GET / DELETE / HEAD / QUERY）
 3. 请求体
 
 ```go

@@ -98,8 +98,8 @@ func(c *echo.Context) error {
 
 ```json
 {
-  "email": "jon@labstack.com",
-  "name": "Jon"
+  "name": "Jon",
+  "email": "jon@labstack.com"
 }
 ```
 
@@ -178,18 +178,10 @@ func(c *echo.Context) error {
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <User>
-  <Name>Jon</Name>
-  <Email>jon@labstack.com</Email>
+  <name>Jon</name>
+  <email>jon@labstack.com</email>
 </User>
 ```
-
-:::tip
-你也可以在请求 URL 查询字符串中追加 `pretty`，让 `Context#XML()` 输出格式化后的 XML。
-
-```sh
-curl http://localhost:1323/users/1?pretty
-```
-:::
 
 ### XML blob
 
@@ -292,8 +284,7 @@ func(c *echo.Context) error {
 
 ### 响应后
 
-`Response#After(func())` 注册一个函数，在响应写入之后运行。如果 `Content-Length`
-未知，则不会运行任何 after 函数。
+`Response#After(func())` 注册一个函数，在响应写入之后运行。
 
 ```go
 e.GET("/hooks", func(c *echo.Context) error {
