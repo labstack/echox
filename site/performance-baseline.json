@@ -1,61 +1,55 @@
 {
   "/": {
     "html": {
-      "raw": 51106,
-      "gzip": 11580
+      "raw": 55971,
+      "gzip": 13291
     },
     "firstLoadAssets": {
-      "raw": 121132,
-      "gzip": 27418
+      "raw": 116823,
+      "gzip": 26316
     },
     "externalDomains": [
-      "fonts.googleapis.com",
-      "github.com",
       "widget.kapa.ai",
       "www.googletagmanager.com"
     ]
   },
   "/middleware/cors/": {
     "html": {
-      "raw": 64337,
-      "gzip": 12671
+      "raw": 72266,
+      "gzip": 14466
     },
     "firstLoadAssets": {
-      "raw": 123856,
-      "gzip": 28794
+      "raw": 117481,
+      "gzip": 26738
     },
     "externalDomains": [
-      "fonts.googleapis.com",
       "widget.kapa.ai",
       "www.googletagmanager.com"
     ]
   },
   "/next/": {
     "html": {
-      "raw": 50213,
-      "gzip": 11409
+      "raw": 55096,
+      "gzip": 12936
     },
     "firstLoadAssets": {
-      "raw": 121152,
-      "gzip": 27425
+      "raw": 116843,
+      "gzip": 26326
     },
     "externalDomains": [
-      "fonts.googleapis.com",
-      "github.com",
       "www.googletagmanager.com"
     ]
   },
   "/next/middleware/cors/": {
     "html": {
-      "raw": 64150,
-      "gzip": 12326
+      "raw": 72097,
+      "gzip": 14112
     },
     "firstLoadAssets": {
-      "raw": 123876,
-      "gzip": 28801
+      "raw": 117501,
+      "gzip": 26748
     },
     "externalDomains": [
-      "fonts.googleapis.com",
       "www.googletagmanager.com"
     ]
   }

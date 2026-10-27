@@ -12,14 +12,36 @@ head:
 hero:
   tagline: ' '
 tableOfContents: false
+# The splash home has no page source to edit or date.
+editUrl: false
+lastUpdated: false
 ---
 
 import FeatureCard from '../../components/FeatureCard.astro';
 import HomeHero from '../../components/HomeHero.astro';
 import { starsLabel } from '../../data/github.ts';
-import { CardGrid, Code, LinkButton, LinkCard, Steps } from '@astrojs/starlight/components';
+import { CardGrid, Code, LinkCard, Steps } from '@astrojs/starlight/components';
 
 <HomeHero />
+
+<section class="ub-strip not-content" aria-labelledby="built-on-echo">
+  <h2 id="built-on-echo">Built on Echo</h2>
+  <ul>
+    <li><a href="https://github.com/bluesky-social/indigo" target="_blank" rel="noopener noreferrer" title="AT Protocol Relay">Bluesky</a></li>
+    <li><a href="https://github.com/temporalio/ui" target="_blank" rel="noopener noreferrer" title="Web UI server">Temporal</a></li>
+    <li><a href="https://github.com/NVIDIA/nvcf" target="_blank" rel="noopener noreferrer" title="Cloud Functions LLM API gateway">NVIDIA</a></li>
+    <li><a href="https://github.com/Azure/azure-container-networking" target="_blank" rel="noopener noreferrer" title="Container Networking CNS REST API">Azure</a></li>
+    <li><a href="https://github.com/osbuild/osbuild-composer" target="_blank" rel="noopener noreferrer" title="Image Builder API (osbuild-composer)">Red Hat</a></li>
+    <li><a href="https://github.com/docker/docker-agent" target="_blank" rel="noopener noreferrer" title="Docker Agent and A2A servers">Docker</a></li>
+    <li><a href="https://github.com/yugabyte/yugabyte-db" target="_blank" rel="noopener noreferrer" title="yugabyted UI API">YugabyteDB</a></li>
+    <li><a href="https://github.com/PostHog/posthog" target="_blank" rel="noopener noreferrer" title="Livestream service">PostHog</a></li>
+    <li><a href="https://github.com/bytebase/bytebase" target="_blank" rel="noopener noreferrer" title="Backend and API">Bytebase</a></li>
+    <li><a href="https://github.com/hatchet-dev/hatchet" target="_blank" rel="noopener noreferrer" title="API server">Hatchet</a></li>
+    <li><a href="https://github.com/IceWhaleTech/CasaOS" target="_blank" rel="noopener noreferrer" title="API server">CasaOS</a></li>
+    <li><a href="https://github.com/teamhanko/hanko" target="_blank" rel="noopener noreferrer" title="Authentication backend">Hanko</a></li>
+  </ul>
+  <a class="ub-all" href="https://github.com/labstack/echo/blob/master/ADOPTERS.md" target="_blank" rel="noopener noreferrer">See all adopters <span aria-hidden="true">→</span></a>
+</section>
 
 <div class="echo-stats">
   <div><b>{starsLabel}</b><span>GitHub stars</span></div>
@@ -28,20 +50,20 @@ import { CardGrid, Code, LinkButton, LinkCard, Steps } from '@astrojs/starlight/
   <div><b>MIT</b><span>open source license</span></div>
 </div>
 
-<div class="echo-h"><span class="ey">Why Echo</span><h2>Everything you need. Nothing you don't.</h2></div>
+<div class="echo-h"><h2>Everything you need. Nothing you don't.</h2></div>
 
 <div class="echo-features not-content">
   <CardGrid>
     <FeatureCard title="Optimized Router" icon="rocket">Radix-tree routing with zero dynamic allocation and smart route prioritization.</FeatureCard>
     <FeatureCard title="Batteries-included Middleware" icon="setting">CORS, JWT, rate-limit, gzip, recover, request logging — 25+ built in.</FeatureCard>
-    <FeatureCard title="Data Binding" icon="document">Bind JSON, XML, form, query &amp; path params into typed structs, with validation.</FeatureCard>
+    <FeatureCard title="Data Binding" icon="document">Bind JSON, XML, form, query &amp; path params into typed structs.<Code code={'var u user\nif err := c.Bind(&u); err != nil {\n\treturn err\n}'} lang="go" frame="none" /></FeatureCard>
     <FeatureCard title="Automatic TLS" icon="padlock">HTTPS out of the box via Let's Encrypt, plus HTTP/2 support.</FeatureCard>
     <FeatureCard title="Extensible" icon="puzzle">Composable middleware and a clean, minimal interface for total control.</FeatureCard>
     <FeatureCard title="Templates" icon="window">Plug in any Go template engine for fast, flexible HTML rendering.</FeatureCard>
   </CardGrid>
 </div>
 
-<div class="echo-h"><span class="ey">Get Started</span><h2>A running server in three steps.</h2></div>
+<div class="echo-h"><h2>A running server in three steps.</h2></div>
 
 <div class="echo-steps">
   <Steps>
@@ -53,9 +75,9 @@ import { CardGrid, Code, LinkButton, LinkCard, Steps } from '@astrojs/starlight/
       </li>
       <li>
         <h3>Write</h3>
-        <p>Save the <a href="/cookbook/hello-world/">Hello World server</a> as <code>server.go</code>.</p>
+        <p>The core of <code>server.go</code>. Copy the <a href="/cookbook/hello-world/">full Hello World example</a> for the imports and <code>main</code>.</p>
 
-        ```go file=cookbook/hello-world/server.go frame="none" wrap
+        ```go file=cookbook/hello-world/server.go#hero frame="none" wrap
         ```
 
       </li>
@@ -68,7 +90,7 @@ import { CardGrid, Code, LinkButton, LinkCard, Steps } from '@astrojs/starlight/
   </Steps>
 </div>
 
-<div class="echo-h"><span class="ey">Ecosystem</span><h2>Official packages, ready to plug in.</h2></div>
+<div class="echo-h"><h2>Official packages, ready to plug in.</h2></div>
 
 <div class="echo-eco not-content">
   <CardGrid>
@@ -79,10 +101,32 @@ import { CardGrid, Code, LinkButton, LinkCard, Steps } from '@astrojs/starlight/
   </CardGrid>
 </div>
 
-<div class="echo-h"><span class="ey">Echo Pro</span><h2>Production building blocks for Echo v5.</h2></div>
+<div class="echo-h"><h2>Backed by teams who build on Echo.</h2></div>
 
-<div class="echo-pro not-content">
-  <p class="echo-pro-lede">A separate commercial Go library from LabStack for teams running multi-tenant APIs on Echo v5.</p>
+<div class="sp not-content">
+  <div class="sp-featured-row">
+    <a class="sp-featured" href="https://blacksmith.sh" target="_blank" rel="noopener noreferrer">
+      <span class="sp-mark" aria-hidden="true">B</span>
+      <span class="t"><b>Blacksmith</b><span>Faster, drop-in GitHub Actions runners.</span></span>
+    </a>
+    <a class="sp-featured" href="https://encore.dev" target="_blank" rel="noopener noreferrer">
+      <span class="sp-mark" aria-hidden="true">E</span>
+      <span class="t"><b>Encore</b><span>The platform for building Go-based cloud backends.</span></span>
+    </a>
+  </div>
+  <div class="sp-grid">
+    <a class="sp-card" href="https://github.com/customerio" target="_blank" rel="noopener noreferrer"><span class="sp-mark sm" aria-hidden="true">C</span><span>Customer.io</span></a>
+    <a class="sp-card" href="https://github.com/gravitycarbon" target="_blank" rel="noopener noreferrer"><span class="sp-mark sm" aria-hidden="true">G</span><span>Gravity Carbon</span></a>
+    <a class="sp-card" href="https://github.com/Codeerror" target="_blank" rel="noopener noreferrer"><span class="sp-mark sm" aria-hidden="true">C</span><span>Codeerror</span></a>
+    <a class="sp-cta" href="https://github.com/sponsors/labstack" target="_blank" rel="noopener noreferrer"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>Become a sponsor</a>
+  </div>
+</div>
+
+<section class="echo-pro not-content" aria-labelledby="echo-pro-title">
+  <div class="echo-pro-head">
+    <h2 id="echo-pro-title">Echo stays MIT. Echo Pro is a separate commercial library that funds it.</h2>
+    <p>Production building blocks for teams running multi-tenant APIs on Echo v5.</p>
+  </div>
   <div class="echo-pro-grid">
     <a class="echo-pro-card" href="/pro#features"><b>Auth and tenant isolation</b><span>API keys, JWT access tokens and deny-by-default tenant authorizers.</span></a>
     <a class="echo-pro-card" href="/pro#features"><b>Quotas and usage metering</b><span>Per-tenant plans, AI and MCP metering, and Stripe meter export.</span></a>
@@ -91,49 +135,9 @@ import { CardGrid, Code, LinkButton, LinkCard, Steps } from '@astrojs/starlight/
   </div>
   <div class="echo-pro-links">
     <a class="hh-btn sec" href="/pro">Explore Echo Pro</a>
-    <a class="echo-pro-text" href="/pro#pricing">Pricing</a>
+    <a class="echo-pro-text" href="/pro#pricing">See pricing <span aria-hidden="true">→</span></a>
   </div>
-  <p class="echo-commit">Echo is open source under the MIT license and always will be. Echo Pro is a separate commercial library; subscriptions fund Echo's maintenance.</p>
-</div>
-
-<div class="echo-h"><span class="ey">In production</span><h2>Built on Echo.</h2></div>
-
-<div class="ub-grid">
-  <a class="ub-card" href="https://github.com/bluesky-social/indigo" target="_blank" rel="noopener noreferrer"><b>Bluesky indigo</b><span>AT Protocol Relay</span></a>
-  <a class="ub-card" href="https://github.com/temporalio/ui" target="_blank" rel="noopener noreferrer"><b>Temporal UI</b><span>Web UI server</span></a>
-  <a class="ub-card" href="https://github.com/NVIDIA/nvcf" target="_blank" rel="noopener noreferrer"><b>NVIDIA Cloud Functions</b><span>LLM API gateway</span></a>
-  <a class="ub-card" href="https://github.com/Azure/azure-container-networking" target="_blank" rel="noopener noreferrer"><b>Azure Container Networking</b><span>CNS REST API</span></a>
-  <a class="ub-card" href="https://github.com/osbuild/osbuild-composer" target="_blank" rel="noopener noreferrer"><b>osbuild-composer</b><span>Red Hat Image Builder API</span></a>
-  <a class="ub-card" href="https://github.com/docker/docker-agent" target="_blank" rel="noopener noreferrer"><b>Docker Agent</b><span>Agent and A2A servers</span></a>
-  <a class="ub-card" href="https://github.com/yugabyte/yugabyte-db" target="_blank" rel="noopener noreferrer"><b>YugabyteDB</b><span>yugabyted UI API</span></a>
-  <a class="ub-card" href="https://github.com/PostHog/posthog" target="_blank" rel="noopener noreferrer"><b>PostHog</b><span>Livestream service</span></a>
-  <a class="ub-card" href="https://github.com/bytebase/bytebase" target="_blank" rel="noopener noreferrer"><b>Bytebase</b><span>Backend and API</span></a>
-  <a class="ub-card" href="https://github.com/hatchet-dev/hatchet" target="_blank" rel="noopener noreferrer"><b>Hatchet</b><span>API server</span></a>
-  <a class="ub-card" href="https://github.com/IceWhaleTech/CasaOS" target="_blank" rel="noopener noreferrer"><b>CasaOS</b><span>API server</span></a>
-  <a class="ub-card" href="https://github.com/teamhanko/hanko" target="_blank" rel="noopener noreferrer"><b>Hanko</b><span>Authentication backend</span></a>
-</div>
-
-<p class="ub-more"><a href="https://github.com/labstack/echo/blob/master/ADOPTERS.md" target="_blank" rel="noopener noreferrer">See all adopters</a> · <a href="https://github.com/labstack/echo/blob/master/ADOPTERS.md#add-your-project" target="_blank" rel="noopener noreferrer">Add your project</a></p>
-
-<div class="echo-h"><span class="ey">Sponsors</span><h2>Backed by teams who build on Echo.</h2></div>
-
-<a class="sp-featured" href="https://blacksmith.sh" target="_blank" rel="noopener noreferrer">
-  <img src="https://github.com/useblacksmith.png?size=88" alt="Blacksmith" width="44" height="44" loading="lazy" decoding="async" />
-  <span class="t"><b>Blacksmith</b><span>Faster, drop-in GitHub Actions runners.</span></span>
-</a>
-
-<a class="sp-featured" href="https://encore.dev" target="_blank" rel="noopener noreferrer">
-  <img src="https://github.com/encoredev.png?size=88" alt="Encore" width="44" height="44" loading="lazy" decoding="async" />
-  <span class="t"><b>Encore</b><span>The platform for building Go-based cloud backends.</span></span>
-</a>
-
-<div class="sp-grid">
-  <a class="sp-card" href="https://github.com/customerio" target="_blank" rel="noopener noreferrer"><img src="https://github.com/customerio.png?size=52" alt="Customer.io" width="26" height="26" loading="lazy" decoding="async" /><span>Customer.io</span></a>
-  <a class="sp-card" href="https://github.com/gravitycarbon" target="_blank" rel="noopener noreferrer"><img src="https://github.com/gravitycarbon.png?size=52" alt="Gravity Carbon" width="26" height="26" loading="lazy" decoding="async" /><span>Gravity Carbon</span></a>
-  <a class="sp-card" href="https://github.com/Codeerror" target="_blank" rel="noopener noreferrer"><img src="https://github.com/Codeerror.png?size=52" alt="Codeerror" width="26" height="26" loading="lazy" decoding="async" /><span>Codeerror</span></a>
-</div>
-
-<div class="sp-cta"><LinkButton href="https://github.com/sponsors/labstack" variant="secondary" target="_blank" rel="noopener noreferrer"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>Become a sponsor</LinkButton></div>
+</section>
 
 <div class="echo-foot">
   <h2 class="sr-only">Site links</h2>

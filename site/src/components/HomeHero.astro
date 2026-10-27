@@ -1,10 +1,12 @@
 ---
 // Living Terminal hero: code window + a terminal pane that types `curl`
-// and shows the runnable example's response. Animation is client-side, with a
-// static final-state fallback for reduced motion.
+// and shows the runnable example's response. The pane is server-rendered in its
+// final state; the typing animation only re-plays the command once, keeps the
+// prompt and reserved height (never blank, no layout shift) and is skipped for
+// reduced motion.
 import { starsLabel } from '../data/github.ts';
 import stable from '../generated/echo-source.json';
-import { Code, Icon, LinkButton } from '@astrojs/starlight/components';
+import { Code, LinkButton } from '@astrojs/starlight/components';
 import helloWorldSource from '../../../cookbook/hello-world/server.go?raw';
 import { sourceSnippet } from '../../plugins/remark-source-code.mjs';
 const next = process.env.DOCS_CHANNEL === 'next';
@@ -13,15 +15,14 @@ const helloWorldCode = sourceSnippet(helloWorldSource, 'hero', 'cookbook/hello-w
 
 <section class="hh not-content">
   <div class="hh-left">
-    <span class="hh-eyebrow"><Icon name="star" /> {next ? 'Echo next — preview documentation' : `Echo ${stable.release} — release documentation`}</span>
+    <span class="hh-eyebrow">{next ? 'Echo next — preview documentation' : `Echo ${stable.release} — release documentation`}</span>
     <h1>Build fast Go APIs.<br /><span class="g">Without the bloat.</span></h1>
     <p class="hh-sub">
-      A high-performance, minimalist Go web framework — a zero-allocation
-      router, batteries-included middleware, and an expressive API. Ship
-      production services in minutes.
+      A high-performance, minimalist Go web framework with a zero-allocation
+      router, batteries-included middleware and an expressive API.
     </p>
     <div class="hh-cta">
-      <LinkButton class="hh-btn pri" href="/guide/quickstart/" icon="right-arrow">Get Started</LinkButton>
+      <LinkButton class="hh-btn pri" href="/guide/quickstart/" icon="right-arrow">Get started</LinkButton>
       <LinkButton class="hh-btn sec" variant="secondary" icon="github" iconPlacement="start" href="https://github.com/labstack/echo" target="_blank" rel="noopener noreferrer">{starsLabel} on GitHub</LinkButton>
       <a class="hh-pro" href="/pro">Echo Pro <span aria-hidden="true">→</span></a>
     </div>
@@ -31,49 +32,35 @@ const helloWorldCode = sourceSnippet(helloWorldSource, 'hero', 'cookbook/hello-w
   <div class="hh-win">
     <Code code={helloWorldCode} lang="go" title="server.go · excerpt" frame="code" wrap />
     <div class="hh-term" data-term aria-hidden="true">
-      <script is:inline>document.currentScript.parentElement.setAttribute('data-js', '');</script>
-      <div><span class="pr">~/echo $</span> <span data-cmd>curl localhost:1323</span><span class="hh-cur" data-cur style="display:none"></span></div>
+      <div><span class="pr">~/echo $</span> <span data-cmd>curl localhost:1323</span><span class="hh-cur" data-cur hidden></span></div>
       <div data-out><div class="dim">HTTP/1.1 200 OK</div><div class="response">Hello, World!</div></div>
     </div>
   </div>
 </section>
 
 <script>
-  // --- terminal typing animation ---
+  // One-shot enhancement: re-type the command over the server-rendered final
+  // state, then reveal the response. The prompt and pane height never change.
   const term = document.querySelector('[data-term]');
-  if (term) {
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (term && !reduce) {
     const cmdEl = term.querySelector('[data-cmd]') as HTMLElement;
     const outEl = term.querySelector('[data-out]') as HTMLElement;
     const curEl = term.querySelector('[data-cur]') as HTMLElement;
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
     const cmd = cmdEl.textContent ?? '';
-
     const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-
-    async function run() {
-      while (true) {
-        cmdEl.textContent = '';
-        outEl.hidden = true;
-        curEl.style.display = 'inline-block';
-        await sleep(900);
-        for (const ch of cmd) {
-          cmdEl.textContent += ch;
-          await sleep(55);
-        }
-        await sleep(450);
-        curEl.style.display = 'none';
-        outEl.hidden = false;
-        await sleep(3600);
+    (async () => {
+      await sleep(600);
+      cmdEl.textContent = '';
+      outEl.style.visibility = 'hidden';
+      curEl.hidden = false;
+      for (const ch of cmd) {
+        cmdEl.textContent += ch;
+        await sleep(45);
       }
-    }
-
-    if (reduce) {
-      cmdEl.textContent = cmd;
-      curEl.style.display = 'none';
-    } else {
-      term.setAttribute('data-typing', '');
-      run();
-    }
+      await sleep(350);
+      curEl.hidden = true;
+      outEl.style.visibility = '';
+    })();
   }
 </script>
