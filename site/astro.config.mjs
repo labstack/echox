@@ -26,6 +26,7 @@ export default defineConfig({
         replacesTitle: true,
       },
       customCss: ['./src/styles/terminal.css'],
+      routeMiddleware: './src/routeData.ts',
       social: [
         { icon: 'github', label: 'GitHub', href: 'https://github.com/labstack/echo' },
       ],
@@ -41,6 +42,7 @@ export default defineConfig({
         Banner: './src/components/VersionBanner.astro',
         Footer: './src/components/Footer.astro',
         Search: './src/components/Search.astro',
+        SocialIcons: './src/components/SocialIcons.astro',
       },
       head: [
         // Google Analytics (carried over from the Docusaurus site, anonymized IP).

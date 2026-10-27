@@ -1,5 +1,8 @@
 /* Echo Docs — cyan accents and neutral surfaces over Astro Starlight.
-   DM Sans prose/headings · Fragment Mono code and UI chrome. */
+   DM Sans prose/headings · Fragment Mono code and UI chrome.
+   Quiet and text-first: depth comes from tonal surfaces and 1px borders, never
+   shadows or glows. Cyan is reserved for the primary button fill, links,
+   active/selected states and focus rings. Hover changes colour or border only. */
 
 :root {
   --sl-font: 'DM Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -7,6 +10,7 @@
   --echo-cyan: #00afd1;
   --echo-cyan-text: #33c9e6;   /* contrast-tuned for small text/links on dark */
   --echo-soft: rgba(0, 175, 209, 0.12);
+  --echo-ease: 120ms ease-out;
 }
 
 /* ---------- DARK (default) ---------- */
@@ -32,6 +36,9 @@
   --sl-color-text: #a5b4c3;
   --sl-color-text-accent: #72e0f2;
   --echo-cyan-text: #72e0f2;
+  --echo-btn-bg: #00afd1;
+  --echo-btn-fg: #04110c;
+  --echo-btn-hover: color-mix(in srgb, #00afd1 82%, #ffffff);
 }
 
 /* ---------- LIGHT ---------- */
@@ -56,18 +63,16 @@
   --sl-color-text: #344b5e;
   --sl-color-text-accent: #006c82;
   --echo-cyan-text: #006c82;
+  --echo-btn-bg: #006c82;
+  --echo-btn-fg: #ffffff;
+  --echo-btn-hover: color-mix(in srgb, #006c82 82%, #000000);
 }
 
-/* atmosphere: cyan glow (dark, respects reduced motion) */
-:root[data-theme='dark'] body::before {
-  content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none;
-  background: radial-gradient(840px 460px at 84% -12%, rgba(0, 175, 209, 0.10), transparent 62%);
-}
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 
 /* ---------- Type ---------- */
-.sl-markdown-content :is(h1, h2, h3, h4) { font-family: var(--sl-font); font-weight: 700; letter-spacing: -0.018em; }
-.sl-markdown-content h1, .content-panel h1 { letter-spacing: -0.03em; }
+.sl-markdown-content :is(h1, h2, h3, h4) { font-family: var(--sl-font); font-weight: 600; letter-spacing: -0.015em; }
+.sl-markdown-content h1, .content-panel h1 { font-weight: 600; letter-spacing: -0.025em; }
 .sl-markdown-content { font-size: 0.96rem; }
 
 /* UI chrome in Fragment Mono (terminal feel) */
@@ -102,13 +107,12 @@ site-search button { border-radius: 8px !important; }
   border: 1px solid var(--sl-color-gray-5); border-radius: 8px;
   background: var(--sl-color-black); color: var(--sl-color-text);
   font-family: var(--sl-font-mono); font-size: 0.8125rem; font-weight: 500; line-height: 1;
-  transition: border-color .15s, background .15s, color .15s;
+  transition: border-color var(--echo-ease), color var(--echo-ease);
 }
-.echo-ask-ai svg { font-size: 1rem; color: var(--echo-cyan-text); transition: color .15s; }
-.echo-ask-ai:focus-visible { outline: 2px solid var(--echo-cyan-text); outline-offset: 3px; }
+.echo-ask-ai svg { font-size: 1rem; color: var(--echo-cyan-text); }
+.echo-ask-ai:focus-visible { outline: 2px solid var(--echo-cyan-text); outline-offset: 2px; }
 .echo-ask-ai:hover, .echo-ask-ai:focus-visible {
-  border-color: var(--echo-cyan); background: var(--echo-soft);
-  color: var(--sl-color-white);
+  border-color: var(--echo-cyan); color: var(--sl-color-white);
 }
 /* Tight headers (mobile): drop the label, keep the star as an icon button. */
 @media (max-width: 50rem) {
@@ -133,8 +137,8 @@ site-search button { border-radius: 8px !important; }
 }
 .ess-link svg { flex: none; width: 1.05rem; height: 1.05rem; color: var(--echo-cyan-text); }
 .ess-link .ess-sec { margin-left: auto; font-family: var(--sl-font-mono); font-size: 0.7rem; color: var(--sl-color-gray-4); }
-.ess-link:hover { background: var(--echo-soft); }
-.ess-link:focus-visible { background: var(--echo-soft); outline: 2px solid var(--echo-cyan-text); outline-offset: 2px; }
+.ess-link:hover { background: var(--sl-color-gray-6); }
+.ess-link:focus-visible { background: var(--sl-color-gray-6); outline: 2px solid var(--echo-cyan-text); outline-offset: 2px; }
 .ess-foot {
   display: flex; gap: 18px; justify-content: center; flex-wrap: wrap;
   margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--sl-color-hairline);
@@ -182,17 +186,17 @@ site-search button { border-radius: 8px !important; }
   border-radius: 7px;
 }
 .expressive-code .copy button::before { border: none !important; background: transparent !important; }
-.expressive-code .copy button:hover { background: color-mix(in srgb, var(--echo-cyan) 16%, transparent); }
+.expressive-code .copy button:hover { background: color-mix(in srgb, var(--sl-color-gray-3) 18%, transparent); }
 .expressive-code .copy button:hover::after { background-color: var(--echo-cyan-text) !important; } /* icon glyph */
 
 
 /* ---------- Homepage ---------- */
 .hero { padding-block: 3rem 1rem; }
-.hero h1 { font-weight: 800; letter-spacing: -0.035em; }
+.hero h1 { font-weight: 600; letter-spacing: -0.03em; }
 .hero .tagline { font-family: var(--sl-font-mono); font-size: 0.95rem; }
 
 .echo-stats { display: flex; gap: 38px; flex-wrap: wrap; justify-content: center; padding: 26px 0; margin: 8px 0; border-block: 1px solid var(--sl-color-hairline); font-family: var(--sl-font-mono); }
-.echo-stats b { display: block; font-family: var(--sl-font); font-weight: 700; font-size: 1.6rem; color: var(--sl-color-white); letter-spacing: -0.02em; }
+.echo-stats b { display: block; font-family: var(--sl-font); font-weight: 600; font-size: 1.6rem; color: var(--sl-color-white); letter-spacing: -0.02em; }
 .echo-stats span { font-size: 0.8rem; color: var(--sl-color-gray-4); }
 .echo-features { margin-top: 28px; }
 .echo-features .card-grid, .echo-eco .card-grid { grid-template-columns: minmax(0, 1fr); gap: 14px; }
@@ -201,13 +205,13 @@ site-search button { border-radius: 8px !important; }
 
 /* section heading */
 .echo-h { text-align: center; margin: 56px 0 26px; }
-.echo-h .ey { font-family: var(--sl-font); font-weight: 600; font-size: 0.72rem; letter-spacing: .15em; text-transform: uppercase; color: var(--echo-cyan-text); }
-.echo-h h2 { font-family: var(--sl-font); font-weight: 700; font-size: 1.7rem; letter-spacing: -0.02em; color: var(--sl-color-white); margin: 8px 0 0; border: 0; padding: 0; }
+.echo-h .ey { font-family: var(--sl-font-mono); font-weight: 500; font-size: 0.72rem; letter-spacing: .12em; text-transform: uppercase; color: var(--sl-color-gray-4); }
+.echo-h h2 { font-family: var(--sl-font); font-weight: 600; font-size: 1.7rem; letter-spacing: -0.025em; color: var(--sl-color-white); margin: 8px 0 0; border: 0; padding: 0; }
 
 /* Semantic Starlight steps, presented as compact homepage cards. */
 .echo-steps .sl-steps { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
 .echo-steps .sl-steps > li { min-width: 0; border: 1px solid var(--sl-color-hairline); border-radius: 12px; padding: 62px 18px 18px; background: var(--sl-color-bg-sidebar); }
-.echo-steps .sl-steps > li::before { top: 18px; inset-inline-start: 18px; background: var(--echo-soft); color: var(--echo-cyan-text); box-shadow: none; }
+.echo-steps .sl-steps > li::before { top: 18px; inset-inline-start: 18px; background: var(--sl-color-gray-6); color: var(--sl-color-white); box-shadow: inset 0 0 0 1px var(--sl-color-hairline-light); }
 .echo-steps .sl-steps > li::after { display: none; }
 .echo-steps .sl-steps > li > :first-child { transform: none; }
 .echo-steps h3 { font-size: 1rem; margin: 0 0 6px; }
@@ -222,15 +226,16 @@ site-search button { border-radius: 8px !important; }
 /* footer */
 .echo-foot { margin-top: 64px; border-top: 1px solid var(--sl-color-hairline); padding-top: 34px; display: flex; flex-wrap: wrap; gap: 30px 56px; }
 .echo-foot .brand { flex: 1 1 200px; }
-.echo-foot .brand .n { font-family: var(--sl-font); font-weight: 700; font-size: 1.05rem; color: var(--sl-color-white); }
+.echo-foot .brand .n { font-family: var(--sl-font); font-weight: 600; font-size: 1.05rem; color: var(--sl-color-white); }
 .echo-foot .brand p { font-family: var(--sl-font-mono); font-size: 0.74rem; color: var(--sl-color-gray-4); margin: 8px 0 0; max-width: 30ch; }
 .echo-foot .col h3 { font-family: var(--sl-font); font-size: 0.66rem; text-transform: uppercase; letter-spacing: .12em; color: var(--sl-color-gray-4); margin: 0 0 12px; }
 .echo-foot .col a { display: block; font-family: var(--sl-font-mono); font-size: 0.875rem; color: var(--sl-color-gray-3); padding: 4px 0; text-decoration: none; }
-.echo-foot .col a:hover { color: var(--echo-cyan-text); }
+.echo-foot .col a { transition: color var(--echo-ease); }
+.echo-foot .col a:hover { color: var(--echo-cyan-text); text-decoration: underline; text-underline-offset: 3px; }
 
 /* social icon row — used in both homepage footer and the site-wide docs footer */
 .echo-social { display: inline-flex; align-items: center; gap: 16px; }
-.echo-social a { display: inline-flex; color: var(--sl-color-gray-3); font-size: 1.2rem; line-height: 1; text-decoration: none; transition: color .15s; }
+.echo-social a { display: inline-flex; color: var(--sl-color-gray-3); font-size: 1.2rem; line-height: 1; text-decoration: none; transition: color var(--echo-ease); }
 .echo-social a:hover { color: var(--echo-cyan-text); }
 
 /* site-wide footer on docs pages (homepage uses its own .echo-foot) */
@@ -238,15 +243,15 @@ site-search button { border-radius: 8px !important; }
 
 /* ===================== Asides / callouts ===================== */
 /* Starlight defaults (purple note, muddy yellow caution) are customized for Echo's
-   neutral surfaces. Re-theme: faint tinted bg, solid accent left-bar, mono
+   neutral surfaces. Re-theme: neutral surface, solid accent left-bar, mono
    accent title. Each variant just sets --aside-accent / --aside-text. */
 .starlight-aside {
   --aside-accent: var(--echo-cyan);
   --aside-text: var(--echo-cyan-text);
-  border: 1px solid color-mix(in srgb, var(--aside-accent) 25%, transparent);
+  border: 1px solid var(--sl-color-hairline);
   border-inline-start: 3px solid var(--aside-accent);
-  border-radius: 9px;
-  background: color-mix(in srgb, var(--aside-accent) 8%, var(--sl-color-bg));
+  border-radius: 8px;
+  background: var(--sl-color-bg-sidebar);
   padding: 14px 18px;
 }
 .starlight-aside__title {
@@ -274,28 +279,28 @@ site-search button { border-radius: 8px !important; }
 
 /* ===================== Prev / next pager ===================== */
 /* Starlight's default title is ~h4; in mono it reads oversized. Tone down,
-   tighten padding, add a cyan hover border to match other interactive cards. */
-.pagination-links a { padding: 14px 18px; border-radius: 10px; transition: border-color .15s, background .15s; }
-.pagination-links a:hover { border-color: var(--echo-cyan); }
+   tighten padding, step the border on hover like other interactive cards. */
+.pagination-links a { padding: 14px 18px; border-radius: 10px; box-shadow: none; transition: border-color var(--echo-ease); }
+.pagination-links a:hover { border-color: var(--sl-color-gray-4); }
 .pagination-links a > span { font-size: 0.68rem; color: var(--sl-color-gray-4); }
 .pagination-links a .link-title { font-size: 1.02rem; font-weight: 600; margin-top: 2px; }
 
 /* ===================== Theme polish ===================== */
 
-/* Tables — mono accent headers, hairline rules, subtle row hover */
+/* Tables — mono headers, hairline rules, subtle neutral row hover */
 .sl-markdown-content table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
 .sl-markdown-content th, .sl-markdown-content td { border: 1px solid var(--sl-color-hairline); padding: 8px 13px; }
 .sl-markdown-content th {
   font-family: var(--sl-font-mono); font-weight: 600; font-size: 0.74rem;
   text-transform: uppercase; letter-spacing: 0.05em; text-align: start;
-  color: var(--echo-cyan-text); background: var(--sl-color-bg-sidebar);
+  color: var(--sl-color-gray-2); background: var(--sl-color-bg-sidebar);
 }
-.sl-markdown-content tbody tr:hover td { background: color-mix(in srgb, var(--echo-cyan) 5%, transparent); }
+.sl-markdown-content tbody tr:hover td { background: color-mix(in srgb, var(--sl-color-gray-3) 5%, transparent); }
 
-/* Blockquotes — cyan accent + faint tint instead of the plain gray bar */
+/* Blockquotes — a stronger neutral bar, no tint */
 .sl-markdown-content blockquote {
-  border-inline-start: 3px solid var(--echo-cyan);
-  background: color-mix(in srgb, var(--echo-cyan) 5%, transparent);
+  border-inline-start: 3px solid var(--sl-color-hairline-light);
+  background: transparent;
   border-radius: 0 8px 8px 0; padding: 2px 18px; color: var(--sl-color-gray-2);
 }
 
@@ -316,7 +321,7 @@ starlight-toc a[aria-current='true'] { color: var(--echo-cyan-text); border-inli
 * { scrollbar-width: thin; scrollbar-color: var(--sl-color-gray-4) transparent; }
 ::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-thumb { background: var(--sl-color-gray-4); border-radius: 6px; border: 2px solid var(--sl-color-bg); }
-::-webkit-scrollbar-thumb:hover { background: var(--echo-cyan); }
+::-webkit-scrollbar-thumb:hover { background: var(--sl-color-gray-3); }
 
 /* ===================== Living Terminal hero ===================== */
 /* Home uses a custom <HomeHero/>; hide Starlight's own splash hero/title region. */
@@ -334,25 +339,28 @@ starlight-toc a[aria-current='true'] { color: var(--echo-cyan-text); border-inli
 .hh { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 48px; align-items: start; padding: 28px 0 8px; }
 @media (max-width: 900px) { .hh { grid-template-columns: minmax(0, 1fr); gap: 28px; } }
 .hh-left { min-width: 0; }
-.hh-eyebrow { display: inline-flex; align-items: center; gap: 7px; font-family: var(--sl-font-mono); font-size: 0.72rem; color: var(--echo-cyan-text); border: 1px solid rgba(0,175,209,.3); background: var(--echo-soft); border-radius: 30px; padding: 4px 12px; margin-bottom: 22px; }
-.hh h1 { font-family: var(--sl-font); font-weight: 800; font-size: clamp(2.2rem, 4.4vw, 3.2rem); line-height: 1.05; letter-spacing: -0.035em; color: var(--sl-color-white); margin: 0 0 18px; }
-.hh h1 .g { color: var(--echo-cyan-text); }
+.hh-eyebrow { display: inline-flex; align-items: center; gap: 7px; font-family: var(--sl-font-mono); font-size: 0.72rem; color: var(--sl-color-gray-3); border: 1px solid var(--sl-color-hairline-light); background: transparent; border-radius: 9999px; padding: 4px 12px; margin-bottom: 22px; }
+.hh h1 { font-family: var(--sl-font); font-weight: 600; font-size: clamp(2.2rem, 4.4vw, 3.2rem); line-height: 1.08; letter-spacing: -0.03em; color: var(--sl-color-white); margin: 0 0 18px; }
+.hh h1 .g { color: var(--sl-color-gray-4); }
 .hh-sub { font-family: var(--sl-font-mono); font-size: 1rem; line-height: 1.72; color: var(--sl-color-text); max-width: 48ch; margin-bottom: 26px; }
 .hh-cta { display: flex; gap: 11px; flex-wrap: wrap; align-items: center; margin-bottom: 20px; }
-.hh-btn { display: inline-flex; align-items: center; gap: 8px; font-family: var(--sl-font); font-weight: 600; font-size: 0.92rem; border-radius: 10px; padding: 11px 18px; cursor: pointer; text-decoration: none; transition: all .16s; margin: 0; min-height: 44px; }
-.hh-btn.pri { background: linear-gradient(145deg, #00afd1, #4ae1ff); color: #04110c; }
-.hh-btn.pri:hover { box-shadow: 0 10px 26px -8px var(--echo-cyan); }
-.hh-btn.sec { border: 1px solid var(--sl-color-hairline-light); color: var(--sl-color-white); background: var(--sl-color-bg-sidebar); }
-.hh-btn.sec:hover { border-color: var(--echo-cyan); }
+.hh-btn { display: inline-flex; align-items: center; gap: 8px; font-family: var(--sl-font); font-weight: 600; font-size: 0.92rem; border: 1px solid transparent; border-radius: 8px; padding: 11px 18px; cursor: pointer; text-decoration: none; transition: background-color var(--echo-ease), border-color var(--echo-ease), color var(--echo-ease); margin: 0; min-height: 44px; }
+.hh-btn.pri { background: var(--echo-btn-bg); color: var(--echo-btn-fg); }
+.hh-btn.pri:hover { background: var(--echo-btn-hover); color: var(--echo-btn-fg); }
+.hh-btn.sec { border-color: var(--sl-color-hairline-light); color: var(--sl-color-white); background: var(--sl-color-bg-sidebar); }
+.hh-btn.sec:hover { border-color: var(--sl-color-gray-4); color: var(--sl-color-white); }
 .hh-btn svg { font-size: 1.2em; }
+/* quiet text link to Echo Pro beside the hero buttons */
+.hh-pro { font-family: var(--sl-font); font-size: 0.92rem; color: var(--sl-color-gray-3); text-decoration: none; padding: 0 4px; transition: color var(--echo-ease); }
+.hh-pro:hover { color: var(--sl-color-white); text-decoration: underline; text-underline-offset: 3px; }
 .hh-install { max-width: 26rem; }
 .hh-install .expressive-code { --ec-codeFontSize: .85rem; }
 .hh-eyebrow svg { flex-shrink: 0; }
 
 /* Expressive Code owns the title, syntax and copy controls; the terminal shares its surface. */
-.hh-win { min-width: 0; border: 1px solid var(--sl-color-hairline-light); border-radius: 13px; overflow: hidden; background: var(--sl-color-bg-sidebar); box-shadow: 0 24px 64px -40px rgba(0,0,0,.35); font-family: var(--sl-font-mono); }
+.hh-win { min-width: 0; border: 1px solid var(--sl-color-hairline-light); border-radius: 12px; overflow: hidden; background: var(--sl-color-bg-sidebar); font-family: var(--sl-font-mono); }
 .hh-win .expressive-code { --ec-brdRad: 0; --ec-brdCol: transparent; --ec-codeFontSize: .82rem; margin: 0; }
-.hh-term { border-top: 1px solid var(--sl-color-hairline); background: color-mix(in srgb, var(--echo-cyan) 4%, var(--sl-color-bg-sidebar)); color: var(--sl-color-text); padding: 16px 18px; font-size: .82rem; line-height: 1.85; min-height: 118px; }
+.hh-term { border-top: 1px solid var(--sl-color-hairline); background: var(--sl-color-gray-6); color: var(--sl-color-text); padding: 16px 18px; font-size: .82rem; line-height: 1.85; min-height: 118px; }
 .hh-term [data-out] { margin-top: .65rem; }
 /* Keep the static final state from flashing before the typing script clears it.
    An inline script sets data-js during parsing; no-JS and reduced-motion visitors
@@ -369,28 +377,28 @@ starlight-toc a[aria-current='true'] { color: var(--echo-cyan-text); border-inli
 @keyframes hhblink { 50% { opacity: 0; } }
 
 /* ===================== Sponsors ===================== */
-.sp-featured { display: flex; align-items: center; gap: 16px; justify-content: center; border: 1px solid var(--sl-color-hairline-light); background: var(--sl-color-bg-sidebar); border-radius: 14px; padding: 20px 26px; max-width: 560px; margin: 0 auto 18px; text-decoration: none; transition: border-color .15s; }
-.sp-featured:hover { border-color: var(--echo-cyan); }
+.sp-featured { display: flex; align-items: center; gap: 16px; justify-content: center; border: 1px solid var(--sl-color-hairline-light); background: var(--sl-color-bg-sidebar); border-radius: 12px; padding: 20px 26px; max-width: 560px; margin: 0 auto 18px; text-decoration: none; transition: border-color var(--echo-ease); }
+.sp-featured:hover { border-color: var(--sl-color-gray-4); }
 .sp-featured .t b, .sp-featured .t span { text-decoration: none; }
 .sp-featured img { width: 44px; height: 44px; border-radius: 10px; }
-.sp-featured .t b { font-family: var(--sl-font); font-weight: 700; color: var(--sl-color-white); font-size: 1rem; }
+.sp-featured .t b { font-family: var(--sl-font); font-weight: 600; color: var(--sl-color-white); font-size: 1rem; }
 .sp-featured .t span { display: block; font-family: var(--sl-font-mono); font-size: 0.86rem; color: var(--sl-color-gray-4); margin-top: 4px; }
 .sp-grid { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; margin-bottom: 22px; }
-.sp-card { display: flex; align-items: center; gap: 10px; border: 1px solid var(--sl-color-hairline); border-radius: 10px; padding: 10px 14px; text-decoration: none; transition: border-color .15s; }
-.sp-card:hover { border-color: var(--echo-cyan); }
+.sp-card { display: flex; align-items: center; gap: 10px; border: 1px solid var(--sl-color-hairline); border-radius: 10px; padding: 10px 14px; text-decoration: none; transition: border-color var(--echo-ease); }
+.sp-card:hover { border-color: var(--sl-color-gray-4); }
 .sp-card img { width: 26px; height: 26px; border-radius: 50%; }
 .sp-card span { font-family: var(--sl-font-mono); font-size: 0.9rem; color: var(--sl-color-gray-3); }
 .sp-cta { text-align: center; }
-.sp-cta a { margin: 0; font-family: var(--sl-font-mono); font-size: 0.82rem; color: var(--echo-cyan-text); text-decoration: none; border: 1px solid rgba(0,175,209,.3); border-radius: 9px; padding: 8px 16px; }
-.sp-cta a:hover { background: var(--echo-soft); }
+.sp-cta a { margin: 0; font-family: var(--sl-font-mono); font-size: 0.82rem; color: var(--echo-cyan-text); text-decoration: none; border: 1px solid var(--sl-color-hairline-light); border-radius: 8px; padding: 8px 16px; transition: border-color var(--echo-ease); }
+.sp-cta a:hover { border-color: var(--echo-cyan); }
 .sp-cta a svg { font-size: 1em; color: #db61a2; }
 
 /* ===================== Used by ===================== */
 .ub-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; margin-bottom: 18px; }
 @media (min-width: 40rem) { .ub-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (min-width: 64rem) { .ub-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
-.ub-card { display: flex; flex-direction: column; gap: 4px; border: 1px solid var(--sl-color-hairline); background: var(--sl-color-bg-sidebar); border-radius: 11px; padding: 12px 16px; text-decoration: none; transition: border-color .15s, background .15s; }
-.ub-card:hover { border-color: var(--echo-cyan); background: var(--echo-soft); }
+.ub-card { display: flex; flex-direction: column; gap: 4px; border: 1px solid var(--sl-color-hairline); background: var(--sl-color-bg-sidebar); border-radius: 11px; padding: 12px 16px; text-decoration: none; transition: border-color var(--echo-ease); }
+.ub-card:hover { border-color: var(--sl-color-gray-4); }
 .ub-card b { font-family: var(--sl-font-mono); font-size: .9rem; font-weight: 600; color: var(--echo-cyan-text); }
 .ub-card span { font-size: .84rem; color: var(--sl-color-gray-3); }
 .ub-more { text-align: center; font-family: var(--sl-font-mono); font-size: .82rem; }
@@ -398,9 +406,28 @@ starlight-toc a[aria-current='true'] { color: var(--echo-cyan-text); border-inli
 .ub-more a:hover { text-decoration: underline; }
 
 /* ===================== Ecosystem ===================== */
-.echo-eco .sl-link-card { border-color: var(--sl-color-hairline); background: var(--sl-color-bg-sidebar); border-radius: 11px; box-shadow: none; transition: border-color .15s, background .15s; }
-.echo-eco .sl-link-card:hover { border-color: var(--echo-cyan); background: var(--echo-soft); }
+.echo-eco .sl-link-card { border-color: var(--sl-color-hairline); background: var(--sl-color-bg-sidebar); border-radius: 11px; box-shadow: none; transition: border-color var(--echo-ease); }
+.echo-eco .sl-link-card:hover { border-color: var(--sl-color-gray-4); background: var(--sl-color-bg-sidebar); }
 .echo-eco .title { font-family: var(--sl-font-mono); font-size: .9rem; color: var(--echo-cyan-text); }
 .echo-eco .description { font-size: .86rem; }
-.echo-eco .sl-link-card:focus-within { outline: 2px solid var(--echo-cyan-text); outline-offset: 3px; }
-:where(.hh-btn, .echo-social a, .sp-featured, .sp-card, .sp-cta a, .ub-card, .ub-more a):focus-visible { outline: 2px solid var(--echo-cyan-text); outline-offset: 3px; }
+.echo-eco .sl-link-card:focus-within { outline: 2px solid var(--echo-cyan-text); outline-offset: 2px; }
+:where(.hh-btn, .echo-social a, .echo-foot .col a, .sp-featured, .sp-card, .sp-cta a, .ub-card, .ub-more a):focus-visible { outline: 2px solid var(--echo-cyan-text); outline-offset: 2px; }
+
+/* ===================== Header "Pro" link ===================== */
+.echo-nav-pro { font-family: var(--sl-font-mono); font-size: 0.82rem; color: var(--sl-color-gray-2); text-decoration: none; transition: color var(--echo-ease); }
+.echo-nav-pro:hover, .echo-nav-pro[aria-current='page'] { color: var(--sl-color-white); text-decoration: underline; text-underline-offset: 4px; }
+
+/* ===================== Echo Pro (home section and /pro) ===================== */
+.echo-pro-lede { text-align: center; color: var(--sl-color-gray-3); max-width: 56ch; margin: -10px auto 22px; }
+.echo-pro-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+@media (min-width: 40rem) { .echo-pro-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 64rem) { .echo-pro-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.echo-pro-card { display: flex; flex-direction: column; gap: 6px; border: 1px solid var(--sl-color-hairline); background: var(--sl-color-bg-sidebar); border-radius: 12px; padding: 16px 18px; text-decoration: none; transition: border-color var(--echo-ease); }
+.echo-pro-card:hover { border-color: var(--sl-color-gray-4); }
+.echo-pro-card b { font-family: var(--sl-font); font-size: .95rem; font-weight: 600; color: var(--sl-color-white); }
+.echo-pro-card span { font-size: .86rem; line-height: 1.55; color: var(--sl-color-gray-3); }
+.echo-pro-links { display: flex; flex-wrap: wrap; gap: 18px; align-items: center; justify-content: center; margin-top: 22px; }
+.echo-pro-text { font-size: 0.92rem; color: var(--echo-cyan-text); text-underline-offset: 3px; text-decoration: none; }
+.echo-pro-text:hover { text-decoration: underline; }
+.echo-commit { text-align: center; font-size: 0.86rem; color: var(--sl-color-gray-4); max-width: 60ch; margin: 22px auto 0; }
+:where(.hh-pro, .echo-nav-pro, .echo-pro-card, .echo-pro-text):focus-visible { outline: 2px solid var(--echo-cyan-text); outline-offset: 2px; }

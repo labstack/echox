@@ -3,10 +3,12 @@ import Default from '@astrojs/starlight/components/Footer.astro';
 import { Icon } from '@astrojs/starlight/components';
 
 const year = new Date().getFullYear();
+// Echo is MIT; on the Echo Pro page say which product the licence covers.
+const isProduct = Astro.url.pathname.replace(/\/$/, '') === '/pro';
 ---
 <Default><slot /></Default>
 <footer class="echo-docfoot">
-  <span>© {year} LabStack LLC. Released under the MIT License.</span>
+  <span>© {year} LabStack LLC. {isProduct ? 'Echo is released under the MIT License; Echo Pro is commercial software.' : 'Released under the MIT License.'}</span>
   <div class="echo-social">
     <a href="https://x.com/labstack" target="_blank" rel="noopener noreferrer" aria-label="LabStack on X">
       <Icon name="x.com" />
