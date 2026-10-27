@@ -1,12 +1,14 @@
 /* Echo Docs — cyan accents and neutral surfaces over Astro Starlight.
-   DM Sans prose/headings · Fragment Mono code and UI chrome.
+   DM Sans for prose, headings and UI chrome · Fragment Mono only for code,
+   package paths and small technical labels. Fonts are self-hosted through
+   Astro's Fonts API (astro.config.mjs, components/Head.astro).
    Quiet and text-first: depth comes from tonal surfaces and 1px borders, never
    shadows or glows. Cyan is reserved for the primary button fill, links,
    active/selected states and focus rings. Hover changes colour or border only. */
 
 :root {
-  --sl-font: 'DM Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --sl-font-mono: 'Fragment Mono', ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+  --sl-font: var(--font-dm-sans), ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --sl-font-mono: var(--font-fragment-mono), ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
   --echo-cyan: #00afd1;
   --echo-cyan-text: #33c9e6;   /* contrast-tuned for small text/links on dark */
   --echo-soft: rgba(0, 175, 209, 0.12);
@@ -22,7 +24,7 @@
   --sl-color-gray-1: #e2e8f0;
   --sl-color-gray-2: #cbd5e1;
   --sl-color-gray-3: #a5b4c3;
-  --sl-color-gray-4: #7b8c9b;
+  --sl-color-gray-4: #8595a4;   /* >= 4.5:1 on every dark surface */
   --sl-color-gray-5: #263540;
   --sl-color-gray-6: #141e26;
   --sl-color-black: #0b1218;
@@ -39,6 +41,10 @@
   --echo-btn-bg: #00afd1;
   --echo-btn-fg: #04110c;
   --echo-btn-hover: color-mix(in srgb, #00afd1 82%, #ffffff);
+  /* Raised surface for nested panels, and the faint top highlight that gives
+     dark cards depth without shadows. */
+  --echo-surface-2: #16212b;
+  --echo-card-edge: inset 0 1px 0 rgb(255 255 255 / 0.06);
 }
 
 /* ---------- LIGHT ---------- */
@@ -50,7 +56,7 @@
   --sl-color-gray-1: #1d2f3d;
   --sl-color-gray-2: #344b5e;
   --sl-color-gray-3: #42566a;
-  --sl-color-gray-4: #5a6d7d;
+  --sl-color-gray-4: #52657a;   /* >= 4.5:1 on every light surface */
   --sl-color-gray-5: #d4e0e8;
   --sl-color-gray-6: #eaf1f5;
   --sl-color-black: #ffffff;
@@ -66,25 +72,30 @@
   --echo-btn-bg: #006c82;
   --echo-btn-fg: #ffffff;
   --echo-btn-hover: color-mix(in srgb, #006c82 82%, #000000);
+  --echo-surface-2: #e9f0f4;
+  --echo-card-edge: none;
 }
 
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+/* Cross-document view transitions: a plain cross-fade, only when motion is welcome. */
+@media (prefers-reduced-motion: no-preference) { @view-transition { navigation: auto; } }
+
+/* ---------- Base accessibility ---------- */
+/* Anchored targets clear the sticky header (WCAG 2.4.11 Focus Not Obscured). */
+html { scroll-padding-top: calc(var(--sl-nav-height, 4rem) + 1rem); }
+/* One focus ring everywhere: 2px cyan, offset from the control. */
+:focus-visible { outline: 2px solid var(--echo-cyan-text); outline-offset: 2px; }
+:is(h1, h2, h3, h4) { text-wrap: balance; }
+:is(p, li, dd, figcaption) { text-wrap: pretty; }
 
 /* ---------- Type ---------- */
 .sl-markdown-content :is(h1, h2, h3, h4) { font-family: var(--sl-font); font-weight: 600; letter-spacing: -0.015em; }
 .sl-markdown-content h1, .content-panel h1 { font-weight: 600; letter-spacing: -0.025em; }
 .sl-markdown-content { font-size: 0.96rem; }
 
-/* UI chrome in Fragment Mono (terminal feel) */
-.sidebar-content, .sidebar a, nav.sidebar, .right-sidebar, starlight-toc, mobile-starlight-toc,
-.pagination-links, .breadcrumbs, site-search button, .sl-badge, .sl-link-button {
-  font-family: var(--sl-font-mono);
-}
-.sidebar-content a { font-size: 0.82rem; }
-/* sidebar group captions */
-.sidebar-content summary, .top-level > li > a, .sidebar-content > ul > li > details > summary {
-  text-transform: uppercase; letter-spacing: 0.1em; font-size: 0.68rem;
-}
+/* UI chrome stays in DM Sans; small, sentence-case group captions. */
+.sidebar-content a { font-size: 0.875rem; }
+.sidebar-content summary .group-label .large { font-size: 0.875rem; font-weight: 600; color: var(--sl-color-white); }
 /* active sidebar item: cyan pill + left bar */
 .sidebar a[aria-current='page'] {
   color: var(--echo-cyan-text); background: var(--echo-soft);
@@ -106,7 +117,7 @@ site-search button { border-radius: 8px !important; }
   height: 40px; padding: 0 14px; cursor: pointer; white-space: nowrap;
   border: 1px solid var(--sl-color-gray-5); border-radius: 8px;
   background: var(--sl-color-black); color: var(--sl-color-text);
-  font-family: var(--sl-font-mono); font-size: 0.8125rem; font-weight: 500; line-height: 1;
+  font-family: var(--sl-font); font-size: 0.8125rem; font-weight: 500; line-height: 1;
   transition: border-color var(--echo-ease), color var(--echo-ease);
 }
 .echo-ask-ai svg { font-size: 1rem; color: var(--echo-cyan-text); }
@@ -154,6 +165,8 @@ site-search button { border-radius: 8px !important; }
    <pre> corners or it detaches from the title bar into a second box. */
 .expressive-code { --ec-brdRad: 11px; --ec-brdCol: var(--sl-color-hairline); }
 .sl-markdown-content code { font-size: 0.86em; }
+/* Show Go operators literally (no != / := ligatures). */
+.expressive-code, code, kbd, pre { font-variant-ligatures: none; font-feature-settings: 'liga' 0, 'calt' 0; }
 
 /* Retheme Expressive Code to our neutral palette (dark) so code blocks match the
    site instead of github-dark's cool gray, and remove the title-bar seam. */
@@ -234,12 +247,13 @@ site-search button { border-radius: 8px !important; }
 .echo-foot .col a:hover { color: var(--echo-cyan-text); text-decoration: underline; text-underline-offset: 3px; }
 
 /* social icon row — used in both homepage footer and the site-wide docs footer */
-.echo-social { display: inline-flex; align-items: center; gap: 16px; }
-.echo-social a { display: inline-flex; color: var(--sl-color-gray-3); font-size: 1.2rem; line-height: 1; text-decoration: none; transition: color var(--echo-ease); }
-.echo-social a:hover { color: var(--echo-cyan-text); }
+.echo-social { display: inline-flex; align-items: center; gap: 4px; }
+/* 32px hit areas around 20px glyphs (WCAG 2.5.8 target size). */
+.echo-social a { display: inline-flex; align-items: center; justify-content: center; min-width: 32px; min-height: 32px; border-radius: 6px; color: var(--sl-color-gray-3); font-size: 1.2rem; line-height: 1; text-decoration: none; transition: color var(--echo-ease); }
+.echo-social a:hover { color: var(--sl-color-white); }
 
 /* site-wide footer on docs pages (homepage uses its own .echo-foot) */
-.echo-docfoot { margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--sl-color-hairline); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; font-family: var(--sl-font-mono); font-size: 0.72rem; color: var(--sl-color-gray-4); }
+.echo-docfoot { margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--sl-color-hairline); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; font-size: 0.8125rem; color: var(--sl-color-gray-4); }
 
 /* ===================== Asides / callouts ===================== */
 /* Starlight defaults (purple note, muddy yellow caution) are customized for Echo's
@@ -288,14 +302,14 @@ site-search button { border-radius: 8px !important; }
 /* ===================== Theme polish ===================== */
 
 /* Tables — mono headers, hairline rules, subtle neutral row hover */
-.sl-markdown-content table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
-.sl-markdown-content th, .sl-markdown-content td { border: 1px solid var(--sl-color-hairline); padding: 8px 13px; }
-.sl-markdown-content th {
+.sl-markdown-content table:not(:where(.not-content *)) { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
+.sl-markdown-content :is(th, td):not(:where(.not-content *)) { border: 1px solid var(--sl-color-hairline); padding: 8px 13px; }
+.sl-markdown-content th:not(:where(.not-content *)) {
   font-family: var(--sl-font-mono); font-weight: 600; font-size: 0.74rem;
   text-transform: uppercase; letter-spacing: 0.05em; text-align: start;
   color: var(--sl-color-gray-2); background: var(--sl-color-bg-sidebar);
 }
-.sl-markdown-content tbody tr:hover td { background: color-mix(in srgb, var(--sl-color-gray-3) 5%, transparent); }
+.sl-markdown-content tbody tr:hover td:not(:where(.not-content *)) { background: color-mix(in srgb, var(--sl-color-gray-3) 5%, transparent); }
 
 /* Blockquotes — a stronger neutral bar, no tint */
 .sl-markdown-content blockquote {
@@ -414,7 +428,7 @@ starlight-toc a[aria-current='true'] { color: var(--echo-cyan-text); border-inli
 :where(.hh-btn, .echo-social a, .echo-foot .col a, .sp-featured, .sp-card, .sp-cta a, .ub-card, .ub-more a):focus-visible { outline: 2px solid var(--echo-cyan-text); outline-offset: 2px; }
 
 /* ===================== Header "Pro" link ===================== */
-.echo-nav-pro { font-family: var(--sl-font-mono); font-size: 0.82rem; color: var(--sl-color-gray-2); text-decoration: none; transition: color var(--echo-ease); }
+.echo-nav-pro { display: inline-flex; align-items: center; min-height: 32px; padding: 0 4px; font-family: var(--sl-font); font-size: 0.875rem; font-weight: 500; color: var(--sl-color-gray-2); text-decoration: none; transition: color var(--echo-ease); }
 .echo-nav-pro:hover, .echo-nav-pro[aria-current='page'] { color: var(--sl-color-white); text-decoration: underline; text-underline-offset: 4px; }
 
 /* ===================== Echo Pro (home section and /pro) ===================== */

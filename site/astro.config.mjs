@@ -1,4 +1,4 @@
-import { defineConfig } from 'astro/config';
+import { defineConfig, fontProviders } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import { unified } from '@astrojs/markdown-remark';
 import { redirects, retiredCookbookRedirects } from './src/redirects.mjs';
@@ -12,6 +12,31 @@ export default defineConfig({
   site: 'https://echo.labstack.com',
   base: next ? '/next/' : '/',
   outDir: next ? './dist-next' : './dist',
+  // Self-hosted fonts (no third-party font requests). Latin subsets only; other
+  // scripts fall back to the system stack. Astro generates size-adjusted
+  // fallbacks and the preload links emitted by ./src/components/Head.astro.
+  fonts: [
+    {
+      provider: fontProviders.local(),
+      name: 'DM Sans',
+      cssVariable: '--font-dm-sans',
+      fallbacks: ['ui-sans-serif', 'system-ui', 'sans-serif'],
+      display: 'swap',
+      options: {
+        variants: [{ src: ['@fontsource-variable/dm-sans/files/dm-sans-latin-wght-normal.woff2'], weight: '400 700', style: 'normal' }],
+      },
+    },
+    {
+      provider: fontProviders.local(),
+      name: 'Fragment Mono',
+      cssVariable: '--font-fragment-mono',
+      fallbacks: ['ui-monospace', 'monospace'],
+      display: 'swap',
+      options: {
+        variants: [{ src: ['@fontsource/fragment-mono/files/fragment-mono-latin-400-normal.woff2'], weight: '400', style: 'normal' }],
+      },
+    },
+  ],
   markdown: { processor: unified({ remarkPlugins: [remarkSourceCode] }) },
   // Preserve every live Docusaurus /docs/* URL at cutover (generated — see ./src/redirects.mjs).
   redirects: next ? retiredCookbookRedirects('/next/') : redirects,
@@ -40,6 +65,7 @@ export default defineConfig({
       // empty-state launchpad. "Ask AI" is the kapa.ai widget (see head).
       components: {
         Banner: './src/components/VersionBanner.astro',
+        Head: './src/components/Head.astro',
         Footer: './src/components/Footer.astro',
         Search: './src/components/Search.astro',
         SocialIcons: './src/components/SocialIcons.astro',
@@ -80,15 +106,6 @@ export default defineConfig({
         {
           tag: 'script',
           content: "try{if(!localStorage.getItem('starlight-theme')){localStorage.setItem('starlight-theme','dark');document.documentElement.dataset.theme='dark';}}catch(e){document.documentElement.dataset.theme='dark';}",
-        },
-        { tag: 'link', attrs: { rel: 'preconnect', href: 'https://fonts.googleapis.com' } },
-        { tag: 'link', attrs: { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: true } },
-        {
-          tag: 'link',
-          attrs: {
-            rel: 'stylesheet',
-            href: 'https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Fragment+Mono&display=swap',
-          },
         },
         // Default social card. Starlight already emits og:title/description/url
         // and twitter:card=summary_large_image, but no image — add a site-wide
