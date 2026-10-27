@@ -1,48 +1,213 @@
 ---
 // Echo Pro product page: a commercial Go library from LabStack that builds on
 // Echo v5. Rendered inside Starlight so it keeps the site header, footer and
-// theme. Checkout links are placeholders until launch; noindex until then.
+// theme. Code-library product pattern: hero with real code, trust row, request
+// path, package table, pricing, install, FAQ. Every snippet is trimmed from the
+// echo-pro package READMEs and must keep matching their APIs.
+// Buying is by email until checkout launches; noindex until then.
 import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
 import { Code } from '@astrojs/starlight/components';
+import { Image } from 'astro:assets';
+import consoleDark from '../assets/pro/admin-console-dark.webp';
+import consoleLight from '../assets/pro/admin-console-light.webp';
 
 // The release site owns /pro; the next preview sends visitors there.
 if (process.env.DOCS_CHANNEL === 'next') return Astro.redirect('/pro');
 
-// Stripe Payment Links are not live yet; "#" renders the launch note.
-const checkout = { team: '#', business: '#' };
+// Flip to true at launch (with indexing) to emit SoftwareApplication + Offer JSON-LD.
+const ENABLE_STRUCTURED_DATA = false;
+// Set to an absolute URL (1200x630) to give /pro its own social card.
+const OG_IMAGE: string | undefined = undefined;
 
-const features = [
-  ['Auth and tenant isolation', 'API keys (HMAC with a pepper ring) and asymmetric JWT access tokens with bounded JWKS caching. Conflict-detecting tenant resolution with deny-by-default Static, Casbin, Cerbos and OpenFGA authorizers and isolation assertions.', 'auth · tenant · auth/authbind'],
-  ['Quotas and usage plans', 'Per-tenant plans with weighted costs, overrides, plan reload, shadow plans, concurrency limits, prepaid credits and Top-K. Memory and atomic Redis/Valkey stores, Echo middleware, and a client package for RateLimit parsing and polite retries.', 'quota · quota/redisstore · quota/quotaclient'],
-  ['AI and MCP metering', 'Reserve/settle accounting for AI usage and plan quotas for MCP tools on the official MCP Go SDK. Final consumption exports to Stripe meters in fixed UTC minute windows, with receipts and reconciliation.', 'quota/quotamcp · quota/quotastripe'],
-  ['Audit', 'Durable business audit events with verified actors and shared redaction: a PostgreSQL 16–18 recorder, masked query, snapshot export and evidence-recorded reveal.', 'audit · audit/auditpg'],
-  ['Execution records', 'Agent-safe records for declared external effects: memory and PostgreSQL 16–18 stores, operator recovery, an Echo HTTP adapter and an admin inspection and recovery panel.', 'execution · execution/pgstore'],
-  ['Webhooks', 'Inbox and outbox with signed HTTP delivery and verification, durable PostgreSQL acceptance and transactional enqueue, retry workers, replay and maintenance.', 'webhook · webhook/webhookpg'],
-  ['OpenAPI policy coverage', 'Operation-policy coverage with Check and CI reports, an ordered auth, quota and validation Mount chain, and an admin coverage view.', 'openapi'],
-  ['RFC 9457 problems', 'A problem catalog with a bilingual reference and Echo error rendering. Problem-type URIs are stable identifiers.', 'problem · problem/echoadapter'],
-  ['Embedded admin console', 'Plans, usage, credits, denials, outbox, audit, webhooks and execution records in one console mounted behind your own sign-in, with preview-then-confirm audited actions.', 'admin'],
+const buy = (plan: string) =>
+  `mailto:support@labstack.com?subject=${encodeURIComponent(`Buy Echo Pro ${plan}`)}`;
+
+// Trimmed from auth/README.md (quickstart) and auth/authbind/README.md.
+const authSnippet = `authCfg := auth.Config{
+	Schemes: map[string]auth.Scheme{"key": auth.APIKey{
+		Namespace: "billing", Prefix: "demo",
+		Peppers: ring, Store: store, Header: "X-API-Key",
+	}},
+	Fallback: auth.Require(map[string][]string{
+		"key": {"invoice:read"},
+	}),
+}
+guard, err := authbind.Middleware(authCfg, tenant.Config{
+	Selectors: []tenant.Selector{tenant.FromCredential()},
+	Required:  true,
+})
+e.Group("/v1", guard).GET("/invoices", listInvoices)`;
+
+// Trimmed from quota/README.md (five-minute quickstart) and auth/authbind.
+const quotaSnippet = `lim, err := quota.New(quota.Config{
+	Store: quota.NewMemoryStore(quota.MemoryConfig{}),
+	Plans: []quota.Plan{{ID: "free", Limits: []quota.Limit{
+		quota.PerSecond("burst", 5).Burst(10),
+		quota.PerMonth("requests", 10_000),
+	}}},
+})
+identity, err := authbind.Quota()
+mw, err := quota.MiddlewareConfig{
+	Limiter: lim, Identity: identity,
+}.ToMiddleware()
+e.Group("/v1", guard, mw).GET("/hello", hello) // explained 429s`;
+
+// Trimmed from webhook/README.md (memory round trip).
+const webhookSnippet = `p, err := webhook.PrepareOutgoing(webhook.Outgoing{
+	Tenant: "t1", Destination: "credits", Version: "v1",
+	Key: "invoice_42/grant", Type: "credit.add", Format: "json",
+	Payload: []byte(\`{"amount":100}\`),
+})
+receipt, err := store.Enqueue(ctx, p)
+worker, err := webhookmem.NewWorker(store, webhookmem.WorkerConfig{
+	Concurrency: 1,
+})
+go func() { done <- worker.Run(ctx) }() // signs and delivers`;
+
+const tabs = [
+  { id: 'auth', label: 'Auth + tenant', file: 'auth · tenant · authbind', code: authSnippet },
+  { id: 'quota', label: 'Quota', file: 'quota', code: quotaSnippet },
+  { id: 'webhook', label: 'Webhooks', file: 'webhook · webhookmem', code: webhookSnippet },
 ];
+
+const requirements = ['Go 1.26 and 1.27', 'Echo v5.4.2 or later', 'PostgreSQL 16–18', 'Redis and Valkey'];
 
 const trust = [
-  ['No telemetry', 'Echo Pro sends nothing anywhere by itself. Prometheus and OpenTelemetry hooks are opt-in and report to your own systems.'],
-  ['No runtime license checks', 'Nothing in the library checks a key or calls home. Your token is only used to download modules.'],
-  ['Keep what you have', 'Versions you received while subscribed, and security fixes for those release lines, stay licensed after your subscription ends.'],
-  ['Standard Go tooling', 'Modules come from the private proxy go.labstack.io; public dependencies keep using proxy.golang.org and sum.golang.org, and Echo Pro hashes are recorded in your go.sum.'],
-  ['Honest 0.x', 'Until 1.0.0, incompatible API changes ship in minor releases with migration notes; patch releases contain compatible fixes.'],
+  ['No telemetry', 'The library sends nothing anywhere by itself.'],
+  ['No license checks at run time', 'Your token only downloads modules.'],
+  ['Keep what you bought', 'Versions you received stay licensed after you stop paying.'],
+  ['Plain go get', 'A private Go module proxy and your go.sum.'],
 ];
 
-const plans = [
-  { name: 'Team', tag: 'Small teams', price: '$1,500', developers: 'Up to 20 developers', href: checkout.team },
-  { name: 'Business', tag: 'Growing companies', price: '$4,500', developers: 'Up to 100 developers', href: checkout.business },
+const flagships = [
+  {
+    title: 'Auth and tenant isolation',
+    packages: 'auth · tenant · auth/authbind',
+    text: 'Every request carries a verified API key or JWT and a resolved tenant, or it is refused. Conflicting tenant sources fail closed; Static, Casbin, Cerbos and OpenFGA authorizers deny by default.',
+  },
+  {
+    title: 'Quotas, AI and MCP metering, Stripe',
+    packages: 'quota · quota/quotamcp · quota/quotastripe',
+    text: 'Enforce per-tenant plans with an explained 429, reserve and settle AI usage, meter MCP tools, and export final consumption to Stripe meters with receipts and reconciliation.',
+  },
+  {
+    title: 'Embedded admin console',
+    packages: 'admin',
+    text: 'Plans, usage, credits, denials, audit, webhooks and execution records in one console mounted behind your own sign-in. Changes are previewed, confirmed and audited.',
+    console: true,
+  },
 ];
-const included = ['Every Echo Pro package', 'Every release during your subscription', 'Access tokens for go.labstack.io'];
+
+const packages = [
+  ['auth', 'API keys and asymmetric JWT access tokens, one credential per request.'],
+  ['tenant', 'Tenant resolution with membership checks and deny-by-default authorizers.'],
+  ['auth/authbind', 'Maps verified identity into quota, audit, execution, admin and MCP.'],
+  ['quota', 'Per-tenant plans, weighted costs, credits, concurrency limits and Echo middleware.'],
+  ['quota/redisstore', 'Atomic Redis and Valkey store: standalone, Sentinel and Cluster.'],
+  ['quota/quotamcp', 'Plan quotas and metering for MCP tools on the official MCP Go SDK.'],
+  ['quota/quotastripe', 'Stripe meter export of final usage, with receipts and reconciliation.'],
+  ['quota/quotaclient', 'Client-side RateLimit parsing, problems and polite retries.'],
+  ['quota/quotaprom, quota/quotaotel', 'Opt-in Prometheus and OpenTelemetry hooks into your own systems.'],
+  ['audit, audit/auditpg', 'Durable business audit events with redaction, recorded in PostgreSQL 16–18.'],
+  ['execution, execution/pgstore', 'Records of declared external effects, with operator recovery.'],
+  ['webhook, webhook/webhookpg', 'Signed inbox and outbox, retry workers and replay, durable on PostgreSQL.'],
+  ['openapi', 'Operation-policy coverage reports and an ordered auth, quota and validation chain.'],
+  ['problem', 'RFC 9457 problem catalog and Echo error rendering.'],
+  ['redact', 'Input classification and bounded projection of stored evidence.'],
+  ['admin', 'The embedded console, with panels for every package above.'],
+  ['cmd/quota', 'Command line for plan checks, usage, resets, credits, keys and the outbox.'],
+];
+
+const founding = 'First three annual invoices with code FOUNDING · first 25 organisations · until 31 Mar 2027';
+const plans = [
+  {
+    name: 'Echo', tag: 'Open source', price: 'Free', unit: 'MIT license', note: 'For every Go team',
+    items: ['The Echo framework and built-in middleware', 'echo-jwt, echo-otel, echo-prometheus, echo-contrib', 'Community support on GitHub'],
+    cta: { label: 'Get started', href: '/guide/quickstart/', primary: false },
+  },
+  {
+    name: 'Team', tag: 'Small teams', was: '$1,500', price: '$990', unit: '/ year', note: 'Up to 20 developers',
+    items: ['Everything in Echo', 'Every Echo Pro package', 'Every release while subscribed', 'Access tokens for go.labstack.io'],
+    cta: { label: 'Email to buy Team', href: buy('Team'), primary: true },
+  },
+  {
+    name: 'Business', tag: 'Growing companies', was: '$4,500', price: '$2,970', unit: '/ year', note: 'Up to 100 developers',
+    items: ['Everything in Team', 'Up to 100 developers', 'Every release while subscribed', 'Access tokens for go.labstack.io'],
+    cta: { label: 'Email to buy Business', href: buy('Business'), primary: true },
+  },
+];
+
+// ✓ = true, — = false, strings render as-is.
+const comparison: Array<[string, Array<[string, ...Array<boolean | string>]>]> = [
+  ['Packages', [
+    ['Echo framework and built-in middleware', true, true, true],
+    ['Official packages (echo-jwt, echo-otel, echo-prometheus, echo-contrib)', true, true, true],
+    ['Echo Pro packages', false, true, true],
+  ]],
+  ['Developers', [
+    ['Developers per organisation', 'Any', 'Up to 20', 'Up to 100'],
+  ]],
+  ['Updates', [
+    ['New releases', true, 'While subscribed', 'While subscribed'],
+    ['Keep received versions after the subscription ends', true, true, true],
+    ['Security fixes on owned release lines after it ends', false, true, true],
+  ]],
+  ['Support', [
+    ['Community support on GitHub', true, true, true],
+    ['Support contract ($4,900 / year)', false, 'Separate', 'Separate'],
+  ]],
+  ['Billing', [
+    ['Price', 'Free', '$1,500 / year', '$4,500 / year'],
+    ['Founding price with FOUNDING', false, '$990 / year', '$2,970 / year'],
+    ['Billing', false, 'Annual', 'Annual'],
+    ['Full refund within 30 days', false, true, true],
+  ]],
+];
+
+const ciSnippet = `- name: Configure Echo Pro
+  run: |
+    go env -w GOPRIVATE=echo.labstack.com
+    echo "machine go.labstack.io login <org> password \${{ secrets.ECHO_PRO_TOKEN }}" >> ~/.netrc
+    chmod 600 ~/.netrc`;
 
 const faq = [
   ['What stays free?', 'Echo, its built-in middleware and the official packages (echo-jwt, echo-otel, echo-prometheus and echo-contrib) are open source under the MIT license. Echo Pro is a separate module that builds on them.'],
-  ['What license is Echo Pro under?', 'The Echo Pro commercial license. While subscribed, your organisation may use, copy and modify it and include it in its own applications and services, including programs you distribute and services you operate. Its source may not be passed on to third parties.'],
+  ['Is Echo going closed source?', 'No. Echo stays open source under the MIT license. Echo Pro is a separate module that builds on Echo and does not change its license.'],
+  ['Why paid?', 'Echo Pro is a large body of maintained code: auth, tenant isolation, quotas and durable stores verified against PostgreSQL 16–18, Redis and Valkey. Subscriptions pay for that work and fund Echo\'s maintenance.'],
+  ['What license is Echo Pro under?', 'The Echo Pro commercial license. While subscribed, your organisation may use, copy and modify it and include it in its own applications and services, including programs it distributes and services it operates. It may not pass the source code to third parties or offer it as a standalone library or competing product.'],
   ['Does Echo Pro send telemetry or check a license at run time?', 'No. The library sends nothing anywhere by itself and never checks a key. Metrics and tracing are opt-in hooks into your own systems.'],
   ['What happens when the subscription ends?', 'You keep the versions you already have, plus security fixes on the release lines you owned. New versions need an active subscription.'],
+  ['Can we evaluate before buying?', 'There is no free trial. This page, the package list and the code samples show what you get; if Echo Pro is not right for you, you get a full refund within 30 days of purchase.'],
+  ['Invoices and purchase orders?', 'Team and Business are billed annually per organisation. Support and Enterprise are invoiced annually. Email support@labstack.com for billing details your company needs.'],
   ['Can I get a refund?', 'Yes: a full refund within 30 days of purchase. There is no free trial and no monthly plan.'],
+];
+
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'Echo Pro',
+  applicationCategory: 'DeveloperApplication',
+  operatingSystem: 'Any',
+  description: 'Commercial Go library for Echo v5: auth, tenant isolation, quotas and AI/MCP metering, audit, execution records, webhooks and an embedded admin console.',
+  url: 'https://echo.labstack.com/pro',
+  publisher: { '@type': 'Organization', name: 'LabStack LLC', url: 'https://labstack.com' },
+  offers: [
+    { '@type': 'Offer', name: 'Team', price: '1500', priceCurrency: 'USD', url: 'https://echo.labstack.com/pro#pricing' },
+    { '@type': 'Offer', name: 'Business', price: '4500', priceCurrency: 'USD', url: 'https://echo.labstack.com/pro#pricing' },
+  ],
+};
+
+const head = [
+  { tag: 'title', content: 'Echo Pro — Multi-tenant building blocks for Echo v5' },
+  { tag: 'meta', attrs: { name: 'robots', content: 'noindex' } },
+  { tag: 'meta', attrs: { name: 'go-import', content: 'echo.labstack.com/pro mod https://go.labstack.io' } },
+  ...(OG_IMAGE ? [
+    { tag: 'meta', attrs: { property: 'og:image', content: OG_IMAGE } },
+    { tag: 'meta', attrs: { name: 'twitter:image', content: OG_IMAGE } },
+  ] : []),
+  ...(ENABLE_STRUCTURED_DATA ? [
+    { tag: 'script', attrs: { type: 'application/ld+json' }, content: JSON.stringify(structuredData) },
+  ] : []),
 ];
 ---
 
@@ -57,202 +222,434 @@ const faq = [
     lastUpdated: false,
     // The page title folds into the hidden hero region, as on the home page.
     hero: { tagline: ' ' },
-    head: [
-      { tag: 'title', content: 'Echo Pro — Production building blocks for Echo v5' },
-      { tag: 'meta', attrs: { name: 'robots', content: 'noindex' } },
-      { tag: 'meta', attrs: { name: 'go-import', content: 'echo.labstack.com/pro mod https://go.labstack.io' } },
-    ],
+    head,
   }}
 >
   <div class="pro not-content">
-    <section class="pro-hero">
-      <span class="pro-eyebrow">Echo Pro · for Echo v5</span>
-      <h1>Production building blocks for Echo v5 APIs</h1>
-      <p class="pro-lead">
-        Auth, tenant isolation, usage quotas, audit, execution records, webhooks and an embedded
-        admin console in one commercial Go module from LabStack, <code>echo.labstack.com/pro</code>,
-        installed with the standard Go toolchain.
-      </p>
-      <ul class="pro-facts" aria-label="Requirements">
-        <li>Go 1.26 and 1.27</li>
-        <li>Echo v5.4.2 or later</li>
-        <li>PostgreSQL 16–18</li>
-        <li>Redis and Valkey</li>
-      </ul>
-      <div class="pro-actions">
-        <a class="hh-btn pri" href="#pricing">See pricing</a>
-        <a class="hh-btn sec" href="#install">How install works</a>
+    <section class="pro-hero" aria-labelledby="pro-title">
+      <div class="pro-hero-copy">
+        <p class="pro-kicker"><code>echo.labstack.com/pro</code></p>
+        <h1 id="pro-title">Multi-tenant APIs on Echo v5, without building the plumbing.</h1>
+        <p class="pro-lead">
+          Auth, tenant isolation, quotas, audit, webhooks and an admin console in one commercial
+          Go module from LabStack. Mount it in your own Echo app and install it with the standard Go toolchain.
+        </p>
+        <div class="pro-actions">
+          <a class="hh-btn pri" href="#pricing">See pricing</a>
+          <a class="hh-btn sec" href="#docs">Read the docs</a>
+        </div>
+        <ul class="pro-chips" aria-label="Requirements">
+          {requirements.map((item) => <li>{item}</li>)}
+        </ul>
       </div>
+
+      <div class="pro-tabs" data-tabs>
+        <div class="pro-tablist" role="tablist" aria-label="Echo Pro code samples" hidden data-tablist>
+          {tabs.map((tab, i) => (
+            <button type="button" role="tab" id={`tab-${tab.id}`} aria-controls={`panel-${tab.id}`} aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1}>{tab.label}</button>
+          ))}
+        </div>
+        {tabs.map((tab) => (
+          <div class="pro-panel" id={`panel-${tab.id}`} role="tabpanel" aria-labelledby={`tab-${tab.id}`} aria-label={tab.label} tabindex="0">
+            <Code code={tab.code} lang="go" title={tab.file} frame="code" wrap />
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <ul class="pro-trust" aria-label="What you can rely on">
+      {trust.map(([title, text]) => (
+        <li>
+          <svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
+          <span><b>{title === 'Plain go get' ? <>Plain <code>go get</code></> : title}</b> {text}</span>
+        </li>
+      ))}
+    </ul>
+
+    <section id="how" aria-labelledby="how-title">
+      <h2 id="how-title">Where it sits in a request</h2>
+      <p class="pro-intro">Middleware you mount in order on your own routes. Your handler stays yours; the stores are your PostgreSQL and Redis.</p>
+      <figure class="pro-diagram">
+        <svg class="d-wide" viewBox="0 28 960 240" role="img" aria-labelledby="dw-title dw-desc">
+          <title id="dw-title">Echo Pro request path</title>
+          <desc id="dw-desc">A request passes auth (auth/authbind), then tenant resolution, then quota, then reaches your handler. The handler writes audit events, execution records and webhook outbox messages to stores. The admin console reads from those stores.</desc>
+          <defs><marker id="dw-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="d-head" /></marker></defs>
+          {[
+            [20, 'Request', 'HTTP or MCP tool call'],
+            [210, 'auth', 'auth/authbind'],
+            [400, 'tenant', 'resolve and authorize'],
+            [590, 'quota', 'plans, credits, 429'],
+          ].map(([x, t, s]) => (
+            <g><rect class="d-box" x={x} y="40" width="160" height="64" rx="8" /><text class="d-t" x={Number(x) + 16} y="67">{t}</text><text class="d-s" x={Number(x) + 16} y="88">{s}</text></g>
+          ))}
+          <g><rect class="d-box d-yours" x="780" y="40" width="160" height="64" rx="8" /><text class="d-t" x="796" y="67">Your handler</text><text class="d-s" x="796" y="88">business logic</text></g>
+          {[
+            [400, 'audit', 'business events'],
+            [590, 'execution', 'external effects'],
+            [780, 'webhook outbox', 'signed delivery'],
+          ].map(([x, t, s]) => (
+            <g><rect class="d-box d-store" x={x} y="190" width="160" height="64" rx="8" /><text class="d-t" x={Number(x) + 16} y="217">{t}</text><text class="d-s" x={Number(x) + 16} y="238">{s}</text></g>
+          ))}
+          <g><rect class="d-box" x="20" y="190" width="310" height="64" rx="8" /><text class="d-t" x="36" y="217">Admin console</text><text class="d-s" x="36" y="238">behind your own sign-in</text></g>
+          <g class="d-flow">
+            <path d="M180 72H209" marker-end="url(#dw-arrow)" /><path d="M370 72H399" marker-end="url(#dw-arrow)" /><path d="M560 72H589" marker-end="url(#dw-arrow)" /><path d="M750 72H779" marker-end="url(#dw-arrow)" />
+            <path d="M860 104V189" marker-end="url(#dw-arrow)" /><path d="M860 150H480V189" marker-end="url(#dw-arrow)" /><path d="M670 150V189" marker-end="url(#dw-arrow)" />
+          </g>
+          <path class="d-read" d="M400 222H330" marker-end="url(#dw-arrow)" />
+          <text class="d-note" x="365" y="212" text-anchor="middle">reads</text>
+        </svg>
+        <svg class="d-narrow" viewBox="0 0 320 560" role="img" aria-labelledby="dn-title dn-desc">
+          <title id="dn-title">Echo Pro request path</title>
+          <desc id="dn-desc">A request passes auth (auth/authbind), then tenant resolution, then quota, then reaches your handler. The handler writes audit events, execution records and webhook outbox messages to stores. The admin console reads from those stores.</desc>
+          <defs><marker id="dn-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="d-head" /></marker></defs>
+          {[
+            [0, 'Request', 'HTTP or MCP tool call', ''],
+            [64, 'auth', 'auth/authbind', ''],
+            [128, 'tenant', 'resolve and authorize', ''],
+            [192, 'quota', 'plans, credits, 429', ''],
+            [256, 'Your handler', 'business logic', 'd-yours'],
+          ].map(([y, t, s, cls]) => (
+            <g><rect class={`d-box ${cls}`} x="20" y={Number(y) + 2} width="280" height="46" rx="8" /><text class="d-t" x="36" y={Number(y) + 22}>{t}</text><text class="d-s" x="36" y={Number(y) + 40}>{s}</text></g>
+          ))}
+          <g class="d-flow"><path d="M160 49V65" marker-end="url(#dn-arrow)" /><path d="M160 112V129" marker-end="url(#dn-arrow)" /><path d="M160 176V193" marker-end="url(#dn-arrow)" /><path d="M160 240V257" marker-end="url(#dn-arrow)" /><path d="M160 304V335" marker-end="url(#dn-arrow)" /></g>
+          <rect class="d-group" x="20" y="336" width="280" height="140" rx="10" />
+          {[
+            [346, 'audit', 'business events'],
+            [388, 'execution', 'external effects'],
+            [430, 'webhook outbox', 'signed delivery'],
+          ].map(([y, t, s]) => (
+            <g><text class="d-t" x="36" y={Number(y) + 18}>{t}</text><text class="d-s" x="36" y={Number(y) + 34}>{s}</text></g>
+          ))}
+          <path class="d-read" d="M160 512V484" marker-end="url(#dn-arrow)" />
+          <text class="d-note" x="172" y="502">reads</text>
+          <g><rect class="d-box" x="20" y="512" width="280" height="46" rx="8" /><text class="d-t" x="36" y="532">Admin console</text><text class="d-s" x="36" y="550">behind your own sign-in</text></g>
+        </svg>
+      </figure>
     </section>
 
     <section id="features" aria-labelledby="features-title">
-      <h2 id="features-title">What is in the module</h2>
-      <p class="pro-intro">Packages you mount in your own Echo application, with runnable examples, tests and package READMEs shipped in the module.</p>
-      <div class="pro-grid">
-        {features.map(([title, text, packages]) => (
-          <div class="pro-card">
-            <h3>{title}</h3>
-            <p>{text}</p>
-            <p class="pro-pkg">{packages}</p>
-          </div>
-        ))}
-      </div>
-    </section>
+      <h2 id="features-title">What's in the box</h2>
+      <p class="pro-intro">One module, <code>echo.labstack.com/pro</code>. Runnable examples, tests and package READMEs ship with it.</p>
 
-    <section id="trust" aria-labelledby="trust-title">
-      <h2 id="trust-title">Yours to run</h2>
-      <p class="pro-intro">Echo Pro is source you build into your applications, not a service you depend on.</p>
-      <div class="pro-grid">
-        {trust.map(([title, text]) => (
-          <div class="pro-card">
-            <h3>{title}</h3>
-            <p>{text}</p>
-          </div>
+      <div class="pro-flagships">
+        {flagships.map((item) => (
+          <article class={`pro-flagship${item.console ? ' has-media' : ''}`}>
+            <div class="pro-flagship-copy">
+              <h3>{item.title}</h3>
+              <p class="pro-pkg">{item.packages}</p>
+              <p>{item.text}</p>
+            </div>
+            {item.console && (
+              <figure class="pro-shot">
+                <Image class="shot-dark" src={consoleDark} alt="Echo Pro admin console overview: a pipeline from requests through executions, outbox and webhooks to receivers, with event counts for the selected window." width={1600} height={570} loading="lazy" decoding="async" />
+                <Image class="shot-light" src={consoleLight} alt="Echo Pro admin console overview: a pipeline from requests through executions, outbox and webhooks to receivers, with event counts for the selected window." width={1600} height={570} loading="lazy" decoding="async" />
+                <figcaption>The admin console overview, from the demo catalog.</figcaption>
+              </figure>
+            )}
+          </article>
         ))}
       </div>
+
+      <table class="pro-pkgs">
+        <caption class="sr-only">Echo Pro packages</caption>
+        <thead><tr><th scope="col">Package</th><th scope="col">What it does</th></tr></thead>
+        <tbody>
+          {packages.map(([path, text]) => (
+            <tr><th scope="row"><code>{path}</code></th><td>{text}</td></tr>
+          ))}
+        </tbody>
+      </table>
     </section>
 
     <section id="pricing" aria-labelledby="pricing-title">
       <h2 id="pricing-title">Pricing</h2>
-      <p class="pro-intro">Billed annually per organisation. Buy online, then create your organisation's access token straight after checkout.</p>
+      <p class="pro-intro">Billed annually per organisation. Echo is open source under the MIT license and always will be; Echo Pro subscriptions fund its maintenance.</p>
+
       <div class="pro-plans">
-        <div class="pro-card pro-plan">
-          <span class="pro-tag">Open source</span>
-          <h3>Echo</h3>
-          <p class="pro-price">Free</p>
-          <p class="pro-muted">MIT license</p>
-          <ul class="pro-checks">
-            <li>The Echo framework and built-in middleware</li>
-            <li>Official packages: echo-jwt, echo-otel, echo-prometheus, echo-contrib</li>
-            <li>Community support on GitHub</li>
-          </ul>
-          <a class="hh-btn sec" href="/guide/quickstart/">Get started</a>
-        </div>
         {plans.map((plan) => (
-          <div class="pro-card pro-plan">
-            <span class="pro-tag">{plan.tag}</span>
+          <div class={`pro-plan${plan.was ? ' paid' : ''}`}>
+            <p class="pro-tag">{plan.tag}</p>
             <h3>{plan.name}</h3>
-            <p class="pro-price">{plan.price} <span>/ year</span></p>
-            <p class="pro-muted">{plan.developers}</p>
-            <ul class="pro-checks">
-              <li>Everything in Echo</li>
-              {included.map((item) => <li>{item}</li>)}
-            </ul>
-            <a class="hh-btn pri" href={plan.href}>Buy {plan.name}</a>
-            {plan.href === '#' && <p class="pro-pending">Checkout opens at launch.</p>}
+            <p class="pro-price">
+              {plan.was && <s><span class="sr-only">Was </span>{plan.was}</s>}
+              {plan.was && <span class="sr-only">, now </span>}
+              <b>{plan.price}</b> <span class="u">{plan.unit}</span>
+            </p>
+            <p class="pro-note">{plan.was ? founding : plan.note}</p>
+            {plan.was && <p class="pro-seats">{plan.note}</p>}
+            <ul class="pro-checks">{plan.items.map((item) => <li>{item}</li>)}</ul>
+            <a class={`hh-btn ${plan.cta.primary ? 'pri' : 'sec'}`} href={plan.cta.href}>{plan.cta.label}</a>
           </div>
         ))}
       </div>
+      <p class="pro-pending">Online checkout opens at launch. Until then, email us to buy.</p>
 
-      <p class="pro-note">
-        <strong>Founding offer.</strong> Enter code <code>FOUNDING</code> at checkout for 34% off your
-        first three annual invoices: Team $990/year, Business $2,970/year. For the first 25
-        organisations, until 31 March 2027.
-      </p>
-
-      <div class="pro-contact">
-        <div class="pro-card">
+      <div class="pro-extra">
+        <div>
           <h3>Support</h3>
-          <p class="pro-price">$4,900 <span>/ year</span></p>
-          <p>A support contract, invoiced annually.</p>
+          <p><b>$4,900</b> / year · A support contract, invoiced annually.</p>
           <a class="pro-link" href="mailto:support@labstack.com?subject=Echo%20Pro%20Support">Contact us</a>
         </div>
-        <div class="pro-card">
+        <div>
           <h3>Enterprise</h3>
-          <p class="pro-price"><small>From</small> $12,000 <span>/ year</span></p>
-          <p>More than 100 developers, or group companies.</p>
+          <p>From <b>$12,000</b> / year · More than 100 developers, or group companies.</p>
           <a class="pro-link" href="mailto:support@labstack.com?subject=Echo%20Pro%20Enterprise">Contact us</a>
         </div>
       </div>
 
-      <ul class="pro-checks pro-terms">
-        <li>Annual billing only; there is no monthly plan.</li>
+      <div class="pro-compare-wrap" role="region" aria-label="Compare plans" tabindex="0">
+        <table class="pro-compare">
+          <caption>Compare plans</caption>
+          <thead>
+            <tr><td></td><th scope="col">Echo</th><th scope="col">Team</th><th scope="col">Business</th></tr>
+          </thead>
+          {comparison.map(([group, rows]) => (
+            <tbody>
+              <tr class="grp"><th scope="colgroup" colspan="4">{group}</th></tr>
+              {rows.map(([label, ...cells]) => (
+                <tr>
+                  <th scope="row">{label}</th>
+                  {cells.map((cell) => (
+                    <td>{cell === true ? <><span aria-hidden="true" class="yes">✓</span><span class="sr-only">Included</span></> : cell === false ? <><span aria-hidden="true" class="no">—</span><span class="sr-only">Not included</span></> : cell}</td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          ))}
+        </table>
+      </div>
+
+      <ul class="pro-terms">
+        <li>Annual billing only; no monthly plan.</li>
         <li>No free trial; full refund within 30 days.</li>
         <li>Prices exclude tax. A business tax ID is required at checkout.</li>
-        <li>After your subscription ends you keep the versions you already have, plus security fixes on the release lines you owned.</li>
+        <li>After your subscription ends you keep the versions you have, plus security fixes on the release lines you owned.</li>
       </ul>
     </section>
 
     <section id="install" aria-labelledby="install-title" class="pro-install">
-      <h2 id="install-title">How install works</h2>
-      <p class="pro-intro">After checkout you create your organisation's access token once. Then, on each machine or CI runner:</p>
+      <h2 id="install-title">Install</h2>
+      <p class="pro-intro">After purchase you create your organisation's access token once. Then, on each machine:</p>
       <ol>
-        <li>Mark the module private:<Code code="go env -w GOPRIVATE=echo.labstack.com" lang="sh" frame="none" wrap /></li>
-        <li>Add this line to <code>~/.netrc</code> (Windows: <code>%USERPROFILE%\_netrc</code>):<Code code="machine go.labstack.io login <org> password <token>" lang="text" frame="none" wrap /></li>
-        <li>Add Echo Pro to your module:<Code code="go get echo.labstack.com/pro@latest" lang="sh" frame="none" wrap /></li>
+        <li><span>Mark the module private.</span><Code code="go env -w GOPRIVATE=echo.labstack.com" lang="sh" frame="none" wrap /></li>
+        <li><span>Add this line to <code>~/.netrc</code> (Windows: <code>%USERPROFILE%\_netrc</code>), mode 600.</span><Code code="machine go.labstack.io login <org> password <token>" lang="text" frame="none" wrap /></li>
+        <li><span>Add Echo Pro to your module.</span><Code code="go get echo.labstack.com/pro@latest" lang="sh" frame="none" wrap /></li>
       </ol>
+      <h3>In CI</h3>
+      <p class="pro-muted">GitHub Actions: store the token as a repository secret and write the same line before <code>go</code> runs.</p>
+      <Code code={ciSnippet} lang="yaml" title=".github/workflows/ci.yml" frame="code" />
       <p class="pro-muted">Corporate mirrors and <code>GOPROXY</code> chains with <code>GONOSUMDB=echo.labstack.com</code> are documented in the module README.</p>
+
+      <h3 id="docs">Read the docs</h3>
+      <p class="pro-muted">Documentation ships inside the module: start with <code>README.md</code>, then <code>auth/README.md</code>, <code>quota/README.md</code> and <code>webhook/README.md</code>. Open the module's source directory with:</p>
+      <Code code={`cd "$(go list -m -f '{{.Dir}}' echo.labstack.com/pro)"`} lang="sh" frame="none" wrap />
     </section>
 
     <section id="faq" aria-labelledby="faq-title" class="pro-faq">
       <h2 id="faq-title">Questions</h2>
-      <dl>
+      <div class="pro-faq-list">
         {faq.map(([question, answer]) => (
-          <div>
-            <dt>{question}</dt>
-            <dd>{answer}</dd>
-          </div>
+          <details>
+            <summary>{question}</summary>
+            <p>{answer}</p>
+          </details>
         ))}
-      </dl>
+      </div>
       <p class="pro-muted">Anything else? Email <a class="pro-link" href="mailto:support@labstack.com">support@labstack.com</a>.</p>
     </section>
 
-    <p class="echo-commit">
-      Echo is open source under the MIT license and always will be. Echo Pro is a separate commercial
-      library; subscriptions fund Echo's maintenance.
-    </p>
+    <section class="pro-close" aria-labelledby="close-title">
+      <h2 id="close-title">Build the product, not the plumbing.</h2>
+      <div class="pro-actions">
+        <a class="hh-btn pri" href="#pricing">See pricing</a>
+        <a class="hh-btn sec" href="mailto:support@labstack.com?subject=Echo%20Pro">Email us</a>
+      </div>
+    </section>
   </div>
 </StarlightPage>
 
+<script>
+  // Progressive tabs: without JS every panel stays visible (stacked). With JS,
+  // show the tablist, keep one panel visible, and follow the ARIA tabs pattern
+  // (arrow keys, Home and End move and activate).
+  for (const root of document.querySelectorAll<HTMLElement>('[data-tabs]')) {
+    const list = root.querySelector<HTMLElement>('[data-tablist]');
+    if (!list) continue;
+    const tabs = [...list.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
+    const select = (next: HTMLButtonElement, focus = false) => {
+      for (const tab of tabs) {
+        const on = tab === next;
+        tab.setAttribute('aria-selected', String(on));
+        tab.tabIndex = on ? 0 : -1;
+        const panel = document.getElementById(tab.getAttribute('aria-controls') ?? '');
+        if (panel) panel.hidden = !on;
+      }
+      if (focus) next.focus();
+    };
+    list.hidden = false;
+    root.classList.add('is-tabbed');
+    for (const panel of root.querySelectorAll<HTMLElement>('[role="tabpanel"]')) panel.removeAttribute('aria-label');
+    select(tabs[0]);
+    list.addEventListener('click', (event) => {
+      const tab = (event.target as HTMLElement).closest<HTMLButtonElement>('[role="tab"]');
+      if (tab) select(tab);
+    });
+    list.addEventListener('keydown', (event) => {
+      const i = tabs.indexOf(document.activeElement as HTMLButtonElement);
+      if (i < 0) return;
+      const to = { ArrowRight: i + 1, ArrowLeft: i - 1, Home: 0, End: tabs.length - 1 }[event.key];
+      if (to === undefined) return;
+      event.preventDefault();
+      select(tabs[(to + tabs.length) % tabs.length], true);
+    });
+  }
+</script>
+
 <style>
-  .pro { max-width: 68rem; margin: 0 auto; }
-  .pro section { margin-top: 5rem; scroll-margin-top: calc(var(--sl-nav-height) + 1rem); }
-  .pro .pro-hero { margin-top: 2rem; }
-  .pro h1 { font-weight: 600; font-size: clamp(2.1rem, 4.6vw, 3.2rem); line-height: 1.08; letter-spacing: -0.03em; color: var(--sl-color-white); margin: 0 0 1.1rem; max-width: 22ch; }
-  .pro h2 { font-weight: 600; font-size: 1.6rem; letter-spacing: -0.025em; color: var(--sl-color-white); margin: 0 0 0.5rem; }
+  .pro { max-width: 72rem; margin: 0 auto; }
+  .pro section { margin-top: 6rem; }
+  .pro h1 { font-weight: 600; font-size: clamp(2rem, 3.6vw, 2.75rem); line-height: 1.1; letter-spacing: -0.03em; color: var(--sl-color-white); margin: 0 0 1.1rem; }
+  .pro h2 { font-weight: 600; font-size: clamp(1.4rem, 2.4vw, 1.75rem); line-height: 1.25; letter-spacing: -0.025em; color: var(--sl-color-white); margin: 0 0 0.5rem; }
   .pro h3 { font-weight: 600; font-size: 1.02rem; letter-spacing: -0.01em; color: var(--sl-color-white); margin: 0 0 0.4rem; }
   .pro p { margin: 0 0 0.75rem; }
   .pro code { font-family: var(--sl-font-mono); font-size: 0.86em; background: var(--sl-color-bg-inline-code); border-radius: 4px; padding: 0.1em 0.35em; }
-  .pro-eyebrow, .pro-tag { display: inline-block; font-family: var(--sl-font-mono); font-size: 0.72rem; line-height: 1; color: var(--sl-color-gray-3); border: 1px solid var(--sl-color-hairline-light); border-radius: 9999px; padding: 5px 11px; margin-bottom: 1.25rem; }
-  .pro-tag { margin-bottom: 0.9rem; align-self: flex-start; }
-  .pro-lead { font-size: 1.12rem; line-height: 1.65; color: var(--sl-color-gray-2); max-width: 62ch; }
-  .pro-facts { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; padding: 0; margin: 0 0 1.6rem; }
-  .pro-facts li { font-family: var(--sl-font-mono); font-size: 0.75rem; color: var(--sl-color-gray-3); border: 1px solid var(--sl-color-hairline); border-radius: 6px; padding: 5px 9px; }
-  .pro-actions { display: flex; flex-wrap: wrap; gap: 11px; }
-  .pro-intro { color: var(--sl-color-gray-3); max-width: 62ch; margin-bottom: 1.6rem !important; }
-  .pro-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr)); gap: 14px; }
-  .pro-card { display: flex; flex-direction: column; border: 1px solid var(--sl-color-hairline); border-radius: 12px; background: var(--sl-color-bg-sidebar); padding: 20px; }
-  .pro-card p { font-size: 0.9rem; line-height: 1.62; color: var(--sl-color-gray-3); }
-  .pro-card p:last-child { margin-bottom: 0; }
-  .pro-pkg { font-family: var(--sl-font-mono); font-size: 0.76rem !important; color: var(--sl-color-gray-4) !important; margin-top: auto; }
-  .pro-plans { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr)); gap: 14px; }
-  .pro-plan { padding: 24px; }
-  .pro-plan .hh-btn { margin-top: auto; justify-content: center; }
-  .pro-price { font-size: 2.2rem !important; font-weight: 600; line-height: 1 !important; letter-spacing: -0.03em; color: var(--sl-color-white) !important; margin: 0.6rem 0 0.35rem !important; }
-  .pro-price span, .pro-price small { font-size: 0.9rem; font-weight: 400; letter-spacing: 0; color: var(--sl-color-gray-4); }
-  .pro-muted { font-size: 0.86rem; color: var(--sl-color-gray-4); }
-  .pro-checks { list-style: none; padding: 0; margin: 0.9rem 0 1.4rem; }
-  .pro-checks li { position: relative; padding-inline-start: 1.3rem; margin-bottom: 0.45rem; font-size: 0.9rem; color: var(--sl-color-gray-2); }
-  .pro-checks li::before { content: ''; position: absolute; inset-inline-start: 0.15rem; top: 0.6em; width: 6px; height: 6px; border-radius: 2px; background: var(--sl-color-gray-4); }
-  .pro-pending { margin: 0.6rem 0 0 !important; font-size: 0.8rem !important; color: var(--sl-color-gray-4) !important; text-align: center; }
-  .pro-note { margin: 1.25rem 0 !important; padding: 14px 18px; border: 1px solid var(--sl-color-hairline); border-inline-start: 3px solid var(--echo-cyan); border-radius: 8px; background: var(--sl-color-bg-sidebar); color: var(--sl-color-gray-2); font-size: 0.92rem; }
-  .pro-note strong { color: var(--sl-color-white); }
-  .pro-contact { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr)); gap: 14px; }
-  .pro-contact .pro-price { font-size: 1.6rem !important; }
-  .pro-link { color: var(--echo-cyan-text); text-underline-offset: 3px; text-decoration: none; font-size: 0.9rem; }
+  .pro-intro { color: var(--sl-color-gray-3); max-width: 62ch; margin-bottom: 1.75rem !important; }
+  .pro-muted { font-size: 0.9rem; color: var(--sl-color-gray-3); }
+  .pro-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+  .pro-link { display: inline-flex; align-items: center; min-height: 24px; color: var(--echo-cyan-text); text-underline-offset: 3px; text-decoration: none; font-size: 0.9rem; font-weight: 500; }
   .pro-link:hover { text-decoration: underline; }
-  .pro-link:focus-visible { outline: 2px solid var(--echo-cyan-text); outline-offset: 2px; }
-  .pro-terms { columns: 2 20rem; column-gap: 2rem; margin-top: 1.4rem; }
-  .pro-terms li { break-inside: avoid; }
-  .pro-install { max-width: 46rem; }
-  .pro-install ol { padding-inline-start: 1.3rem; margin: 0 0 1rem; }
+  .pro-plan, .pro-flagship, .pro-extra > div { border: 1px solid var(--sl-color-hairline); border-radius: 12px; background: var(--sl-color-bg-sidebar); box-shadow: var(--echo-card-edge); }
+
+  /* Hero: copy left, code right */
+  .pro .pro-hero { margin-top: 2.5rem; display: grid; grid-template-columns: minmax(0, 1fr); gap: 2.5rem; align-items: start; }
+  @media (min-width: 64rem) { .pro .pro-hero { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 3rem; } }
+  .pro-kicker { margin-bottom: 1rem !important; }
+  .pro-kicker code { font-size: 0.8rem; color: var(--sl-color-gray-3); background: transparent; border: 1px solid var(--sl-color-hairline-light); border-radius: 9999px; padding: 4px 11px; }
+  .pro-lead { font-size: 1.0625rem; line-height: 1.65; color: var(--sl-color-gray-2); max-width: 52ch; margin-bottom: 1.6rem !important; }
+  .pro-chips { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; padding: 0; margin: 1.5rem 0 0; }
+  .pro-chips li { display: inline-flex; align-items: center; min-height: 28px; margin: 0; font-family: var(--sl-font-mono); font-size: 0.75rem; color: var(--sl-color-gray-3); border: 1px solid var(--sl-color-hairline); border-radius: 6px; padding: 0 9px; }
+
+  /* Tabs */
+  .pro-tabs { min-width: 0; border: 1px solid var(--sl-color-hairline-light); border-radius: 12px; overflow: hidden; background: var(--sl-color-bg-sidebar); box-shadow: var(--echo-card-edge); }
+  .pro-tablist { display: flex; gap: 2px; padding: 6px; border-bottom: 1px solid var(--sl-color-hairline); background: var(--sl-color-bg); overflow-x: auto; }
+  .pro-tablist[hidden] { display: none; }
+  .pro-tablist button { flex: none; min-height: 32px; padding: 0 12px; border: 1px solid transparent; border-radius: 7px; background: transparent; color: var(--sl-color-gray-3); font: 500 0.85rem/1 var(--sl-font); cursor: pointer; transition: color var(--echo-ease), background-color var(--echo-ease); }
+  .pro-tablist button:hover { color: var(--sl-color-white); }
+  .pro-tablist button[aria-selected='true'] { color: var(--sl-color-white); background: var(--echo-surface-2); border-color: var(--sl-color-hairline); }
+  .pro-panel + .pro-panel { border-top: 1px solid var(--sl-color-hairline); }
+  .is-tabbed .pro-panel + .pro-panel { border-top: 0; }
+  .pro-panel[hidden] { display: none; }
+  .pro-panel :global(.expressive-code) { --ec-brdRad: 0; --ec-brdCol: transparent; --ec-codeFontSize: 0.78rem; margin: 0; }
+
+  /* Trust row */
+  .pro-trust { list-style: none; margin: 3.5rem 0 0; padding: 1.25rem 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px 28px; border-block: 1px solid var(--sl-color-hairline); }
+  @media (min-width: 40rem) { .pro-trust { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (min-width: 64rem) { .pro-trust { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+  .pro-trust li { display: flex; gap: 10px; margin: 0; font-size: 0.875rem; line-height: 1.5; color: var(--sl-color-gray-3); }
+  .pro-trust svg { flex: none; margin-top: 3px; color: var(--sl-color-gray-2); }
+  .pro-trust b { display: block; color: var(--sl-color-white); font-weight: 600; }
+  .pro-trust b code { font-size: 0.85em; }
+
+  /* Diagram */
+  .pro-diagram { margin: 0; padding: 20px; border: 1px solid var(--sl-color-hairline); border-radius: 12px; background: var(--sl-color-bg-sidebar); box-shadow: var(--echo-card-edge); }
+  .pro-diagram svg { display: block; width: 100%; height: auto; font-family: var(--sl-font); }
+  .d-narrow { max-width: 22rem; margin: 0 auto; }
+  .d-wide { display: none !important; }
+  @media (min-width: 48rem) { .d-wide { display: block !important; } .d-narrow { display: none !important; } }
+  .pro-diagram :global(.d-box) { fill: var(--sl-color-bg); stroke: var(--sl-color-hairline-light); stroke-width: 1; }
+  .pro-diagram :global(.d-yours) { fill: var(--echo-surface-2); stroke: var(--sl-color-gray-4); }
+  .pro-diagram :global(.d-store) { stroke-dasharray: 0; }
+  .pro-diagram :global(.d-group) { fill: var(--sl-color-bg); stroke: var(--sl-color-hairline-light); }
+  .pro-diagram :global(.d-t) { fill: var(--sl-color-white); font-size: 15px; font-weight: 600; }
+  .pro-diagram :global(.d-s) { fill: var(--sl-color-gray-3); font-size: 12.5px; }
+  .pro-diagram :global(.d-note) { fill: var(--sl-color-gray-3); font-size: 12px; }
+  .pro-diagram :global(.d-flow path) { fill: none; stroke: var(--sl-color-gray-4); stroke-width: 1.25; }
+  .pro-diagram :global(.d-read) { fill: none; stroke: var(--sl-color-gray-4); stroke-width: 1.25; stroke-dasharray: 4 4; }
+  .pro-diagram :global(.d-head) { fill: var(--sl-color-gray-4); }
+
+  /* What's in the box */
+  .pro-flagships { display: grid; gap: 12px; margin-bottom: 2rem; }
+  @media (min-width: 64rem) { .pro-flagships { grid-template-columns: repeat(2, minmax(0, 1fr)); } .pro-flagship.has-media { grid-column: 1 / -1; } }
+  .pro-flagship { padding: 22px; display: grid; gap: 18px; }
+  @media (min-width: 64rem) { .pro-flagship.has-media { grid-template-columns: minmax(0, 2fr) minmax(0, 5fr); align-items: start; } }
+  .pro-flagship p { font-size: 0.92rem; line-height: 1.62; color: var(--sl-color-gray-3); }
+  .pro-flagship-copy p:last-child { margin-bottom: 0; }
+  .pro-pkg { font-family: var(--sl-font-mono); font-size: 0.78rem !important; color: var(--sl-color-gray-4) !important; }
+  .pro-shot { margin: 0; }
+  .pro-shot :global(img) { display: block; width: 100%; height: auto; aspect-ratio: 1600 / 570; border: 1px solid var(--sl-color-hairline-light); border-radius: 8px; }
+  .pro-shot figcaption { margin-top: 8px; font-size: 0.8rem; color: var(--sl-color-gray-4); }
+  :global([data-theme='dark']) .pro-shot :global(.shot-light), :global([data-theme='light']) .pro-shot :global(.shot-dark) { display: none; }
+
+  .pro-pkgs, .pro-compare { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+  .pro-pkgs th, .pro-pkgs td { text-align: start; vertical-align: top; padding: 10px 12px 10px 0; border-bottom: 1px solid var(--sl-color-hairline); }
+  .pro-pkgs thead th { font-size: 0.8rem; font-weight: 600; color: var(--sl-color-gray-3); padding-bottom: 8px; }
+  .pro-pkgs tbody th { font-weight: 400; white-space: nowrap; width: 1%; padding-inline-end: 28px; }
+  .pro-pkgs tbody th code { background: transparent; padding: 0; color: var(--sl-color-white); }
+  .pro-pkgs td { color: var(--sl-color-gray-3); }
+  @media (max-width: 40rem) {
+    .pro-pkgs thead { display: none; }
+    .pro-pkgs tr { display: block; padding: 10px 0; border-bottom: 1px solid var(--sl-color-hairline); }
+    .pro-pkgs tbody th, .pro-pkgs td { display: block; width: auto; white-space: normal; padding: 0; border: 0; }
+    .pro-pkgs td { margin-top: 4px; }
+  }
+
+  /* Pricing */
+  .pro-plans { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  @media (min-width: 56rem) { .pro-plans { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  .pro-plan { display: flex; flex-direction: column; padding: 24px; }
+  .pro-plan.paid { border-color: var(--sl-color-hairline-light); }
+  .pro-tag { align-self: flex-start; margin-bottom: 0.9rem !important; font-family: var(--sl-font-mono); font-size: 0.75rem; line-height: 1; color: var(--sl-color-gray-3); border: 1px solid var(--sl-color-hairline-light); border-radius: 9999px; padding: 5px 10px; }
+  .pro-price { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 8px; margin: 0.4rem 0 0.5rem !important; }
+  .pro-price b { font-size: 2.2rem; font-weight: 600; line-height: 1; letter-spacing: -0.03em; color: var(--sl-color-white); font-variant-numeric: tabular-nums; }
+  .pro-price s { font-size: 1.05rem; color: var(--sl-color-gray-4); }
+  .pro-price .u { font-size: 0.9rem; color: var(--sl-color-gray-3); }
+  .pro-note { font-size: 0.8rem; line-height: 1.5; color: var(--sl-color-gray-3); min-height: 2.4rem; }
+  .pro-seats { font-size: 0.9rem; font-weight: 500; color: var(--sl-color-gray-2); margin-bottom: 0 !important; }
+  .pro-checks { list-style: none; padding: 0; margin: 1rem 0 1.5rem; }
+  .pro-checks li { position: relative; padding-inline-start: 1.4rem; margin: 0 0 0.5rem; font-size: 0.9rem; color: var(--sl-color-gray-2); }
+  .pro-checks li::before { content: '✓'; position: absolute; inset-inline-start: 0; color: var(--sl-color-gray-4); }
+  .pro-plan .hh-btn { margin-top: auto; justify-content: center; }
+  .pro-pending { margin: 0.9rem 0 0 !important; font-size: 0.85rem; color: var(--sl-color-gray-3); }
+  .pro-extra { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; margin-top: 1.5rem; }
+  @media (min-width: 48rem) { .pro-extra { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .pro-extra > div { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; padding: 16px 20px; }
+  .pro-extra h3 { margin: 0; }
+  .pro-extra p { flex: 1 1 16rem; margin: 0 !important; font-size: 0.9rem; color: var(--sl-color-gray-3); }
+  .pro-extra p b { color: var(--sl-color-white); font-weight: 600; }
+
+  /* position: relative keeps the absolutely positioned sr-only labels inside the scroller. */
+  .pro-compare-wrap { position: relative; margin-top: 2.5rem; overflow-x: auto; }
+  .pro-compare { min-width: 34rem; }
+  .pro-compare caption { text-align: start; font-weight: 600; font-size: 1.02rem; color: var(--sl-color-white); padding-bottom: 10px; }
+  .pro-compare th, .pro-compare td { padding: 9px 10px; border-bottom: 1px solid var(--sl-color-hairline); text-align: center; }
+  .pro-compare thead th { font-weight: 600; color: var(--sl-color-white); }
+  .pro-compare tbody th[scope='row'] { text-align: start; font-weight: 400; color: var(--sl-color-gray-2); padding-inline-start: 0; }
+  .pro-compare td { color: var(--sl-color-gray-2); font-variant-numeric: tabular-nums; }
+  .pro-compare .grp th { text-align: start; padding: 22px 0 8px; font-family: var(--sl-font-mono); font-size: 0.75rem; font-weight: 400; color: var(--sl-color-gray-3); }
+  .pro-compare .yes { color: var(--sl-color-white); }
+  .pro-compare .no { color: var(--sl-color-gray-4); }
+  .pro-terms { margin: 1.75rem 0 0; padding-inline-start: 1.1rem; columns: 2 20rem; column-gap: 2rem; font-size: 0.875rem; color: var(--sl-color-gray-3); }
+  .pro-terms li { break-inside: avoid; margin-bottom: 0.4rem; }
+
+  /* Install */
+  .pro-install { max-width: 48rem; }
+  .pro-install ol { padding-inline-start: 1.3rem; margin: 0 0 1.5rem; }
   .pro-install li { margin-bottom: 1.1rem; color: var(--sl-color-gray-2); }
   .pro-install li::marker { color: var(--sl-color-gray-4); font-family: var(--sl-font-mono); }
   .pro-install li :global(.expressive-code) { margin-top: 0.5rem; }
-  .pro-faq { max-width: 46rem; }
-  .pro-faq dl { margin: 0 0 1.25rem; border-top: 1px solid var(--sl-color-hairline); }
-  .pro-faq dl > div { padding: 1rem 0; border-bottom: 1px solid var(--sl-color-hairline); }
-  .pro-faq dt { font-weight: 600; color: var(--sl-color-white); margin-bottom: 0.3rem; }
-  .pro-faq dd { margin: 0; color: var(--sl-color-gray-3); font-size: 0.94rem; }
-  .pro .echo-commit { margin: 4rem 0 0; }
+  .pro-install h3 { margin-top: 2rem; }
+  .pro-install :global(.expressive-code) { margin-bottom: 0.9rem; }
+
+  /* FAQ */
+  .pro-faq { max-width: 48rem; }
+  .pro-faq-list { border-top: 1px solid var(--sl-color-hairline); margin-bottom: 1.25rem; }
+  .pro-faq details { border-bottom: 1px solid var(--sl-color-hairline); }
+  .pro-faq summary { display: flex; justify-content: space-between; align-items: center; gap: 1rem; min-height: 48px; padding: 10px 0; cursor: pointer; font-weight: 600; color: var(--sl-color-white); list-style: none; }
+  .pro-faq summary::-webkit-details-marker { display: none; }
+  .pro-faq summary::after { content: '+'; flex: none; font-family: var(--sl-font-mono); color: var(--sl-color-gray-4); }
+  .pro-faq details[open] summary::after { content: '−'; }
+  .pro-faq details p { margin: 0 0 1rem; color: var(--sl-color-gray-3); font-size: 0.94rem; max-width: 64ch; }
+
+  .pro-close { padding: 2.5rem 0 0; border-top: 1px solid var(--sl-color-hairline); }
+  .pro-close h2 { margin-bottom: 1.25rem; }
 </style>
