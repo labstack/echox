@@ -70,7 +70,7 @@ const tabs = [
   { id: 'webhook', label: 'Webhooks', file: 'webhook · webhookmem', code: webhookSnippet },
 ];
 
-const requirements = ['Go 1.26 and 1.27', 'Echo v5.4.2 or later', 'PostgreSQL 16–18', 'Redis and Valkey'];
+const requirements = ['Go 1.26 and 1.27', 'Echo v5.4.2 or later', 'PostgreSQL 16–18', 'Redis or Valkey (optional, for quota/redisstore)'];
 
 const trust = [
   ['No telemetry', 'The library sends nothing anywhere by itself.'],
@@ -132,7 +132,7 @@ const plans = [
   },
   {
     name: 'Business', tag: 'Growing companies', was: '$4,500', price: '$2,970', unit: '/ year', note: 'Up to 100 developers',
-    items: ['Everything in Team', 'Up to 100 developers', 'Every release while subscribed', 'Access tokens for go.labstack.io'],
+    items: ['Everything in Team', 'Every release while subscribed', 'Access tokens for go.labstack.io'],
     cta: { label: 'Email to buy Business', href: buy('Business'), primary: true },
   },
 ];
@@ -167,13 +167,13 @@ const comparison: Array<[string, Array<[string, ...Array<boolean | string>]>]> =
 const ciSnippet = `- name: Configure Echo Pro
   run: |
     go env -w GOPRIVATE=echo.labstack.com
-    echo "machine go.labstack.io login <org> password \${{ secrets.ECHO_PRO_TOKEN }}" >> ~/.netrc
-    chmod 600 ~/.netrc`;
+    umask 077
+    echo "machine go.labstack.io login <org> password \${{ secrets.ECHO_PRO_TOKEN }}" > ~/.netrc`;
 
 const faq = [
   ['What stays free?', 'Echo, its built-in middleware and the official packages (echo-jwt, echo-otel, echo-prometheus and echo-contrib) are open source under the MIT license. Echo Pro is a separate module that builds on them.'],
   ['Is Echo going closed source?', 'No. Echo stays open source under the MIT license. Echo Pro is a separate module that builds on Echo and does not change its license.'],
-  ['Why paid?', 'Echo Pro is a large body of maintained code: auth, tenant isolation, quotas and durable stores verified against PostgreSQL 16–18, Redis and Valkey. Subscriptions pay for that work and fund Echo\'s maintenance.'],
+  ['Why paid?', 'Echo Pro is a large body of maintained code: auth, tenant isolation, quotas and durable stores tested against PostgreSQL 16–18, Redis and Valkey. Subscriptions pay for that work and fund Echo\'s maintenance.'],
   ['What license is Echo Pro under?', 'The Echo Pro commercial license. While subscribed, your organisation may use, copy and modify it and include it in its own applications and services, including programs it distributes and services it operates. It may not pass the source code to third parties or offer it as a standalone library or competing product.'],
   ['Does Echo Pro send telemetry or check a license at run time?', 'No. The library sends nothing anywhere by itself and never checks a key. Metrics and tracing are opt-in hooks into your own systems.'],
   ['What happens when the subscription ends?', 'You keep the versions you already have, plus security fixes on the release lines you owned. New versions need an active subscription.'],
@@ -363,7 +363,7 @@ const head = [
 
     <section id="pricing" aria-labelledby="pricing-title">
       <h2 id="pricing-title">Pricing</h2>
-      <p class="pro-intro">Billed annually per organisation. Echo is open source under the MIT license and always will be; Echo Pro subscriptions fund its maintenance.</p>
+      <p class="pro-intro">Billed annually per organisation. Echo stays open source under the MIT license; Echo Pro subscriptions fund its maintenance.</p>
 
       <div class="pro-plans">
         {plans.map((plan) => (
@@ -401,7 +401,7 @@ const head = [
         <table class="pro-compare">
           <caption>Compare plans</caption>
           <thead>
-            <tr><td></td><th scope="col">Echo</th><th scope="col">Team</th><th scope="col">Business</th></tr>
+            <tr><th scope="col"><span class="sr-only">Feature</span></th><th scope="col">Echo</th><th scope="col">Team</th><th scope="col">Business</th></tr>
           </thead>
           {comparison.map(([group, rows]) => (
             <tbody>
@@ -555,10 +555,9 @@ const head = [
   .pro-diagram svg { display: block; width: 100%; height: auto; font-family: var(--sl-font); }
   .d-narrow { max-width: 22rem; margin: 0 auto; }
   .d-wide { display: none !important; }
-  @media (min-width: 48rem) { .d-wide { display: block !important; } .d-narrow { display: none !important; } }
+  @media (min-width: 64rem) { .d-wide { display: block !important; } .d-narrow { display: none !important; } }
   .pro-diagram :global(.d-box) { fill: var(--sl-color-bg); stroke: var(--sl-color-hairline-light); stroke-width: 1; }
   .pro-diagram :global(.d-yours) { fill: var(--echo-surface-2); stroke: var(--sl-color-gray-4); }
-  .pro-diagram :global(.d-store) { stroke-dasharray: 0; }
   .pro-diagram :global(.d-group) { fill: var(--sl-color-bg); stroke: var(--sl-color-hairline-light); }
   .pro-diagram :global(.d-t) { fill: var(--sl-color-white); font-size: 15px; font-weight: 600; }
   .pro-diagram :global(.d-s) { fill: var(--sl-color-gray-3); font-size: 12.5px; }
@@ -586,11 +585,9 @@ const head = [
   .pro-pkgs tbody th { font-weight: 400; white-space: nowrap; width: 1%; padding-inline-end: 28px; }
   .pro-pkgs tbody th code { background: transparent; padding: 0; color: var(--sl-color-white); }
   .pro-pkgs td { color: var(--sl-color-gray-3); }
+  /* Phones keep table semantics and headers; long package paths wrap. */
   @media (max-width: 40rem) {
-    .pro-pkgs thead { display: none; }
-    .pro-pkgs tr { display: block; padding: 10px 0; border-bottom: 1px solid var(--sl-color-hairline); }
-    .pro-pkgs tbody th, .pro-pkgs td { display: block; width: auto; white-space: normal; padding: 0; border: 0; }
-    .pro-pkgs td { margin-top: 4px; }
+    .pro-pkgs tbody th { width: 40%; white-space: normal; overflow-wrap: anywhere; padding-inline-end: 12px; }
   }
 
   /* Pricing */

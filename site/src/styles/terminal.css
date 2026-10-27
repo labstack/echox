@@ -403,8 +403,6 @@ starlight-toc a[aria-current='true'] { color: var(--echo-cyan-text); border-inli
 @media (min-width: 40rem) { .sp-featured-row { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .sp-featured { display: flex; align-items: center; gap: 16px; border: 1px solid var(--sl-color-hairline); background: var(--sl-color-bg-sidebar); box-shadow: var(--echo-card-edge); border-radius: 12px; padding: 18px 20px; text-decoration: none; transition: border-color var(--echo-ease); }
 .sp-featured:hover { border-color: var(--sl-color-gray-4); }
-.sp-mark { flex: none; display: inline-grid; place-items: center; width: 44px; height: 44px; border-radius: 10px; border: 1px solid var(--sl-color-hairline-light); background: var(--echo-surface-2); font-family: var(--sl-font); font-weight: 600; font-size: 1.1rem; color: var(--sl-color-gray-2); }
-.sp-mark.sm { width: 26px; height: 26px; border-radius: 7px; font-size: 0.78rem; }
 .sp-featured .t b { display: block; font-family: var(--sl-font); font-weight: 600; color: var(--sl-color-white); font-size: 1rem; }
 .sp-featured .t span { display: block; font-size: 0.875rem; color: var(--sl-color-gray-3); margin-top: 2px; }
 .sp-grid { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }

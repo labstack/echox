@@ -1,8 +1,8 @@
 ---
 // Living Terminal hero: code window + a terminal pane that types `curl`
 // and shows the runnable example's response. The pane is server-rendered in its
-// final state; the typing animation only re-plays the command once, keeps the
-// prompt and reserved height (never blank, no layout shift) and is skipped for
+// final state; the typing animation clears and re-types the command once,
+// keeping the prompt and reserved height (no layout shift), and is skipped for
 // reduced motion.
 import { starsLabel } from '../data/github.ts';
 import stable from '../generated/echo-source.json';
