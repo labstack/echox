@@ -235,8 +235,8 @@ const head = [
           Go module from LabStack. Mount it in your own Echo app and install it with the standard Go toolchain.
         </p>
         <div class="pro-actions">
-          <a class="hh-btn pri" href="#pricing">See pricing</a>
-          <a class="hh-btn sec" href="#docs">Read the docs</a>
+          <a class="hh-btn pri" href="#pricing" data-ga-event="view_pricing">See pricing</a>
+          <a class="hh-btn sec" href="#docs" data-ga-event="view_docs">Read the docs</a>
         </div>
         <ul class="pro-chips" aria-label="Requirements">
           {requirements.map(({ text, pkg }) => <li><span>{text}{pkg && <> <code>{pkg}</code></>}</span></li>)}
@@ -377,7 +377,7 @@ const head = [
             <p class="pro-note">{plan.was ? founding : plan.note}</p>
             {plan.was && <p class="pro-seats">{plan.note}</p>}
             <ul class="pro-checks">{plan.items.map((item) => <li>{item}</li>)}</ul>
-            <a class={`hh-btn ${plan.cta.primary ? 'pri' : 'sec'}`} href={plan.cta.href}>{plan.cta.label}</a>
+            <a class={`hh-btn ${plan.cta.primary ? 'pri' : 'sec'}`} href={plan.cta.href} data-ga-event={plan.was ? 'begin_checkout' : 'select_content'} data-ga-plan={plan.name} data-ga-value={plan.was ? plan.price.replace(/[$,]/g, '') : undefined}>{plan.cta.label}</a>
           </div>
         ))}
       </div>
@@ -387,12 +387,12 @@ const head = [
         <div>
           <h3>Support</h3>
           <p><b>$4,900</b> / year · A support contract, invoiced annually.</p>
-          <a class="pro-link" href="mailto:support@labstack.com?subject=Echo%20Pro%20Support">Contact us</a>
+          <a class="pro-link" href="mailto:support@labstack.com?subject=Echo%20Pro%20Support" data-ga-event="generate_lead" data-ga-plan="Support">Contact us</a>
         </div>
         <div>
           <h3>Enterprise</h3>
           <p>From <b>$12,000</b> / year · More than 100 developers, or group companies.</p>
-          <a class="pro-link" href="mailto:support@labstack.com?subject=Echo%20Pro%20Enterprise">Contact us</a>
+          <a class="pro-link" href="mailto:support@labstack.com?subject=Echo%20Pro%20Enterprise" data-ga-event="generate_lead" data-ga-plan="Enterprise">Contact us</a>
         </div>
       </div>
 
@@ -454,14 +454,14 @@ const head = [
           </details>
         ))}
       </div>
-      <p class="pro-muted">Anything else? Email <a class="pro-link" href="mailto:support@labstack.com">support@labstack.com</a>.</p>
+      <p class="pro-muted">Anything else? Email <a class="pro-link" href="mailto:support@labstack.com" data-ga-event="generate_lead">support@labstack.com</a>.</p>
     </section>
 
     <section class="pro-close" aria-labelledby="close-title">
       <h2 id="close-title">Build the product, not the plumbing.</h2>
       <div class="pro-actions">
-        <a class="hh-btn pri" href="#pricing">See pricing</a>
-        <a class="hh-btn sec" href="mailto:support@labstack.com?subject=Echo%20Pro">Email us</a>
+        <a class="hh-btn pri" href="#pricing" data-ga-event="view_pricing">See pricing</a>
+        <a class="hh-btn sec" href="mailto:support@labstack.com?subject=Echo%20Pro" data-ga-event="generate_lead">Email us</a>
       </div>
     </section>
   </div>
