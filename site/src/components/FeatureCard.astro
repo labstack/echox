@@ -26,8 +26,9 @@ const { icon, title } = Astro.props;
 		flex-direction: column;
 		gap: clamp(0.5rem, calc(0.125rem + 1vw), 1rem);
 		border: 1px solid var(--sl-color-hairline);
-		border-radius: 13px;
+		border-radius: 12px;
 		background: var(--sl-color-bg-sidebar);
+		box-shadow: var(--echo-card-edge);
 		padding: 20px;
 	}
 	.card .title {
@@ -42,7 +43,7 @@ const { icon, title } = Astro.props;
 	}
 	.icon {
 		flex-shrink: 0;
-		color: var(--echo-cyan-text);
+		color: var(--sl-color-gray-3);
 	}
 	.body {
 		margin: 0;

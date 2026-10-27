@@ -1,0 +1,19 @@
+---
+// Starlight's header plus a phone-only "Pro" link and theme picker. Docs pages
+// reach both through the mobile menu (SocialIcons, MobileMenuFooter); splash
+// pages (home, /pro) have no sidebar and so no menu, and Starlight hides its
+// right-hand group below 50rem.
+import Default from '@astrojs/starlight/components/Header.astro';
+import ThemeSelect from '@astrojs/starlight/components/ThemeSelect.astro';
+import ProNavLink from './ProNavLink.astro';
+const { hasSidebar } = Astro.locals.starlightRoute;
+---
+<div class="echo-header">
+  <Default />
+  {!hasSidebar && (
+    <div class="echo-header-phone print:hidden">
+      <ProNavLink />
+      <ThemeSelect />
+    </div>
+  )}
+</div>

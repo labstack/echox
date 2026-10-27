@@ -2,6 +2,7 @@
 import stable from '../generated/echo-source.json';
 import manifest from '../generated/config-fields.json';
 import { formatRevision } from '../data/source.mjs';
+import { isProPage } from '../pro-page.mjs';
 
 const isNext = process.env.DOCS_CHANNEL === 'next';
 const revision = manifest.revision;
@@ -14,20 +15,24 @@ const labels = {
   'pt-br': { release: 'Documentação estável', next: 'Próxima versão', source: 'Código da API', switch: isNext ? 'Ver estável' : 'Ver próxima versão' },
   'zh-cn': { release: '稳定版文档', next: '下一版文档', source: 'API 源码', switch: isNext ? '查看稳定版' : '查看下一版' },
 }[locale];
+// /pro is a release-site product page, not versioned documentation.
+const isProduct = isProPage(path);
 const counterpart = /\/(?:404|404\.html)\/?$/.test(path)
   ? (isNext ? '/' : '/next/')
   : isNext ? path.replace(/^\/next/, '') || '/' : `/next${path}`;
 ---
 
-<nav class="echo-version-banner" aria-label="Documentation version" data-pagefind-ignore>
+{!isProduct && <nav class="echo-version-banner" aria-label="Documentation version" data-pagefind-ignore>
   <strong>{isNext ? labels.next : `${labels.release} · Echo ${stable.release}`}</strong>
   <span>· {labels.source} <a href={`https://github.com/labstack/echo/tree/${revision}`}>{formatRevision(revision)}</a></span>
-  <a class="switch" data-version-switch href={counterpart}>{labels.switch} →</a>
-</nav>
+  <a class="switch" data-version-switch href={counterpart}>{labels.switch}</a>
+</nav>}
 
 <style>
-  .echo-version-banner { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: .4rem; padding: .45rem 1rem; background: var(--sl-color-bg-accent); color: var(--sl-color-text-invert); font-size: var(--sl-text-sm); }
-  .echo-version-banner a { color: inherit; text-decoration: underline; text-underline-offset: .15em; }
-  .echo-version-banner .switch { margin-inline-start: .7rem; font-weight: 700; }
-  .echo-version-banner a:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+  /* A quiet strip: neutral surface and hairline, with cyan only on the links. */
+  .echo-version-banner { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: .4rem; padding: .45rem 1rem; background: var(--sl-color-bg-sidebar); border-bottom: 1px solid var(--sl-color-hairline); color: var(--sl-color-gray-3); font-size: var(--sl-text-sm); }
+  .echo-version-banner strong { color: var(--sl-color-white); font-weight: 600; }
+  .echo-version-banner a { color: var(--echo-cyan-text); text-decoration: underline; text-underline-offset: .15em; }
+  .echo-version-banner .switch { margin-inline-start: .7rem; font-weight: 600; }
+  .echo-version-banner a:focus-visible { outline: 2px solid var(--echo-cyan-text); outline-offset: 2px; }
 </style>

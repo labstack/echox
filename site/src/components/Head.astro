@@ -1,0 +1,9 @@
+---
+// Starlight's head plus the self-hosted font faces from Astro's Fonts API.
+// Preload exactly two files: DM Sans (variable, latin) and Fragment Mono (latin).
+import Default from '@astrojs/starlight/components/Head.astro';
+import { Font } from 'astro:assets';
+---
+<Default />
+<Font cssVariable="--font-dm-sans" preload />
+<Font cssVariable="--font-fragment-mono" preload />
