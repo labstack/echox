@@ -13,6 +13,15 @@
   --echo-cyan-text: #33c9e6;   /* contrast-tuned for small text/links on dark */
   --echo-soft: rgba(0, 175, 209, 0.12);
   --echo-ease: 120ms ease-out;
+  /* Dark-first defaults (the dark theme uses them as is), so buttons and cards
+     render before data-theme is set. --echo-surface-2 is the raised surface for
+     nested panels; --echo-card-edge the faint top highlight that gives dark
+     cards depth without shadows. */
+  --echo-btn-bg: #00afd1;
+  --echo-btn-fg: #04110c;
+  --echo-btn-hover: color-mix(in srgb, var(--echo-btn-bg) 82%, #ffffff);
+  --echo-surface-2: #16212b;
+  --echo-card-edge: inset 0 1px 0 rgb(255 255 255 / 0.06);
 }
 
 /* ---------- DARK (default) ---------- */
@@ -38,13 +47,7 @@
   --sl-color-text: #a5b4c3;
   --sl-color-text-accent: #72e0f2;
   --echo-cyan-text: #72e0f2;
-  --echo-btn-bg: #00afd1;
-  --echo-btn-fg: #04110c;
-  --echo-btn-hover: color-mix(in srgb, #00afd1 82%, #ffffff);
-  /* Raised surface for nested panels, and the faint top highlight that gives
-     dark cards depth without shadows. */
-  --echo-surface-2: #16212b;
-  --echo-card-edge: inset 0 1px 0 rgb(255 255 255 / 0.06);
+  /* Button, raised-surface and card-edge tokens use the dark :root defaults. */
 }
 
 /* ---------- LIGHT ---------- */
@@ -71,7 +74,7 @@
   --echo-cyan-text: #006c82;
   --echo-btn-bg: #006c82;
   --echo-btn-fg: #ffffff;
-  --echo-btn-hover: color-mix(in srgb, #006c82 82%, #000000);
+  --echo-btn-hover: color-mix(in srgb, var(--echo-btn-bg) 82%, #000000);
   --echo-surface-2: #e9f0f4;
   --echo-card-edge: none;
 }
@@ -107,7 +110,8 @@ site-search button { border-radius: 8px !important; }
 
 /* "Ask AI" pill — opens the kapa.ai modal (Search.astro + astro.config). Sits
    beside the search box and mirrors its chrome (40px, dark, 8px radius) so the
-   two read as one control group. Cyan star marks it as the AI entrypoint. */
+   two read as one control group. The star stays neutral ink like the rest of
+   the chrome; cyan is left to links, the primary button and focus. */
 .echo-search-row { display: flex; align-items: center; gap: 8px; flex: 1 1 auto; min-width: 0; }
 /* site-search is display:contents, so size its actual trigger button: let it grow
    to fill the row (capped at Starlight's 352px max-width, restoring its old size). */
@@ -120,11 +124,12 @@ site-search button { border-radius: 8px !important; }
   font-family: var(--sl-font); font-size: 0.8125rem; font-weight: 500; line-height: 1;
   transition: border-color var(--echo-ease), color var(--echo-ease);
 }
-.echo-ask-ai svg { font-size: 1rem; color: var(--echo-cyan-text); }
+.echo-ask-ai svg { font-size: 1rem; color: var(--sl-color-gray-3); }
 .echo-ask-ai:focus-visible { outline: 2px solid var(--echo-cyan-text); outline-offset: 2px; }
 .echo-ask-ai:hover, .echo-ask-ai:focus-visible {
-  border-color: var(--echo-cyan); color: var(--sl-color-white);
+  border-color: var(--sl-color-hairline-light); color: var(--sl-color-white);
 }
+.echo-ask-ai:hover svg, .echo-ask-ai:focus-visible svg { color: var(--sl-color-white); }
 /* Tight headers (mobile): drop the label, keep the star as an icon button. */
 @media (max-width: 50rem) {
   .echo-ask-ai { padding: 0 11px; }
@@ -356,9 +361,7 @@ starlight-toc a[aria-current='true'] { color: var(--echo-cyan-text); border-inli
 .hh { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 48px; align-items: start; padding: 28px 0 8px; }
 @media (max-width: 900px) { .hh { grid-template-columns: minmax(0, 1fr); gap: 28px; } }
 .hh-left { min-width: 0; }
-.hh-eyebrow { display: inline-flex; align-items: center; gap: 7px; font-family: var(--sl-font-mono); font-size: 0.75rem; color: var(--sl-color-gray-3); border: 1px solid var(--sl-color-hairline-light); background: transparent; border-radius: 9999px; padding: 4px 12px; margin-bottom: 22px; }
 .hh h1 { font-family: var(--sl-font); font-weight: 600; font-size: clamp(2.2rem, 4.4vw, 3.2rem); line-height: 1.08; letter-spacing: -0.03em; color: var(--sl-color-white); margin: 0 0 18px; }
-.hh h1 .g { color: var(--sl-color-gray-4); }
 .hh-sub { font-family: var(--sl-font); font-size: 1.0625rem; line-height: 1.65; color: var(--sl-color-gray-2); max-width: 46ch; margin-bottom: 26px; }
 .hh-cta { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 20px; }
 .hh-btn { display: inline-flex; align-items: center; gap: 8px; font-family: var(--sl-font); font-weight: 600; font-size: 0.92rem; border: 1px solid transparent; border-radius: 8px; padding: 11px 18px; cursor: pointer; text-decoration: none; transition: background-color var(--echo-ease), border-color var(--echo-ease), color var(--echo-ease); margin: 0; min-height: 44px; }
@@ -367,9 +370,6 @@ starlight-toc a[aria-current='true'] { color: var(--echo-cyan-text); border-inli
 .hh-btn.sec { border-color: var(--sl-color-hairline-light); color: var(--sl-color-white); background: var(--sl-color-bg-sidebar); box-shadow: var(--echo-card-edge); }
 .hh-btn.sec:hover { border-color: var(--sl-color-gray-4); color: var(--sl-color-white); }
 .hh-btn svg { font-size: 1.2em; }
-/* quiet text link to Echo Pro beside the hero buttons */
-.hh-pro { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; font-family: var(--sl-font); font-size: 0.92rem; font-weight: 500; color: var(--sl-color-gray-3); text-decoration: none; padding: 0 6px; transition: color var(--echo-ease); }
-.hh-pro:hover { color: var(--sl-color-white); text-decoration: underline; text-underline-offset: 3px; }
 .hh-install { max-width: 26rem; }
 .hh-install .expressive-code { --ec-codeFontSize: .85rem; }
 
@@ -378,7 +378,6 @@ starlight-toc a[aria-current='true'] { color: var(--echo-cyan-text); border-inli
 .hh-win .expressive-code { --ec-brdRad: 0; --ec-brdCol: transparent; --ec-codeFontSize: .82rem; margin: 0; }
 .hh-term { border-top: 1px solid var(--sl-color-hairline); background: var(--sl-color-gray-6); color: var(--sl-color-text); padding: 16px 18px; font-size: .82rem; line-height: 1.85; min-height: 118px; }
 .hh-term [data-out] { margin-top: .65rem; }
-.hh-cur[hidden] { display: none; }
 .hh-term .pr { color: var(--echo-cyan-text); }
 .hh-term .dim { color: var(--sl-color-gray-3); }
 .hh-term .response { color: var(--echo-cyan-text); }
@@ -389,7 +388,7 @@ starlight-toc a[aria-current='true'] { color: var(--echo-cyan-text); border-inli
 /* One compact monochrome row directly under the hero (Encore pattern): names
    only, neutral until hover, no cards. */
 .ub-strip { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px 24px; margin: 40px 0 0; padding: 18px 0 0; border-top: 1px solid var(--sl-color-hairline); }
-.ub-strip h2 { margin: 0; padding: 0; border: 0; font-family: var(--sl-font-mono); font-size: 0.75rem; font-weight: 400; letter-spacing: 0; color: var(--sl-color-gray-4); }
+.ub-strip h2 { margin: 0; padding: 0; border: 0; font-family: var(--sl-font); font-size: 0.8125rem; font-weight: 500; letter-spacing: 0; color: var(--sl-color-gray-4); }
 .ub-strip ul { display: flex; flex-wrap: wrap; gap: 2px 20px; list-style: none; margin: 0; padding: 0; flex: 1 1 32rem; }
 .ub-strip li { margin: 0; }
 .ub-strip ul a, .ub-all { display: inline-flex; align-items: center; min-height: 32px; font-family: var(--sl-font); font-size: 0.95rem; font-weight: 600; letter-spacing: -0.01em; color: var(--sl-color-gray-3); text-decoration: none; transition: color var(--echo-ease); }
@@ -416,13 +415,22 @@ starlight-toc a[aria-current='true'] { color: var(--echo-cyan-text); border-inli
 /* ===================== Ecosystem ===================== */
 .echo-eco .sl-link-card { border-color: var(--sl-color-hairline); background: var(--sl-color-bg-sidebar); border-radius: 12px; box-shadow: var(--echo-card-edge); transition: border-color var(--echo-ease); }
 .echo-eco .sl-link-card:hover { border-color: var(--sl-color-gray-4); background: var(--sl-color-bg-sidebar); }
-.echo-eco .title { font-family: var(--sl-font-mono); font-size: .9rem; color: var(--echo-cyan-text); }
+/* The whole card is the link: ink title at rest, cyan only on hover/focus. */
+.echo-eco .title { font-family: var(--sl-font-mono); font-size: .9rem; color: var(--sl-color-white); transition: color var(--echo-ease); }
+.echo-eco .sl-link-card:is(:hover, :focus-within) .title { color: var(--echo-cyan-text); }
 .echo-eco .description { font-size: .875rem; color: var(--sl-color-gray-3); }
 .echo-eco .sl-link-card:focus-within { outline: 2px solid var(--echo-cyan-text); outline-offset: 2px; }
 
 /* ===================== Header "Pro" link ===================== */
 .echo-nav-pro { display: inline-flex; align-items: center; min-height: 32px; padding: 0 4px; font-family: var(--sl-font); font-size: 0.875rem; font-weight: 500; color: var(--sl-color-gray-2); text-decoration: none; transition: color var(--echo-ease); }
 .echo-nav-pro:hover, .echo-nav-pro[aria-current='page'] { color: var(--sl-color-white); text-decoration: underline; text-underline-offset: 4px; }
+/* Header.astro: on splash pages (no sidebar, so no mobile menu) phones get
+   Pro and the theme picker in the header itself; Starlight hides its own
+   right-hand group below 50rem. */
+.echo-header { display: flex; align-items: center; gap: 12px; height: 100%; }
+.echo-header > .header { flex: 1 1 auto; min-width: 0; }
+.echo-header-phone { display: flex; flex: none; align-items: center; gap: 10px; }
+@media (min-width: 50rem) { .echo-header-phone { display: none; } }
 
 /* ===================== Echo Pro (home band) ===================== */
 .echo-pro { margin-top: 72px; padding-top: 40px; border-top: 1px solid var(--sl-color-hairline); }

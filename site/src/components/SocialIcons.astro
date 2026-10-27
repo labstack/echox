@@ -1,8 +1,8 @@
 ---
 // One plain "Pro" link ahead of the social icons in the header and the mobile
-// menu. /pro exists only on the release site, so the link stays absolute.
+// menu.
 import Default from '@astrojs/starlight/components/SocialIcons.astro';
-const current = Astro.url.pathname.replace(/\/$/, '') === '/pro';
+import ProNavLink from './ProNavLink.astro';
 ---
-<a class="echo-nav-pro" href="/pro" aria-current={current ? 'page' : undefined}>Pro</a>
+<ProNavLink />
 <Default />

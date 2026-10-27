@@ -70,7 +70,13 @@ const tabs = [
   { id: 'webhook', label: 'Webhooks', file: 'webhook · webhookmem', code: webhookSnippet },
 ];
 
-const requirements = ['Go 1.26 and 1.27', 'Echo v5.4.2 or later', 'PostgreSQL 16–18', 'Redis or Valkey (optional, for quota/redisstore)'];
+// Plain text, plus a package path (the only part set in mono) where one applies.
+const requirements: Array<{ text: string; pkg?: string }> = [
+  { text: 'Go 1.26 and 1.27' },
+  { text: 'Echo v5.4.2 or later' },
+  { text: 'PostgreSQL 16–18' },
+  { text: 'Redis or Valkey (optional) for', pkg: 'quota/redisstore' },
+];
 
 const trust = [
   ['No telemetry', 'The library sends nothing anywhere by itself.'],
@@ -118,22 +124,22 @@ const packages = [
   ['cmd/quota', 'Command line for plan checks, usage, resets, credits, keys and the outbox.'],
 ];
 
-const founding = 'First three annual invoices with code FOUNDING · first 25 organisations · until 31 Mar 2027';
+const founding = 'Founding price with code FOUNDING on the first three annual invoices, for the first 25 organisations until 31 Mar 2027.';
 const plans = [
   {
-    name: 'Echo', tag: 'Open source', price: 'Free', unit: 'MIT license', note: 'For every Go team',
+    name: 'Echo', price: 'Free', unit: 'MIT license', note: 'For every Go team',
     items: ['The Echo framework and built-in middleware', 'echo-jwt, echo-otel, echo-prometheus, echo-contrib', 'Community support on GitHub'],
     cta: { label: 'Get started', href: '/guide/quickstart/', primary: false },
   },
   {
-    name: 'Team', tag: 'Small teams', was: '$1,500', price: '$990', unit: '/ year', note: 'Up to 20 developers',
+    name: 'Team', was: '$1,500', price: '$990', unit: '/ year', note: 'Up to 20 developers',
     items: ['Everything in Echo', 'Every Echo Pro package', 'Every release while subscribed', 'Access tokens for go.labstack.io'],
-    cta: { label: 'Email to buy Team', href: buy('Team'), primary: true },
+    cta: { label: 'Buy Team by email', href: buy('Team'), primary: true },
   },
   {
-    name: 'Business', tag: 'Growing companies', was: '$4,500', price: '$2,970', unit: '/ year', note: 'Up to 100 developers',
+    name: 'Business', was: '$4,500', price: '$2,970', unit: '/ year', note: 'Up to 100 developers',
     items: ['Everything in Team', 'Every release while subscribed', 'Access tokens for go.labstack.io'],
-    cta: { label: 'Email to buy Business', href: buy('Business'), primary: true },
+    cta: { label: 'Buy Business by email', href: buy('Business'), primary: false },
   },
 ];
 
@@ -200,7 +206,6 @@ const structuredData = {
 const head = [
   { tag: 'title', content: 'Echo Pro — Multi-tenant building blocks for Echo v5' },
   { tag: 'meta', attrs: { name: 'robots', content: 'noindex' } },
-  { tag: 'meta', attrs: { name: 'go-import', content: 'echo.labstack.com/pro mod https://go.labstack.io' } },
   ...(OG_IMAGE ? [
     { tag: 'meta', attrs: { property: 'og:image', content: OG_IMAGE } },
     { tag: 'meta', attrs: { name: 'twitter:image', content: OG_IMAGE } },
@@ -228,7 +233,6 @@ const head = [
   <div class="pro not-content">
     <section class="pro-hero" aria-labelledby="pro-title">
       <div class="pro-hero-copy">
-        <p class="pro-kicker"><code>echo.labstack.com/pro</code></p>
         <h1 id="pro-title">Multi-tenant APIs on Echo v5, without building the plumbing.</h1>
         <p class="pro-lead">
           Auth, tenant isolation, quotas, audit, webhooks and an admin console in one commercial
@@ -239,7 +243,7 @@ const head = [
           <a class="hh-btn sec" href="#docs">Read the docs</a>
         </div>
         <ul class="pro-chips" aria-label="Requirements">
-          {requirements.map((item) => <li>{item}</li>)}
+          {requirements.map(({ text, pkg }) => <li><span>{text}{pkg && <> <code>{pkg}</code></>}</span></li>)}
         </ul>
       </div>
 
@@ -368,7 +372,6 @@ const head = [
       <div class="pro-plans">
         {plans.map((plan) => (
           <div class={`pro-plan${plan.was ? ' paid' : ''}`}>
-            <p class="pro-tag">{plan.tag}</p>
             <h3>{plan.name}</h3>
             <p class="pro-price">
               {plan.was && <s><span class="sr-only">Was </span>{plan.was}</s>}
@@ -516,18 +519,17 @@ const head = [
   .pro-intro { color: var(--sl-color-gray-3); max-width: 62ch; margin-bottom: 1.75rem !important; }
   .pro-muted { font-size: 0.9rem; color: var(--sl-color-gray-3); }
   .pro-actions { display: flex; flex-wrap: wrap; gap: 10px; }
-  .pro-link { display: inline-flex; align-items: center; min-height: 24px; color: var(--echo-cyan-text); text-underline-offset: 3px; text-decoration: none; font-size: 0.9rem; font-weight: 500; }
+  .pro-link { display: inline-flex; align-items: center; min-height: 32px; color: var(--echo-cyan-text); text-underline-offset: 3px; text-decoration: none; font-size: 0.9rem; font-weight: 500; }
   .pro-link:hover { text-decoration: underline; }
   .pro-plan, .pro-flagship, .pro-extra > div { border: 1px solid var(--sl-color-hairline); border-radius: 12px; background: var(--sl-color-bg-sidebar); box-shadow: var(--echo-card-edge); }
 
   /* Hero: copy left, code right */
   .pro .pro-hero { margin-top: 2.5rem; display: grid; grid-template-columns: minmax(0, 1fr); gap: 2.5rem; align-items: start; }
   @media (min-width: 64rem) { .pro .pro-hero { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 3rem; } }
-  .pro-kicker { margin-bottom: 1rem !important; }
-  .pro-kicker code { font-size: 0.8rem; color: var(--sl-color-gray-3); background: transparent; border: 1px solid var(--sl-color-hairline-light); border-radius: 9999px; padding: 4px 11px; }
   .pro-lead { font-size: 1.0625rem; line-height: 1.65; color: var(--sl-color-gray-2); max-width: 52ch; margin-bottom: 1.6rem !important; }
   .pro-chips { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; padding: 0; margin: 1.5rem 0 0; }
-  .pro-chips li { display: inline-flex; align-items: center; min-height: 28px; margin: 0; font-family: var(--sl-font-mono); font-size: 0.75rem; color: var(--sl-color-gray-3); border: 1px solid var(--sl-color-hairline); border-radius: 6px; padding: 0 9px; }
+  .pro-chips li { display: inline-flex; align-items: center; min-height: 28px; margin: 0; font-size: 0.8125rem; line-height: 1.35; color: var(--sl-color-gray-3); border: 1px solid var(--sl-color-hairline); border-radius: 6px; padding: 3px 9px; }
+  .pro-chips code { background: transparent; padding: 0; color: var(--sl-color-gray-2); }
 
   /* Tabs */
   .pro-tabs { min-width: 0; border: 1px solid var(--sl-color-hairline-light); border-radius: 12px; overflow: hidden; background: var(--sl-color-bg-sidebar); box-shadow: var(--echo-card-edge); }
@@ -595,7 +597,6 @@ const head = [
   @media (min-width: 56rem) { .pro-plans { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
   .pro-plan { display: flex; flex-direction: column; padding: 24px; }
   .pro-plan.paid { border-color: var(--sl-color-hairline-light); }
-  .pro-tag { align-self: flex-start; margin-bottom: 0.9rem !important; font-family: var(--sl-font-mono); font-size: 0.75rem; line-height: 1; color: var(--sl-color-gray-3); border: 1px solid var(--sl-color-hairline-light); border-radius: 9999px; padding: 5px 10px; }
   .pro-price { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 8px; margin: 0.4rem 0 0.5rem !important; }
   .pro-price b { font-size: 2.2rem; font-weight: 600; line-height: 1; letter-spacing: -0.03em; color: var(--sl-color-white); font-variant-numeric: tabular-nums; }
   .pro-price s { font-size: 1.05rem; color: var(--sl-color-gray-4); }
@@ -622,7 +623,7 @@ const head = [
   .pro-compare thead th { font-weight: 600; color: var(--sl-color-white); }
   .pro-compare tbody th[scope='row'] { text-align: start; font-weight: 400; color: var(--sl-color-gray-2); padding-inline-start: 0; }
   .pro-compare td { color: var(--sl-color-gray-2); font-variant-numeric: tabular-nums; }
-  .pro-compare .grp th { text-align: start; padding: 22px 0 8px; font-family: var(--sl-font-mono); font-size: 0.75rem; font-weight: 400; color: var(--sl-color-gray-3); }
+  .pro-compare .grp th { text-align: start; padding: 22px 0 8px; font-family: var(--sl-font); font-size: 0.8125rem; font-weight: 600; color: var(--sl-color-gray-3); }
   .pro-compare .yes { color: var(--sl-color-white); }
   .pro-compare .no { color: var(--sl-color-gray-4); }
   .pro-terms { margin: 1.75rem 0 0; padding-inline-start: 1.1rem; columns: 2 20rem; column-gap: 2rem; font-size: 0.875rem; color: var(--sl-color-gray-3); }

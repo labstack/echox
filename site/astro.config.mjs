@@ -1,9 +1,11 @@
 import { defineConfig, fontProviders } from 'astro/config';
 import starlight from '@astrojs/starlight';
+import sitemap from '@astrojs/sitemap';
 import { unified } from '@astrojs/markdown-remark';
 import { redirects, retiredCookbookRedirects } from './src/redirects.mjs';
 import remarkSourceCode from './plugins/remark-source-code.mjs';
 import { locales } from './src/locales.mjs';
+import { isProPage } from './src/pro-page.mjs';
 
 const next = process.env.DOCS_CHANNEL === 'next';
 
@@ -66,7 +68,9 @@ export default defineConfig({
       components: {
         Banner: './src/components/VersionBanner.astro',
         Head: './src/components/Head.astro',
+        Header: './src/components/Header.astro',
         Footer: './src/components/Footer.astro',
+        LanguageSelect: './src/components/LanguageSelect.astro',
         Search: './src/components/Search.astro',
         SocialIcons: './src/components/SocialIcons.astro',
       },
@@ -126,6 +130,15 @@ export default defineConfig({
       ],
       // tune the built-in code theme toward our terminal palette
       expressiveCode: { themes: ['github-dark', 'github-light'] },
+    }),
+    // Starlight adds @astrojs/sitemap only when it is missing; add it here with
+    // the same i18n mapping so the noindex /pro page stays out of the sitemap.
+    sitemap({
+      i18n: {
+        defaultLocale: 'root',
+        locales: Object.fromEntries(Object.entries(locales).map(([locale, { lang }]) => [locale, lang])),
+      },
+      filter: (page) => !isProPage(new URL(page).pathname),
     }),
   ],
 });

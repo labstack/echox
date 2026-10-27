@@ -1,10 +1,11 @@
 ---
 import Default from '@astrojs/starlight/components/Footer.astro';
 import { Icon } from '@astrojs/starlight/components';
+import { isProPage } from '../pro-page.mjs';
 
 const year = new Date().getFullYear();
 // Echo is MIT; on the Echo Pro page say which product the licence covers.
-const isProduct = Astro.url.pathname.replace(/\/$/, '') === '/pro';
+const isProduct = isProPage(Astro.url.pathname);
 ---
 <Default><slot /></Default>
 <footer class="echo-docfoot">

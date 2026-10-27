@@ -1,0 +1,7 @@
+---
+// /pro exists only in English: a language picker there would offer
+// /zh-cn/pro/, /ja/pro/ and so on, which 404.
+import Default from '@astrojs/starlight/components/LanguageSelect.astro';
+import { isProPage } from '../pro-page.mjs';
+---
+{!isProPage(Astro.url.pathname) && <Default />}
