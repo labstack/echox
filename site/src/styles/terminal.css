@@ -262,6 +262,8 @@ site-search button { border-radius: 8px !important; }
 /* 32px hit areas around 20px glyphs (WCAG 2.5.8 target size). */
 .echo-social a { display: inline-flex; align-items: center; justify-content: center; min-width: 32px; min-height: 32px; border-radius: 6px; color: var(--sl-color-gray-3); font-size: 1.2rem; line-height: 1; text-decoration: none; transition: color var(--echo-ease); }
 .echo-social a:hover { color: var(--sl-color-white); }
+.echo-social .echo-docfoot-pro { font-size: 0.8125rem; padding: 0 8px; }
+.echo-social .echo-docfoot-pro:hover { color: var(--echo-cyan-text); }
 
 /* site-wide footer on docs pages (homepage uses its own .echo-foot) */
 .echo-docfoot { margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--sl-color-hairline); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; font-size: 0.8125rem; color: var(--sl-color-gray-4); }
@@ -372,6 +374,10 @@ starlight-toc a[aria-current='true'] { color: var(--echo-cyan-text); border-inli
 .hh-btn.sec:hover { border-color: var(--sl-color-gray-4); color: var(--sl-color-white); }
 .hh-btn svg { font-size: 1.2em; }
 .hh-install { max-width: 26rem; }
+/* One quiet Pro line under the hero CTAs: muted text, the link carries the cyan. */
+.hh-pro { margin: 0; font-size: 0.875rem; color: var(--sl-color-gray-3); text-wrap: pretty; }
+.hh-pro a { color: var(--echo-cyan-text); font-weight: 600; text-decoration: none; }
+.hh-pro a:hover { text-decoration: underline; }
 .hh-install .expressive-code { --ec-codeFontSize: .85rem; }
 
 /* Expressive Code owns the title, syntax and copy controls; the terminal shares its surface. */

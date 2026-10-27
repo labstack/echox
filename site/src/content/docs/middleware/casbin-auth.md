@@ -105,3 +105,7 @@ curl -v -u "alice:password" http://localhost:8080/dataset2/resource2
 ### Full Casbin + JWT example
 
 Run the [complete Casbin + JWT example](https://github.com/labstack/echox/tree/master/cookbook/casbin), using the model and policy files above.
+
+:::note[Echo Pro]
+Need tenant isolation with Casbin, Cerbos or OpenFGA authorizers built in? [Echo Pro](/pro) adds it to Echo v5.
+:::
