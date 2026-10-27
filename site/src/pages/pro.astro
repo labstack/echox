@@ -23,11 +23,9 @@ const buy = (plan: string) =>
   `mailto:support@labstack.com?subject=${encodeURIComponent(`Buy Echo Pro ${plan}`)}`;
 
 // Trimmed from auth/README.md (quickstart) and auth/authbind/README.md.
+// apiKey is the quickstart's auth.APIKey scheme (store, prefix and peppers).
 const authSnippet = `authCfg := auth.Config{
-	Schemes: map[string]auth.Scheme{"key": auth.APIKey{
-		Namespace: "billing", Prefix: "demo",
-		Peppers: ring, Store: store, Header: "X-API-Key",
-	}},
+	Schemes: map[string]auth.Scheme{"key": apiKey},
 	Fallback: auth.Require(map[string][]string{
 		"key": {"invoice:read"},
 	}),
@@ -49,8 +47,8 @@ const quotaSnippet = `lim, err := quota.New(quota.Config{
 identity, err := authbind.Quota()
 mw, err := quota.MiddlewareConfig{
 	Limiter: lim, Identity: identity,
-}.ToMiddleware()
-e.Group("/v1", guard, mw).GET("/hello", hello) // explained 429s`;
+}.ToMiddleware() // explained 429s
+e.Group("/v1", guard, mw).GET("/hello", hello)`;
 
 // Trimmed from webhook/README.md (memory round trip).
 const webhookSnippet = `p, err := webhook.PrepareOutgoing(webhook.Outgoing{
@@ -59,15 +57,14 @@ const webhookSnippet = `p, err := webhook.PrepareOutgoing(webhook.Outgoing{
 	Payload: []byte(\`{"amount":100}\`),
 })
 receipt, err := store.Enqueue(ctx, p)
-worker, err := webhookmem.NewWorker(store, webhookmem.WorkerConfig{
-	Concurrency: 1,
-})
+worker, err := webhookmem.NewWorker(store,
+	webhookmem.WorkerConfig{})
 go func() { done <- worker.Run(ctx) }() // signs and delivers`;
 
 const tabs = [
-  { id: 'auth', label: 'Auth + tenant', file: 'auth · tenant · authbind', code: authSnippet },
-  { id: 'quota', label: 'Quota', file: 'quota', code: quotaSnippet },
-  { id: 'webhook', label: 'Webhooks', file: 'webhook · webhookmem', code: webhookSnippet },
+  { id: 'auth', label: 'Auth + tenant', code: authSnippet },
+  { id: 'quota', label: 'Quota', code: quotaSnippet },
+  { id: 'webhook', label: 'Webhooks', code: webhookSnippet },
 ];
 
 // Plain text, plus a package path (the only part set in mono) where one applies.
@@ -124,7 +121,7 @@ const packages = [
   ['cmd/quota', 'Command line for plan checks, usage, resets, credits, keys and the outbox.'],
 ];
 
-const founding = 'Founding price with code FOUNDING on the first three annual invoices, for the first 25 organisations until 31 Mar 2027.';
+const founding = 'Founding price with code FOUNDING for the first 25 organisations, on the first three annual invoices, until 31 Mar 2027.';
 const plans = [
   {
     name: 'Echo', price: 'Free', unit: 'MIT license', note: 'For every Go team',
@@ -138,7 +135,7 @@ const plans = [
   },
   {
     name: 'Business', was: '$4,500', price: '$2,970', unit: '/ year', note: 'Up to 100 developers',
-    items: ['Everything in Team', 'Every release while subscribed', 'Access tokens for go.labstack.io'],
+    items: ['Everything in Team'],
     cta: { label: 'Buy Business by email', href: buy('Business'), primary: false },
   },
 ];
@@ -166,7 +163,6 @@ const comparison: Array<[string, Array<[string, ...Array<boolean | string>]>]> =
     ['Price', 'Free', '$1,500 / year', '$4,500 / year'],
     ['Founding price with FOUNDING', false, '$990 / year', '$2,970 / year'],
     ['Billing', false, 'Annual', 'Annual'],
-    ['Full refund within 30 days', false, true, true],
   ]],
 ];
 
@@ -174,7 +170,8 @@ const ciSnippet = `- name: Configure Echo Pro
   run: |
     go env -w GOPRIVATE=echo.labstack.com
     umask 077
-    echo "machine go.labstack.io login <org> password \${{ secrets.ECHO_PRO_TOKEN }}" > ~/.netrc`;
+    grep -qs '^machine go.labstack.io ' ~/.netrc ||
+      echo "machine go.labstack.io login <org> password \${{ secrets.ECHO_PRO_TOKEN }}" >> ~/.netrc`;
 
 const faq = [
   ['What stays free?', 'Echo, its built-in middleware and the official packages (echo-jwt, echo-otel, echo-prometheus and echo-contrib) are open source under the MIT license. Echo Pro is a separate module that builds on them.'],
@@ -183,9 +180,8 @@ const faq = [
   ['What license is Echo Pro under?', 'The Echo Pro commercial license. While subscribed, your organisation may use, copy and modify it and include it in its own applications and services, including programs it distributes and services it operates. It may not pass the source code to third parties or offer it as a standalone library or competing product.'],
   ['Does Echo Pro send telemetry or check a license at run time?', 'No. The library sends nothing anywhere by itself and never checks a key. Metrics and tracing are opt-in hooks into your own systems.'],
   ['What happens when the subscription ends?', 'You keep the versions you already have, plus security fixes on the release lines you owned. New versions need an active subscription.'],
-  ['Can we evaluate before buying?', 'There is no free trial. This page, the package list and the code samples show what you get; if Echo Pro is not right for you, you get a full refund within 30 days of purchase.'],
+  ['Can we evaluate before buying, or get a refund?', 'There is no free trial. This page, the package list and the code samples show what you get. If Echo Pro is not right for you, you get a full refund within 30 days of purchase.'],
   ['Invoices and purchase orders?', 'Team and Business are billed annually per organisation. Support and Enterprise are invoiced annually. Email support@labstack.com for billing details your company needs.'],
-  ['Can I get a refund?', 'Yes: a full refund within 30 days of purchase. There is no free trial and no monthly plan.'],
 ];
 
 const structuredData = {
@@ -255,7 +251,7 @@ const head = [
         </div>
         {tabs.map((tab) => (
           <div class="pro-panel" id={`panel-${tab.id}`} role="tabpanel" aria-labelledby={`tab-${tab.id}`} aria-label={tab.label} tabindex="0">
-            <Code code={tab.code} lang="go" title={tab.file} frame="code" wrap />
+            <Code code={tab.code} lang="go" frame="code" />
           </div>
         ))}
       </div>
@@ -424,8 +420,8 @@ const head = [
 
       <ul class="pro-terms">
         <li>Annual billing only; no monthly plan.</li>
-        <li>No free trial; full refund within 30 days.</li>
-        <li>Prices exclude tax. A business tax ID is required at checkout.</li>
+        <li>Full refund within 30 days of purchase.</li>
+        <li>Prices exclude tax. Sold to businesses: checkout asks for your company name, and a tax ID where supported.</li>
         <li>After your subscription ends you keep the versions you have, plus security fixes on the release lines you owned.</li>
       </ul>
     </section>
@@ -434,12 +430,12 @@ const head = [
       <h2 id="install-title">Install</h2>
       <p class="pro-intro">After purchase you create your organisation's access token once. Then, on each machine:</p>
       <ol>
-        <li><span>Mark the module private.</span><Code code="go env -w GOPRIVATE=echo.labstack.com" lang="sh" frame="none" wrap /></li>
+        <li><span>Mark the module private. If you already set <code>GOPRIVATE</code>, append <code>,echo.labstack.com</code> to your existing value instead.</span><Code code="go env -w GOPRIVATE=echo.labstack.com" lang="sh" frame="none" wrap /></li>
         <li><span>Add this line to <code>~/.netrc</code> (Windows: <code>%USERPROFILE%\_netrc</code>), mode 600.</span><Code code="machine go.labstack.io login <org> password <token>" lang="text" frame="none" wrap /></li>
         <li><span>Add Echo Pro to your module.</span><Code code="go get echo.labstack.com/pro@latest" lang="sh" frame="none" wrap /></li>
       </ol>
       <h3>In CI</h3>
-      <p class="pro-muted">GitHub Actions: store the token as a repository secret and write the same line before <code>go</code> runs.</p>
+      <p class="pro-muted">GitHub Actions: store the token as a repository secret and append the same line before <code>go</code> runs.</p>
       <Code code={ciSnippet} lang="yaml" title=".github/workflows/ci.yml" frame="code" />
       <p class="pro-muted">Corporate mirrors and <code>GOPROXY</code> chains with <code>GONOSUMDB=echo.labstack.com</code> are documented in the module README.</p>
 
@@ -601,7 +597,7 @@ const head = [
   .pro-price b { font-size: 2.2rem; font-weight: 600; line-height: 1; letter-spacing: -0.03em; color: var(--sl-color-white); font-variant-numeric: tabular-nums; }
   .pro-price s { font-size: 1.05rem; color: var(--sl-color-gray-4); }
   .pro-price .u { font-size: 0.9rem; color: var(--sl-color-gray-3); }
-  .pro-note { font-size: 0.8rem; line-height: 1.5; color: var(--sl-color-gray-3); min-height: 2.4rem; }
+  .pro-note { font-size: 0.8rem; line-height: 1.5; color: var(--sl-color-gray-3); }
   .pro-seats { font-size: 0.9rem; font-weight: 500; color: var(--sl-color-gray-2); margin-bottom: 0 !important; }
   .pro-checks { list-style: none; padding: 0; margin: 1rem 0 1.5rem; }
   .pro-checks li { position: relative; padding-inline-start: 1.4rem; margin: 0 0 0.5rem; font-size: 0.9rem; color: var(--sl-color-gray-2); }

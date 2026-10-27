@@ -2,8 +2,9 @@
    DM Sans for prose, headings and UI chrome · Fragment Mono only for code,
    package paths and small technical labels. Fonts are self-hosted through
    Astro's Fonts API (astro.config.mjs, components/Head.astro).
-   Quiet and text-first: depth comes from tonal surfaces and 1px borders, never
-   shadows or glows. Cyan is reserved for the primary button fill, links,
+   Quiet and text-first: depth comes from tonal surfaces and 1px borders, with
+   no drop shadows or glows; dark cards keep only the 1px inset top edge
+   (--echo-card-edge). Cyan is reserved for the primary button fill, links,
    active/selected states and focus rings. Hover changes colour or border only. */
 
 :root {
@@ -15,8 +16,8 @@
   --echo-ease: 120ms ease-out;
   /* Dark-first defaults (the dark theme uses them as is), so buttons and cards
      render before data-theme is set. --echo-surface-2 is the raised surface for
-     nested panels; --echo-card-edge the faint top highlight that gives dark
-     cards depth without shadows. */
+     nested panels; --echo-card-edge the faint 1px inset top highlight that
+     gives dark cards depth without a drop shadow. */
   --echo-btn-bg: #00afd1;
   --echo-btn-fg: #04110c;
   --echo-btn-hover: color-mix(in srgb, var(--echo-btn-bg) 82%, #ffffff);
@@ -440,7 +441,7 @@ starlight-toc a[aria-current='true'] { color: var(--echo-cyan-text); border-inli
 .echo-pro-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
 @media (min-width: 40rem) { .echo-pro-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (min-width: 64rem) { .echo-pro-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
-.echo-pro-card { display: flex; flex-direction: column; gap: 6px; border: 1px solid var(--sl-color-hairline); background: var(--sl-color-bg-sidebar); box-shadow: var(--echo-card-edge); border-radius: 12px; padding: 16px 18px; text-decoration: none; transition: border-color var(--echo-ease); }
+.echo-pro-card { display: flex; flex-direction: column; gap: 6px; color: inherit; border: 1px solid var(--sl-color-hairline); background: var(--sl-color-bg-sidebar); box-shadow: var(--echo-card-edge); border-radius: 12px; padding: 16px 18px; text-decoration: none; transition: border-color var(--echo-ease); }
 .echo-pro-card:hover { border-color: var(--sl-color-gray-4); }
 .echo-pro-card b { font-family: var(--sl-font); font-size: .95rem; font-weight: 600; color: var(--sl-color-white); }
 .echo-pro-card span { font-size: .875rem; line-height: 1.55; color: var(--sl-color-gray-3); }
