@@ -1,0 +1,145 @@
+---
+title: Quota configuration reference
+description: Fields, defaults and constructors for quota.
+---
+
+{/* Diataxis: reference */}
+
+import ConfigReference from '../../../../components/ConfigReference.astro';
+
+`echo.labstack.com/pro` v0.1.0. See the [task guide](/pro/guides/quota/) for setup examples.
+
+## Required fields
+
+- `Config.Store` and `Config.Plans`: a store and at least one plan.
+- `MiddlewareConfig.Identity`: the paying subject from verified application data.
+- `MiddlewareConfig.Plan`: required with several plans; nil selects the only configured plan.
+- `MiddlewareConfig.Period`: required for billing-period limits.
+
+Redis constructors check options without connecting; your application owns and closes the client.
+
+## `quota.Config`
+
+Import `echo.labstack.com/pro/quota`.
+
+<ConfigReference source="pro" name="quota.Config" />
+
+## `quota.MiddlewareConfig`
+
+Import `echo.labstack.com/pro/quota`.
+
+<ConfigReference source="pro" name="quota.MiddlewareConfig" />
+
+## `quota.MemoryConfig`
+
+Import `echo.labstack.com/pro/quota`.
+
+<ConfigReference source="pro" name="quota.MemoryConfig" />
+
+## `redisstore.Config`
+
+Import `echo.labstack.com/pro/quota/redisstore`.
+
+<ConfigReference source="pro" name="redisstore.Config" />
+
+## `quota.AdminConfig`
+
+Import `echo.labstack.com/pro/quota`.
+
+<ConfigReference source="pro" name="quota.AdminConfig" />
+
+## `quota.Breaker`
+
+Import `echo.labstack.com/pro/quota`.
+
+<ConfigReference source="pro" name="quota.Breaker" />
+
+## `quota.Fallback`
+
+Import `echo.labstack.com/pro/quota`.
+
+<ConfigReference source="pro" name="quota.Fallback" />
+
+## `quota.Hooks`
+
+Import `echo.labstack.com/pro/quota`.
+
+<ConfigReference source="pro" name="quota.Hooks" />
+
+## `quota.Outbox`
+
+Import `echo.labstack.com/pro/quota`.
+
+<ConfigReference source="pro" name="quota.Outbox" />
+
+## `quotaadmin.Config`
+
+Import `echo.labstack.com/pro/quota/quotaadmin`.
+
+<ConfigReference source="pro" name="quotaadmin.Config" />
+
+## `quotamcp.MiddlewareConfig`
+
+Import `echo.labstack.com/pro/quota/quotamcp`.
+
+<ConfigReference source="pro" name="quotamcp.MiddlewareConfig" />
+
+## `quotamcp.Policy`
+
+Import `echo.labstack.com/pro/quota/quotamcp`.
+
+<ConfigReference source="pro" name="quotamcp.Policy" />
+
+## `quotaotel.LifecycleConfig`
+
+Import `echo.labstack.com/pro/quota/quotaotel`.
+
+<ConfigReference source="pro" name="quotaotel.LifecycleConfig" />
+
+## `quotaotel.TraceConfig`
+
+Import `echo.labstack.com/pro/quota/quotaotel`.
+
+<ConfigReference source="pro" name="quotaotel.TraceConfig" />
+
+## `quotaprom.LifecycleConfig`
+
+Import `echo.labstack.com/pro/quota/quotaprom`.
+
+<ConfigReference source="pro" name="quotaprom.LifecycleConfig" />
+
+## `quotastripe.Config`
+
+Import `echo.labstack.com/pro/quota/quotastripe`.
+
+<ConfigReference source="pro" name="quotastripe.Config" />
+
+## `quotastripe.StoreConfig`
+
+Import `echo.labstack.com/pro/quota/quotastripe`.
+
+<ConfigReference source="pro" name="quotastripe.StoreConfig" />
+
+## `stripeadmin.Config`
+
+Import `echo.labstack.com/pro/quota/quotastripe/stripeadmin`.
+
+<ConfigReference source="pro" name="stripeadmin.Config" />
+
+## Plan and store limits
+
+| Setting | Default or limit |
+| --- | --- |
+| `Plan.Limits` | 1–16 |
+| `LimitInfo.ID` / `LimitInfo.Meter` | `[a-z0-9][a-z0-9_]{0,31}` |
+| `Limit.Burst()` | Equals the refill amount unless set |
+| `Limit.Lease()` | Five minutes by default |
+| `Identity` / operation strings | At most 256 bytes each |
+| `Config.StoreTimeout` | 25 ms by default; caller cancellation can end it sooner |
+| `Config.DenyCache` | Off by default; at most ten seconds and never longer than the retry delay |
+
+Call `Limiter.Close` before closing its store or Redis client.
+
+## Related pages
+
+[Package explanation](/pro/quota/) · [Task guide](/pro/guides/quota/) · [Problem catalog](/pro/problems/)

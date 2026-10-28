@@ -1,0 +1,3862 @@
+{
+  "module": "echo.labstack.com/pro",
+  "revision": "v0.1.0",
+  "configs": [
+    {
+      "name": "admin.Config",
+      "file": "admin/types.go",
+      "line": 173,
+      "doc": "Config mounts a console with explicitly enabled panel actions. All callbacks, panels,\nNow and Rand must be safe for concurrent use and honor request cancellation. Mount\ncopies slices and descriptors and starts no goroutines. The application owns the\nlimiter, middleware and Logger. Behind a proxy that rewrites the host, Origins must list\nthe origins browsers actually see.",
+      "fields": [
+        {
+          "name": "Authenticate",
+          "type": "func(*echo.Context) (Principal, error)",
+          "doc": "Authenticate is required. On every request, it returns the principal your application\nhas verified. An error or invalid principal returns 401 admin_unauthenticated.",
+          "default": "Authenticate is required.",
+          "line": 176
+        },
+        {
+          "name": "Authorize",
+          "type": "func(context.Context, Principal, Access) error",
+          "doc": "Authorize optionally narrows the default role grants. Nil applies the default role\ngrants. An error hides the target with 404. Navigation is true when checking a\ncandidate navigation link; every data request is checked separately. Invalid requests\nuse Navigation false and include only valid parameters, so required parameters may be\nmissing. Denied views return the same response as unknown views. After authorization,\ninvalid parameters return 400. POST lookups check the input scope before store access,\nthen check the resolved record before returning data. Lookup input can contain secrets;\ndo not log it.",
+          "default": "Authorize optionally narrows the default role grants. Nil applies the default role grants. Invalid requests use Navigation false and include only valid parameters, so required parameters may be missing.",
+          "line": 185
+        },
+        {
+          "name": "Middleware",
+          "type": "[]echo.MiddlewareFunc",
+          "doc": "Middleware runs inside the protected wrapper, before Authenticate.\nIts HTTP errors are sanitized and passed through ErrorHandler.\nMiddleware is optional; nil installs no additional middleware.",
+          "default": "Middleware is optional; nil installs no additional middleware.",
+          "line": 189
+        },
+        {
+          "name": "Panels",
+          "type": "[]Panel",
+          "doc": "Panels is required and holds 1–64 panel adapters. Mount copies the slice and each panel\ndescriptor.",
+          "default": "Panels is required and holds 1–64 panel adapters.",
+          "line": 192
+        },
+        {
+          "name": "Origins",
+          "type": "[]string",
+          "doc": "Origins contains up to 16 exact trusted browser-visible origins. Empty derives\nthe origin from TLS and Host; forwarded headers are never trusted.",
+          "default": "Empty derives the origin from TLS and Host; forwarded headers are never trusted.",
+          "line": 195
+        },
+        {
+          "name": "PublicPath",
+          "type": "string",
+          "doc": "PublicPath is the path browsers use to reach the console, before any proxy rewrite. It\ndefaults to the mount prefix.",
+          "default": "It defaults to the mount prefix.",
+          "line": 198
+        },
+        {
+          "name": "RateLimit",
+          "type": "func(context.Context, Principal, Access) (time.Duration, error)",
+          "doc": "RateLimit optionally replaces the built-in per-principal rate limiter. A positive\nduration returns 429 with that Retry-After delay. An error returns 503 admin_busy. POST\nlookups count before store access, including lookups that find nothing. Authenticated\nshell pages, client shell routes and descriptor requests also count before navigation,\nusing Access{Panel: \"console\", View: \"shell\"}.",
+          "default": "RateLimit optionally replaces the built-in per-principal rate limiter.",
+          "line": 204
+        },
+        {
+          "name": "MaxExpensive",
+          "type": "int",
+          "doc": "MaxExpensive bounds simultaneous expensive views, including lookup work:\n1–64, default 2.",
+          "default": "MaxExpensive bounds simultaneous expensive views, including lookup work: 1–64, default 2.",
+          "line": 207
+        },
+        {
+          "name": "Timeout",
+          "type": "time.Duration",
+          "doc": "Timeout bounds the full request, including middleware: 1ms–1m, default 10s.",
+          "default": "Timeout bounds the full request, including middleware: 1ms–1m, default 10s.",
+          "line": 209
+        },
+        {
+          "name": "Theme",
+          "type": "Theme",
+          "doc": "Theme contains trusted application presentation; copied by value at Mount.\nTheme at zero selects the system scheme and default Echo Pro Admin title.",
+          "default": "Theme at zero selects the system scheme and default Echo Pro Admin title.",
+          "line": 212
+        },
+        {
+          "name": "Instance",
+          "type": "string",
+          "doc": "Instance names this server instance in views that show per-instance data. Panels that\nshow such data require it.",
+          "default": "Panels that show such data require it.",
+          "line": 215
+        },
+        {
+          "name": "ErrorHandler",
+          "type": "func(*echo.Context, error) error",
+          "doc": "ErrorHandler optionally renders sanitized authentication and middleware problems.\nIf it leaves the response uncommitted, the shell renders the sanitized problem.",
+          "default": "ErrorHandler optionally renders sanitized authentication and middleware problems.",
+          "line": 218
+        },
+        {
+          "name": "Logger",
+          "type": "*slog.Logger",
+          "doc": "Logger is optional and caller-owned; nil logs nothing. Only sanitized codes are logged.",
+          "default": "Logger is optional and caller-owned; nil logs nothing.",
+          "line": 220
+        },
+        {
+          "name": "Now",
+          "type": "func() time.Time",
+          "doc": "Now is a concurrency-safe clock; nil defaults to time.Now.",
+          "default": "Now is a concurrency-safe clock; nil defaults to time.Now.",
+          "line": 222
+        },
+        {
+          "name": "Keys",
+          "type": "[][]byte",
+          "doc": "Keys contains 1–8 signing and encryption keys of 32–64 bytes. Mount copies them. Keys\nis required for pagination, digest8 views, declared POST reads and actions. A digest8\nview displays an eight-character keyed digest instead of the original value. The first\nkey signs tokens and derives display digests. All keys verify tokens. Display digests\nchange when the first key rotates and cannot be reversed without it. Without Keys,\nunpaginated confidential reads use an ephemeral CSRF key created at mount. Those tokens\nexpire on remount and cannot be shared across instances.",
+          "default": "Keys is required for pagination, digest8 views, declared POST reads and actions.",
+          "line": 230
+        },
+        {
+          "name": "CursorTTL",
+          "type": "time.Duration",
+          "doc": "CursorTTL bounds continuation lifetime: zero selects 15 minutes;\nvalid range 1s–24h.",
+          "default": "CursorTTL bounds continuation lifetime: zero selects 15 minutes; valid range 1s–24h.",
+          "line": 233
+        },
+        {
+          "name": "CSRFTTL",
+          "type": "time.Duration",
+          "doc": "CSRFTTL bounds synchronizer tokens: zero selects 1 hour; valid range\n1s–24h.",
+          "default": "CSRFTTL bounds synchronizer tokens: zero selects 1 hour; valid range 1s–24h.",
+          "line": 236
+        },
+        {
+          "name": "ActorBoundCSRF",
+          "type": "bool",
+          "doc": "ActorBoundCSRF permits requests with no session ID. CSRF tokens then bind to the actor\nonly and live for CSRFTTL. The default is false, requiring a session for\ncookie-authenticated POSTs.",
+          "default": "The default is false, requiring a session for cookie-authenticated POSTs.",
+          "line": 240
+        },
+        {
+          "name": "Audit",
+          "type": "AuditSink",
+          "doc": "Audit is a caller-owned, concurrency-safe durable sink required for enabled actions.",
+          "default": "Audit is a caller-owned, concurrency-safe durable sink required for enabled actions.",
+          "line": 242
+        },
+        {
+          "name": "AllowUnauditedWrites",
+          "type": "bool",
+          "doc": "AllowUnauditedWrites explicitly opts out of durable auditing. Mount warns\nthrough Logger when actions are enabled; nil Logger remains silent.",
+          "default": "Mount warns through Logger when actions are enabled; nil Logger remains silent.",
+          "line": 245
+        },
+        {
+          "name": "RedactText",
+          "type": "func(string) string",
+          "doc": "RedactText sanitizes free-text audit fields; nil retains only length and digest.",
+          "default": "RedactText sanitizes free-text audit fields; nil retains only length and digest.",
+          "line": 247
+        },
+        {
+          "name": "Rand",
+          "type": "io.Reader",
+          "doc": "Rand is a concurrency-safe nonce source; nil defaults to crypto/rand.Reader.\nCustom readers must supply cryptographically secure bytes in production.",
+          "default": "Rand is a concurrency-safe nonce source; nil defaults to crypto/rand.Reader.",
+          "line": 250
+        }
+      ]
+    },
+    {
+      "name": "admin.Theme",
+      "file": "admin/types.go",
+      "line": 151,
+      "doc": "Theme customizes trusted application presentation. Accent is #rrggbb and must reach\n4.5:1 on the light canvas, panel and wash. Dark mode uses a readable lighter shade.\nMount rejects accents that fail contrast checks on light backgrounds. ExtraCSS is\ntrusted application code. Tone is empty, info, warning or danger. Environment text\nappears in the console header on every page.",
+      "fields": [
+        {
+          "name": "Mode",
+          "type": "string",
+          "doc": "Mode is the initial SPA color scheme: empty (system), light or dark. Viewers may override it.",
+          "default": "Mode is the initial SPA color scheme: empty (system), light or dark.",
+          "line": 153
+        },
+        {
+          "name": "Title",
+          "type": "string",
+          "doc": "Title is trusted console text; defaults to Echo Pro Admin.",
+          "default": "Title is trusted console text; defaults to Echo Pro Admin.",
+          "line": 155
+        },
+        {
+          "name": "Accent",
+          "type": "string",
+          "doc": "Accent is an optional #rrggbb color. Light backgrounds require 4.5:1\ncontrast. Dark mode uses a lighter shade that reaches that contrast.",
+          "default": "Accent is an optional #rrggbb color. Light backgrounds require 4.5:1 contrast.",
+          "line": 158
+        },
+        {
+          "name": "Environment",
+          "type": "string",
+          "doc": "Environment is optional trusted text shown on the SPA header.",
+          "default": "Environment is optional trusted text shown on the SPA header.",
+          "line": 160
+        },
+        {
+          "name": "Tone",
+          "type": "string",
+          "doc": "Tone is empty, info, warning or danger.",
+          "default": "Tone is empty, info, warning or danger.",
+          "line": 162
+        },
+        {
+          "name": "ExtraCSS",
+          "type": "string",
+          "doc": "ExtraCSS is trusted application CSS, limited to 64 KiB.\nExtraCSS is optional; empty appends no application stylesheet.",
+          "default": "ExtraCSS is optional; empty appends no application stylesheet.",
+          "line": 165
+        }
+      ]
+    },
+    {
+      "name": "audit.Capacity",
+      "file": "audit/memory.go",
+      "line": 40,
+      "doc": "Capacity bounds event count and total serialized bytes, without eviction.\nBoth bounds must be positive. Duplicate recordings consume no capacity.",
+      "fields": [
+        {
+          "name": "Events",
+          "type": "int",
+          "doc": "Events is required and must be positive; there is no default.",
+          "default": "Events is required and must be positive; there is no default.",
+          "line": 42
+        },
+        {
+          "name": "Bytes",
+          "type": "int",
+          "doc": "Bytes is required and must be positive; there is no default.",
+          "default": "Bytes is required and must be positive; there is no default.",
+          "line": 44
+        }
+      ]
+    },
+    {
+      "name": "audit.DenialConfig",
+      "file": "audit/denial.go",
+      "line": 28,
+      "doc": "DenialConfig records denials only on routes or groups where installed. Install\nit first, outside route authentication and authorization. Recording is synchronous\nand fail-open by default. Callbacks must be concurrency safe and must not retain\nthe Echo context. Logger remains caller-owned.",
+      "fields": [
+        {
+          "name": "Schema",
+          "type": "*Schema",
+          "doc": "Schema is required, constructed and caller-owned.",
+          "default": "Schema is required, constructed and caller-owned.",
+          "line": 30
+        },
+        {
+          "name": "Recorder",
+          "type": "Recorder",
+          "doc": "Recorder is required, caller-owned and must honor its recording\ncontext.",
+          "default": "Recorder is required, caller-owned and must honor its recording context.",
+          "line": 33
+        },
+        {
+          "name": "Actor",
+          "type": "func(*echo.Context) (Actor, error)",
+          "doc": "Actor is optional; nil or a failed callback uses Anonymous when no\nScope exists.",
+          "default": "Actor is optional; nil or a failed callback uses Anonymous when no Scope exists.",
+          "line": 36
+        },
+        {
+          "name": "Tenant",
+          "type": "func(*echo.Context) (string, error)",
+          "doc": "Tenant is optional; nil or a failed callback uses the global tenant\nwhen no Scope exists.",
+          "default": "Tenant is optional; nil or a failed callback uses the global tenant when no Scope exists.",
+          "line": 39
+        },
+        {
+          "name": "Statuses",
+          "type": "[]int",
+          "doc": "Statuses lists 1–8 distinct 4xx statuses to record. It defaults to 401 and 403 and is\ncopied.",
+          "default": "It defaults to 401 and 403 and is copied.",
+          "line": 42
+        },
+        {
+          "name": "Action",
+          "type": "string",
+          "doc": "Action defaults to http.request.denied.",
+          "default": "Action defaults to http.request.denied.",
+          "line": 44
+        },
+        {
+          "name": "FailClosed",
+          "type": "bool",
+          "doc": "FailClosed returns *DenialUnrecordedError if recording fails before the response is\nwritten. If false (the default), the client gets the original denial.",
+          "default": "If false (the default), the client gets the original denial.",
+          "line": 47
+        },
+        {
+          "name": "Timeout",
+          "type": "time.Duration",
+          "doc": "Timeout defaults to 500ms; valid range 50ms–5s.",
+          "default": "Timeout defaults to 500ms; valid range 50ms–5s.",
+          "line": 49
+        },
+        {
+          "name": "MaxInFlight",
+          "type": "int",
+          "doc": "MaxInFlight limits concurrent recording calls. Default 64; valid range 1–1024.",
+          "default": "Default 64; valid range 1–1024.",
+          "line": 51
+        },
+        {
+          "name": "RequestIDHeader",
+          "type": "string",
+          "doc": "RequestIDHeader defaults to X-Request-ID.",
+          "default": "RequestIDHeader defaults to X-Request-ID.",
+          "line": 53
+        },
+        {
+          "name": "Logger",
+          "type": "*slog.Logger",
+          "doc": "Logger is optional and receives only sanitized codes.",
+          "default": "Logger is optional and receives only sanitized codes.",
+          "line": 55
+        }
+      ]
+    },
+    {
+      "name": "audit.MemoryStoreConfig",
+      "file": "audit/memory.go",
+      "line": 48,
+      "doc": "MemoryStoreConfig bounds process-local recording. Capacity is copied.",
+      "fields": [
+        {
+          "name": "Capacity",
+          "type": "Capacity",
+          "doc": "Capacity requires positive event and byte bounds; there are no\ndefaults.",
+          "default": "Capacity requires positive event and byte bounds; there are no defaults.",
+          "line": 51
+        },
+        {
+          "name": "Timeout",
+          "type": "time.Duration",
+          "doc": "Timeout bounds lock waits, TestTransaction.Record, Commit and Rollback calls, and\nReadView including its callback. It defaults to 5s; valid range 100ms–60s.",
+          "default": "It defaults to 5s; valid range 100ms–60s.",
+          "line": 54
+        },
+        {
+          "name": "Now",
+          "type": "func() time.Time",
+          "doc": "Now is retained and must be concurrency safe; nil uses time.Now.",
+          "default": "Now is retained and must be concurrency safe; nil uses time.Now.",
+          "line": 56
+        }
+      ]
+    },
+    {
+      "name": "audit.MiddlewareConfig",
+      "file": "audit/middleware.go",
+      "line": 59,
+      "doc": "MiddlewareConfig maps requests to audit fields after routing and authentication.\nCallbacks must support concurrent calls. RealIP comes from deployment configuration.\nIt is not a verified principal.",
+      "fields": [
+        {
+          "name": "Actor",
+          "type": "func(*echo.Context) (Actor, error)",
+          "doc": "Actor is required; it resolves the verified principal and must not retain\nc.",
+          "default": "Actor is required; it resolves the verified principal and must not retain c.",
+          "line": 62
+        },
+        {
+          "name": "Tenant",
+          "type": "func(*echo.Context) (string, error)",
+          "doc": "Tenant is optional; nil uses the global (empty) tenant. It must not\nretain c.",
+          "default": "Tenant is optional; nil uses the global (empty) tenant.",
+          "line": 65
+        },
+        {
+          "name": "RequestIDHeader",
+          "type": "string",
+          "doc": "RequestIDHeader defaults to X-Request-ID and must be a valid HTTP\nfield name.",
+          "default": "RequestIDHeader defaults to X-Request-ID and must be a valid HTTP field name.",
+          "line": 68
+        }
+      ]
+    },
+    {
+      "name": "audit.ReaderConfig",
+      "file": "audit/read.go",
+      "line": 139,
+      "doc": "ReaderConfig is copied by NewReader. Schema, Access and Now are caller-owned\nand must be concurrency safe. Query and Get ignore Access.",
+      "fields": [
+        {
+          "name": "Schema",
+          "type": "*Schema",
+          "doc": "Schema is required and retained; it must carry the recording keyring\n(non-nil Keys), including retained keys.",
+          "default": "Schema is required and retained; it must carry the recording keyring (non-nil Keys), including retained keys.",
+          "line": 142
+        },
+        {
+          "name": "Access",
+          "type": "Recorder",
+          "doc": "Access is required for Reveal and Export. Its record must commit on its own, outside\nthe caller's transaction.",
+          "default": "Access is required for Reveal and Export.",
+          "line": 145
+        },
+        {
+          "name": "TokenTTL",
+          "type": "time.Duration",
+          "doc": "default 15m; 1m–24h",
+          "default": "default 15m; 1m–24h.",
+          "line": 146
+        },
+        {
+          "name": "MaxExports",
+          "type": "int",
+          "doc": "default 2; 1–16 concurrent snapshot exports per Reader",
+          "default": "default 2; 1–16 concurrent snapshot exports per Reader.",
+          "line": 147
+        },
+        {
+          "name": "Now",
+          "type": "func() time.Time",
+          "doc": "default time.Now; must not block",
+          "default": "default time.Now; must not block.",
+          "line": 148
+        }
+      ]
+    },
+    {
+      "name": "audit.RelayConfig",
+      "file": "audit/relay.go",
+      "line": 163,
+      "doc": "RelayConfig configures a delivery coordinator and is copied by NewRelay.\nRun owns one coordinator and one renewal worker.",
+      "fields": [
+        {
+          "name": "Name",
+          "type": "string",
+          "doc": "Name is required and identifies an already registered cursor: 1–64\nASCII lowercase letters, digits, underscores or hyphens, starting\nwith a letter.",
+          "default": "Name is required and identifies an already registered cursor: 1–64 ASCII lowercase letters, digits, underscores or hyphens, starting with a letter.",
+          "line": 167
+        },
+        {
+          "name": "Exporter",
+          "type": "Exporter",
+          "doc": "Exporter is required and retained; it must honor cancellation and\ndeclare the same representation as the registered cursor.",
+          "default": "Exporter is required and retained; it must honor cancellation and declare the same representation as the registered cursor.",
+          "line": 170
+        },
+        {
+          "name": "Witness",
+          "type": "ProgressWitness",
+          "doc": "Witness, if set, durably records how far the relay has delivered. It is caller-owned.\nNil disables the witness.",
+          "default": "Nil disables the witness.",
+          "line": 173
+        },
+        {
+          "name": "Batch",
+          "type": "int",
+          "doc": "Batch defaults to 256 (1–4096); MaxBytes defaults to 1 MiB\n(64 KiB–8 MiB).",
+          "default": "Batch defaults to 256 (1–4096); MaxBytes defaults to 1 MiB (64 KiB–8 MiB).",
+          "line": 176
+        },
+        {
+          "name": "MaxBytes",
+          "type": "int",
+          "doc": "Batch defaults to 256 (1–4096); MaxBytes defaults to 1 MiB\n(64 KiB–8 MiB).",
+          "default": "Batch defaults to 256 (1–4096); MaxBytes defaults to 1 MiB (64 KiB–8 MiB).",
+          "line": 176
+        },
+        {
+          "name": "Poll",
+          "type": "time.Duration",
+          "doc": "Poll defaults to 1s and must be positive. Lease defaults to 30s\n(5s–5m). Backoff defaults to 1s (1s–5m).",
+          "default": "Poll defaults to 1s and must be positive. Lease defaults to 30s (5s–5m). Backoff defaults to 1s (1s–5m).",
+          "line": 179
+        },
+        {
+          "name": "Lease",
+          "type": "time.Duration",
+          "doc": "Poll defaults to 1s and must be positive. Lease defaults to 30s\n(5s–5m). Backoff defaults to 1s (1s–5m).",
+          "default": "Poll defaults to 1s and must be positive. Lease defaults to 30s (5s–5m). Backoff defaults to 1s (1s–5m).",
+          "line": 179
+        },
+        {
+          "name": "Backoff",
+          "type": "time.Duration",
+          "doc": "Poll defaults to 1s and must be positive. Lease defaults to 30s\n(5s–5m). Backoff defaults to 1s (1s–5m).",
+          "default": "Poll defaults to 1s and must be positive. Lease defaults to 30s (5s–5m). Backoff defaults to 1s (1s–5m).",
+          "line": 179
+        },
+        {
+          "name": "Logger",
+          "type": "*slog.Logger",
+          "doc": "Logger is optional and caller-owned. Relay does not log yet; this field is reserved for\nfuture use.",
+          "default": "Logger is optional and caller-owned.",
+          "line": 182
+        }
+      ]
+    },
+    {
+      "name": "audit.SchemaConfig",
+      "file": "audit/schema.go",
+      "line": 110,
+      "doc": "SchemaConfig contains copied field registrations and projection policy.",
+      "fields": [
+        {
+          "name": "Fields",
+          "type": "map[string]redact.Class",
+          "doc": "Fields is copied; nil registers no metadata fields. At most 256 names\nmatching [a-z][a-z0-9_]{0,63} may be registered with valid classes.",
+          "default": "Fields is copied; nil registers no metadata fields.",
+          "line": 113
+        },
+        {
+          "name": "Policy",
+          "type": "redact.StorePolicy",
+          "doc": "Policy sets how each field class is stored, such as masking or HMAC hashing.\nConstruction copies its Modes map. The zero value selects redact defaults and requires\nHMAC Keys unless AllowMaskFallback is set.",
+          "default": "The zero value selects redact defaults and requires HMAC Keys unless AllowMaskFallback is set.",
+          "line": 117
+        },
+        {
+          "name": "Keys",
+          "type": "*redact.Keyring",
+          "doc": "Keys is an immutable caller-owned keyring retained by Schema. Keep it\nusable independently of the Schema lifetime. Nil requires\nPolicy.AllowMaskFallback when an HMAC mode is selected.",
+          "default": "Nil requires Policy.AllowMaskFallback when an HMAC mode is selected.",
+          "line": 121
+        },
+        {
+          "name": "Now",
+          "type": "func() time.Time",
+          "doc": "Now is retained and must be concurrency safe; nil uses time.Now.",
+          "default": "Now is retained and must be concurrency safe; nil uses time.Now.",
+          "line": 123
+        }
+      ]
+    },
+    {
+      "name": "auditadmin.PanelConfig",
+      "file": "audit/auditadmin/panel.go",
+      "line": 22,
+      "doc": "PanelConfig configures the read-only Audit panel.\nReveal additionally requires Principal.Reveal.",
+      "fields": [
+        {
+          "name": "ID",
+          "type": "string",
+          "doc": "ID defaults to audit; use [a-z][a-z0-9-]{0,31}, excluding api and assets. When pointing\nthe panel at a different store, change ID or the console Keys so old cursors stop\nworking.",
+          "default": "ID defaults to audit; use [a-z][a-z0-9-]{0,31}, excluding api and assets.",
+          "line": 26
+        },
+        {
+          "name": "Reader",
+          "type": "*audit.Reader",
+          "doc": "Reader is required, concurrency safe and caller-owned; it is never closed.",
+          "default": "Reader is required, concurrency safe and caller-owned; it is never closed.",
+          "line": 28
+        },
+        {
+          "name": "ActorClass",
+          "type": "redact.Class",
+          "doc": "ActorClass defaults to Identifier; SensitiveDigest8 is also accepted.",
+          "default": "ActorClass defaults to Identifier; SensitiveDigest8 is also accepted.",
+          "line": 30
+        },
+        {
+          "name": "TargetClass",
+          "type": "redact.Class",
+          "doc": "TargetClass defaults to Identifier; Public, SensitiveIP and SensitiveDigest8 are also\naccepted. A request's class parameter overrides this default.",
+          "default": "TargetClass defaults to Identifier; Public, SensitiveIP and SensitiveDigest8 are also accepted. A request's class parameter overrides this default.",
+          "line": 33
+        },
+        {
+          "name": "EnableReveal",
+          "type": "bool",
+          "doc": "EnableReveal adds the privileged POST read that writes an audit record. Default false.",
+          "default": "Default false.",
+          "line": 35
+        },
+        {
+          "name": "PrincipalClass",
+          "type": "redact.Class",
+          "doc": "PrincipalClass sets the class of the actor field in reveal audit records. It defaults\nto Identifier; SensitiveDigest8 is also accepted.",
+          "default": "It defaults to Identifier; SensitiveDigest8 is also accepted.",
+          "line": 38
+        },
+        {
+          "name": "RevealReasons",
+          "type": "[]string",
+          "doc": "RevealReasons is copied; empty selects incident_response,\ncustomer_request and legal_request. Otherwise supply 1–16 distinct\n[a-z0-9_]{1,64} codes.",
+          "default": "RevealReasons is copied; empty selects incident_response, customer_request and legal_request.",
+          "line": 42
+        }
+      ]
+    },
+    {
+      "name": "auditpg.Roles",
+      "file": "audit/auditpg/store.go",
+      "line": 50,
+      "doc": "Roles names the trusted NOLOGIN deployment owner and four independent runtime\nroles. Empty fields default to audit_deployment, audit_recorder, audit_relay,\naudit_maintenance and audit_reader. Roles must already exist; migration never\ncreates logins. Use keyed literals: adding Reader breaks positional literals.",
+      "fields": [
+        {
+          "name": "Deployment",
+          "type": "string",
+          "doc": "Deployment defaults to audit_deployment.",
+          "default": "Deployment defaults to audit_deployment.",
+          "line": 52
+        },
+        {
+          "name": "Recorder",
+          "type": "string",
+          "doc": "Recorder defaults to audit_recorder.",
+          "default": "Recorder defaults to audit_recorder.",
+          "line": 54
+        },
+        {
+          "name": "Relay",
+          "type": "string",
+          "doc": "Relay defaults to audit_relay.",
+          "default": "Relay defaults to audit_relay.",
+          "line": 56
+        },
+        {
+          "name": "Maintenance",
+          "type": "string",
+          "doc": "Maintenance defaults to audit_maintenance.",
+          "default": "Maintenance defaults to audit_maintenance.",
+          "line": 58
+        },
+        {
+          "name": "Reader",
+          "type": "string",
+          "doc": "Reader defaults to audit_reader.",
+          "default": "Reader defaults to audit_reader.",
+          "line": 60
+        }
+      ]
+    },
+    {
+      "name": "auditpg.SchemaConfig",
+      "file": "audit/auditpg/store.go",
+      "line": 66,
+      "doc": "SchemaConfig selects a schema, exact role grants and operation deadlines.\nAn earlier caller deadline or cancellation still ends an operation first.\nValues are copied by New.",
+      "fields": [
+        {
+          "name": "Schema",
+          "type": "string",
+          "doc": "Schema defaults to public; use [A-Za-z_][A-Za-z0-9_]{0,62}.",
+          "default": "Schema defaults to public; use [A-Za-z_][A-Za-z0-9_]{0,62}.",
+          "line": 68
+        },
+        {
+          "name": "Roles",
+          "type": "Roles",
+          "doc": "Roles selects existing deployment and runtime roles. Empty fields use\nRoles defaults; names must be distinct.",
+          "default": "Empty fields use Roles defaults; names must be distinct.",
+          "line": 71
+        },
+        {
+          "name": "Timeout",
+          "type": "time.Duration",
+          "doc": "Timeout bounds ordinary operations; zero uses 5s, valid range\n100ms–60s.",
+          "default": "Timeout bounds ordinary operations; zero uses 5s, valid range 100ms–60s.",
+          "line": 74
+        },
+        {
+          "name": "MigrateTimeout",
+          "type": "time.Duration",
+          "doc": "MigrateTimeout bounds the whole migration in place of Timeout;\nzero uses 1m, valid range 1s–1h.",
+          "default": "MigrateTimeout bounds the whole migration in place of Timeout; zero uses 1m, valid range 1s–1h.",
+          "line": 77
+        }
+      ]
+    },
+    {
+      "name": "auth.APIKey",
+      "file": "auth/apikey.go",
+      "line": 205,
+      "doc": "APIKey configures a key-store scheme. Header sets an optional alternative to\nAuthorization: ApiKey. Supplying credentials in both headers is rejected.\nLookupTimeout defaults to 2s (1ms–30s). The store stays caller-owned and must honor\ncancellation. No goroutines start. Construction copies the pepper ring and key bytes.\nCancellation and lookup failures return a sanitized *Failure without exposing store or\ncontext errors.",
+      "fields": [
+        {
+          "name": "Namespace",
+          "type": "string",
+          "doc": "Namespace and Prefix are required and validated during middleware construction.",
+          "default": "Namespace and Prefix are required and validated during middleware construction.",
+          "line": 207
+        },
+        {
+          "name": "Prefix",
+          "type": "string",
+          "doc": "Namespace and Prefix are required and validated during middleware construction.",
+          "default": "Namespace and Prefix are required and validated during middleware construction.",
+          "line": 207
+        },
+        {
+          "name": "Header",
+          "type": "string",
+          "doc": "Header selects an optional alternative to Authorization: ApiKey. If empty, only\nAuthorization: ApiKey is accepted. With Header set, clients may use either header.\nSupplying both is rejected.",
+          "default": "Header selects an optional alternative to Authorization: ApiKey. If empty, only Authorization: ApiKey is accepted.",
+          "line": 211
+        },
+        {
+          "name": "Peppers",
+          "type": "PepperRing",
+          "doc": "Peppers is required; construction copies its versions and key bytes.",
+          "default": "Peppers is required; construction copies its versions and key bytes.",
+          "line": 213
+        },
+        {
+          "name": "Store",
+          "type": "KeyStore",
+          "doc": "Store is required, caller-owned and must return current revocation state.",
+          "default": "Store is required, caller-owned and must return current revocation state.",
+          "line": 215
+        },
+        {
+          "name": "LookupTimeout",
+          "type": "time.Duration",
+          "doc": "LookupTimeout defaults to 2s; valid range 1ms–30s.",
+          "default": "LookupTimeout defaults to 2s; valid range 1ms–30s.",
+          "line": 217
+        }
+      ]
+    },
+    {
+      "name": "auth.BearerConfig",
+      "file": "auth/bearer.go",
+      "line": 39,
+      "doc": "BearerConfig describes one trusted issuer. HTTPS is mandatory, including\ndiscovery jwks_uri.",
+      "fields": [
+        {
+          "name": "Namespace",
+          "type": "string",
+          "doc": "Namespace is required. It prefixes this issuer's principal IDs and matches\n[a-z][a-z0-9-]{0,31}.",
+          "default": "Namespace is required.",
+          "line": 42
+        },
+        {
+          "name": "Issuer",
+          "type": "string",
+          "doc": "Issuer is the exact trusted issuer string. It is required and at most 2048 bytes.",
+          "default": "It is required and at most 2048 bytes.",
+          "line": 44
+        },
+        {
+          "name": "Audiences",
+          "type": "[]string",
+          "doc": "Audiences is copied; require 1–32 accepted values, each 1–512 bytes.",
+          "default": "Audiences is copied; require 1–32 accepted values, each 1–512 bytes.",
+          "line": 46
+        },
+        {
+          "name": "JWKSURL",
+          "type": "string",
+          "doc": "JWKSURL and DiscoveryURL are HTTPS sources; set exactly one.",
+          "default": "JWKSURL and DiscoveryURL are HTTPS sources; set exactly one.",
+          "line": 48
+        },
+        {
+          "name": "DiscoveryURL",
+          "type": "string",
+          "doc": "JWKSURL and DiscoveryURL are HTTPS sources; set exactly one.",
+          "default": "JWKSURL and DiscoveryURL are HTTPS sources; set exactly one.",
+          "line": 48
+        },
+        {
+          "name": "AllowedJWKSHosts",
+          "type": "[]string",
+          "doc": "AllowedJWKSHosts is copied, with at most 32 exact jwks_uri hosts,\nincluding a port only when the URL has one. Empty permits only the\ndiscovery host for the discovered JWKS URL.",
+          "default": "Empty permits only the discovery host for the discovered JWKS URL.",
+          "line": 52
+        },
+        {
+          "name": "Algorithms",
+          "type": "[]jose.SignatureAlgorithm",
+          "doc": "Algorithms is copied; empty selects RS256, PS256, ES256 and EdDSA.\nAt most ten RSA, RSA-PSS, ECDSA or EdDSA algorithms are accepted.",
+          "default": "Algorithms is copied; empty selects RS256, PS256, ES256 and EdDSA.",
+          "line": 55
+        },
+        {
+          "name": "Profile",
+          "type": "TokenProfile",
+          "doc": "Profile defaults to ProfileAccessToken; ProfileJWT is the other valid\nvalue.",
+          "default": "Profile defaults to ProfileAccessToken; ProfileJWT is the other valid value.",
+          "line": 58
+        },
+        {
+          "name": "ClockSkew",
+          "type": "time.Duration",
+          "doc": "ClockSkew defaults to 30s; nonzero values must be positive and at\nmost 2m.",
+          "default": "ClockSkew defaults to 30s; nonzero values must be positive and at most 2m.",
+          "line": 61
+        },
+        {
+          "name": "SubjectClaim",
+          "type": "string",
+          "doc": "SubjectClaim defaults to sub. ScopeClaim defaults to scope, then scp if absent. If\nKindClaim is empty, every principal has kind User. TenantClaim is used only with\nTrustTenantClaim.",
+          "default": "SubjectClaim defaults to sub. ScopeClaim defaults to scope, then scp if absent. If KindClaim is empty, every principal has kind User.",
+          "line": 65
+        },
+        {
+          "name": "ScopeClaim",
+          "type": "string",
+          "doc": "SubjectClaim defaults to sub. ScopeClaim defaults to scope, then scp if absent. If\nKindClaim is empty, every principal has kind User. TenantClaim is used only with\nTrustTenantClaim.",
+          "default": "SubjectClaim defaults to sub. ScopeClaim defaults to scope, then scp if absent. If KindClaim is empty, every principal has kind User.",
+          "line": 65
+        },
+        {
+          "name": "KindClaim",
+          "type": "string",
+          "doc": "SubjectClaim defaults to sub. ScopeClaim defaults to scope, then scp if absent. If\nKindClaim is empty, every principal has kind User. TenantClaim is used only with\nTrustTenantClaim.",
+          "default": "SubjectClaim defaults to sub. ScopeClaim defaults to scope, then scp if absent. If KindClaim is empty, every principal has kind User.",
+          "line": 65
+        },
+        {
+          "name": "TenantClaim",
+          "type": "string",
+          "doc": "SubjectClaim defaults to sub. ScopeClaim defaults to scope, then scp if absent. If\nKindClaim is empty, every principal has kind User. TenantClaim is used only with\nTrustTenantClaim.",
+          "default": "SubjectClaim defaults to sub. ScopeClaim defaults to scope, then scp if absent. If KindClaim is empty, every principal has kind User.",
+          "line": 65
+        },
+        {
+          "name": "TrustTenantClaim",
+          "type": "bool",
+          "doc": "TrustTenantClaim explicitly permits TenantClaim to restrict the\nprincipal; default false.",
+          "default": "TrustTenantClaim explicitly permits TenantClaim to restrict the principal; default false.",
+          "line": 68
+        },
+        {
+          "name": "ClaimAllowlist",
+          "type": "[]string",
+          "doc": "ClaimAllowlist is copied; empty retains no extra claims. At most 32\nnames of 1–128 bytes are accepted; retained values must satisfy\nPrincipalConfig.",
+          "default": "ClaimAllowlist is copied; empty retains no extra claims.",
+          "line": 72
+        },
+        {
+          "name": "Client",
+          "type": "*http.Client",
+          "doc": "Client is optional; nil uses a zero http.Client. A private shallow\ncopy shares its transport, disables cookies and restricts redirects.",
+          "default": "Client is optional; nil uses a zero http.Client.",
+          "line": 75
+        },
+        {
+          "name": "Timeout",
+          "type": "time.Duration",
+          "doc": "Timeout bounds each fetch independently: zero selects 5s; valid range\n1ms–30s.",
+          "default": "Timeout bounds each fetch independently: zero selects 5s; valid range 1ms–30s.",
+          "line": 78
+        },
+        {
+          "name": "Now",
+          "type": "func() time.Time",
+          "doc": "Now is retained and must be concurrency safe; nil uses time.Now.",
+          "default": "Now is retained and must be concurrency safe; nil uses time.Now.",
+          "line": 80
+        },
+        {
+          "name": "Logger",
+          "type": "*slog.Logger",
+          "doc": "Logger is caller-owned; nil is silent. Only sanitized categories for\nskipped JWKS entries are logged.",
+          "default": "Logger is caller-owned; nil is silent.",
+          "line": 83
+        }
+      ]
+    },
+    {
+      "name": "auth.Config",
+      "file": "auth/middleware.go",
+      "line": 56,
+      "doc": "Config authenticates before quota. Maps and slices are copied. Caller-owned\nstores, logger and clock must be concurrency safe. ToMiddleware starts no work.",
+      "fields": [
+        {
+          "name": "Schemes",
+          "type": "map[string]Scheme",
+          "doc": "Schemes requires 1–32 named schemes with distinct namespaces.\nConstruction compiles a private map and retains constructed Bearers\nand APIKey stores.",
+          "default": "Schemes requires 1–32 named schemes with distinct namespaces.",
+          "line": 60
+        },
+        {
+          "name": "Fallback",
+          "type": "Requirement",
+          "doc": "Fallback is required; choose Deny, Anonymous or Require. Its zero\nvalue is invalid.",
+          "default": "Fallback is required; choose Deny, Anonymous or Require. Its zero value is invalid.",
+          "line": 63
+        },
+        {
+          "name": "Report",
+          "type": "*openapi.Report",
+          "doc": "Report is an optional OpenAPI report. If set, construction checks each operation's\nscheme names and scope alternatives. Construction copies its policies; do not change\nReport during the call.",
+          "default": "Report is an optional OpenAPI report.",
+          "line": 67
+        },
+        {
+          "name": "Logger",
+          "type": "*slog.Logger",
+          "doc": "Logger is retained and caller-owned; nil is silent.",
+          "default": "Logger is retained and caller-owned; nil is silent.",
+          "line": 69
+        },
+        {
+          "name": "Now",
+          "type": "func() time.Time",
+          "doc": "Now is retained and must be concurrency safe; nil uses each scheme's\nclock (time.Now unless a BearerConfig.Now was supplied).",
+          "default": "Now is retained and must be concurrency safe; nil uses each scheme's clock (time.Now unless a BearerConfig.Now was supplied).",
+          "line": 72
+        }
+      ]
+    },
+    {
+      "name": "auth.KeyOptions",
+      "file": "auth/apikey.go",
+      "line": 59,
+      "doc": "KeyOptions controls issuance; Kind defaults to Service. A zero expiration\npermits a nonexpiring credential. Callers own revocation and record persistence.",
+      "fields": [
+        {
+          "name": "Kind",
+          "type": "Kind",
+          "doc": "Kind defaults to Service; User is the other accepted value.",
+          "default": "Kind defaults to Service; User is the other accepted value.",
+          "line": 61
+        },
+        {
+          "name": "Scopes",
+          "type": "[]string",
+          "doc": "Scopes is optional; empty grants none. IssueKey copies the slice.",
+          "default": "Scopes is optional; empty grants none.",
+          "line": 63
+        },
+        {
+          "name": "TenantRestriction",
+          "type": "string",
+          "doc": "TenantRestriction is optional; empty leaves membership resolution to the application.",
+          "default": "TenantRestriction is optional; empty leaves membership resolution to the application.",
+          "line": 65
+        },
+        {
+          "name": "ExpiresAt",
+          "type": "time.Time",
+          "doc": "ExpiresAt at zero permits a nonexpiring credential.",
+          "default": "ExpiresAt at zero permits a nonexpiring credential.",
+          "line": 67
+        }
+      ]
+    },
+    {
+      "name": "auth.PrincipalConfig",
+      "file": "auth/principal.go",
+      "line": 44,
+      "doc": "PrincipalConfig contains already verified principal data. Never populate it\nfrom unverified headers or tool arguments. Claims must be explicitly allowlisted\nby the verifier. Inputs are copied.",
+      "fields": [
+        {
+          "name": "Namespace",
+          "type": "string",
+          "doc": "Namespace is required and matches [a-z][a-z0-9-]{0,31}. Subject is\nrequired, valid UTF-8 and at most 16 KiB. Scheme is required and at\nmost 64 bytes.",
+          "default": "Namespace is required and matches [a-z][a-z0-9-]{0,31}. Subject is required, valid UTF-8 and at most 16 KiB. Scheme is required and at most 64 bytes.",
+          "line": 48
+        },
+        {
+          "name": "Subject",
+          "type": "string",
+          "doc": "Namespace is required and matches [a-z][a-z0-9-]{0,31}. Subject is\nrequired, valid UTF-8 and at most 16 KiB. Scheme is required and at\nmost 64 bytes.",
+          "default": "Namespace is required and matches [a-z][a-z0-9-]{0,31}. Subject is required, valid UTF-8 and at most 16 KiB. Scheme is required and at most 64 bytes.",
+          "line": 48
+        },
+        {
+          "name": "Scheme",
+          "type": "string",
+          "doc": "Namespace is required and matches [a-z][a-z0-9-]{0,31}. Subject is\nrequired, valid UTF-8 and at most 16 KiB. Scheme is required and at\nmost 64 bytes.",
+          "default": "Namespace is required and matches [a-z][a-z0-9-]{0,31}. Subject is required, valid UTF-8 and at most 16 KiB. Scheme is required and at most 64 bytes.",
+          "line": 48
+        },
+        {
+          "name": "Kind",
+          "type": "Kind",
+          "doc": "Kind must be User or Service; the zero value is invalid.",
+          "default": "Kind must be User or Service; the zero value is invalid.",
+          "line": 50
+        },
+        {
+          "name": "Scopes",
+          "type": "[]string",
+          "doc": "Scopes is copied; empty grants none. At most 64 visible ASCII\n(0x21–0x7E) scopes of 1–128 bytes are accepted.",
+          "default": "Scopes is copied; empty grants none.",
+          "line": 53
+        },
+        {
+          "name": "TenantRestriction",
+          "type": "string",
+          "doc": "TenantRestriction is optional and matches [A-Za-z0-9._:-]{1,128} when\nset. KeyID is optional and at most 256 bytes.",
+          "default": "TenantRestriction is optional and matches [A-Za-z0-9._:-]{1,128} when set. KeyID is optional and at most 256 bytes.",
+          "line": 56
+        },
+        {
+          "name": "KeyID",
+          "type": "string",
+          "doc": "TenantRestriction is optional and matches [A-Za-z0-9._:-]{1,128} when\nset. KeyID is optional and at most 256 bytes.",
+          "default": "TenantRestriction is optional and matches [A-Za-z0-9._:-]{1,128} when set. KeyID is optional and at most 256 bytes.",
+          "line": 56
+        },
+        {
+          "name": "ExpiresAt",
+          "type": "time.Time",
+          "doc": "ExpiresAt is the verified expiry; zero represents a nonexpiring API\nkey. NewPrincipal stores it without checking whether it is in the\nfuture.",
+          "default": "ExpiresAt is the verified expiry; zero represents a nonexpiring API key.",
+          "line": 60
+        },
+        {
+          "name": "Claims",
+          "type": "map[string]string",
+          "doc": "Claims is copied; nil retains none. At most 32 UTF-8 entries fit,\nwith names of 1–128 bytes and values of at most 1024 bytes.",
+          "default": "Claims is copied; nil retains none.",
+          "line": 63
+        }
+      ]
+    },
+    {
+      "name": "authbind.QuotaConfig",
+      "file": "auth/authbind/bind.go",
+      "line": 52,
+      "doc": "QuotaConfig controls trusted IP extraction and anonymous metering. Without a trusted IP\nextractor, quota records no IP for authenticated requests. AnonymousByIP needs a valid\ntrusted IP.",
+      "fields": [
+        {
+          "name": "IP",
+          "type": "func(*echo.Context) string",
+          "doc": "IP is a retained, concurrency-safe trusted extractor. Nil uses\nc.RealIP only when Echo.IPExtractor is configured.",
+          "default": "Nil uses c.RealIP only when Echo.IPExtractor is configured.",
+          "line": 55
+        },
+        {
+          "name": "AnonymousByIP",
+          "type": "bool",
+          "doc": "AnonymousByIP permits anonymous metering by a valid trusted IP;\ndefault false.",
+          "default": "AnonymousByIP permits anonymous metering by a valid trusted IP; default false.",
+          "line": 58
+        }
+      ]
+    },
+    {
+      "name": "execution.Effect",
+      "file": "execution/types.go",
+      "line": 41,
+      "doc": "Effect names an immutable provider and defines request replay rules.",
+      "fields": [
+        {
+          "name": "Name",
+          "type": "string",
+          "doc": "Name and Provider are required. Name identifies the effect. Provider names the external\nservice whose replay rules apply.",
+          "default": "Name and Provider are required.",
+          "line": 41
+        },
+        {
+          "name": "Provider",
+          "type": "string",
+          "doc": "Name and Provider are required. Name identifies the effect. Provider names the external\nservice whose replay rules apply.",
+          "default": "Name and Provider are required.",
+          "line": 41
+        },
+        {
+          "name": "ReplayWindow",
+          "type": "time.Duration",
+          "doc": "ReplayWindow at zero declares no provider replay window; nonzero must exceed RequestTimeout plus 5m.",
+          "default": "ReplayWindow at zero declares no provider replay window; nonzero must exceed RequestTimeout plus 5m.",
+          "line": 41
+        },
+        {
+          "name": "RequestTimeout",
+          "type": "time.Duration",
+          "doc": "RequestTimeout is required, positive and at most 5m. It must be a whole number of\nmicroseconds.",
+          "default": "RequestTimeout is required, positive and at most 5m.",
+          "line": 41
+        }
+      ]
+    },
+    {
+      "name": "execution.FingerprintSpec",
+      "file": "execution/fingerprint.go",
+      "line": 24,
+      "doc": "FingerprintSpec describes the request fields included in the safety digest. Built-in\nprofiles are \"http/v1\" and \"http/v1+json\", with Version \"v1\". Custom profiles require\nVersion and CustomVersion. ConfigDigest hashes application settings that change\noperation behavior. Nil Headers selects If-Match, If-None-Match, If-Modified-Since,\nIf-Unmodified-Since, Content-Encoding and Content-Language. An explicit empty slice\nselects none. Callers retain ownership of Headers.",
+      "fields": [
+        {
+          "name": "Profile",
+          "type": "string",
+          "doc": "Profile empty selects http/v1 during policy construction.",
+          "default": "Profile empty selects http/v1 during policy construction.",
+          "line": 24
+        },
+        {
+          "name": "Version",
+          "type": "string",
+          "doc": "Version defaults to v1 when Profile is defaulted; custom profiles require it explicitly.",
+          "default": "Version defaults to v1 when Profile is defaulted; custom profiles require it explicitly.",
+          "line": 24
+        },
+        {
+          "name": "Headers",
+          "type": "[]string",
+          "doc": "Headers nil selects If-Match, If-None-Match, If-Modified-Since, If-Unmodified-Since,\nContent-Encoding and Content-Language. An explicit empty slice selects none.",
+          "default": "Headers nil selects If-Match, If-None-Match, If-Modified-Since, If-Unmodified-Since, Content-Encoding and Content-Language. An explicit empty slice selects none.",
+          "line": 24
+        },
+        {
+          "name": "CustomVersion",
+          "type": "string",
+          "doc": "CustomVersion is required for custom profiles and empty for built-in profiles.",
+          "default": "CustomVersion is required for custom profiles and empty for built-in profiles.",
+          "line": 24
+        },
+        {
+          "name": "ConfigDigest",
+          "type": "[32]byte",
+          "doc": "ConfigDigest is optional; zero contributes a zero digest. Set it to a hash of\napplication settings that change operation behavior. Changing it makes stored\noperations return operation_policy_changed.",
+          "default": "ConfigDigest is optional; zero contributes a zero digest.",
+          "line": 24
+        }
+      ]
+    },
+    {
+      "name": "execution.JournalConfig",
+      "file": "execution/journal.go",
+      "line": 21,
+      "doc": "JournalConfig configures a Journal. New copies Policies and their slices. Store remains\ncaller-owned and must outlive the Journal. New starts no goroutines. Callbacks must\nhonor their context and support concurrent calls for different attempts and operator\ncalls. The limit fields form the namespace Limits.",
+      "fields": [
+        {
+          "name": "Namespace",
+          "type": "string",
+          "doc": "Namespace is required: 1–64 UTF-8 bytes without control characters.",
+          "default": "Namespace is required: 1–64 UTF-8 bytes without control characters.",
+          "line": 23
+        },
+        {
+          "name": "Store",
+          "type": "Store",
+          "doc": "Store is required, retained and caller-owned; it must satisfy Store\ncancellation, copying and concurrency requirements.",
+          "default": "Store is required, retained and caller-owned; it must satisfy Store cancellation, copying and concurrency requirements.",
+          "line": 26
+        },
+        {
+          "name": "Policies",
+          "type": "map[string]Policy",
+          "doc": "Policies requires 1–1024 named policies; New copies the map and\nnested slices.",
+          "default": "Policies requires 1–1024 named policies; New copies the map and nested slices.",
+          "line": 29
+        },
+        {
+          "name": "OpTimeout",
+          "type": "time.Duration",
+          "doc": "OpTimeout defaults to 5s; valid range 1s–30s.",
+          "default": "OpTimeout defaults to 5s; valid range 1s–30s.",
+          "line": 31
+        },
+        {
+          "name": "CompleteTimeout",
+          "type": "time.Duration",
+          "doc": "CompleteTimeout defaults to 10s; valid range 1s–30s.",
+          "default": "CompleteTimeout defaults to 10s; valid range 1s–30s.",
+          "line": 33
+        },
+        {
+          "name": "ReconcileTimeout",
+          "type": "time.Duration",
+          "doc": "ReconcileTimeout defaults to 30s; valid range 1s–5m.",
+          "default": "ReconcileTimeout defaults to 30s; valid range 1s–5m.",
+          "line": 35
+        },
+        {
+          "name": "ReconcileLease",
+          "type": "time.Duration",
+          "doc": "ReconcileLease defaults to 1m; valid range 2s–10m. It must exceed ReconcileTimeout +\nOpTimeout.",
+          "default": "ReconcileLease defaults to 1m; valid range 2s–10m.",
+          "line": 38
+        },
+        {
+          "name": "MaxResultBytes",
+          "type": "int",
+          "doc": "MaxResultBytes defaults to 64 KiB (1 byte–1 MiB); MaxUnresolvedPerTenant\ndefaults to 1000 and must be positive.",
+          "default": "MaxResultBytes defaults to 64 KiB (1 byte–1 MiB); MaxUnresolvedPerTenant defaults to 1000 and must be positive.",
+          "line": 41
+        },
+        {
+          "name": "MaxUnresolvedPerTenant",
+          "type": "int",
+          "doc": "MaxResultBytes defaults to 64 KiB (1 byte–1 MiB); MaxUnresolvedPerTenant\ndefaults to 1000 and must be positive.",
+          "default": "MaxResultBytes defaults to 64 KiB (1 byte–1 MiB); MaxUnresolvedPerTenant defaults to 1000 and must be positive.",
+          "line": 41
+        },
+        {
+          "name": "MaxNamespaceRecords",
+          "type": "int64",
+          "doc": "MaxNamespaceRecords defaults to 5,000,000 and MaxNamespaceBytes to 20\nGiB; both must be positive after defaults.",
+          "default": "MaxNamespaceRecords defaults to 5,000,000 and MaxNamespaceBytes to 20 GiB; both must be positive after defaults.",
+          "line": 44
+        },
+        {
+          "name": "MaxNamespaceBytes",
+          "type": "int64",
+          "doc": "MaxNamespaceRecords defaults to 5,000,000 and MaxNamespaceBytes to 20\nGiB; both must be positive after defaults.",
+          "default": "MaxNamespaceRecords defaults to 5,000,000 and MaxNamespaceBytes to 20 GiB; both must be positive after defaults.",
+          "line": 44
+        },
+        {
+          "name": "BudgetShards",
+          "type": "int",
+          "doc": "BudgetShards defaults to 16; valid range 1–256.",
+          "default": "BudgetShards defaults to 16; valid range 1–256.",
+          "line": 46
+        },
+        {
+          "name": "Redact",
+          "type": "func(context.Context, Key, Result) (Result, error)",
+          "doc": "Redact optionally transforms copied results before storage; nil preserves them. Redact,\nRedactEvidence, OnTransition and OnError run synchronously. Attempt methods hold the\nattempt mutex while invoking callbacks. This includes Intent, Resend, Renew, Release,\nComplete, Fail, FailedProven, Uncertain, RecordSendTiming and finalization in Do.\nReturn promptly. Calling the same Attempt, or waiting for work that calls it,\ndeadlocks. Redacting stored results and diagnostics is the application's\nresponsibility.",
+          "default": "Redact optionally transforms copied results before storage; nil preserves them.",
+          "line": 54
+        },
+        {
+          "name": "RedactEvidence",
+          "type": "func(context.Context, Evidence) (Evidence, error)",
+          "doc": "RedactEvidence can rewrite recorded diagnostics before storage. If nil, diagnostics are\nstored unchanged. The Redact callback rules also apply.",
+          "default": "If nil, diagnostics are stored unchanged.",
+          "line": 57
+        },
+        {
+          "name": "OnTransition",
+          "type": "func(context.Context, Transition)",
+          "doc": "OnTransition observes committed records and cannot change the commit. Nil disables it.\nThe Redact callback rules also apply.",
+          "default": "Nil disables it.",
+          "line": 60
+        },
+        {
+          "name": "OnError",
+          "type": "func(context.Context, error)",
+          "doc": "OnError observes errors without replacing the operation's answer. Nil disables it. The\nRedact callback rules also apply.",
+          "default": "Nil disables it.",
+          "line": 63
+        }
+      ]
+    },
+    {
+      "name": "execution.Limits",
+      "file": "execution/types.go",
+      "line": 87,
+      "doc": "Limits are immutable per namespace; zero values select documented defaults.",
+      "fields": [
+        {
+          "name": "MaxResultBytes",
+          "type": "int",
+          "doc": "MaxResultBytes defaults to 64 KiB; valid range 1 byte–1 MiB.",
+          "default": "MaxResultBytes defaults to 64 KiB; valid range 1 byte–1 MiB.",
+          "line": 87
+        },
+        {
+          "name": "MaxUnresolvedPerTenant",
+          "type": "int",
+          "doc": "MaxUnresolvedPerTenant defaults to 1000 and must be positive.",
+          "default": "MaxUnresolvedPerTenant defaults to 1000 and must be positive.",
+          "line": 87
+        },
+        {
+          "name": "MaxNamespaceRecords",
+          "type": "int64",
+          "doc": "MaxNamespaceRecords defaults to 5000000 and must be positive.",
+          "default": "MaxNamespaceRecords defaults to 5000000 and must be positive.",
+          "line": 87
+        },
+        {
+          "name": "MaxNamespaceBytes",
+          "type": "int64",
+          "doc": "MaxNamespaceBytes defaults to 20 GiB of logical charges and must be positive.",
+          "default": "MaxNamespaceBytes defaults to 20 GiB of logical charges and must be positive.",
+          "line": 87
+        },
+        {
+          "name": "BudgetShards",
+          "type": "int",
+          "doc": "BudgetShards defaults to 16; valid range 1–256.",
+          "default": "BudgetShards defaults to 16; valid range 1–256.",
+          "line": 87
+        }
+      ]
+    },
+    {
+      "name": "execution.MiddlewareConfig",
+      "file": "execution/http.go",
+      "line": 27,
+      "doc": "MiddlewareConfig protects one configured operation. Callbacks run\nsynchronously and must not retain c. Header slices are copied during\nconstruction. Journal and callbacks remain caller-owned. Constructed\nmiddleware supports concurrent requests; all callbacks must be concurrency\nsafe and honor request cancellation. It starts no goroutines that outlive a\nrequest.",
+      "fields": [
+        {
+          "name": "Journal",
+          "type": "*Journal",
+          "doc": "Journal is required, retained and caller-owned.",
+          "default": "Journal is required, retained and caller-owned.",
+          "line": 29
+        },
+        {
+          "name": "Identity",
+          "type": "func(*echo.Context) (tenant, subject string, err error)",
+          "doc": "Identity is required and resolves trusted tenant and subject per\nrequest.",
+          "default": "Identity is required and resolves trusted tenant and subject per request.",
+          "line": 32
+        },
+        {
+          "name": "Operation",
+          "type": "string",
+          "doc": "Operation must name a configured ExternalMode policy; empty is\ninvalid.",
+          "default": "Operation must name a configured ExternalMode policy; empty is invalid.",
+          "line": 35
+        },
+        {
+          "name": "ReplayCheck",
+          "type": "func(*echo.Context) error",
+          "doc": "ReplayCheck is required and authorizes current access on every\ninvocation.",
+          "default": "ReplayCheck is required and authorizes current access on every invocation.",
+          "line": 38
+        },
+        {
+          "name": "ClassifyStatus",
+          "type": "func(int) State",
+          "doc": "ClassifyStatus maps an HTTP status to Completed or Failed. If it returns an empty\nstate, or is nil, the handler must call Classify.",
+          "default": "If it returns an empty state, or is nil, the handler must call Classify.",
+          "line": 41
+        },
+        {
+          "name": "Header",
+          "type": "string",
+          "doc": "Header defaults to Idempotency-Key and must be a valid HTTP field\nname.",
+          "default": "Header defaults to Idempotency-Key and must be a valid HTTP field name.",
+          "line": 44
+        },
+        {
+          "name": "Fingerprint",
+          "type": "func(context.Context, *http.Request, string, map[string]string, FingerprintSpec, int64) ([32]byte, error)",
+          "doc": "Fingerprint defaults to FingerprintHTTP for built-in HTTP profiles;\ncustom profiles require a callback with FingerprintHTTP's bounds and\ncancellation requirements.",
+          "default": "Fingerprint defaults to FingerprintHTTP for built-in HTTP profiles; custom profiles require a callback with FingerprintHTTP's bounds and cancellation requirements.",
+          "line": 48
+        },
+        {
+          "name": "MaxFingerprintBytes",
+          "type": "int64",
+          "doc": "MaxFingerprintBytes defaults to 1 MiB; valid range 1 byte–8 MiB.",
+          "default": "MaxFingerprintBytes defaults to 1 MiB; valid range 1 byte–8 MiB.",
+          "line": 50
+        },
+        {
+          "name": "MaxResponseBytes",
+          "type": "int",
+          "doc": "MaxResponseBytes defaults to 1 MiB; valid range 1 byte–8 MiB.",
+          "default": "MaxResponseBytes defaults to 1 MiB; valid range 1 byte–8 MiB.",
+          "line": 52
+        },
+        {
+          "name": "ReplayHeaders",
+          "type": "[]string",
+          "doc": "ReplayHeaders is copied; nil selects Content-Type, nonnil empty\nselects none. At most 64 distinct allowed HTTP field names fit;\nhop-by-hop, framing, Set-Cookie and Idempotent-Replayed fields are\nforbidden.",
+          "default": "ReplayHeaders is copied; nil selects Content-Type, nonnil empty selects none.",
+          "line": 57
+        },
+        {
+          "name": "NotExecuted",
+          "type": "func(*echo.Context)",
+          "doc": "NotExecuted runs once whenever the handler does not run, including validation failures\nand refusals. Nil disables it.",
+          "default": "Nil disables it.",
+          "line": 60
+        },
+        {
+          "name": "ProblemHandler",
+          "type": "func(*echo.Context, Problem) error",
+          "doc": "ProblemHandler optionally renders execution problems; nil uses RFC\n9457.",
+          "default": "ProblemHandler optionally renders execution problems; nil uses RFC 9457.",
+          "line": 63
+        },
+        {
+          "name": "OnError",
+          "type": "func(context.Context, error)",
+          "doc": "OnError optionally observes storage/finalization and transport\nfailures without changing the answer; nil is silent.",
+          "default": "OnError optionally observes storage/finalization and transport failures without changing the answer; nil is silent.",
+          "line": 66
+        }
+      ]
+    },
+    {
+      "name": "execution.Policy",
+      "file": "execution/types.go",
+      "line": 77,
+      "doc": "Policy declares effects and their safety rules. New owns copied slices. Zero tunables\nselect Lease=1 minute, ResultRetention=24 hours, KeyRetention=7 days. Effects require\nexplicit timeouts. Backend selection comes only from the injected Store; a policy\ncarries no storage selector. An empty fingerprint selects http/v1; nil Headers selects\nIf-Match, If-None-Match, If-Modified-Since, If-Unmodified-Since, Content-Encoding and\nContent-Language, while an explicit empty slice selects none. An empty Mode selects\nExternalMode; TransactionalMode requires no effects, a zero Lease and an empty\nReconcilerVersion.",
+      "fields": [
+        {
+          "name": "SafetyVersion",
+          "type": "string",
+          "doc": "SafetyVersion is required and versions the operation's safety rules.",
+          "default": "SafetyVersion is required and versions the operation's safety rules.",
+          "line": 77
+        },
+        {
+          "name": "Scope",
+          "type": "string",
+          "doc": "Scope empty defaults to the configured operation name in Journal.New.",
+          "default": "Scope empty defaults to the configured operation name in Journal.New.",
+          "line": 77
+        },
+        {
+          "name": "ReconcilerVersion",
+          "type": "string",
+          "doc": "ReconcilerVersion is required for external mode and empty for transactional mode.",
+          "default": "ReconcilerVersion is required for external mode and empty for transactional mode.",
+          "line": 77
+        },
+        {
+          "name": "Effects",
+          "type": "[]Effect",
+          "doc": "Effects requires 1–8 entries in external mode; transactional mode requires none.",
+          "default": "Effects requires 1–8 entries in external mode; transactional mode requires none.",
+          "line": 77
+        },
+        {
+          "name": "Fingerprint",
+          "type": "FingerprintSpec",
+          "doc": "Fingerprint at zero selects http/v1 with its default header set.",
+          "default": "Fingerprint at zero selects http/v1 with its default header set.",
+          "line": 77
+        },
+        {
+          "name": "Lease",
+          "type": "time.Duration",
+          "doc": "Lease defaults to 1m in external mode; transactional mode requires zero.",
+          "default": "Lease defaults to 1m in external mode; transactional mode requires zero.",
+          "line": 77
+        },
+        {
+          "name": "ResultRetention",
+          "type": "time.Duration",
+          "doc": "ResultRetention defaults to 24h and must be positive.",
+          "default": "ResultRetention defaults to 24h and must be positive.",
+          "line": 77
+        },
+        {
+          "name": "KeyRetention",
+          "type": "time.Duration",
+          "doc": "KeyRetention defaults to 7 days and must be at least ResultRetention.",
+          "default": "KeyRetention defaults to 7 days and must be at least ResultRetention.",
+          "line": 77
+        },
+        {
+          "name": "Mode",
+          "type": "ExecutionMode",
+          "doc": "Mode empty selects ExternalMode; TransactionalMode is explicit.",
+          "default": "Mode empty selects ExternalMode; TransactionalMode is explicit.",
+          "line": 77
+        }
+      ]
+    },
+    {
+      "name": "execution.ReconcileSchedulerConfig",
+      "file": "execution/scheduler.go",
+      "line": 51,
+      "doc": "ReconcileSchedulerConfig configures a reconciliation scheduler. Authorization callbacks\nreceive a child context bounded by the journal's OpTimeout. The Operator, Store, Logger\nand callbacks stay caller-owned. Keep them usable until Run and any PendingReconcile.Run\nretry finish. Reconciler and Completion callbacks are retained. Callbacks run serially\nwithin one scheduler but must tolerate other schedulers and manual recovery in the same\nnamespace.",
+      "fields": [
+        {
+          "name": "Operator",
+          "type": "*Operator",
+          "doc": "Operator is required and retained; its journal's Store must implement\nScheduledReconcileStore.",
+          "default": "Operator is required and retained; its journal's Store must implement ScheduledReconcileStore.",
+          "line": 54
+        },
+        {
+          "name": "Scopes",
+          "type": "map[string]ScheduledReconciler",
+          "doc": "Scopes is copied and requires 1–1024 registered policy scopes, rather than operation\naliases.",
+          "default": "Scopes is copied and requires 1–1024 registered policy scopes, rather than operation aliases.",
+          "line": 58
+        },
+        {
+          "name": "PollInterval",
+          "type": "time.Duration",
+          "doc": "PollInterval defaults to 30s; valid range 1s–1h, measured after each\npass. It is not a recovery-latency guarantee.",
+          "default": "PollInterval defaults to 30s; valid range 1s–1h, measured after each pass.",
+          "line": 62
+        },
+        {
+          "name": "PageSize",
+          "type": "int",
+          "doc": "PageSize defaults to 25; valid range 1–100 examined records per pass.",
+          "default": "PageSize defaults to 25; valid range 1–100 examined records per pass.",
+          "line": 64
+        },
+        {
+          "name": "AuthorizeNamespace",
+          "type": "func(context.Context, string) error",
+          "doc": "AuthorizeNamespace is required and retained; it runs before each\nListUncertain. Errors stop Run.",
+          "default": "AuthorizeNamespace is required and retained; it runs before each ListUncertain.",
+          "line": 68
+        },
+        {
+          "name": "AuthorizeTarget",
+          "type": "func(context.Context, ReconcileTarget) (bool, error)",
+          "doc": "AuthorizeTarget is required and retained; it runs before preparing\neach candidate. False skips the target; errors stop Run.",
+          "default": "AuthorizeTarget is required and retained; it runs before preparing each candidate.",
+          "line": 71
+        },
+        {
+          "name": "Logger",
+          "type": "*slog.Logger",
+          "doc": "Logger is retained and caller-owned; nil is silent. It receives only\nbounded categories, never refs, principal data or error text.",
+          "default": "Logger is retained and caller-owned; nil is silent.",
+          "line": 75
+        }
+      ]
+    },
+    {
+      "name": "executionadmin.Config",
+      "file": "execution/executionadmin/panel.go",
+      "line": 35,
+      "doc": "Config configures the panel. The Operator, its Store, and the Reconciler and\nCompletion callbacks stay caller-owned and must be safe for concurrent use.\nKeep them usable for the panel's whole lifetime, including retries of retained\npending reconcile handles. New starts no goroutines. Reconciler and Completion\nhonor context cancellation. Lookup keys contain the authorized tenant, subject\nand scope from the body. Use admin.Config.Authorize to narrow authorization.",
+      "fields": [
+        {
+          "name": "Operator",
+          "type": "*execution.Operator",
+          "doc": "Operator is required, retained and must come from Journal.Operator.",
+          "default": "Operator is required, retained and must come from Journal.Operator.",
+          "line": 37
+        },
+        {
+          "name": "Reconciler",
+          "type": "execution.Reconciler",
+          "doc": "Reconciler is optional and retained; nil disables reconciliation. It may send only\nafter ReconcileClaim.Resend grants a permit.",
+          "default": "Reconciler is optional and retained; nil disables reconciliation.",
+          "line": 40
+        },
+        {
+          "name": "Completion",
+          "type": "execution.Completion",
+          "doc": "Completion is optional and retained; nonnil requires Reconciler.",
+          "default": "Completion is optional and retained; nonnil requires Reconciler.",
+          "line": 42
+        },
+        {
+          "name": "EnableResolve",
+          "type": "bool",
+          "doc": "EnableResolve opts into destructive resolution; default false.",
+          "default": "EnableResolve opts into destructive resolution; default false.",
+          "line": 44
+        },
+        {
+          "name": "MaxPending",
+          "type": "int",
+          "doc": "MaxPending defaults to 128 (1–1000); at the cap new reconciles are\nrefused and ambiguous handles are never evicted.",
+          "default": "MaxPending defaults to 128 (1–1000); at the cap new reconciles are refused and ambiguous handles are never evicted.",
+          "line": 47
+        }
+      ]
+    },
+    {
+      "name": "pgstore.StoreConfig",
+      "file": "execution/pgstore/store.go",
+      "line": 53,
+      "doc": "StoreConfig selects a schema and optionally binds an instance to one namespace.\nNamespace, when supplied, makes New check its persisted shard count and caps\nagainst Limits; Begin must use those same caps.\nWith no Namespace, Begin checks its own Limits against the persisted namespace.\nThe caller's pgx query mode is never changed.\n\nAn earlier caller deadline or cancellation still ends migration first, and\nstatements keep the one-second lock timeout. New validates MigrateTimeout and rejects out-of-range values. New and Store\noperations do not use it as their deadline.",
+      "fields": [
+        {
+          "name": "Schema",
+          "type": "string",
+          "doc": "Schema defaults to public; valid identifiers are 1–63 UTF-8 bytes\nwithout NUL or \"$$\". Namespace is optional; when set it is 1–64 UTF-8\nbytes without controls and binds New to the namespace caps.",
+          "default": "Schema defaults to public; valid identifiers are 1–63 UTF-8 bytes without NUL or \"$$\". Namespace is optional; when set it is 1–64 UTF-8 bytes without controls and binds New to the namespace caps.",
+          "line": 57
+        },
+        {
+          "name": "Namespace",
+          "type": "string",
+          "doc": "Schema defaults to public; valid identifiers are 1–63 UTF-8 bytes\nwithout NUL or \"$$\". Namespace is optional; when set it is 1–64 UTF-8\nbytes without controls and binds New to the namespace caps.",
+          "default": "Schema defaults to public; valid identifiers are 1–63 UTF-8 bytes without NUL or \"$$\". Namespace is optional; when set it is 1–64 UTF-8 bytes without controls and binds New to the namespace caps.",
+          "line": 57
+        },
+        {
+          "name": "Limits",
+          "type": "execution.Limits",
+          "doc": "Limits selects namespace caps; zero fields select execution.Limits\ndefaults.",
+          "default": "Limits selects namespace caps; zero fields select execution.Limits defaults.",
+          "line": 60
+        },
+        {
+          "name": "MigrateTimeout",
+          "type": "time.Duration",
+          "doc": "MigrateTimeout bounds all of Migrate: pool acquisition, DDL, catalog\nvalidation and COMMIT. It defaults to 1m; valid range 1s–1h.",
+          "default": "It defaults to 1m; valid range 1s–1h.",
+          "line": 63
+        }
+      ]
+    },
+    {
+      "name": "pgstore.TxRunnerConfig",
+      "file": "execution/pgstore/transactional.go",
+      "line": 24,
+      "doc": "TxRunnerConfig configures a TxRunner. An empty policy Scope defaults to the\noperation name and aliases sharing a scope must share one safety policy.\n\nA Journal and TxRunner sharing a namespace and scope must use the same\nnormalized safety policy. Each invocation checks retained records.",
+      "fields": [
+        {
+          "name": "Namespace",
+          "type": "string",
+          "doc": "Namespace is required: 1–64 UTF-8 bytes without control characters.",
+          "default": "Namespace is required: 1–64 UTF-8 bytes without control characters.",
+          "line": 26
+        },
+        {
+          "name": "Policies",
+          "type": "map[string]execution.Policy",
+          "doc": "Policies requires 1–1024 TransactionalMode policies; the map and\nslices are copied.",
+          "default": "Policies requires 1–1024 TransactionalMode policies; the map and slices are copied.",
+          "line": 29
+        },
+        {
+          "name": "Limits",
+          "type": "execution.Limits",
+          "doc": "Limits zero fields select execution.Limits defaults; caps must match\na namespace-bound Store.",
+          "default": "Limits zero fields select execution.Limits defaults; caps must match a namespace-bound Store.",
+          "line": 32
+        },
+        {
+          "name": "OpTimeout",
+          "type": "time.Duration",
+          "doc": "OpTimeout defaults to 5s; valid range 1–30s, for starting or\nfinishing an operation, including COMMIT.",
+          "default": "OpTimeout defaults to 5s; valid range 1–30s, for starting or finishing an operation, including COMMIT.",
+          "line": 36
+        },
+        {
+          "name": "TxTimeout",
+          "type": "time.Duration",
+          "doc": "TxTimeout bounds the total call; defaults to 30s, valid range 1–60s,\nshortened by the caller deadline.",
+          "default": "TxTimeout bounds the total call; defaults to 30s, valid range 1–60s, shortened by the caller deadline.",
+          "line": 39
+        },
+        {
+          "name": "CleanupTimeout",
+          "type": "time.Duration",
+          "doc": "CleanupTimeout defaults to 5s; valid range 1–30s, for detached\nrollback.",
+          "default": "CleanupTimeout defaults to 5s; valid range 1–30s, for detached rollback.",
+          "line": 42
+        },
+        {
+          "name": "Redact",
+          "type": "func(context.Context, execution.Key, execution.Result) (execution.Result, error)",
+          "doc": "Redact is retained, must be safe for concurrent use and must honor ctx. Nil preserves\nthe copied result. It runs once on the operation's first commit. It receives the key's\ntenant and subject; Value is empty.",
+          "default": "Nil preserves the copied result. It receives the key's tenant and subject; Value is empty.",
+          "line": 47
+        }
+      ]
+    },
+    {
+      "name": "quota.AdminConfig",
+      "file": "quota/admin.go",
+      "line": 22,
+      "doc": "AdminConfig mounts administration routes on a caller-owned Echo group.\nAuthorization sees no target, so every route acts on any tenant: grant access\nonly to global operators. POST bodies must be application/json; prefer bearer\ntokens to cookies. Callbacks must be concurrency safe; request cancellation\ncontrols store calls. Input/store errors are sanitized problems.",
+      "fields": [
+        {
+          "name": "Limiter",
+          "type": "*Limiter",
+          "doc": "Limiter is required, retained and caller-owned.",
+          "default": "Limiter is required, retained and caller-owned.",
+          "line": 24
+        },
+        {
+          "name": "Authorize",
+          "type": "func(*echo.Context) error",
+          "doc": "Authorize is required and runs before parsing or store access on\nevery route. It must not retain c.",
+          "default": "Authorize is required and runs before parsing or store access on every route.",
+          "line": 27
+        },
+        {
+          "name": "Overrides",
+          "type": "func(*echo.Context, Identity, string) ([]Override, error)",
+          "doc": "Overrides optionally changes limit numbers for /usage; nil uses plan\nvalues.",
+          "default": "Overrides optionally changes limit numbers for /usage; nil uses plan values.",
+          "line": 30
+        },
+        {
+          "name": "TopK",
+          "type": "*TopK",
+          "doc": "TopK is optional and caller-owned; nil makes /top return not found.",
+          "default": "TopK is optional and caller-owned; nil makes /top return not found.",
+          "line": 32
+        },
+        {
+          "name": "ErrorHandler",
+          "type": "func(*echo.Context, error) error",
+          "doc": "ErrorHandler optionally handles authorization errors; nil returns\nthem to Echo.",
+          "default": "ErrorHandler optionally handles authorization errors; nil returns them to Echo.",
+          "line": 35
+        }
+      ]
+    },
+    {
+      "name": "quota.Breaker",
+      "file": "quota/config.go",
+      "line": 79,
+      "doc": "Breaker configures a remote-store rolling failure ratio. Samples are bucketed\nby Window/256 (at least 1ms) to bound memory. Calls whose caller canceled are\nnot counted; calls that outlive a caller deadline count as failures.",
+      "fields": [
+        {
+          "name": "Window",
+          "type": "time.Duration",
+          "doc": "Window defaults to 10s; valid range 1ms–24h.",
+          "default": "Window defaults to 10s; valid range 1ms–24h.",
+          "line": 81
+        },
+        {
+          "name": "MinCalls",
+          "type": "int",
+          "doc": "MinCalls defaults to 20; nonzero values must be positive.",
+          "default": "MinCalls defaults to 20; nonzero values must be positive.",
+          "line": 83
+        },
+        {
+          "name": "FailureRatio",
+          "type": "float64",
+          "doc": "FailureRatio defaults to 0.5. Nonzero values must be greater than 0 and at most 1.\nNaN is invalid.",
+          "default": "FailureRatio defaults to 0.5. Nonzero values must be greater than 0 and at most 1.",
+          "line": 86
+        },
+        {
+          "name": "Cooldown",
+          "type": "time.Duration",
+          "doc": "Cooldown defaults to 1s; nonzero values must be positive.",
+          "default": "Cooldown defaults to 1s; nonzero values must be positive.",
+          "line": 88
+        }
+      ]
+    },
+    {
+      "name": "quota.Config",
+      "file": "quota/config.go",
+      "line": 19,
+      "doc": "Config configures immutable plans and synchronous hooks.",
+      "fields": [
+        {
+          "name": "Store",
+          "type": "Store",
+          "doc": "Store is required, retained and caller-owned; Limiter.Close never\ncloses it.",
+          "default": "Store is required, retained and caller-owned; Limiter.Close never closes it.",
+          "line": 22
+        },
+        {
+          "name": "Plans",
+          "type": "[]Plan",
+          "doc": "Plans requires at least one valid plan; New copies all maps and\nslices.",
+          "default": "Plans requires at least one valid plan; New copies all maps and slices.",
+          "line": 25
+        },
+        {
+          "name": "StoreTimeout",
+          "type": "time.Duration",
+          "doc": "StoreTimeout bounds each remote store call; zero uses 25ms, negative is\ninvalid, and caller deadlines always win. Local stores, such as memory,\nrun without it.",
+          "default": "StoreTimeout bounds each remote store call; zero uses 25ms, negative is invalid, and caller deadlines always win.",
+          "line": 29
+        },
+        {
+          "name": "DenyCache",
+          "type": "time.Duration",
+          "doc": "DenyCache is off at zero; positive durations at most 10s cache store denials.",
+          "default": "DenyCache is off at zero; positive durations at most 10s cache store denials.",
+          "line": 31
+        },
+        {
+          "name": "DenyCacheSize",
+          "type": "int",
+          "doc": "DenyCacheSize bounds the LRU; zero defaults to 10000, otherwise it\nmust be positive.",
+          "default": "DenyCacheSize bounds the LRU; zero defaults to 10000, otherwise it must be positive.",
+          "line": 34
+        },
+        {
+          "name": "ReservationTTL",
+          "type": "time.Duration",
+          "doc": "ReservationTTL defaults to 1h and must be at least 1ms; size it above\nthe longest work plus settlement.",
+          "default": "ReservationTTL defaults to 1h and must be at least 1ms; size it above the longest work plus settlement.",
+          "line": 37
+        },
+        {
+          "name": "SettledRetention",
+          "type": "time.Duration",
+          "doc": "SettledRetention defaults to 5m, must be at least 1ms, and bounds the\nidempotent retry window.",
+          "default": "SettledRetention defaults to 5m, must be at least 1ms, and bounds the idempotent retry window.",
+          "line": 40
+        },
+        {
+          "name": "SettleWorkers",
+          "type": "int",
+          "doc": "SettleWorkers defaults to 4 (1–1024); the queue holds 1024 jobs.",
+          "default": "SettleWorkers defaults to 4 (1–1024); the queue holds 1024 jobs.",
+          "line": 42
+        },
+        {
+          "name": "Expired",
+          "type": "SettlePolicy",
+          "doc": "Expired settles reservations past ReservationTTL: Keep (default) commits\nreserved amounts, Refund returns them. It runs on the next Reserve or Settle\nin the partition and, with an Outbox, in the periodic sweep.",
+          "default": "Expired settles reservations past ReservationTTL: Keep (default) commits reserved amounts, Refund returns them.",
+          "line": 46
+        },
+        {
+          "name": "Outbox",
+          "type": "*Outbox",
+          "doc": "Outbox makes consumption and threshold events durable and is copied when\nnonnil; with it, Hooks.OnConsumption and Hooks.OnThreshold must be nil.\nNew then starts background delivery goroutines, with partition concurrency\nbounded by Outbox.Workers; Close stops them. Nil disables durable delivery;\nHooks then receive events at most once.",
+          "default": "Outbox makes consumption and threshold events durable and is copied when nonnil; with it, Hooks.OnConsumption and Hooks.OnThreshold must be nil. Nil disables durable delivery; Hooks then receive events at most once.",
+          "line": 52
+        },
+        {
+          "name": "Fallback",
+          "type": "Fallback",
+          "doc": "Fallback applies only to buckets in a remote store. If the remote store fails, counters\nallow requests unless the limit is strict. The zero value enables local fallback for\nremote buckets with one instance and up to 100,000 local keys.",
+          "default": "The zero value enables local fallback for remote buckets with one instance and up to 100,000 local keys.",
+          "line": 56
+        },
+        {
+          "name": "Breaker",
+          "type": "Breaker",
+          "doc": "Breaker selects bounded remote-store failure tracking; zero uses\nBreaker defaults.",
+          "default": "Breaker selects bounded remote-store failure tracking; zero uses Breaker defaults.",
+          "line": 59
+        },
+        {
+          "name": "Hooks",
+          "type": "Hooks",
+          "doc": "Hooks contains optional retained synchronous callbacks; see Hooks for\nconcurrency.",
+          "default": "Hooks contains optional retained synchronous callbacks; see Hooks for concurrency.",
+          "line": 62
+        },
+        {
+          "name": "Logger",
+          "type": "*slog.Logger",
+          "doc": "Logger is retained and caller-owned; nil is silent.",
+          "default": "Logger is retained and caller-owned; nil is silent.",
+          "line": 64
+        }
+      ]
+    },
+    {
+      "name": "quota.Fallback",
+      "file": "quota/config.go",
+      "line": 68,
+      "doc": "Fallback configures remote-store local buckets.",
+      "fields": [
+        {
+          "name": "Disabled",
+          "type": "bool",
+          "doc": "Disabled turns off local fallback; default false.",
+          "default": "Disabled turns off local fallback; default false.",
+          "line": 70
+        },
+        {
+          "name": "Instances",
+          "type": "int",
+          "doc": "Instances defaults to 1 and MaxKeys to 100000; both must be positive\nafter defaults.",
+          "default": "Instances defaults to 1 and MaxKeys to 100000; both must be positive after defaults.",
+          "line": 73
+        },
+        {
+          "name": "MaxKeys",
+          "type": "int",
+          "doc": "Instances defaults to 1 and MaxKeys to 100000; both must be positive\nafter defaults.",
+          "default": "Instances defaults to 1 and MaxKeys to 100000; both must be positive after defaults.",
+          "line": 73
+        }
+      ]
+    },
+    {
+      "name": "quota.Hooks",
+      "file": "quota/config.go",
+      "line": 99,
+      "doc": "Hooks run synchronously, without panic recovery, on the calling goroutine. Callbacks\nmust support concurrent use; blocking delays the request. All are optional. Consumption\nand threshold delivery is at-most-once. OnStoreError operations include admit, reserve,\nsettle, usage, reset, shadow, release, credits, expire and outbox. A shadow-only failure\ncalls OnStoreError once with a *StoreError and operation shadow; live limit checks and\nDecision.Err are unaffected. Lifecycle observations run once per normally returning call\nor worker job, after other hooks and cache invalidation. OnOperation runs last. They\ncount attempts, never consumption. Application panics propagate.",
+      "fields": [
+        {
+          "name": "OnDecision",
+          "type": "func(context.Context, Request, Decision)",
+          "doc": "OnDecision is optional; nil disables this callback.",
+          "default": "OnDecision is optional; nil disables this callback.",
+          "line": 102
+        },
+        {
+          "name": "OnStoreError",
+          "type": "func(context.Context, string, error)",
+          "doc": "OnStoreError is optional; nil disables this callback.",
+          "default": "OnStoreError is optional; nil disables this callback.",
+          "line": 104
+        },
+        {
+          "name": "OnConsumption",
+          "type": "func(context.Context, ConsumptionEvent)",
+          "doc": "OnConsumption is optional; nil disables this callback.",
+          "default": "OnConsumption is optional; nil disables this callback.",
+          "line": 106
+        },
+        {
+          "name": "OnThreshold",
+          "type": "func(context.Context, ThresholdEvent)",
+          "doc": "OnThreshold is optional; nil disables this callback.",
+          "default": "OnThreshold is optional; nil disables this callback.",
+          "line": 108
+        },
+        {
+          "name": "OnSettlement",
+          "type": "func(context.Context, SettlementObservation)",
+          "doc": "OnSettlement is optional; nil disables this callback.",
+          "default": "OnSettlement is optional; nil disables this callback.",
+          "line": 110
+        },
+        {
+          "name": "OnCredit",
+          "type": "func(context.Context, CreditObservation)",
+          "doc": "OnCredit is optional; nil disables this callback.",
+          "default": "OnCredit is optional; nil disables this callback.",
+          "line": 112
+        },
+        {
+          "name": "OnRelease",
+          "type": "func(context.Context, ReleaseObservation)",
+          "doc": "OnRelease is optional; nil disables this callback.",
+          "default": "OnRelease is optional; nil disables this callback.",
+          "line": 114
+        },
+        {
+          "name": "OnReset",
+          "type": "func(context.Context, ResetObservation)",
+          "doc": "OnReset is optional; nil disables this callback.",
+          "default": "OnReset is optional; nil disables this callback.",
+          "line": 116
+        },
+        {
+          "name": "ObserveOperation",
+          "type": "func(context.Context) bool",
+          "doc": "ObserveOperation gates only OnOperation and its aggregate construction.\nNil observes every operation. It runs once per public operation or worker\njob with that operation's context; a panic is recovered and means true.\nLifecycle callbacks are unaffected. It must be safe for concurrent calls\nand should return promptly without retaining the context.",
+          "default": "Nil observes every operation.",
+          "line": 122
+        },
+        {
+          "name": "OnOperation",
+          "type": "func(context.Context, OperationObservation)",
+          "doc": "OnOperation is optional; nil disables this callback.",
+          "default": "OnOperation is optional; nil disables this callback.",
+          "line": 124
+        }
+      ]
+    },
+    {
+      "name": "quota.MemoryConfig",
+      "file": "quota/memory.go",
+      "line": 18,
+      "doc": "MemoryConfig configures bounded process-local quota state.",
+      "fields": [
+        {
+          "name": "MaxKeys",
+          "type": "int",
+          "doc": "MaxKeys defaults to 500000. Positive values cap keys separately for live state,\nreservations, credit records, generations and outbox entries. Negative values fail\nValidate and quota.New.",
+          "default": "MaxKeys defaults to 500000.",
+          "line": 22
+        },
+        {
+          "name": "Clock",
+          "type": "func() time.Time",
+          "doc": "Clock is retained and must be concurrency safe; nil uses time.Now.",
+          "default": "Clock is retained and must be concurrency safe; nil uses time.Now.",
+          "line": 24
+        }
+      ]
+    },
+    {
+      "name": "quota.MiddlewareConfig",
+      "file": "quota/middleware.go",
+      "line": 26,
+      "doc": "MiddlewareConfig binds a concurrent Limiter to Echo. Callbacks run\nsynchronously and must support concurrent requests. The request context\ncontrols store cancellation. Settle jobs retain a cancellation-detached\nrequest context, never the Echo context. The caller owns and closes Limiter.\nDefaults are applied to a private copy. Concurrency slots are released after\nthe handler returns or panics, on the settle worker pool.",
+      "fields": [
+        {
+          "name": "Exclusive",
+          "type": "bool",
+          "doc": "Exclusive rejects a second quota check on the same Limiter with ErrDuplicateAdmission.\nEarlier usage stays counted. Skips and callback failures do not count as checks; all\nAllow and Reserve outcomes do. Request state tracks at most eight distinct Limiters. An\nExclusive check on a ninth Limiter returns ErrParticipationLimit. Further non-Exclusive\nchecks run without tracking. Exclusive defaults to false.",
+          "default": "Exclusive defaults to false.",
+          "line": 32
+        },
+        {
+          "name": "Settle",
+          "type": "bool",
+          "doc": "Settle reserves before the handler and asynchronously settles final costs afterward.\nSettle defaults to false, charging usage without reserving and settling.",
+          "default": "Settle defaults to false, charging usage without reserving and settling.",
+          "line": 35
+        },
+        {
+          "name": "Unsettled",
+          "type": "func(status int) SettlePolicy",
+          "doc": "Unsettled defaults to Keep; it selects a policy only when Charge was not called.",
+          "default": "Unsettled defaults to Keep; it selects a policy only when Charge was not called.",
+          "line": 37
+        },
+        {
+          "name": "Limiter",
+          "type": "*Limiter",
+          "doc": "Limiter is required, retained and caller-owned.",
+          "default": "Limiter is required, retained and caller-owned.",
+          "line": 39
+        },
+        {
+          "name": "Identity",
+          "type": "func(*echo.Context) (Identity, error)",
+          "doc": "Identity is required and resolves a trusted paying subject.",
+          "default": "Identity is required and resolves a trusted paying subject.",
+          "line": 41
+        },
+        {
+          "name": "Plan",
+          "type": "func(*echo.Context, Identity) (string, error)",
+          "doc": "Plan is optional only with one configured plan; nil selects that\nplan.",
+          "default": "Plan is optional only with one configured plan; nil selects that plan.",
+          "line": 44
+        },
+        {
+          "name": "Period",
+          "type": "func(*echo.Context, Identity) (Period, error)",
+          "doc": "Period is required for selected billing-period limits; nil supplies\nno period.",
+          "default": "Period is required for selected billing-period limits; nil supplies no period.",
+          "line": 47
+        },
+        {
+          "name": "Overrides",
+          "type": "func(*echo.Context, Identity, string) ([]Override, error)",
+          "doc": "Overrides runs for both middleware and UsageHandler. Your application should cache the\ndata it reads. Nil applies no numeric overrides.",
+          "default": "Nil applies no numeric overrides.",
+          "line": 50
+        },
+        {
+          "name": "Shadow",
+          "type": "func(*echo.Context, Identity, string) (string, error)",
+          "doc": "Shadow selects a candidate plan for limit checks only; nil disables it.",
+          "default": "Shadow selects a candidate plan for limit checks only; nil disables it.",
+          "line": 52
+        },
+        {
+          "name": "Dimensions",
+          "type": "func(*echo.Context) (map[string]string, error)",
+          "doc": "Dimensions selects trusted subjects in middleware; UsageHandler uses query values.\nDimensions is optional; nil supplies no dimension values during limit checks.",
+          "default": "Dimensions is optional; nil supplies no dimension values during limit checks.",
+          "line": 55
+        },
+        {
+          "name": "Cost",
+          "type": "func(*echo.Context) (Cost, error)",
+          "doc": "Cost is optional; nil charges requests:1. Returned maps are borrowed\nfor the request and must not be mutated concurrently.",
+          "default": "Cost is optional; nil charges requests:1.",
+          "line": 58
+        },
+        {
+          "name": "Operation",
+          "type": "func(*echo.Context) string",
+          "doc": "Operation defaults to the registered method/path, with automatic HEAD\nusing GET and unmatched requests sharing one operation.",
+          "default": "Operation defaults to the registered method/path, with automatic HEAD using GET and unmatched requests sharing one operation.",
+          "line": 61
+        },
+        {
+          "name": "Skipper",
+          "type": "middleware.Skipper",
+          "doc": "Skipper defaults to nil, which skips nothing. When it returns true, quota does not\ncheck or charge the request.",
+          "default": "Skipper defaults to nil, which skips nothing.",
+          "line": 64
+        },
+        {
+          "name": "Headers",
+          "type": "HeaderMode",
+          "doc": "Headers defaults to Draft11; Legacy, Draft11AndLegacy and NoHeaders\nselect other modes.",
+          "default": "Headers defaults to Draft11; Legacy, Draft11AndLegacy and NoHeaders select other modes.",
+          "line": 67
+        },
+        {
+          "name": "DenyHandler",
+          "type": "func(*echo.Context, Decision) error",
+          "doc": "DenyHandler defaults to the package RFC 9457 denial renderer.",
+          "default": "DenyHandler defaults to the package RFC 9457 denial renderer.",
+          "line": 69
+        },
+        {
+          "name": "UnavailableHandler",
+          "type": "func(*echo.Context, Decision) error",
+          "doc": "UnavailableHandler defaults to the package RFC 9457 unavailable\nrenderer.",
+          "default": "UnavailableHandler defaults to the package RFC 9457 unavailable renderer.",
+          "line": 72
+        },
+        {
+          "name": "ErrorHandler",
+          "type": "func(*echo.Context, error) error",
+          "doc": "ErrorHandler defaults to returning input errors unchanged to Echo.",
+          "default": "ErrorHandler defaults to returning input errors unchanged to Echo.",
+          "line": 74
+        }
+      ]
+    },
+    {
+      "name": "quota.Outbox",
+      "file": "quota/outbox.go",
+      "line": 24,
+      "doc": "Outbox delivers consumption and threshold events durably. The store writes each event in\nthe same atomic step that changes usage, so events are as durable as the store. The zero\nvalue is invalid: Deliver is required. New copies settings and retains Deliver. Call\nLimiter.Close to stop delivery. Close does not cancel Deliver's context; Deliver must\nbound its work and return for Close to finish.",
+      "fields": [
+        {
+          "name": "Deliver",
+          "type": "func(context.Context, Event) error",
+          "doc": "Deliver receives every event at least once, possibly concurrently and out of\norder. Return nil after durably handling it; an error retries with backoff.\nDeduplicate by Event.ID. It must support concurrent calls.",
+          "default": "Return nil after durably handling it; an error retries with backoff.",
+          "line": 28
+        },
+        {
+          "name": "Workers",
+          "type": "int",
+          "doc": "Workers sets how many partitions deliver at once. Default 2; valid range 1–64.",
+          "default": "Default 2; valid range 1–64.",
+          "line": 30
+        },
+        {
+          "name": "Batch",
+          "type": "int",
+          "doc": "Batch sets how many entries each store call reads. Default 100; valid range 1–1000.",
+          "default": "Default 100; valid range 1–1000.",
+          "line": 32
+        },
+        {
+          "name": "PollInterval",
+          "type": "time.Duration",
+          "doc": "PollInterval sets the index poll interval and first retry delay. Default 1s; minimum\n1ms.",
+          "default": "Default 1s; minimum 1ms.",
+          "line": 35
+        },
+        {
+          "name": "SweepInterval",
+          "type": "time.Duration",
+          "doc": "SweepInterval sets the re-index and expiry sweep interval. Default 1m; minimum 1ms.",
+          "default": "Default 1m; minimum 1ms.",
+          "line": 37
+        }
+      ]
+    },
+    {
+      "name": "quotaadmin.Config",
+      "file": "quota/quotaadmin/panel.go",
+      "line": 24,
+      "doc": "Config selects a constructed limiter.",
+      "fields": [
+        {
+          "name": "EnableCredits",
+          "type": "bool",
+          "doc": "EnableCredits exposes credit-topup and credit-correct. Mount then requires\nKeys and a durable Audit sink or explicit AllowUnauditedWrites.",
+          "default": "Mount then requires Keys and a durable Audit sink or explicit AllowUnauditedWrites.",
+          "line": 27
+        },
+        {
+          "name": "EnableReset",
+          "type": "bool",
+          "doc": "EnableReset exposes destructive partition-wide generation resets. Mount\nrequires Keys and an Audit sink or explicit AllowUnauditedWrites.",
+          "default": "Mount requires Keys and an Audit sink or explicit AllowUnauditedWrites.",
+          "line": 30
+        },
+        {
+          "name": "TopK",
+          "type": "*quota.TopK",
+          "doc": "TopK optionally enables the top-consumption view; nil omits it.\nIt remains caller-owned.",
+          "default": "TopK optionally enables the top-consumption view; nil omits it.",
+          "line": 33
+        },
+        {
+          "name": "Denials",
+          "type": "*DenialRecorder",
+          "doc": "Denials optionally supplies instance-local denials; nil omits that\nview. It remains caller-owned.",
+          "default": "Denials optionally supplies instance-local denials; nil omits that view.",
+          "line": 36
+        },
+        {
+          "name": "Backlog",
+          "type": "Backlog",
+          "doc": "Backlog optionally supplies outbox observations; nil omits that view.\nIt remains caller-owned.",
+          "default": "Backlog optionally supplies outbox observations; nil omits that view.",
+          "line": 39
+        },
+        {
+          "name": "ID",
+          "type": "string",
+          "doc": "ID defaults to quota; use 1–32 lowercase ASCII letters, digits or\nhyphens, starting with a letter, excluding api and assets.",
+          "default": "ID defaults to quota; use 1–32 lowercase ASCII letters, digits or hyphens, starting with a letter, excluding api and assets.",
+          "line": 42
+        },
+        {
+          "name": "Limiter",
+          "type": "*quota.Limiter",
+          "doc": "Limiter is required, constructed and caller-owned; keep it open while\nserving.",
+          "default": "Limiter is required, constructed and caller-owned; keep it open while serving.",
+          "line": 45
+        },
+        {
+          "name": "Overrides",
+          "type": "func(context.Context, quota.Identity, string) ([]quota.Override, error)",
+          "doc": "Overrides optionally supplies read-only limit adjustments after\nauthorization; nil uses plan values. The callback is retained, must\nbe concurrency safe and must honor ctx.",
+          "default": "Overrides optionally supplies read-only limit adjustments after authorization; nil uses plan values.",
+          "line": 49
+        }
+      ]
+    },
+    {
+      "name": "quotamcp.MiddlewareConfig",
+      "file": "quota/quotamcp/config.go",
+      "line": 36,
+      "doc": "MiddlewareConfig meters MCP tool calls with a quota.Limiter. Callbacks run on\nthe request goroutine and must support concurrent calls. Configuration is\ncopied by ToMiddleware; the caller owns and closes Limiter. Policies and\ntheir cost maps are copied; callbacks are retained and must honor\ncancellation. The middleware supports concurrent calls and owns no goroutines\nor client lifecycle.",
+      "fields": [
+        {
+          "name": "Limiter",
+          "type": "*quota.Limiter",
+          "doc": "Limiter is required and caller-owned; quotamcp never closes it.",
+          "default": "Limiter is required and caller-owned; quotamcp never closes it.",
+          "line": 38
+        },
+        {
+          "name": "Identity",
+          "type": "func(ctx context.Context, c Caller) (quota.Identity, error)",
+          "doc": "Identity is required and returns the paying subject. It sees\nauthenticated data only: ctx, Caller.TokenInfo and Caller.Header,\nnever tool arguments.",
+          "default": "Identity is required and returns the paying subject.",
+          "line": 42
+        },
+        {
+          "name": "Plan",
+          "type": "func(ctx context.Context, id quota.Identity) (string, error)",
+          "doc": "Plan selects a plan ID; nil uses the sole plan.",
+          "default": "Plan selects a plan ID; nil uses the sole plan.",
+          "line": 44
+        },
+        {
+          "name": "Period",
+          "type": "func(ctx context.Context, id quota.Identity) (quota.Period, error)",
+          "doc": "Period returns the billing period; it is required and runs only for\nplans with billing-period limits.",
+          "default": "Period returns the billing period; it is required and runs only for plans with billing-period limits.",
+          "line": 47
+        },
+        {
+          "name": "Overrides",
+          "type": "func(ctx context.Context, id quota.Identity, plan string) ([]quota.Override, error)",
+          "doc": "Overrides changes limit numbers for one call; optional.",
+          "default": "Overrides changes limit numbers for one call; optional.",
+          "line": 49
+        },
+        {
+          "name": "Shadow",
+          "type": "func(ctx context.Context, id quota.Identity, plan string) (string, error)",
+          "doc": "Shadow selects a candidate plan for limit checks only; optional.",
+          "default": "Shadow selects a candidate plan for limit checks only; optional.",
+          "line": 51
+        },
+        {
+          "name": "Dimensions",
+          "type": "func(ctx context.Context, call Call) (map[string]string, error)",
+          "doc": "Dimensions selects dimension values, for example the model a tool will\ncall. It may read arguments; values select subjects, never the authenticated caller.\nDimensions is optional; nil supplies no dimension values.",
+          "default": "Dimensions is optional; nil supplies no dimension values.",
+          "line": 55
+        },
+        {
+          "name": "Policies",
+          "type": "map[string]Policy",
+          "doc": "Policies maps tool names to metering policies; unlisted tools use Default\nwith the operation Unlisted.",
+          "default": "Policies maps tool names to metering policies; unlisted tools use Default with the operation Unlisted.",
+          "line": 58
+        },
+        {
+          "name": "Default",
+          "type": "Policy",
+          "doc": "Default meters unlisted tools; zero charges one requests attempt with\nno billable Cost.",
+          "default": "Default meters unlisted tools; zero charges one requests attempt with no billable Cost.",
+          "line": 61
+        },
+        {
+          "name": "Unsettled",
+          "type": "func(Outcome) quota.SettlePolicy",
+          "doc": "Unsettled chooses what to do with a settled call that recorded no Charge. Nil keeps the\nreservation. A ChargeFirst call that never started refunds Cost without calling\nUnsettled. An input-required round also refunds Cost by default. Refunds never return\nAttempt meters.",
+          "default": "Nil keeps the reservation. An input-required round also refunds Cost by default.",
+          "line": 66
+        },
+        {
+          "name": "Disclose",
+          "type": "bool",
+          "doc": "Disclose adds plan and limit names, quotas and balances to denials.\nDisclose defaults to false.",
+          "default": "Disclose defaults to false.",
+          "line": 69
+        },
+        {
+          "name": "ReportUsage",
+          "type": "bool",
+          "doc": "ReportUsage adds the smallest remaining requests limit to the _meta of\nsuccessful results.\nReportUsage defaults to false.",
+          "default": "ReportUsage defaults to false.",
+          "line": 73
+        },
+        {
+          "name": "LoopBreaker",
+          "type": "bool",
+          "doc": "LoopBreaker adds the attempt meter LoopMeter and the dimension\nLoopDimension to every metered call, so a plan can limit identical calls.\nLoopBreaker defaults to false.",
+          "default": "LoopBreaker defaults to false.",
+          "line": 77
+        },
+        {
+          "name": "OnCall",
+          "type": "func(ctx context.Context, info CallInfo)",
+          "doc": "OnCall observes each metered call after it ends; optional. It never sees\narguments or results.",
+          "default": "OnCall observes each metered call after it ends; optional.",
+          "line": 80
+        },
+        {
+          "name": "OnMeteringError",
+          "type": "func(ctx context.Context, failure MeteringFailure)",
+          "doc": "OnMeteringError observes each eligible metered tools/call that obtains no\nallow/deny decision, independently of OnError's once-per-plan-set reports.\nOther methods, malformed pass-through requests and exempt tools are excluded.\nIt runs synchronously and must support concurrent calls; no context is retained.\nOnMeteringError is optional; nil disables the callback.",
+          "default": "OnMeteringError is optional; nil disables the callback.",
+          "line": 86
+        },
+        {
+          "name": "OnError",
+          "type": "func(ctx context.Context, c Caller, err error)",
+          "doc": "OnError receives callback errors, *quota.RequestError, settlement\nfailures and plan sets that break a policy; optional. Store failures also\nreach quota.Hooks.OnStoreError.",
+          "default": "OnError receives callback errors, *quota.RequestError, settlement failures and plan sets that break a policy; optional.",
+          "line": 90
+        }
+      ]
+    },
+    {
+      "name": "quotamcp.Policy",
+      "file": "quota/quotamcp/config.go",
+      "line": 94,
+      "doc": "Policy is one tool's metering policy.",
+      "fields": [
+        {
+          "name": "Attempt",
+          "type": "quota.Cost",
+          "doc": "Attempt is charged on every admitted call and never refunded by\nquotamcp, so rate limits and the loop breaker see every attempt. Nil\nmeans {\"requests\": 1}; an empty non-nil Attempt charges no attempt meter.",
+          "default": "Nil means {\"requests\": 1}; an empty non-nil Attempt charges no attempt meter.",
+          "line": 98
+        },
+        {
+          "name": "Cost",
+          "type": "quota.Cost",
+          "doc": "Cost holds the billable meters, disjoint from Attempt. Attempt-counted\ntools charge it when the request is allowed. Settled tools reserve it as an upper bound\nand settle it with Charge; it is the only part quotamcp ever refunds.\nCost is optional; nil has no billable work meters.",
+          "default": "Cost is optional; nil has no billable work meters.",
+          "line": 103
+        },
+        {
+          "name": "Settle",
+          "type": "bool",
+          "doc": "Settle reserves Attempt plus Cost and settles Cost with the actual.\nSettle defaults to false, charging Cost when the request is allowed.",
+          "default": "Settle defaults to false, charging Cost when the request is allowed.",
+          "line": 106
+        },
+        {
+          "name": "ChargeFirst",
+          "type": "bool",
+          "doc": "ChargeFirst declares that the settled tool calls Charge(ctx, nil) or Charge with an\namount before any billable work. When a failed call records no Charge, quotamcp assumes\nit never reached the handler and refunds Cost. A successful result without Charge\nbreaks this declaration: quota keeps the reservation and reports the error to OnError.",
+          "default": "ChargeFirst declares that the settled tool calls Charge(ctx, nil) or Charge with an amount before any billable work.",
+          "line": 111
+        },
+        {
+          "name": "Exempt",
+          "type": "bool",
+          "doc": "Exempt tools are never metered; they take no Attempt or Cost.\nExempt defaults to false.",
+          "default": "Exempt defaults to false.",
+          "line": 114
+        }
+      ]
+    },
+    {
+      "name": "quotaotel.LifecycleConfig",
+      "file": "quota/quotaotel/lifecycle.go",
+      "line": 20,
+      "doc": "LifecycleConfig configures bounded call counters. Names are validated and\ncopied. With the zero value all names map to _other.",
+      "fields": [
+        {
+          "name": "Names",
+          "type": "NameAllowlist",
+          "doc": "Names at zero maps all plan, limit and meter names to _other.",
+          "default": "Names at zero maps all plan, limit and meter names to _other.",
+          "line": 22
+        }
+      ]
+    },
+    {
+      "name": "quotaotel.TraceConfig",
+      "file": "quota/quotaotel/tracing.go",
+      "line": 35,
+      "doc": "TraceConfig configures synchronous span events. Its zero value is usable;\ndisclosure and status changes are off. Callbacks and Logger remain caller-owned\nand must support concurrent calls and return promptly. No context is retained.",
+      "fields": [
+        {
+          "name": "Names",
+          "type": "NameAllowlist",
+          "doc": "Names is validated and copied; zero normalizes names to _other.",
+          "default": "Names is validated and copied; zero normalizes names to _other.",
+          "line": 37
+        },
+        {
+          "name": "Identity",
+          "type": "func(quota.Identity) []attribute.KeyValue",
+          "doc": "Identity optionally returns attributes to include in traces. Nil discloses none. At\nmost four candidates are checked. Only namespaced scalar attributes outside quota.*,\nerror.*, gen_ai.* and mcp.* are kept. Keys are at most 64 bytes; string values are at\nmost 128 bytes. Duplicate keys are dropped. Prefer a keyed digest. It remains linkable\npersonal data and does not anonymize the caller.",
+          "default": "Identity optionally returns attributes to include in traces. Nil discloses none.",
+          "line": 43
+        },
+        {
+          "name": "Remaining",
+          "type": "bool",
+          "doc": "Remaining discloses coarse usage per subject, even without caller attributes.\nRemaining defaults to false.",
+          "default": "Remaining defaults to false.",
+          "line": 46
+        },
+        {
+          "name": "MarkErrors",
+          "type": "bool",
+          "doc": "MarkErrors sets Error status only when an unavailable store causes a request to be rejected.\nMarkErrors defaults to false.",
+          "default": "MarkErrors defaults to false.",
+          "line": 49
+        },
+        {
+          "name": "MaxEventAttrs",
+          "type": "int",
+          "doc": "MaxEventAttrs includes the dropped marker: zero selects 16; otherwise 1–32.",
+          "default": "MaxEventAttrs includes the dropped marker: zero selects 16; otherwise 1–32.",
+          "line": 51
+        },
+        {
+          "name": "Failures",
+          "type": "FailureSink",
+          "doc": "Failures optionally counts recovered panics; nil does not count failures.",
+          "default": "Failures optionally counts recovered panics; nil does not count failures.",
+          "line": 53
+        },
+        {
+          "name": "Logger",
+          "type": "*slog.Logger",
+          "doc": "Logger optionally receives fixed diagnostics, at most once per minute per\nconstructed hook. Recovered values, caller data and error text are never logged.",
+          "default": "Logger optionally receives fixed diagnostics, at most once per minute per constructed hook.",
+          "line": 56
+        }
+      ]
+    },
+    {
+      "name": "quotaprom.LifecycleConfig",
+      "file": "quota/quotaprom/lifecycle.go",
+      "line": 23,
+      "doc": "LifecycleConfig configures bounded call counters. Names are validated and\ncopied. With the zero value all names map to _other.",
+      "fields": [
+        {
+          "name": "Names",
+          "type": "NameAllowlist",
+          "doc": "Names at zero maps all plan, limit and meter names to _other.",
+          "default": "Names at zero maps all plan, limit and meter names to _other.",
+          "line": 25
+        }
+      ]
+    },
+    {
+      "name": "quotastripe.Config",
+      "file": "quota/quotastripe/config.go",
+      "line": 39,
+      "doc": "Config selects one immutable namespace and state history within a Stripe account. New\ncopies maps and slices; the application owns Client, Store and callbacks. Callbacks must\nbe safe for concurrent use and honor their bounded contexts.",
+      "fields": [
+        {
+          "name": "Namespace",
+          "type": "string",
+          "doc": "Namespace is required and identifies one account's immutable state history. The event\nindex preserves the first customer and meter mapping across replay.",
+          "default": "Namespace is required and identifies one account's immutable state history.",
+          "line": 42
+        },
+        {
+          "name": "Store",
+          "type": "Store",
+          "doc": "Store is required, concurrency safe, and caller-owned.",
+          "default": "Store is required, concurrency safe, and caller-owned.",
+          "line": 44
+        },
+        {
+          "name": "Client",
+          "type": "*http.Client",
+          "doc": "Client is required and caller-owned. An owned copy refuses redirects. Any RoundTripper\nis supported behind an HTTPS wrapper.",
+          "default": "Client is required and caller-owned.",
+          "line": 47
+        },
+        {
+          "name": "APIKey",
+          "type": "func(context.Context) (string, error)",
+          "doc": "APIKey is required and supplies a key under a request deadline. One callback runs at a\ntime; concurrent callers wait within their own bounded contexts. Keys are cached only\nin memory and never logged. Dispatch resolves or reuses a validated key before claiming\nwork. A failure before claiming writes nothing, reports OnError with operation\n\"dispatch\", and pauses dispatch with escalating backoff.",
+          "default": "APIKey is required and supplies a key under a request deadline.",
+          "line": 53
+        },
+        {
+          "name": "APIKeyTTL",
+          "type": "time.Duration",
+          "doc": "APIKeyTTL defaults to one minute; require 1 second–15 minutes. A validated key is\nshared by workers and reads for this duration after resolution. Expiry, 401/403,\nvalidation failure and Run start clear it. Shorter TTLs reduce key memory residency and\nrotation delay but increase callback traffic. In-flight requests may finish with their\nadmitted key.",
+          "default": "APIKeyTTL defaults to one minute; require 1 second–15 minutes.",
+          "line": 59
+        },
+        {
+          "name": "Meters",
+          "type": "map[string]Meter",
+          "doc": "Meters contains 1–256 source-meter mappings; New takes a private copy. Meters is\nrequired; configure 1–256 mappings.",
+          "default": "Meters is required; configure 1–256 mappings.",
+          "line": 62
+        },
+        {
+          "name": "Ignore",
+          "type": "[]string",
+          "doc": "Ignore contains at most 256 pure ignored source meters; default empty.",
+          "default": "Ignore contains at most 256 pure ignored source meters; default empty.",
+          "line": 64
+        },
+        {
+          "name": "Customer",
+          "type": "func(context.Context, quota.ConsumptionEvent) (string, error)",
+          "doc": "Customer is required. Its first event-specific result is durably indexed. Return\nErrSkip to skip the event permanently. Any other error pauses export and retries.",
+          "default": "Customer is required.",
+          "line": 67
+        },
+        {
+          "name": "Drained",
+          "type": "func(context.Context) (bool, error)",
+          "doc": "Drained reports whether final source usage through the chosen cutoff has arrived.\nNil leaves source completeness unknown.",
+          "default": "Nil leaves source completeness unknown.",
+          "line": 70
+        },
+        {
+          "name": "Window",
+          "type": "time.Duration",
+          "doc": "Window defaults to one minute; other nonzero grids are rejected.",
+          "default": "Window defaults to one minute; other nonzero grids are rejected.",
+          "line": 72
+        },
+        {
+          "name": "Lateness",
+          "type": "time.Duration",
+          "doc": "Lateness defaults to two minutes before automatic sealing. Nonzero values must be positive.",
+          "default": "Lateness defaults to two minutes before automatic sealing. Nonzero values must be positive.",
+          "line": 74
+        },
+        {
+          "name": "ResendWithin",
+          "type": "time.Duration",
+          "doc": "ResendWithin defaults to 12 hours from the persisted first send\nintent; require RequestTimeout + 5m \u003c ResendWithin \u003c 23h55m.",
+          "default": "ResendWithin defaults to 12 hours from the persisted first send intent; require RequestTimeout + 5m \u003c ResendWithin \u003c 23h55m.",
+          "line": 77
+        },
+        {
+          "name": "DedupeRetention",
+          "type": "time.Duration",
+          "doc": "DedupeRetention defaults to 72 hours after window end; unresolved work pins it.\nValid range 1 minute–10 years; it must match StoreConfig.",
+          "default": "DedupeRetention defaults to 72 hours after window end; unresolved work pins it.",
+          "line": 80
+        },
+        {
+          "name": "DecisionRetention",
+          "type": "time.Duration",
+          "doc": "DecisionRetention defaults to 35 days; valid range 1 minute–35 days.\nIt must match StoreConfig.",
+          "default": "DecisionRetention defaults to 35 days; valid range 1 minute–35 days.",
+          "line": 83
+        },
+        {
+          "name": "ReceiptRetention",
+          "type": "time.Duration",
+          "doc": "ReceiptRetention defaults to 400 days; MaxHistory can shorten actual coverage.\nValid range 1 minute–10 years; it must match StoreConfig.",
+          "default": "ReceiptRetention defaults to 400 days; MaxHistory can shorten actual coverage.",
+          "line": 86
+        },
+        {
+          "name": "LeaseTTL",
+          "type": "time.Duration",
+          "doc": "LeaseTTL defaults to two minutes; require \u003e=3*RequestTimeout and \u003c=24 hours.",
+          "default": "LeaseTTL defaults to two minutes; require \u003e=3*RequestTimeout and \u003c=24 hours.",
+          "line": 88
+        },
+        {
+          "name": "BacklogAlarm",
+          "type": "time.Duration",
+          "doc": "BacklogAlarm defaults to 30 minutes for OnBacklog.",
+          "default": "BacklogAlarm defaults to 30 minutes for OnBacklog.",
+          "line": 90
+        },
+        {
+          "name": "SummaryLag",
+          "type": "time.Duration",
+          "doc": "SummaryLag defaults to 15 minutes and must be positive. It is a heuristic, not a processing SLA.",
+          "default": "SummaryLag defaults to 15 minutes and must be positive.",
+          "line": 92
+        },
+        {
+          "name": "RequestTimeout",
+          "type": "time.Duration",
+          "doc": "RequestTimeout defaults to 30 seconds; require 0 \u003c timeout \u003c=5 minutes.",
+          "default": "RequestTimeout defaults to 30 seconds; require 0 \u003c timeout \u003c=5 minutes.",
+          "line": 94
+        },
+        {
+          "name": "RatePerSecond",
+          "type": "int",
+          "doc": "RatePerSecond defaults to 20 for each shared POST/read budget; maximum 1000.",
+          "default": "RatePerSecond defaults to 20 for each shared POST/read budget; maximum 1000.",
+          "line": 96
+        },
+        {
+          "name": "Burst",
+          "type": "int",
+          "doc": "Burst defaults to one; maximum 1000 per budget.",
+          "default": "Burst defaults to one; maximum 1000 per budget.",
+          "line": 98
+        },
+        {
+          "name": "Workers",
+          "type": "int",
+          "doc": "Workers defaults to eight concurrent group workers; require 1–64. Each group has at\nmost one local request in flight. All workers share rate budgets and the account\nauthentication pause. Run cancels and joins them.",
+          "default": "Workers defaults to eight concurrent group workers; require 1–64.",
+          "line": 102
+        },
+        {
+          "name": "MaxAttempts",
+          "type": "int",
+          "doc": "MaxAttempts defaults to 50; require 1–1000. Auth responses do not count.",
+          "default": "MaxAttempts defaults to 50; require 1–1000.",
+          "line": 104
+        },
+        {
+          "name": "MaxDedupeEvents",
+          "type": "int",
+          "doc": "MaxDedupeEvents defaults to 100000 per billed group, matching StoreConfig.\nNonzero overrides must be 1–1000000 and must match StoreConfig.",
+          "default": "MaxDedupeEvents defaults to 100000 per billed group, matching StoreConfig. Nonzero overrides must be 1–1000000 and must match StoreConfig.",
+          "line": 107
+        },
+        {
+          "name": "MaxDecisions",
+          "type": "int",
+          "doc": "MaxDecisions defaults to 100000 per terminal/counter shard, matching StoreConfig.\nNonzero overrides must be 1–1000000 and must match StoreConfig.",
+          "default": "MaxDecisions defaults to 100000 per terminal/counter shard, matching StoreConfig. Nonzero overrides must be 1–1000000 and must match StoreConfig.",
+          "line": 110
+        },
+        {
+          "name": "MaxOpenGroups",
+          "type": "int",
+          "doc": "MaxOpenGroups defaults to 10000 retained groups, including internal shards.\nRedis group counting is approximate across slots; matching StoreConfig is required.\nNonzero overrides must be 1–1000000 and must match StoreConfig.",
+          "default": "MaxOpenGroups defaults to 10000 retained groups, including internal shards. Redis group counting is approximate across slots; matching StoreConfig is required. Nonzero overrides must be 1–1000000 and must match StoreConfig.",
+          "line": 114
+        },
+        {
+          "name": "MaxUnsentBatches",
+          "type": "int",
+          "doc": "MaxUnsentBatches defaults to 10000 open/sealed/sending/uncertain/quarantined\nrecords per group, matching StoreConfig.MaxBatches. Sent receipts are excluded.\nNonzero overrides must be 1–1000000 and must match StoreConfig.",
+          "default": "MaxUnsentBatches defaults to 10000 open/sealed/sending/uncertain/quarantined records per group, matching StoreConfig.MaxBatches. Nonzero overrides must be 1–1000000 and must match StoreConfig.",
+          "line": 118
+        },
+        {
+          "name": "MaxQuarantined",
+          "type": "int",
+          "doc": "MaxQuarantined defaults to 10000 per group, matching StoreConfig.\nNonzero overrides must be 1–1000000 and must match StoreConfig.",
+          "default": "MaxQuarantined defaults to 10000 per group, matching StoreConfig. Nonzero overrides must be 1–1000000 and must match StoreConfig.",
+          "line": 121
+        },
+        {
+          "name": "Logger",
+          "type": "*slog.Logger",
+          "doc": "Logger is optional and caller-owned; default silence. Logs use fixed fields,\nbounded response classifications and only the last four customer characters.",
+          "default": "Logger is optional and caller-owned; default silence.",
+          "line": 124
+        },
+        {
+          "name": "OnError",
+          "type": "func(context.Context, string, error)",
+          "doc": "OnError is optional and may run concurrently; it must be concurrency safe,\nhonor its bounded context and not block.",
+          "default": "OnError is optional and may run concurrently; it must be concurrency safe, honor its bounded context and not block.",
+          "line": 127
+        },
+        {
+          "name": "OnBacklog",
+          "type": "func(context.Context, time.Duration)",
+          "doc": "OnBacklog is optional; it must honor its bounded context and not block.",
+          "default": "OnBacklog is optional; it must honor its bounded context and not block.",
+          "line": 129
+        }
+      ]
+    },
+    {
+      "name": "quotastripe.StoreConfig",
+      "file": "quota/quotastripe/store_config.go",
+      "line": 19,
+      "doc": "StoreConfig bounds authoritative state. Zero fields select finite defaults.\nPrefix is a physical Redis prefix; Namespace remains part of the normalized\ngroup digest. Per-group caps are exact; Redis MaxGroups is approximate across\ncluster slots. Retained groups include persistent sequence/fence tombstones\nand never expire. Every nonzero capacity must be in [1, 2^30].\nDedupeRetention and ReceiptRetention must be 1 minute–10 years. Constructors\ncopy settings and retain the optional Clock callback.",
+      "fields": [
+        {
+          "name": "Prefix",
+          "type": "string",
+          "doc": "Prefix defaults to quotastripe; use \u003c=32 lowercase letters, digits or underscores. An\noptional namespace: prefix accepts a namespace of up to 32 lowercase letters, digits,\nunderscores or hyphens (for example myapp:prod).",
+          "default": "Prefix defaults to quotastripe; use \u003c=32 lowercase letters, digits or underscores. An optional namespace: prefix accepts a namespace of up to 32 lowercase letters, digits, underscores or hyphens (for example myapp:prod).",
+          "line": 23
+        },
+        {
+          "name": "Clock",
+          "type": "func() time.Time",
+          "doc": "Clock is an optional concurrency-safe clock for isolated tests; default store time.",
+          "default": "Clock is an optional concurrency-safe clock for isolated tests; default store time.",
+          "line": 25
+        },
+        {
+          "name": "DedupeRetention",
+          "type": "time.Duration",
+          "doc": "DedupeRetention defaults to 72 hours, measured strictly after window end.",
+          "default": "DedupeRetention defaults to 72 hours, measured strictly after window end.",
+          "line": 27
+        },
+        {
+          "name": "DecisionRetention",
+          "type": "time.Duration",
+          "doc": "DecisionRetention defaults to 35 days; require one minute through 35 days.",
+          "default": "DecisionRetention defaults to 35 days; require one minute through 35 days.",
+          "line": 29
+        },
+        {
+          "name": "ReceiptRetention",
+          "type": "time.Duration",
+          "doc": "ReceiptRetention defaults to 400 days; history capacity may evict sooner.",
+          "default": "ReceiptRetention defaults to 400 days; history capacity may evict sooner.",
+          "line": 31
+        },
+        {
+          "name": "MaxDedupeEvents",
+          "type": "int",
+          "doc": "MaxDedupeEvents defaults to 100000 per billed group. Index shards allow\nMaxDedupeEvents+MaxDecisions entries, additionally limited by MaxBytes.",
+          "default": "MaxDedupeEvents defaults to 100000 per billed group.",
+          "line": 34
+        },
+        {
+          "name": "MaxDecisions",
+          "type": "int",
+          "doc": "MaxDecisions defaults to 100000 per terminal shard or daily-counter shard.",
+          "default": "MaxDecisions defaults to 100000 per terminal shard or daily-counter shard.",
+          "line": 36
+        },
+        {
+          "name": "MaxGroups",
+          "type": "int",
+          "doc": "MaxGroups defaults to 10000, including internal shards and permanent tombstones.\nIt is exact per MemoryStore and approximate per namespace across Redis slots.",
+          "default": "MaxGroups defaults to 10000, including internal shards and permanent tombstones.",
+          "line": 39
+        },
+        {
+          "name": "MaxOpenWindows",
+          "type": "int",
+          "doc": "MaxOpenWindows defaults to 1000 per group.",
+          "default": "MaxOpenWindows defaults to 1000 per group.",
+          "line": 41
+        },
+        {
+          "name": "MaxBatches",
+          "type": "int",
+          "doc": "MaxBatches defaults to 10000 unresolved records per group, including open work.",
+          "default": "MaxBatches defaults to 10000 unresolved records per group, including open work.",
+          "line": 43
+        },
+        {
+          "name": "MaxQuarantined",
+          "type": "int",
+          "doc": "MaxQuarantined defaults to 10000 per group; quarantined input never expires.",
+          "default": "MaxQuarantined defaults to 10000 per group; quarantined input never expires.",
+          "line": 45
+        },
+        {
+          "name": "MaxHistory",
+          "type": "int",
+          "doc": "MaxHistory defaults to 10000 sent receipts per group in companion storage.\nOldest-first eviction advances CoverageLostBefore and never removes unresolved work.",
+          "default": "MaxHistory defaults to 10000 sent receipts per group in companion storage.",
+          "line": 48
+        },
+        {
+          "name": "MaxReservations",
+          "type": "int",
+          "doc": "MaxReservations defaults to 1000 per group. It caps saved Capture replies (at most one\nminute) and persistent FlushOnce snapshots. Capture saves the state used for a flush;\nFlushOnce snapshots survive retries. The same limit caps persistent FlushOnce requests\nin the namespace slot. Persistent records are never evicted; a full registry rejects\nnew request IDs. MaxBytes also applies. Seal creates no reply receipt.",
+          "default": "MaxReservations defaults to 1000 per group.",
+          "line": 54
+        },
+        {
+          "name": "MaxBytes",
+          "type": "int",
+          "doc": "MaxBytes defaults to 32 MiB for the active group record. It excludes sent receipts and\ndurable flush receipts, which use companion storage. Each flush receipt is bounded by\n32 * MaxBytes * (registered groups + 1). MaxReservations bounds the number of receipts.\nNamespace scheduling leases have a separate 2 KiB allowance, so a full flush registry\ncan restart.",
+          "default": "MaxBytes defaults to 32 MiB for the active group record.",
+          "line": 60
+        }
+      ]
+    },
+    {
+      "name": "redisstore.Config",
+      "file": "quota/redisstore/store.go",
+      "line": 25,
+      "doc": "Config selects a key namespace. An optional namespace: prefix scopes keys to a shared\nRedis ACL, for example myapp:prod. Use at most 32 lowercase letters, digits, underscores\nor hyphens.",
+      "fields": [
+        {
+          "name": "Prefix",
+          "type": "string",
+          "doc": "Prefix defaults to quota; the unqualified prefix must match\n[a-z0-9][a-z0-9_]{0,15}. See Config for the optional namespace.",
+          "default": "Prefix defaults to quota; the unqualified prefix must match [a-z0-9][a-z0-9_]{0,15}. See Config for the optional namespace.",
+          "line": 28
+        },
+        {
+          "name": "Clock",
+          "type": "func() time.Time",
+          "doc": "Clock is retained for isolated tests only and must be concurrency safe.\nIt replaces server time, including virtual expiry; nil uses Redis TIME.",
+          "default": "It replaces server time, including virtual expiry; nil uses Redis TIME.",
+          "line": 31
+        }
+      ]
+    },
+    {
+      "name": "stripeadmin.Config",
+      "file": "quota/quotastripe/stripeadmin/panel.go",
+      "line": 37,
+      "doc": "Config selects the caller-owned status reader. Status and optional readers\nare retained for the panel lifetime, never closed; all must be concurrency\nsafe and honor cancellation.",
+      "fields": [
+        {
+          "name": "Status",
+          "type": "StatusReader",
+          "doc": "Status is required, retained and caller-owned; it must honor ctx and\nbe concurrency safe.",
+          "default": "Status is required, retained and caller-owned; it must honor ctx and be concurrency safe.",
+          "line": 40
+        },
+        {
+          "name": "Inspection",
+          "type": "InspectionReader",
+          "doc": "Inspection enables bounded shared-store diagnostic views. Nil omits them.",
+          "default": "Nil omits them.",
+          "line": 42
+        },
+        {
+          "name": "Reconcile",
+          "type": "ReconcileReader",
+          "doc": "Reconcile enables a probe that compares exported totals with Stripe usage. Nil omits\nthe action.",
+          "default": "Nil omits the action.",
+          "line": 45
+        },
+        {
+          "name": "Flush",
+          "type": "FlushRunner",
+          "doc": "Flush enables an action that seals and dispatches eligible usage through the local\ndispatcher. The request is saved durably for retries. Nil omits the action.",
+          "default": "Nil omits the action.",
+          "line": 48
+        },
+        {
+          "name": "Budget",
+          "type": "quotastripe.InspectionBudget",
+          "doc": "Budget bounds inspection; zero uses quotastripe defaults.",
+          "default": "Budget bounds inspection; zero uses quotastripe defaults.",
+          "line": 50
+        },
+        {
+          "name": "StripePages",
+          "type": "int",
+          "doc": "StripePages defaults to 10 and must be 1–100. Shared across Probe retries.",
+          "default": "StripePages defaults to 10 and must be 1–100.",
+          "line": 52
+        },
+        {
+          "name": "ID",
+          "type": "string",
+          "doc": "ID defaults to stripe; use 1–32 lowercase ASCII letters, digits or\nhyphens, starting with a letter, excluding api and assets.",
+          "default": "ID defaults to stripe; use 1–32 lowercase ASCII letters, digits or hyphens, starting with a letter, excluding api and assets.",
+          "line": 55
+        },
+        {
+          "name": "BacklogAlarm",
+          "type": "time.Duration",
+          "doc": "BacklogAlarm is a display threshold; defaults to 30m, nonzero values\nmust be positive.",
+          "default": "BacklogAlarm is a display threshold; defaults to 30m, nonzero values must be positive.",
+          "line": 58
+        },
+        {
+          "name": "Now",
+          "type": "func() time.Time",
+          "doc": "Now is retained and must be concurrency safe; nil uses time.Now.",
+          "default": "Now is retained and must be concurrency safe; nil uses time.Now.",
+          "line": 60
+        }
+      ]
+    },
+    {
+      "name": "tenant.AuthorizeConfig",
+      "file": "tenant/authorize.go",
+      "line": 61,
+      "doc": "AuthorizeConfig configures fail-closed resource authorization. Resource receives the deadline through the Echo request context. The\nmiddleware restores the original context before calling the handler.\nResolver request changes and parsed form state are preserved. Callbacks must honor cancellation and be concurrency\nsafe; no detached work is started. Resolvers must establish resource\nownership, not merely operation ID, and must not retain the Echo context.",
+      "fields": [
+        {
+          "name": "Authorizer",
+          "type": "Authorizer",
+          "doc": "Authorizer is required, caller-owned and must be concurrency safe and\nhonor ctx.",
+          "default": "Authorizer is required, caller-owned and must be concurrency safe and honor ctx.",
+          "line": 64
+        },
+        {
+          "name": "Action",
+          "type": "string",
+          "doc": "Action is required and contains 1–128 bytes.",
+          "default": "Action is required and contains 1–128 bytes.",
+          "line": 66
+        },
+        {
+          "name": "Resource",
+          "type": "func(*echo.Context) (Resource, error)",
+          "doc": "Resource is a required, concurrency-safe resolver. It borrows the\nEcho context for the call and must honor its request deadline.",
+          "default": "Resource is a required, concurrency-safe resolver.",
+          "line": 69
+        },
+        {
+          "name": "Timeout",
+          "type": "time.Duration",
+          "doc": "Timeout bounds resource resolution and authorization; defaults to 2s,\nvalid range 1ms–30s.",
+          "default": "Timeout bounds resource resolution and authorization; defaults to 2s, valid range 1ms–30s.",
+          "line": 72
+        }
+      ]
+    },
+    {
+      "name": "tenant.CerbosConfig",
+      "file": "tenant/http.go",
+      "line": 146,
+      "doc": "CerbosConfig requires an explicit trusted mapping, so arbitrary claims are\nnever forwarded. The adapter adds the resolved tenant as resource attr tenant.",
+      "fields": [
+        {
+          "name": "HTTP",
+          "type": "HTTPConfig",
+          "doc": "HTTP supplies the required client, origin and bounded request\nsettings.",
+          "default": "HTTP supplies the required client, origin and bounded request settings.",
+          "line": 149
+        },
+        {
+          "name": "Principal",
+          "type": "func(Check) (CerbosPrincipal, error)",
+          "doc": "Principal is a required retained mapping and must be concurrency\nsafe. Returned roles and attributes are borrowed only during the\nauthorization call.",
+          "default": "Principal is a required retained mapping and must be concurrency safe.",
+          "line": 153
+        }
+      ]
+    },
+    {
+      "name": "tenant.Config",
+      "file": "tenant/tenant.go",
+      "line": 179,
+      "doc": "Config evaluates every selector and refuses conflicts. A credential\nrestriction supplies the tenant when selectors are absent. AnonymousSelector\nexplicitly permits public tenant addressing; ordinary selectors cannot confer\ntenant authority on anonymous requests. Callbacks remain caller-owned and\nconcurrency safe.",
+      "fields": [
+        {
+          "name": "Selectors",
+          "type": "[]Selector",
+          "doc": "Selectors is copied; nil selects only a credential restriction.\nAt most 16 non-nil, concurrency-safe callbacks are accepted.",
+          "default": "Selectors is copied; nil selects only a credential restriction. At most 16 non-nil, concurrency-safe callbacks are accepted.",
+          "line": 182
+        },
+        {
+          "name": "Member",
+          "type": "func(context.Context, auth.Principal, ID) (bool, error)",
+          "doc": "Member checks authenticated principals only. If nil, it refuses request-selected\ntenants unless the credential restricts the tenant. The callback is retained, must\nsupport concurrent calls and must honor ctx. An error refuses the request, even when\nMember also returns true.",
+          "default": "If nil, it refuses request-selected tenants unless the credential restricts the tenant.",
+          "line": 187
+        },
+        {
+          "name": "Required",
+          "type": "bool",
+          "doc": "Required refuses an absent tenant except on public operations;\ndefault false.",
+          "default": "Required refuses an absent tenant except on public operations; default false.",
+          "line": 190
+        },
+        {
+          "name": "AnonymousSelector",
+          "type": "Selector",
+          "doc": "AnonymousSelector is an optional retained selector for anonymous\ntraffic; nil disables anonymous tenant selection.",
+          "default": "AnonymousSelector is an optional retained selector for anonymous traffic; nil disables anonymous tenant selection.",
+          "line": 193
+        }
+      ]
+    },
+    {
+      "name": "tenant.HTTPConfig",
+      "file": "tenant/http.go",
+      "line": 31,
+      "doc": "HTTPConfig bounds a caller-owned client's authorization work. Responses are\nlimited to 64 KiB after decompression. Redirects must keep scheme and host,\nwith at most five hops. No retries or goroutines run. Service credentials are\nnever logged.",
+      "fields": [
+        {
+          "name": "Client",
+          "type": "*http.Client",
+          "doc": "Client is required and caller-owned. A shallow private copy shares\nits transport and disables its cookie jar; configure it before\ncalling Cerbos or OpenFGA. Later field changes are not observed.",
+          "default": "Client is required and caller-owned.",
+          "line": 35
+        },
+        {
+          "name": "URL",
+          "type": "string",
+          "doc": "URL is a required http(s) origin without credentials, query or fragment. Plain http\nsupports private service meshes.",
+          "default": "URL is a required http(s) origin without credentials, query or fragment.",
+          "line": 38
+        },
+        {
+          "name": "Timeout",
+          "type": "time.Duration",
+          "doc": "Timeout defaults to 2s; valid range 1ms–30s, bounded by caller\ncancellation.",
+          "default": "Timeout defaults to 2s; valid range 1ms–30s, bounded by caller cancellation.",
+          "line": 41
+        },
+        {
+          "name": "MaxConcurrent",
+          "type": "int",
+          "doc": "MaxConcurrent defaults to 16; valid range 1–256. Excess calls deny\nimmediately.",
+          "default": "MaxConcurrent defaults to 16; valid range 1–256.",
+          "line": 44
+        },
+        {
+          "name": "AuthHeader",
+          "type": "string",
+          "doc": "AuthHeader and AuthValue must be both empty or both set. AuthHeader is 1–64 ASCII\nletters, digits or hyphens. AuthValue is at most 8192 bytes without CR or LF.",
+          "default": "AuthHeader and AuthValue must be both empty or both set.",
+          "line": 47
+        },
+        {
+          "name": "AuthValue",
+          "type": "string",
+          "doc": "AuthHeader and AuthValue must be both empty or both set. AuthHeader is 1–64 ASCII\nletters, digits or hyphens. AuthValue is at most 8192 bytes without CR or LF.",
+          "default": "AuthHeader and AuthValue must be both empty or both set.",
+          "line": 47
+        },
+        {
+          "name": "AllowInsecure",
+          "type": "bool",
+          "doc": "AllowInsecure permits credentials over HTTP for local tests; default\nfalse.",
+          "default": "AllowInsecure permits credentials over HTTP for local tests; default false.",
+          "line": 50
+        }
+      ]
+    },
+    {
+      "name": "tenant.OpenFGAConfig",
+      "file": "tenant/http.go",
+      "line": 217,
+      "doc": "OpenFGAConfig pins the store and authorization model.\nUser optionally maps a trusted principal to a complete OpenFGA user; nil uses\nuser:\u003cbase32 principal ID\u003e, avoiding ':'/'#' ambiguity in principal IDs.",
+      "fields": [
+        {
+          "name": "HTTP",
+          "type": "HTTPConfig",
+          "doc": "HTTP supplies the required client, origin and bounded request\nsettings.",
+          "default": "HTTP supplies the required client, origin and bounded request settings.",
+          "line": 220
+        },
+        {
+          "name": "StoreID",
+          "type": "string",
+          "doc": "StoreID and AuthorizationModelID are required, each 1–64 ASCII\nletters, digits, underscores or hyphens.",
+          "default": "StoreID and AuthorizationModelID are required, each 1–64 ASCII letters, digits, underscores or hyphens.",
+          "line": 223
+        },
+        {
+          "name": "AuthorizationModelID",
+          "type": "string",
+          "doc": "StoreID and AuthorizationModelID are required, each 1–64 ASCII\nletters, digits, underscores or hyphens.",
+          "default": "StoreID and AuthorizationModelID are required, each 1–64 ASCII letters, digits, underscores or hyphens.",
+          "line": 223
+        },
+        {
+          "name": "ActionRelations",
+          "type": "map[string]string",
+          "doc": "ActionRelations is copied; require 1–256 entries. Actions are 1–128\nbytes; relations start with an ASCII letter or underscore followed by\nup to 49 ASCII letters, digits or underscores. Missing actions deny.",
+          "default": "ActionRelations is copied; require 1–256 entries.",
+          "line": 227
+        },
+        {
+          "name": "User",
+          "type": "func(Check) (string, error)",
+          "doc": "User is a retained, concurrency-safe mapping; nil selects the\ndefault principal mapping described above. Its result must be a\nvalid OpenFGA user.",
+          "default": "User is a retained, concurrency-safe mapping; nil selects the default principal mapping described above.",
+          "line": 231
+        }
+      ]
+    },
+    {
+      "name": "webhook.Endpoint",
+      "file": "webhook/http.go",
+      "line": 31,
+      "doc": "Endpoint is a Standard Webhooks HMAC destination. URL must be absolute HTTPS;\nHTTP is permitted only for localhost or a literal loopback IP. Userinfo and\nfragments are refused. Secrets contains 1–8 whsec_-prefixed, standard base64\nencoded keys, each decoding to 24–64 bytes. Generate keys with crypto/rand;\nuse different keys for different endpoints. All keys sign during rotation.",
+      "fields": [
+        {
+          "name": "URL",
+          "type": "string",
+          "doc": "URL is required and has no default.",
+          "default": "URL is required and has no default.",
+          "line": 33
+        },
+        {
+          "name": "Secrets",
+          "type": "[]string",
+          "doc": "Secrets is required; configure 1–8 signing secrets.",
+          "default": "Secrets is required; configure 1–8 signing secrets.",
+          "line": 35
+        }
+      ]
+    },
+    {
+      "name": "webhook.HTTPSenderConfig",
+      "file": "webhook/http.go",
+      "line": 42,
+      "doc": "HTTPSenderConfig configures an opt-in Standard Webhooks sender. The zero value is\ninvalid. Construction copies endpoints and decodes keys privately. The cloned transport\nuses HTTP/1 without persistent connections, compression, redirects, cookies or automatic\nretries.",
+      "fields": [
+        {
+          "name": "Endpoints",
+          "type": "map[string]Endpoint",
+          "doc": "Endpoints registers 1–64 destinations, keyed by Delivery.Destination.\nKeep these keys in sync with the store Routing destinations.\nEndpoints is required; configure 1–64 destinations.",
+          "default": "Endpoints is required; configure 1–64 destinations.",
+          "line": 46
+        },
+        {
+          "name": "Client",
+          "type": "*http.Client",
+          "doc": "Client is optional and caller-owned. Construction copies its settings and clones its\ntransport. Transport must be nil or *http.Transport. Neither may be mutated during\nconstruction; neither is modified. A zero Timeout selects 15s. A positive Timeout is\npreserved.",
+          "default": "Client is optional and caller-owned. Transport must be nil or *http.Transport. A zero Timeout selects 15s.",
+          "line": 51
+        },
+        {
+          "name": "Now",
+          "type": "func() time.Time",
+          "doc": "Now defaults to time.Now; a supplied clock must be concurrency safe.",
+          "default": "Now defaults to time.Now; a supplied clock must be concurrency safe.",
+          "line": 53
+        },
+        {
+          "name": "Logger",
+          "type": "*slog.Logger",
+          "doc": "Logger is optional, caller-owned and defaults to silence. Logs contain\nonly outcome and machine code, never endpoint or delivery IDs.",
+          "default": "Logger is optional, caller-owned and defaults to silence.",
+          "line": 56
+        }
+      ]
+    },
+    {
+      "name": "webhook.ReceiveConfig",
+      "file": "webhook/receive.go",
+      "line": 61,
+      "doc": "ReceiveConfig configures terminal ingress middleware for one dedicated route.\nThe zero value is invalid.\n\nThe middleware retains Inbox and Verify without closing them.\nKeep them and their stores and keys usable while the middleware serves requests.\nBoth callbacks and their dependencies must support concurrent calls.\nThe adapter sets the connection's read deadline to Timeout through http.ResponseController.\nIf the response writer cannot set deadlines, your server must limit body reads to Timeout or less.\nCancelling a context cannot interrupt a blocked body read.\nLogs contain only the source, status and a fixed reason code.",
+      "fields": [
+        {
+          "name": "Inbox",
+          "type": "Acceptor",
+          "doc": "Inbox is required, caller-owned and must be concurrency safe and\nhonor ctx.",
+          "default": "Inbox is required, caller-owned and must be concurrency safe and honor ctx.",
+          "line": 64
+        },
+        {
+          "name": "Source",
+          "type": "string",
+          "doc": "Source is the required registered source name, 1–64 printable ASCII\nbytes. It must equal every Verify result's Source.",
+          "default": "Source is the required registered source name, 1–64 printable ASCII bytes.",
+          "line": 67
+        },
+        {
+          "name": "Verify",
+          "type": "VerifyFunc",
+          "doc": "Verify is required, retained and must be concurrency safe and honor\nctx.",
+          "default": "Verify is required, retained and must be concurrency safe and honor ctx.",
+          "line": 70
+        },
+        {
+          "name": "MaxBodyBytes",
+          "type": "int64",
+          "doc": "MaxBodyBytes defaults to 256 KiB; valid range 1 byte–1 MiB.",
+          "default": "MaxBodyBytes defaults to 256 KiB; valid range 1 byte–1 MiB.",
+          "line": 72
+        },
+        {
+          "name": "Timeout",
+          "type": "time.Duration",
+          "doc": "Timeout bounds body reads, verification and acceptance from adapter\nentry; zero uses 5s, valid range 1–8s. See ReceiveConfig for\nbody-read deadline requirements.",
+          "default": "Timeout bounds body reads, verification and acceptance from adapter entry; zero uses 5s, valid range 1–8s.",
+          "line": 76
+        },
+        {
+          "name": "Logger",
+          "type": "*slog.Logger",
+          "doc": "Logger is optional and caller-owned; nil is silent.",
+          "default": "Logger is optional and caller-owned; nil is silent.",
+          "line": 78
+        }
+      ]
+    },
+    {
+      "name": "webhook.StandardVerifierConfig",
+      "file": "webhook/http.go",
+      "line": 285,
+      "doc": "StandardVerifierConfig configures HMAC Standard Webhooks verification for one\ntrusted route. The zero value is invalid. Unverified headers and payloads cannot select tenant, account, type or\nformat. For dynamic mappings, wrap VerifyFunc and parse only after\nverification succeeds.",
+      "fields": [
+        {
+          "name": "Secrets",
+          "type": "[]string",
+          "doc": "Secrets uses Endpoint's whsec_ form and bounds; any matching key verifies.\nSecrets is required; configure 1–8 verification secrets.",
+          "default": "Secrets is required; configure 1–8 verification secrets.",
+          "line": 288
+        },
+        {
+          "name": "Tenant",
+          "type": "string",
+          "doc": "Source, Type and Format are required. They name the source, event type and payload\nformat assigned to every verified message. Tenant and Account bind the route to trusted\napplication values and may be empty.",
+          "default": "Source, Type and Format are required. Tenant and Account bind the route to trusted application values and may be empty.",
+          "line": 292
+        },
+        {
+          "name": "Source",
+          "type": "string",
+          "doc": "Source, Type and Format are required. They name the source, event type and payload\nformat assigned to every verified message. Tenant and Account bind the route to trusted\napplication values and may be empty.",
+          "default": "Source, Type and Format are required. Tenant and Account bind the route to trusted application values and may be empty.",
+          "line": 292
+        },
+        {
+          "name": "Account",
+          "type": "string",
+          "doc": "Source, Type and Format are required. They name the source, event type and payload\nformat assigned to every verified message. Tenant and Account bind the route to trusted\napplication values and may be empty.",
+          "default": "Source, Type and Format are required. Tenant and Account bind the route to trusted application values and may be empty.",
+          "line": 292
+        },
+        {
+          "name": "Type",
+          "type": "string",
+          "doc": "Source, Type and Format are required. They name the source, event type and payload\nformat assigned to every verified message. Tenant and Account bind the route to trusted\napplication values and may be empty.",
+          "default": "Source, Type and Format are required. Tenant and Account bind the route to trusted application values and may be empty.",
+          "line": 292
+        },
+        {
+          "name": "Format",
+          "type": "string",
+          "doc": "Source, Type and Format are required. They name the source, event type and payload\nformat assigned to every verified message. Tenant and Account bind the route to trusted\napplication values and may be empty.",
+          "default": "Source, Type and Format are required. Tenant and Account bind the route to trusted application values and may be empty.",
+          "line": 292
+        },
+        {
+          "name": "Tolerance",
+          "type": "time.Duration",
+          "doc": "Tolerance defaults to 5m; valid range 1s–5m, on either side of Now.\nTimestamp checking limits replay age; the inbox must deduplicate IDs.",
+          "default": "Tolerance defaults to 5m; valid range 1s–5m, on either side of Now.",
+          "line": 295
+        },
+        {
+          "name": "Now",
+          "type": "func() time.Time",
+          "doc": "Now defaults to time.Now; a supplied clock must be concurrency safe.",
+          "default": "Now defaults to time.Now; a supplied clock must be concurrency safe.",
+          "line": 297
+        }
+      ]
+    },
+    {
+      "name": "webhookadmin.Config",
+      "file": "webhook/webhookadmin/panel.go",
+      "line": 39,
+      "doc": "Config selects one caller-owned store. The zero ID is \"webhook\"; Store has\nno default, so the zero Config is invalid.",
+      "fields": [
+        {
+          "name": "ID",
+          "type": "string",
+          "doc": "ID is the panel ID: 1–32 bytes of [a-z0-9-] starting with a letter, not\n\"api\" or \"assets\". It defaults to \"webhook\". Use a distinct ID for each namespace. Change the ID or console Keys when\nswitching that location to another namespace. Cursors bind the panel ID\nrather than the store.",
+          "default": "It defaults to \"webhook\".",
+          "line": 44
+        },
+        {
+          "name": "Store",
+          "type": "*webhookpg.Store",
+          "doc": "Store is an already constructed, caller-owned store from webhookpg.New\non the runtime-role pool. The panel never migrates, closes or\nreconfigures it. Keep the store and its pool open while any console using the panel serves\nrequests.\nRequired.",
+          "default": "Required.",
+          "line": 51
+        },
+        {
+          "name": "EnableReplay",
+          "type": "bool",
+          "doc": "EnableReplay explicitly enables audited replay, unknown-outcome decisions\nand payload reveal. The default\npanel exposes reads only. Mounting an enabled panel requires console Keys\nand an Audit sink (or the explicit AllowUnauditedWrites opt-out).",
+          "default": "The default panel exposes reads only. Mounting an enabled panel requires console Keys and an Audit sink (or the explicit AllowUnauditedWrites opt-out).",
+          "line": 57
+        }
+      ]
+    },
+    {
+      "name": "webhookmem.DestinationConfig",
+      "file": "webhook/webhookmem/store.go",
+      "line": 27,
+      "doc": "DestinationConfig registers a versioned outgoing destination, with the same\npolicy and defaults as webhookpg.DestinationConfig. Send is caller-owned,\nretained, concurrency safe and must honor cancellation. ReplayWindow is the\nreceiver's deduplication horizon, greater than RequestTimeout + 5m and at most\n30 days. RequestTimeout defaults to 15s, valid range 1–30s.",
+      "fields": [
+        {
+          "name": "Version",
+          "type": "string",
+          "doc": "Version is required; configure the immutable routing version.",
+          "default": "Version is required; configure the immutable routing version.",
+          "line": 29
+        },
+        {
+          "name": "Send",
+          "type": "webhook.SendFunc",
+          "doc": "Send is required, retained and caller-owned.",
+          "default": "Send is required, retained and caller-owned.",
+          "line": 31
+        },
+        {
+          "name": "ReplayWindow",
+          "type": "time.Duration",
+          "doc": "ReplayWindow is required and has no default.",
+          "default": "ReplayWindow is required and has no default.",
+          "line": 33
+        },
+        {
+          "name": "RequestTimeout",
+          "type": "time.Duration",
+          "doc": "RequestTimeout defaults to 15s; valid range 1s–30s.",
+          "default": "RequestTimeout defaults to 15s; valid range 1s–30s.",
+          "line": 35
+        }
+      ]
+    },
+    {
+      "name": "webhookmem.RoutingConfig",
+      "file": "webhook/webhookmem/store.go",
+      "line": 42,
+      "doc": "RoutingConfig freezes outgoing routing and retry policy. Destinations is\ncopied (at most 64). MaxAttempts defaults to 8, range 1–32. MaxAge defaults to\n72h, range 1m–7 days. Logger is optional, caller-owned and silent when nil.\nCallbacks and logger must be safe for concurrent use.",
+      "fields": [
+        {
+          "name": "Destinations",
+          "type": "map[string]DestinationConfig",
+          "doc": "Destinations is optional; nil registers none, with at most 64 entries.",
+          "default": "Destinations is optional; nil registers none, with at most 64 entries.",
+          "line": 44
+        },
+        {
+          "name": "MaxAttempts",
+          "type": "int",
+          "doc": "MaxAttempts defaults to 8; valid range 1–32 attempts per cycle.",
+          "default": "MaxAttempts defaults to 8; valid range 1–32 attempts per cycle.",
+          "line": 46
+        },
+        {
+          "name": "MaxAge",
+          "type": "time.Duration",
+          "doc": "MaxAge defaults to 72h; valid range 1m–7 days per cycle.",
+          "default": "MaxAge defaults to 72h; valid range 1m–7 days per cycle.",
+          "line": 48
+        },
+        {
+          "name": "Logger",
+          "type": "*slog.Logger",
+          "doc": "Logger is optional and caller-owned. Nil logs nothing.",
+          "default": "Logger is optional and caller-owned. Nil logs nothing.",
+          "line": 50
+        }
+      ]
+    },
+    {
+      "name": "webhookmem.StoreConfig",
+      "file": "webhook/webhookmem/store.go",
+      "line": 59,
+      "doc": "StoreConfig bounds live records plus terminal records inside their duplicate\nwindow. Namespace defaults to \"default\"; each Store is independent. MaxMessages\ndefaults to 1,000 (range 1–100,000); MaxBytes defaults to 16 MiB (range 1 KiB–1 GiB). Logical bytes charge payload and all outgoing strings plus 512 bytes\nper record, not Go heap usage. Terminal records expire at first intent plus\nReplayWindow (enqueue time plus ReplayWindow if never sent). Store operations\nreclaim expired terminal records; live records are never evicted.",
+      "fields": [
+        {
+          "name": "Namespace",
+          "type": "string",
+          "doc": "Namespace defaults to default. Each memory store is independent.",
+          "default": "Namespace defaults to default.",
+          "line": 61
+        },
+        {
+          "name": "MaxMessages",
+          "type": "int64",
+          "doc": "MaxMessages defaults to 1000; valid range 1–100000.",
+          "default": "MaxMessages defaults to 1000; valid range 1–100000.",
+          "line": 63
+        },
+        {
+          "name": "MaxBytes",
+          "type": "int64",
+          "doc": "MaxBytes defaults to 16 MiB; valid range 1 KiB–1 GiB. This counts logical bytes, not\nheap usage.",
+          "default": "MaxBytes defaults to 16 MiB; valid range 1 KiB–1 GiB.",
+          "line": 66
+        },
+        {
+          "name": "Routing",
+          "type": "RoutingConfig",
+          "doc": "Routing at zero registers no destinations and uses the RoutingConfig retry defaults.",
+          "default": "Routing at zero registers no destinations and uses the RoutingConfig retry defaults.",
+          "line": 68
+        }
+      ]
+    },
+    {
+      "name": "webhookmem.WorkerConfig",
+      "file": "webhook/webhookmem/worker.go",
+      "line": 19,
+      "doc": "WorkerConfig bounds Run. Concurrency defaults to 16 (1–64); PollInterval\ndefaults to 250ms (50ms–5s); ShutdownTimeout defaults to 30s (1–60s).\nUnlike webhookpg there is no batch acquisition or idle polling backoff.",
+      "fields": [
+        {
+          "name": "Concurrency",
+          "type": "int",
+          "doc": "Concurrency defaults to 16; valid range 1–64.",
+          "default": "Concurrency defaults to 16; valid range 1–64.",
+          "line": 21
+        },
+        {
+          "name": "PollInterval",
+          "type": "time.Duration",
+          "doc": "PollInterval defaults to 250ms; valid range 50ms–5s.",
+          "default": "PollInterval defaults to 250ms; valid range 50ms–5s.",
+          "line": 23
+        },
+        {
+          "name": "ShutdownTimeout",
+          "type": "time.Duration",
+          "doc": "ShutdownTimeout defaults to 30s; valid range 1s–60s.",
+          "default": "ShutdownTimeout defaults to 30s; valid range 1s–60s.",
+          "line": 25
+        }
+      ]
+    },
+    {
+      "name": "webhookpg.DestinationConfig",
+      "file": "webhook/webhookpg/store.go",
+      "line": 73,
+      "doc": "DestinationConfig registers one outgoing destination.",
+      "fields": [
+        {
+          "name": "Version",
+          "type": "string",
+          "doc": "Version is required, immutable and 1–64 printable ASCII bytes. It\ndefines the payload and routing rules and must equal every enqueued\nmessage's Version.",
+          "default": "Version is required, immutable and 1–64 printable ASCII bytes.",
+          "line": 77
+        },
+        {
+          "name": "Send",
+          "type": "webhook.SendFunc",
+          "doc": "Send is required, retained and must be concurrency safe and honor\nctx.",
+          "default": "Send is required, retained and must be concurrency safe and honor ctx.",
+          "line": 80
+        },
+        {
+          "name": "ReplayWindow",
+          "type": "time.Duration",
+          "doc": "ReplayWindow is the receiver's documented deduplication horizon;\nrequired, greater than RequestTimeout + 5m and at most 30 days.",
+          "default": "ReplayWindow is the receiver's documented deduplication horizon; required, greater than RequestTimeout + 5m and at most 30 days.",
+          "line": 83
+        },
+        {
+          "name": "RequestTimeout",
+          "type": "time.Duration",
+          "doc": "RequestTimeout defaults to 15s; valid range 1–30s, stored to\nmillisecond precision.",
+          "default": "RequestTimeout defaults to 15s; valid range 1–30s, stored to millisecond precision.",
+          "line": 86
+        }
+      ]
+    },
+    {
+      "name": "webhookpg.RoutingConfig",
+      "file": "webhook/webhookpg/store.go",
+      "line": 94,
+      "doc": "RoutingConfig is StoreConfig.Routing: the registered routes and the retry\npolicy frozen into new records. Sources maps a source name to its processor;\nDestinations maps a destination name to its registration. Retries back off\nfrom 1s to at most 5m with equal jitter. The Worker logs only fixed messages\nwith direction, route, outcome, code and error-class fields.",
+      "fields": [
+        {
+          "name": "Sources",
+          "type": "map[string]ProcessFunc",
+          "doc": "Sources is copied; nil registers none. At most 64 named processors\nare accepted; callbacks are retained for the Store's lifetime and\nmust be concurrency safe.",
+          "default": "Sources is copied; nil registers none.",
+          "line": 98
+        },
+        {
+          "name": "Destinations",
+          "type": "map[string]DestinationConfig",
+          "doc": "Destinations is copied; nil registers none. At most 64 named\ndestinations are accepted. Names in both maps are 1–64 printable\nASCII bytes.",
+          "default": "Destinations is copied; nil registers none.",
+          "line": 102
+        },
+        {
+          "name": "MaxAttempts",
+          "type": "int",
+          "doc": "MaxAttempts defaults to 8 per cycle; valid range 1–32.\nAt most 32 attempts are permitted in total.",
+          "default": "MaxAttempts defaults to 8 per cycle; valid range 1–32.",
+          "line": 105
+        },
+        {
+          "name": "MaxAge",
+          "type": "time.Duration",
+          "doc": "MaxAge defaults to 72h per cycle; valid range 1m–7 days.",
+          "default": "MaxAge defaults to 72h per cycle; valid range 1m–7 days.",
+          "line": 107
+        },
+        {
+          "name": "ProcessTimeout",
+          "type": "time.Duration",
+          "doc": "ProcessTimeout defaults to 5s; valid range 1–15s.",
+          "default": "ProcessTimeout defaults to 5s; valid range 1–15s.",
+          "line": 109
+        },
+        {
+          "name": "Logger",
+          "type": "*slog.Logger",
+          "doc": "Logger is retained for the Store's lifetime and caller-owned; nil is\nsilent. It must be concurrency safe.",
+          "default": "Logger is retained for the Store's lifetime and caller-owned; nil is silent.",
+          "line": 112
+        }
+      ]
+    },
+    {
+      "name": "webhookpg.StoreConfig",
+      "file": "webhook/webhookpg/store.go",
+      "line": 124,
+      "doc": "StoreConfig selects storage and policy. Use keyed literals: fields may be\nadded. Namespace, caps and retention are persisted by Migrate and must match\nin New. An earlier caller deadline or cancellation still ends an operation\nfirst.\n\nNew and Migrate validate both timeout settings. An out-of-range value\nprevents either call from succeeding. New uses Timeout as its deadline.\nMigrate uses MigrateTimeout. Migrate neither\nvalidates nor uses Routing; New, the Store and its Workers use it.",
+      "fields": [
+        {
+          "name": "Schema",
+          "type": "string",
+          "doc": "Schema defaults to public (1–63 UTF-8 bytes without NUL); Namespace\ndefaults to \"default\" (1–64 printable ASCII bytes).",
+          "default": "Schema defaults to public (1–63 UTF-8 bytes without NUL); Namespace defaults to \"default\" (1–64 printable ASCII bytes).",
+          "line": 127
+        },
+        {
+          "name": "Namespace",
+          "type": "string",
+          "doc": "Schema defaults to public (1–63 UTF-8 bytes without NUL); Namespace\ndefaults to \"default\" (1–64 printable ASCII bytes).",
+          "default": "Schema defaults to public (1–63 UTF-8 bytes without NUL); Namespace defaults to \"default\" (1–64 printable ASCII bytes).",
+          "line": 127
+        },
+        {
+          "name": "Timeout",
+          "type": "time.Duration",
+          "doc": "Timeout bounds New and each Store operation; defaults to 5s, valid\nrange 1–30s.",
+          "default": "Timeout bounds New and each Store operation; defaults to 5s, valid range 1–30s.",
+          "line": 130
+        },
+        {
+          "name": "MigrateTimeout",
+          "type": "time.Duration",
+          "doc": "MigrateTimeout bounds the whole migration in place of Timeout;\ndefaults to 1m, valid range 1s–1h.",
+          "default": "MigrateTimeout bounds the whole migration in place of Timeout; defaults to 1m, valid range 1s–1h.",
+          "line": 133
+        },
+        {
+          "name": "MaxMessages",
+          "type": "int64",
+          "doc": "MaxMessages defaults to 100,000; valid range 1–10,000,000.",
+          "default": "MaxMessages defaults to 100,000; valid range 1–10,000,000.",
+          "line": 135
+        },
+        {
+          "name": "MaxBytes",
+          "type": "int64",
+          "doc": "MaxBytes defaults to 512 MiB; valid range 1 MiB–1 TiB.",
+          "default": "MaxBytes defaults to 512 MiB; valid range 1 MiB–1 TiB.",
+          "line": 137
+        },
+        {
+          "name": "PayloadRetention",
+          "type": "time.Duration",
+          "doc": "PayloadRetention defaults to 7 days; must be positive and at most\nDedupeRetention.",
+          "default": "PayloadRetention defaults to 7 days; must be positive and at most DedupeRetention.",
+          "line": 140
+        },
+        {
+          "name": "DedupeRetention",
+          "type": "time.Duration",
+          "doc": "DedupeRetention defaults to 30 days; valid range 30–365 days.",
+          "default": "DedupeRetention defaults to 30 days; valid range 30–365 days.",
+          "line": 142
+        },
+        {
+          "name": "Routing",
+          "type": "RoutingConfig",
+          "doc": "Routing is validated and copied by New; Migrate ignores it. The zero value registers no\nroutes and uses RoutingConfig retry defaults in New.",
+          "default": "The zero value registers no routes and uses RoutingConfig retry defaults in New.",
+          "line": 145
+        }
+      ]
+    },
+    {
+      "name": "webhookpg.WorkerConfig",
+      "file": "webhook/webhookpg/worker.go",
+      "line": 45,
+      "doc": "WorkerConfig configures one Worker and bounds its Run; the zero value selects\nevery default. Routing, callbacks, retry policy and the logger come from the\nStore's StoreConfig.Routing. A claim never exceeds the free slots. Idle and\nfailed polls back off with equal jitter up to max(PollInterval, 5s) and reset\non work.",
+      "fields": [
+        {
+          "name": "Concurrency",
+          "type": "int",
+          "doc": "Concurrency fixes the worker count and caps claimed or in-flight\nrecords; defaults to 16, valid range 1–64.",
+          "default": "Concurrency fixes the worker count and caps claimed or in-flight records; defaults to 16, valid range 1–64.",
+          "line": 48
+        },
+        {
+          "name": "BatchSize",
+          "type": "int",
+          "doc": "BatchSize caps one claim; defaults to min(8, Concurrency),\nvalid range 1–min(16, Concurrency).",
+          "default": "BatchSize caps one claim; defaults to min(8, Concurrency), valid range 1–min(16, Concurrency).",
+          "line": 51
+        },
+        {
+          "name": "PollInterval",
+          "type": "time.Duration",
+          "doc": "PollInterval is the base idle wait; defaults to 250ms, valid range\n50ms–5s.",
+          "default": "PollInterval is the base idle wait; defaults to 250ms, valid range 50ms–5s.",
+          "line": 54
+        },
+        {
+          "name": "ShutdownTimeout",
+          "type": "time.Duration",
+          "doc": "ShutdownTimeout bounds the drain after cancellation; defaults to 30s,\nvalid range 1–60s. See Worker.Run for shutdown behavior.",
+          "default": "ShutdownTimeout bounds the drain after cancellation; defaults to 30s, valid range 1–60s.",
+          "line": 57
+        }
+      ]
+    }
+  ],
+  "functions": [
+    {
+      "name": "audit.DenialConfig.ToMiddleware",
+      "signature": "func (cfg DenialConfig) ToMiddleware() (echo.MiddlewareFunc, error)",
+      "file": "audit/denial.go",
+      "line": 80
+    },
+    {
+      "name": "audit.MiddlewareConfig.ToMiddleware",
+      "signature": "func (cfg MiddlewareConfig) ToMiddleware() (echo.MiddlewareFunc, error)",
+      "file": "audit/middleware.go",
+      "line": 79
+    },
+    {
+      "name": "audit.NewIdentity",
+      "signature": "func NewIdentity() string",
+      "file": "audit/relay.go",
+      "line": 31
+    },
+    {
+      "name": "audit.NewMemoryStore",
+      "signature": "func NewMemoryStore(c MemoryStoreConfig) (*MemoryStore, error)",
+      "file": "audit/memory.go",
+      "line": 83
+    },
+    {
+      "name": "audit.NewReader",
+      "signature": "func NewReader(b ReadBackend, c ReaderConfig) (*Reader, error)",
+      "file": "audit/read.go",
+      "line": 165
+    },
+    {
+      "name": "audit.NewRelay",
+      "signature": "func NewRelay(b RelayBackend, c RelayConfig) (*Relay, error)",
+      "file": "audit/relay.go",
+      "line": 198
+    },
+    {
+      "name": "audit.NewSchema",
+      "signature": "func NewSchema(c SchemaConfig) (*Schema, error)",
+      "file": "audit/schema.go",
+      "line": 138
+    },
+    {
+      "name": "auditadmin.New",
+      "signature": "func New(store *auditpg.Store) (*Sink, error)",
+      "file": "audit/auditadmin/adapter.go",
+      "line": 28
+    },
+    {
+      "name": "auditadmin.NewPanel",
+      "signature": "func NewPanel(c PanelConfig) (*Panel, error)",
+      "file": "audit/auditadmin/panel.go",
+      "line": 56
+    },
+    {
+      "name": "auditpg.New",
+      "signature": "func New(ctx context.Context, pool *pgxpool.Pool, c SchemaConfig) (*Store, error)",
+      "file": "audit/auditpg/store.go",
+      "line": 323
+    },
+    {
+      "name": "auth.Config.ToMiddleware",
+      "signature": "func (c Config) ToMiddleware() (echo.MiddlewareFunc, error)",
+      "file": "auth/middleware.go",
+      "line": 117
+    },
+    {
+      "name": "auth.NewBearer",
+      "signature": "func NewBearer(ctx context.Context, c BearerConfig) (*Bearer, error)",
+      "file": "auth/bearer.go",
+      "line": 119
+    },
+    {
+      "name": "auth.NewPrincipal",
+      "signature": "func NewPrincipal(c PrincipalConfig) (Principal, error)",
+      "file": "auth/principal.go",
+      "line": 69
+    },
+    {
+      "name": "execution.MiddlewareConfig.ToMiddleware",
+      "signature": "func (cfg MiddlewareConfig) ToMiddleware() (echo.MiddlewareFunc, error)",
+      "file": "execution/http.go",
+      "line": 260
+    },
+    {
+      "name": "execution.New",
+      "signature": "func New(cfg JournalConfig) (*Journal, error)",
+      "file": "execution/journal.go",
+      "line": 85
+    },
+    {
+      "name": "execution.NewMemoryStore",
+      "signature": "func NewMemoryStore(clock func() time.Time) *MemoryStore",
+      "file": "execution/memory.go",
+      "line": 49
+    },
+    {
+      "name": "execution.NewReconcileScheduler",
+      "signature": "func NewReconcileScheduler(cfg ReconcileSchedulerConfig) (*ReconcileScheduler, error)",
+      "file": "execution/scheduler.go",
+      "line": 100
+    },
+    {
+      "name": "executionadmin.New",
+      "signature": "func New(cfg Config) (*Panel, error)",
+      "file": "execution/executionadmin/panel.go",
+      "line": 92
+    },
+    {
+      "name": "pgstore.New",
+      "signature": "func New(ctx context.Context, pool *pgxpool.Pool, cfg StoreConfig) (*Store, error)",
+      "file": "execution/pgstore/store.go",
+      "line": 542
+    },
+    {
+      "name": "pgstore.NewTxRunner",
+      "signature": "func NewTxRunner(store *Store, cfg TxRunnerConfig) (*TxRunner, error)",
+      "file": "execution/pgstore/transactional.go",
+      "line": 104
+    },
+    {
+      "name": "quota.MiddlewareConfig.ToMiddleware",
+      "signature": "func (cfg MiddlewareConfig) ToMiddleware() (echo.MiddlewareFunc, error)",
+      "file": "quota/middleware.go",
+      "line": 224
+    },
+    {
+      "name": "quota.New",
+      "signature": "func New(cfg Config) (*Limiter, error)",
+      "file": "quota/limiter.go",
+      "line": 45
+    },
+    {
+      "name": "quota.NewMemoryStore",
+      "signature": "func NewMemoryStore(cfg MemoryConfig) *MemoryStore",
+      "file": "quota/memory.go",
+      "line": 79
+    },
+    {
+      "name": "quota.NewTopK",
+      "signature": "func NewTopK(k int) *TopK",
+      "file": "quota/topk.go",
+      "line": 62
+    },
+    {
+      "name": "quotaadmin.New",
+      "signature": "func New(cfg Config) (*Panel, error)",
+      "file": "quota/quotaadmin/panel.go",
+      "line": 57
+    },
+    {
+      "name": "quotaadmin.NewDenialRecorder",
+      "signature": "func NewDenialRecorder(size int) (*DenialRecorder, error)",
+      "file": "quota/quotaadmin/denials.go",
+      "line": 48
+    },
+    {
+      "name": "quotamcp.MiddlewareConfig.ToMiddleware",
+      "signature": "func (c MiddlewareConfig) ToMiddleware() (mcp.Middleware, error)",
+      "file": "quota/quotamcp/middleware.go",
+      "line": 47
+    },
+    {
+      "name": "quotaotel.New",
+      "signature": "func New(mp metric.MeterProvider) (*Metrics, error)",
+      "file": "quota/quotaotel/quotaotel.go",
+      "line": 42
+    },
+    {
+      "name": "quotaotel.NewFailureCounter",
+      "signature": "func NewFailureCounter(mp metric.MeterProvider) (FailureSink, error)",
+      "file": "quota/quotaotel/lifecycle.go",
+      "line": 88
+    },
+    {
+      "name": "quotaotel.NewLifecycle",
+      "signature": "func NewLifecycle(mp metric.MeterProvider, cfg LifecycleConfig) (*Lifecycle, error)",
+      "file": "quota/quotaotel/lifecycle.go",
+      "line": 35
+    },
+    {
+      "name": "quotaprom.New",
+      "signature": "func New(reg prometheus.Registerer) (*Metrics, error)",
+      "file": "quota/quotaprom/quotaprom.go",
+      "line": 32
+    },
+    {
+      "name": "quotaprom.NewFailureCounter",
+      "signature": "func NewFailureCounter(reg prometheus.Registerer) (FailureSink, error)",
+      "file": "quota/quotaprom/lifecycle.go",
+      "line": 101
+    },
+    {
+      "name": "quotaprom.NewLifecycle",
+      "signature": "func NewLifecycle(reg prometheus.Registerer, cfg LifecycleConfig) (*Lifecycle, error)",
+      "file": "quota/quotaprom/lifecycle.go",
+      "line": 58
+    },
+    {
+      "name": "quotastripe.New",
+      "signature": "func New(cfg Config) (*Exporter, error)",
+      "file": "quota/quotastripe/config.go",
+      "line": 134
+    },
+    {
+      "name": "quotastripe.NewMemoryStore",
+      "signature": "func NewMemoryStore(cfg StoreConfig) (*MemoryStore, error)",
+      "file": "quota/quotastripe/memory.go",
+      "line": 28
+    },
+    {
+      "name": "quotastripe.NewRedisStore",
+      "signature": "func NewRedisStore(client redis.UniversalClient, cfg StoreConfig) (*RedisStore, error)",
+      "file": "quota/quotastripe/redis.go",
+      "line": 109
+    },
+    {
+      "name": "redisstore.New",
+      "signature": "func New(client redis.UniversalClient, cfg Config) (*Store, error)",
+      "file": "quota/redisstore/store.go",
+      "line": 80
+    },
+    {
+      "name": "stripeadmin.New",
+      "signature": "func New(cfg Config) (*Panel, error)",
+      "file": "quota/quotastripe/stripeadmin/panel.go",
+      "line": 68
+    },
+    {
+      "name": "tenant.AuthorizeConfig.ToMiddleware",
+      "signature": "func (c AuthorizeConfig) ToMiddleware() (echo.MiddlewareFunc, error)",
+      "file": "tenant/authorize.go",
+      "line": 76
+    },
+    {
+      "name": "tenant.Config.ToMiddleware",
+      "signature": "func (c Config) ToMiddleware() (echo.MiddlewareFunc, error)",
+      "file": "tenant/tenant.go",
+      "line": 197
+    },
+    {
+      "name": "webhook.ReceiveConfig.ToMiddleware",
+      "signature": "func (c ReceiveConfig) ToMiddleware() (echo.MiddlewareFunc, error)",
+      "file": "webhook/receive.go",
+      "line": 94
+    },
+    {
+      "name": "webhookadmin.New",
+      "signature": "func New(cfg Config) (*Panel, error)",
+      "file": "webhook/webhookadmin/panel.go",
+      "line": 113
+    },
+    {
+      "name": "webhookmem.New",
+      "signature": "func New(cfg StoreConfig) (*Store, error)",
+      "file": "webhook/webhookmem/store.go",
+      "line": 104
+    },
+    {
+      "name": "webhookmem.NewWorker",
+      "signature": "func NewWorker(s *Store, cfg WorkerConfig) (*Worker, error)",
+      "file": "webhook/webhookmem/worker.go",
+      "line": 39
+    },
+    {
+      "name": "webhookpg.New",
+      "signature": "func New(ctx context.Context, pool *pgxpool.Pool, cfg StoreConfig) (*Store, error)",
+      "file": "webhook/webhookpg/store.go",
+      "line": 470
+    },
+    {
+      "name": "webhookpg.NewWorker",
+      "signature": "func NewWorker(s *Store, cfg WorkerConfig) (*Worker, error)",
+      "file": "webhook/webhookpg/worker.go",
+      "line": 108
+    }
+  ]
+}

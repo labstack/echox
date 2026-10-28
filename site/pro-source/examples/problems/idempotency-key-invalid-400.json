@@ -1,0 +1,9 @@
+{
+  "code": "idempotency_key_invalid",
+  "operation_ref": "",
+  "operation_state": "",
+  "safe_new_key": false,
+  "status": 400,
+  "title": "Bad Request",
+  "type": "https://echo.labstack.com/pro/problems/idempotency-key-invalid"
+}

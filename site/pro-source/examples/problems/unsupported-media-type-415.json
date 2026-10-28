@@ -1,0 +1,6 @@
+{
+  "code": "unsupported_media_type",
+  "status": 415,
+  "title": "Unsupported Media Type",
+  "type": "https://echo.labstack.com/pro/problems/unsupported-media-type"
+}

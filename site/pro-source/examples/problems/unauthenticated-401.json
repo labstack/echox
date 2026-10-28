@@ -1,0 +1,6 @@
+{
+  "code": "unauthenticated",
+  "status": 401,
+  "title": "Unauthorized",
+  "type": "https://echo.labstack.com/pro/problems/unauthenticated"
+}

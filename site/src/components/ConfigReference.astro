@@ -1,4 +1,5 @@
 ---
+import proManifest from '../../pro-source/config-fields.json';
 import echoManifest from '../generated/config-fields.json';
 import jwtManifest from '../generated/jwt.json';
 import prometheusManifest from '../generated/prometheus.json';
@@ -10,17 +11,18 @@ import { Badge } from '@astrojs/starlight/components';
 interface Props {
   name: string;
   locale?: 'en' | 'es' | 'ja' | 'pt-br' | 'zh-cn';
-  source?: 'echo' | 'jwt' | 'prometheus' | 'open-telemetry';
+  source?: 'pro' | 'echo' | 'jwt' | 'prometheus' | 'open-telemetry';
 }
 
 const { name, locale = 'en', source = 'echo' } = Astro.props;
-const manifest = { echo: echoManifest, jwt: jwtManifest, prometheus: prometheusManifest, 'open-telemetry': telemetryManifest }[source];
-const repository = source === 'echo' ? 'https://github.com/labstack/echo' : externalSources[source].repository;
+const manifest = { pro: proManifest, echo: echoManifest, jwt: jwtManifest, prometheus: prometheusManifest, 'open-telemetry': telemetryManifest }[source];
+const repository = source === 'pro' ? '' : source === 'echo' ? 'https://github.com/labstack/echo' : externalSources[source].repository;
 const config = manifest.configs.find((entry) => entry.name === name);
 if (!config) throw new Error(`Missing ${source} source reference for ${name}`);
 const stem = name.replace(/Config$/, '');
 const functions = manifest.functions.filter((entry) =>
-  entry.signature.includes(name) || entry.name === stem || entry.name === `New${stem}` ||
+  (source === 'pro' && (entry.name === `${name}.ToMiddleware` || (entry.file.slice(0, entry.file.lastIndexOf('/')) === config.file.slice(0, config.file.lastIndexOf('/')) && new RegExp(`\\b${name.split('.').at(-1)}\\b`).test(entry.signature)))) ||
+  (source !== 'pro' && entry.signature.includes(name)) || entry.name === stem || entry.name === `New${stem}` ||
   (name === 'RedirectConfig' && /Redirect$/.test(entry.name)) ||
   (source === 'jwt' && entry.name === 'JWT') ||
   (source === 'open-telemetry' && name === 'Config' && entry.name === 'NewMiddleware')
@@ -35,19 +37,20 @@ const labels = {
 const sourceUrl = (file: string, line: number) => `${repository}/blob/${manifest.revision}/${file}#L${line}`;
 ---
 
-<div class="echo-config-reference">
-  <p class="revision"><a href={sourceUrl(config.file, config.line)}>{config.name}</a> · <a href={`${repository}/tree/${manifest.revision}`}>{manifest.module}@{source === 'echo' ? formatRevision(manifest.revision) : manifest.revision}</a></p>
+<div class:list={['echo-config-reference', { 'pro-reference': source === 'pro' }]}>
+  <p class="revision">{source === 'pro' ? <code>{config.name} · {config.file}:{config.line}</code> : <a href={sourceUrl(config.file, config.line)}>{config.name}</a>} · {source === 'pro' ? <span>{manifest.module}@{manifest.revision}</span> : <a href={`${repository}/tree/${manifest.revision}`}>{manifest.module}@{source === 'echo' ? formatRevision(manifest.revision) : manifest.revision}</a>}</p>
   {labels.note && <p class="revision">{labels.note}</p>}
+  {source === 'pro' && config.doc && <p>{config.doc}</p>}
   <div class="table-scroll">
     <table>
       <caption>{labels.caption}</caption>
-      <thead><tr><th scope="col">{labels.field}</th><th scope="col">{labels.type}</th><th scope="col">{labels.description}</th><th scope="col">{labels.source}</th></tr></thead>
+      <thead><tr><th scope="col">{labels.field}</th><th scope="col">{labels.type}</th><th scope="col">{labels.description}</th>{source === 'pro' && <th scope="col">Defaults / requirements</th>}<th scope="col">{labels.source}</th></tr></thead>
       <tbody>
         {config.fields.map((field) => <tr>
           <th scope="row"><code>{field.name}</code>{field.deprecated && <Badge text={labels.deprecated} variant="caution" size="small" class="deprecated" />}</th>
           <td><code>{field.type}</code></td>
-          <td class="field-description">{field.doc || '—'}</td>
-          <td><a href={sourceUrl(config.file, field.line)} aria-label={`${field.name} ${labels.source}`}>L{field.line}</a></td>
+          <td class="field-description">{field.doc || 'See the type documentation.'}</td>{source === 'pro' && <td class="field-description">{field.default}</td>}
+          <td>{source === 'pro' ? <code>{config.file}:{field.line}</code> : <a href={sourceUrl(config.file, field.line)} aria-label={`${field.name} ${labels.source}`}>L{field.line}</a>}</td>
         </tr>)}
       </tbody>
     </table>
@@ -59,7 +62,7 @@ const sourceUrl = (file: string, line: number) => `${repository}/blob/${manifest
       <tbody>
         {functions.map((entry) => <tr>
           <th scope="row"><code>{entry.signature}</code></th>
-          <td><a href={sourceUrl(entry.file, entry.line)} aria-label={`${entry.name} ${labels.source}`}>L{entry.line}</a></td>
+          <td>{source === 'pro' ? <code>{entry.file}:{entry.line}</code> : <a href={sourceUrl(entry.file, entry.line)} aria-label={`${entry.name} ${labels.source}`}>L{entry.line}</a>}</td>
         </tr>)}
       </tbody>
     </table>
@@ -77,5 +80,9 @@ const sourceUrl = (file: string, line: number) => `${repository}/blob/${manifest
   tbody th { font-weight: 500; }
   code { overflow-wrap: anywhere; white-space: pre-wrap; }
   .field-description { min-width: 16rem; white-space: pre-line; overflow-wrap: anywhere; }
+  .pro-reference tbody th { text-transform: none; letter-spacing: normal; min-width: 8rem; }
+  .pro-reference td:nth-child(2) { min-width: 7rem; }
+  .pro-reference td:last-child { white-space: nowrap; }
+  .pro-reference tbody th code, .pro-reference td:nth-child(2) code, .pro-reference td:last-child code { overflow-wrap: normal; }
   .deprecated { margin-inline-start: .5rem; }
 </style>

@@ -1,15 +1,16 @@
 ---
 import Default from '@astrojs/starlight/components/Search.astro';
+import { isProPage } from '../pro-page.mjs';
 import { Icon } from '@astrojs/starlight/components';
 import { labels } from './search-launchpad';
 const isNext = process.env.DOCS_CHANNEL === 'next';
 const locale = Astro.locals.starlightRoute.locale ?? 'en';
 if (!labels[locale]) throw new Error(`Search.astro: add launchpad labels for locale "${locale}"`);
 ---
-<div class="echo-search-row" data-locale={locale}>
+<div class="echo-search-row" data-locale={locale} data-product={isProPage(Astro.url.pathname) ? 'pro' : 'echo'}>
   <Default />
   {/* The kapa.ai index covers release docs; next pages use their own Pagefind index. */}
-  {!isNext && <button id="echo-ask-ai" class="echo-ask-ai" type="button" aria-label="Ask AI about Echo">
+  {!isNext && !isProPage(Astro.url.pathname) && <button id="echo-ask-ai" class="echo-ask-ai" type="button" aria-label="Ask AI about Echo">
     <Icon name="star" />
     <span class="echo-ask-ai__label">Ask AI</span>
   </button>}
@@ -20,13 +21,14 @@ if (!labels[locale]) throw new Error(`Search.astro: add launchpad labels for loc
 
   const search = document.querySelector('site-search');
   const locale = document.querySelector<HTMLElement>('.echo-search-row')?.dataset.locale ?? 'en';
+  const isPro = document.querySelector<HTMLElement>('.echo-search-row')?.dataset.product === 'pro';
   const docsBase = `${import.meta.env.BASE_URL.replace(/\/$/, '')}${locale === 'en' ? '' : `/${locale}`}`;
   function inject() {
     const ui = search?.querySelector('.pagefind-ui');
     if (!ui || ui.querySelector('.echo-search-empty')) return !!ui;
     const form = ui.querySelector('.pagefind-ui__form');
     if (!form) return false;
-    form.insertAdjacentHTML('afterend', launchpadHTML(locale, docsBase));
+    form.insertAdjacentHTML('afterend', launchpadHTML(locale, docsBase, isPro));
     // Starlight closes the dialog only when the click target itself has an href;
     // close it for clicks on a link's icon or section label too.
     ui.querySelectorAll('.ess-link').forEach((link) => {

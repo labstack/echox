@@ -1,0 +1,81 @@
+---
+title: Select tenants and authorize resources
+description: Wire route selectors, stored resource ownership and bounded external authorizers.
+---
+
+{/* Diataxis: how-to */}
+
+## When to use this guide
+
+Use these tasks when routes name tenants or resources that a verified principal must be allowed to address. [Install Echo Pro](/pro/install/) and configure [authentication](/pro/guides/auth/) first. Run the executable examples with:
+
+```sh file=site/pro-source/examples/site-docs/commands.sh#test-tenant
+```
+
+The [tenant overview](/pro/tenant/) explains selector conflicts, anonymous access and cancellation. The [reference](/pro/reference/tenant/) lists all configuration fields.
+
+## Select a path tenant and enforce stored ownership
+
+Construct `FromPathParam("tenant")` before serving and handle its error. Add it alongside `FromCredential()`. Keep `Required: true` on tenant API routes. Add `Member` for unrestricted users; return membership from trusted data with the request context.
+
+The complete example issues a restricted key, resolves a path tenant and authorizes an invoice from its stored owner. Its immutable map is the fixture repository. The three requests print 204, 403 and 403. The foreign invoice never reaches the handler even though its path names `acme`.
+
+```go file=site/pro-source/examples/source/tenant/site_example_test.go#ExampleAuthorizeConfig_ToMiddleware
+```
+
+Replace the map with a repository lookup using `c.Request().Context()`. Return the resource tenant from that lookup, not from `c.Param("tenant")`. Return an error for an absent resource according to your application's disclosure policy. The middleware applies the shared timeout and refuses a mismatched owner before policy.
+
+## Select headers, subdomains or anonymous tenant pages
+
+This executable fixture combines path, header and subdomain selectors for an unrestricted service key. The membership callback permits only `acme`. It prints 204 for agreement, 403 for conflicting selectors, 400 for a malformed header and 403 for failed membership.
+
+```go file=site/pro-source/examples/source/tenant/site_example_test.go#ExampleConfig_selectors
+```
+
+Use `FromHeader` only with a credential restriction or a `Member` check. Otherwise the header alone picks the tenant.  Use `FromSubdomain` when one tenant label sits directly below a trusted base host. The selector reads `Request.Host`, so configure proxy host handling explicitly. Both constructors validate configuration and return errors.
+
+For tenant-addressed public pages, set `AnonymousSelector` deliberately. Ordinary selectors do not authorize anonymous tenant access. Keep public metering separate if `AuthBySpec` skips the authenticated chain. Test empty selectors, conflicting selectors, malformed IDs and membership errors before shipping a route change.
+
+This explicitly public route returns `200 acme` without a credential:
+
+```go file=site/pro-source/examples/source/tenant/site_example_test.go#ExampleConfig_anonymous
+```
+
+## Use Cerbos
+
+Map roles and selected attributes from trusted application data. This example calls a local protocol fixture and prints `true <nil>`. It checks adapter wiring; it does not test an installed Cerbos policy.
+
+```go file=site/pro-source/examples/source/tenant/site_example_test.go#ExampleCerbos
+```
+
+Set `HTTP.URL` to the deployed service origin and supply a caller-owned client. Configure `HTTP.Timeout` and `MaxConcurrent` for the policy service's capacity. Inject service credentials into `AuthHeader` and `AuthValue`. Use HTTPS for those credentials. Add a real-service test for the resource kind, action and role mapping used by your deployment.
+
+## Use OpenFGA
+
+Pin the authorization model used to evaluate the tuple. Supply the action-to-relation mapping. This local fixture demonstrates construction and the check call without creating a remote store or model:
+
+```go file=site/pro-source/examples/source/tenant/site_example_test.go#ExampleOpenFGA
+```
+
+Replace the fixture identifiers with your existing store and reviewed model ID. Missing action mappings deny. Use the validated type, tenant and resource IDs. The OpenFGA adapter rejects characters that could inject object separators. Configure `User` only when your model needs a different trusted user mapping.
+
+## Use an application policy or Casbin
+
+`AuthorizerFunc` receives the caller context and a `Check` containing the principal, tenant, action and resolved resource. Return only `(tenant.Allow, nil)` to grant access. Preserve cancellation in repository calls. `Static` supplies a copied scope policy for applications that do not need a remote engine.
+
+`Casbin(enforcer, mapping)` retains a caller-owned enforcer. Nil mapping uses the principal ID, tenant, `Type+":"+ID` and action. Configure enforcer concurrency before serving. Its `Enforce` implementation must return promptly because the adapter cannot forcibly interrupt it.
+
+This executable fixture checks both the default four-argument model and a custom three-argument mapping. It prints `true <nil>` twice. The local enforcer checks the mapped arguments; it does not load a Casbin policy file. Supply your application's enforcer and test its model separately.
+
+```go file=site/pro-source/examples/source/tenant/site_example_test.go#ExampleCasbin
+```
+
+## Test refusals before quota charges the request
+
+Build own-tenant and foreign-tenant test tables for every resource type. Assert that resource mismatch, policy error and cancellation leave quota/store/handler counters unchanged. `tenanttest.Authorizer` and `tenanttest.Refused` provide those checks. For [403 forbidden](/pro/problems/forbidden/), obtain the correct grant or select an allowed resource.
+Automatic retries cannot fix a tenant mismatch.
+
+This test checks the policy table and sends a foreign-owned invoice through Echo. Its counters show that the ownership check rejects the request before the authorizer or handler runs:
+
+```go file=site/pro-source/examples/source/tenant/site_example_test.go#isolation-test
+```

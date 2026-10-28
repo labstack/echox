@@ -1,0 +1,44 @@
+# SPDX-License-Identifier: LicenseRef-LabStack-Proprietary
+# SPDX-FileCopyrightText: © 2026 LabStack LLC
+name: Application checks
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-26.04
+    env:
+      GOPRIVATE: echo.labstack.com
+      GONOPROXY: echo.labstack.com
+      GONOSUMDB: echo.labstack.com
+    steps:
+      # https://github.com/actions/checkout/commit/3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # https://github.com/actions/setup-go/commit/b7ad1dad31e06c5925ef5d2fc7ad053ef454303e
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: '1.27.3'
+          cache: false
+      - name: Configure registry credential
+        env:
+          ECHO_PRO_TOKEN: ${{ secrets.ECHO_PRO_TOKEN }}
+          NETRC: ${{ runner.temp }}/echo-pro.netrc
+        run: |
+          set +x
+          umask 077
+          printf 'machine go.labstack.io login ci password %s\n' "$ECHO_PRO_TOKEN" > "$NETRC"
+      - name: Download and test
+        env:
+          NETRC: ${{ runner.temp }}/echo-pro.netrc
+        run: |
+          go mod download
+          go mod verify
+          go test ./...
+          go build ./...
+      - name: Remove registry credential
+        if: always()
+        env:
+          NETRC: ${{ runner.temp }}/echo-pro.netrc
+        run: rm -f "$NETRC"

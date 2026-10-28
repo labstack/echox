@@ -1,0 +1,82 @@
+---
+title: Execution configuration reference
+description: Fields, defaults and constructors for execution.
+---
+
+{/* Diataxis: reference */}
+
+import ConfigReference from '../../../../components/ConfigReference.astro';
+
+`echo.labstack.com/pro` v0.1.0. See the [task guide](/pro/guides/execution/) for setup examples.
+
+## Required fields
+
+- `JournalConfig`: `Namespace`, `Store` and `Policies`.
+- `MiddlewareConfig`: a constructed `Journal`, an `Operation`, and the `Identity` and `ReplayCheck` callbacks.
+- Every instance: matching namespace limits and `BudgetShards`, which the store saves.
+- Separate response limits: `MiddlewareConfig.MaxResponseBytes` for live HTTP output and `JournalConfig.MaxResultBytes` for stored results.
+
+Uncertain operations never expire; an operator must resolve them.
+
+## `execution.JournalConfig`
+
+Import `echo.labstack.com/pro/execution`.
+
+<ConfigReference source="pro" name="execution.JournalConfig" />
+
+## `execution.MiddlewareConfig`
+
+Import `echo.labstack.com/pro/execution`.
+
+<ConfigReference source="pro" name="execution.MiddlewareConfig" />
+
+## `execution.ReconcileSchedulerConfig`
+
+Import `echo.labstack.com/pro/execution`.
+
+<ConfigReference source="pro" name="execution.ReconcileSchedulerConfig" />
+
+## `executionadmin.Config`
+
+Import `echo.labstack.com/pro/execution/executionadmin`.
+
+<ConfigReference source="pro" name="executionadmin.Config" />
+
+## `pgstore.StoreConfig`
+
+Import `echo.labstack.com/pro/execution/pgstore`.
+
+<ConfigReference source="pro" name="pgstore.StoreConfig" />
+
+## `pgstore.TxRunnerConfig`
+
+Import `echo.labstack.com/pro/execution/pgstore`.
+
+<ConfigReference source="pro" name="pgstore.TxRunnerConfig" />
+
+## Public policy aliases
+
+`execution.Policy`, `Effect`, `Limits` and `FingerprintSpec` are type aliases used by `JournalConfig` and `MiddlewareConfig`.
+
+<ConfigReference source="pro" name="execution.Policy" />
+<ConfigReference source="pro" name="execution.Effect" />
+<ConfigReference source="pro" name="execution.Limits" />
+<ConfigReference source="pro" name="execution.FingerprintSpec" />
+
+## HTTP and retention limits
+
+| Setting | Default or limit |
+| --- | --- |
+| `MiddlewareConfig.Header` | `Idempotency-Key` |
+| `ParseKey` | One field line, at most 300 bytes; RFC 8941 Item String without parameters or a bare token |
+| `MiddlewareConfig.MaxFingerprintBytes` | 1 MiB by default; at most 8 MiB |
+| `MiddlewareConfig.MaxResponseBytes` | 1 MiB by default; at most 8 MiB |
+| `JournalConfig.MaxResultBytes` | 64 KiB by default; at most 1 MiB |
+| `Policy.ResultRetention` | 24 hours by default |
+| `Policy.KeyRetention` | Seven days by default; unresolved records do not expire automatically |
+
+Keep the store open until requests, recovery calls and the scheduler have stopped.
+
+## Related pages
+
+[Package explanation](/pro/execution/) · [Task guide](/pro/guides/execution/) · [Problem catalog](/pro/problems/)

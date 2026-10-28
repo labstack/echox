@@ -1,0 +1,116 @@
+---
+title: Execution and replay safety
+description: Record each external call under a stable key, so a retry replays the saved result instead of calling the provider again.
+sidebar:
+  order: 8
+---
+
+{/* Diataxis: explanation */}
+
+A client retries a payment request after a timeout. Without a record, you cannot tell whether the first charge went through.
+
+`echo.labstack.com/pro/execution` records external sends under stable operation keys so retries can reuse recorded results.
+The [task guide](/pro/guides/execution/) shows wiring; the [reference](/pro/reference/execution/) lists fields and limits.
+Use it when retrying a request could duplicate a provider operation.
+The journal records what your application reports. It cannot guarantee that a provider applies an operation exactly once.
+
+This route marks its response as completed, so later retries replay it. `mw` comes from a constructed execution configuration.
+
+```go file=site/pro-source/examples/source/execution/http_example_test.go#site-anchor
+```
+
+## Keys, authorization and fingerprints
+
+`JournalConfig` requires a namespace, store and named policies.
+Each policy lists its effect names and a version number for its safety rules and its reconciler. `New` validates and copies policies without starting goroutines.
+An operation key combines the tenant, the subject, a scope and a value the client keeps the same across retries.
+Reuse the same key and business input when retrying.
+
+Check current authorization before looking up or replaying a record.
+A record reference helps locate a record; it does not authorize reading it.
+[Authbind](/pro/guides/auth/) supplies callbacks for the verified principal and selected tenant.
+Recheck changed logins and revoked resource grants before returning a saved result.
+
+Fingerprint descriptors specify which request inputs must match on retries.
+The HTTP middleware has two built-in fingerprint profiles: `http/v1` and `http/v1+json`. Custom profiles require a descriptor and callback.
+Include claims, cookies or query ordering when they change the operation.
+Changed business input under the same key returns 422 `idempotency_key_reused`.
+
+## Record intent before sending
+
+Call `Attempt.Intent` before every external send.
+It records the effect name, durable payload reference, digest and a distinct send token.
+If `Intent` returns an error, do not send. Rebuild the identical provider request from durable application data.
+Disable SDK retries and redirects unless your declared policy accounts for them.
+
+Take a monotonic local start time immediately before `Intent` or `Resend`.
+Before sending, check that `start.Add(permit.ValidFor)` is still in the future.
+Taking the start time before the call makes request latency count against the window instead of extending it.
+Reusing a send token does not extend the stored deadline. Your code sends the provider request; the journal does not.
+
+`Attempt.Call` invokes the provider callback once before the permit deadline and records send timing.
+If the provider succeeded, a timing-recording error does not change that outcome.
+Use `RecordSendTiming` to retry recording timing. Do not call the provider again to repair diagnostics.
+
+## A timeout leaves the result uncertain
+
+A provider can apply a request after the caller times out.
+A cancelled request, an expired lease or a read that finds no record does not prove the provider stopped processing a send.
+If a process records an intent and then stops, the operation can become uncertain. Preserve its key and records for reconciliation or an operator decision.
+
+Only `SafeNewKey` permits using a new operation key.
+It requires proof that no send applied and no duplicate risk remains.
+The library checks the proof kind, effect name, policy version and send coverage. Your application must check the provider records behind that proof. Your application must verify that the provider's answer is trustworthy.
+Applied, disputed, abandoned and uncertain records do not permit a fresh key.
+Uncertain records never expire automatically.
+
+`Operator.PrepareResolve` builds a fixed request. `Resolve` then applies it.
+If the `Resolve` response is lost, retry with the same prepared request and operator.
+Applied and not-applied decisions need different proofs.
+Accepting duplicate risk does not prove a send never happened.
+The [recovery example](/pro/guides/execution/) records a simulated provider success and replays its recovered response.
+
+## Freeze Echo responses
+
+HTTP middleware requires `Journal`, `Operation`, `Identity` and `ReplayCheck`.
+Missing or invalid operation keys return 400 before the handler runs.
+Run body-size checks, authentication, optional `Prepare`, quota, validation, execution and your handler in that order.
+`Prepare` validates and fingerprints without store I/O.
+Execution rechecks the principal and replay permission.
+A validator that returns early must refund its unused work reservation.
+`NotExecuted` can set work cost to zero on replay while keeping the HTTP request charge.
+
+Call `Classify(c, Completed)` or `Classify(c, Failed)` explicitly. The first classification wins.
+The middleware saves the response after the handler and the error handler return.
+If neither `Classify` nor `ClassifyStatus` selects a state, the HTTP status alone does not decide the result. Before `Intent`, the operation is released and can run again. After `Intent`, it becomes uncertain.
+A classified business refusal can replay its 4xx response.
+On a panic, the middleware cleans up within a time limit and then re-panics. Put panic recovery outside execution middleware.
+
+The response writer buffers output and rejects streaming, upgrades and trailers.
+Live-response and stored-result sizes have separate limits.
+A live response can exceed the storage limit and still reach the client.
+Duplicates then receive `operation_result_unavailable`; they do not rerun the handler.
+
+Replay sends only allowlisted headers. Nil `ReplayHeaders` means `Content-Type`; an explicit empty slice means no headers.
+Add `Content-Language` and `Cache-Control` when saving problem responses.
+Cookies, hop-by-hop headers and `Content-Length` cannot be replayed.
+Replay adds `Idempotent-Replayed: true` and preserves saved response bytes.
+
+## Stores and shutdown
+
+Tell clients how long you keep results and keys.
+Deleting a completed record allows its key to run again.
+`pgstore` persists records on PostgreSQL 16 through 18.
+Asynchronous failover or a database restore can lose records and allow a key to run again.
+If a lost record must not allow a second send, use synchronous commit and synchronous replication.
+
+Run `pgstore.Migrate` during deployment. Construct the store with a caller-owned runtime pool.
+`New` starts no workers. `TxRunner` runs SQL-only operations inside a transaction it gives you.
+Do not send provider requests from that transaction callback.
+Maintenance jobs must not delete unresolved operations.
+
+`OnTransition` observes committed records. `OnError` reports recording failures without replacing the operation's answer.
+Callbacks run synchronously and can run concurrently for different attempts.
+The attempt holds its mutex while its callbacks run. Do not call that attempt from a callback.
+The [console](/pro/admin/) exposes authorized records and recovery actions.
+A reconciliation scheduler's `Run(ctx)` returns after `ctx` is cancelled. Wait for it to return before closing its store.

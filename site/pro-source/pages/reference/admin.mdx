@@ -1,0 +1,49 @@
+---
+title: Admin configuration reference
+description: Fields, defaults and constructors for admin.
+---
+
+{/* Diataxis: reference */}
+
+import ConfigReference from '../../../../components/ConfigReference.astro';
+
+`echo.labstack.com/pro` v0.1.0. See the [task guide](/pro/guides/admin/) for setup examples.
+
+## Required fields
+
+- `Config.Panels`: 1–64 panel adapters.
+- `Config.Authenticate`: your per-request login check.
+- Write actions: enable each panel action and configure its role, scope, confirmations and `Audit` sink.
+- `Config.Keys`: required for pagination, digest views, POST reads and actions.
+
+Viewer is the default role; `PublicPath` defaults to the mount prefix and an empty `Theme.Mode` follows the system scheme.
+
+## `admin.Config`
+
+Import `echo.labstack.com/pro/admin`.
+
+<ConfigReference source="pro" name="admin.Config" />
+
+## `admin.Theme`
+
+Import `echo.labstack.com/pro/admin`.
+
+<ConfigReference source="pro" name="admin.Theme" />
+
+## Read and token limits
+
+| Setting | Default or limit |
+| --- | --- |
+| `Config.Timeout` | Ten seconds; range one millisecond–one minute; includes middleware |
+| `Config.MaxExpensive` | Two; range 1–64 |
+| `Config.CursorTTL` | 15 minutes by default; range 1s–24h |
+| `Config.CSRFTTL` | One hour by default; range 1s–24h |
+| `Config.RateLimit` | Reads 10/s, burst 30; writes 12/min, burst 12; probes 6/min, burst 6 |
+
+When every expensive-view slot is busy, the console returns 503 with code `admin_busy`.
+
+The console never closes panel backends, authentication resources or the audit sink.
+
+## Related pages
+
+[Package explanation](/pro/admin/) · [Task guide](/pro/guides/admin/) · [Problem catalog](/pro/problems/)

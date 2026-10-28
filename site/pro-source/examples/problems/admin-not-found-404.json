@@ -1,0 +1,7 @@
+{
+  "code": "admin_not_found",
+  "detail": "",
+  "status": 404,
+  "title": "Not Found",
+  "type": "https://echo.labstack.com/pro/problems/admin-not-found"
+}

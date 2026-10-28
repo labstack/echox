@@ -1,0 +1,9 @@
+{
+  "code": "cost_exceeds_limit",
+  "status": 403,
+  "title": "Request cost exceeds the plan's limit",
+  "type": "https://echo.labstack.com/pro/problems/cost-exceeds-limit",
+  "violated-policies": [
+    "requests"
+  ]
+}

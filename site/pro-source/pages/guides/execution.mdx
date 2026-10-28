@@ -1,0 +1,77 @@
+---
+title: Bind retries and recover uncertain operations
+description: Wire HTTP replay, quota refunds, problem rendering and operator decisions.
+---
+
+{/* Diataxis: how-to */}
+
+## When to use this guide
+
+Use these tasks when a retried HTTP request might repeat an external effect. [Install Echo Pro](/pro/install/) and choose a stable trusted tenant and subject. Run executable examples with:
+
+```sh file=site/pro-source/examples/site-docs/commands.sh#test-execution
+```
+
+The [execution overview](/pro/execution/) explains permits, proof limits and retention. The [reference](/pro/reference/execution/) lists journal, HTTP and PostgreSQL settings.
+
+## Bind a route and replay a conditional result
+
+Create one `MiddlewareConfig` per operation. The operation must exist in the journal's policy map. `Identity` supplies tenant and subject. `ReplayCheck` authorizes current access before new work or replay. This complete source file includes the shared configuration and request helper. Its first example executes the handler once across two requests and replays the second response with `Idempotent-Replayed: true`.
+
+```go file=site/pro-source/examples/source/execution/http_example_test.go
+```
+
+The fixture callbacks use fixed tenant and subject values and permissive replay access. Replace both with application authentication and current resource policy. Configure request fingerprints for every input that changes the operation. Retain the same idempotency key across retries. Do not treat the key as an access token.
+
+## Place preparation before quota and validation
+
+Put `Prepare()` before quota if requests with a malformed key should fail without a quota charge. Keep authentication before preparation. Put validation between quota and execution if failed validation should still count against quota. `NotExecuted` refunds unused work through `quota.Charge` while leaving omitted request units charged.
+
+The complete HTTP source's `ExampleMiddlewareConfig_Prepare` reserves 100 tokens, charges actual use of 60, and performs a replay. It drains settlement with `Limiter.Close`. Its output is two successful HTTP attempts, `requests: 2` and `tokens: 60`. Validation that exits before execution must perform its own refund.
+
+## Persist intent and recover an interrupted provider success
+
+`ExampleAttemptFrom` in the same HTTP source persists an intent and simulates interruption after provider success. Its retry returns 409 `operation_uncertain` with `safe_new_key=false`. The authorized operator reads the record and verifies provider success.
+It prepares an applied resolution with a reconstructed HTTP result. The next request replays `200 recovered true`.
+
+Replace simulated provider success with one identical provider request under the permit deadline. Reconstruct it from a durable payload reference. Disable hidden SDK retries and redirects. Store the decision ID and the prepared request, so you can retry if the response is lost. Do not switch keys to work around uncertainty.
+
+## Freeze problem responses through Echo's error handler
+
+Install the problem adapter as Echo's `HTTPErrorHandler`, keeping its previous handler as fallback. Include `Content-Type`, `Content-Language` and `Cache-Control` in `ReplayHeaders`. The example freezes a typed application problem response.
+It changes rendering language and checks that replay keeps the original English bytes:
+
+```go file=site/pro-source/examples/source/execution/problem_example_test.go
+```
+
+Do not render problems with middleware placed inside execution. Execution buffers the response, and that middleware cannot write to the buffer. Use the configured error handler. Classify a known business refusal with `execution.Failed` before returning the typed error. An unclassified error after intent remains uncertain.
+
+## Instrument provider timing without resending
+
+Capture the local start before obtaining a permit. Pass the permit and start to `Attempt.Call`. Its callback executes once; retry diagnostic persistence through `RecordSendTiming`, never by repeating the provider call. The executable timing example is:
+
+```go file=site/pro-source/examples/source/execution/call_example_test.go
+```
+
+Keep `OnTransition` and `OnError` prompt and concurrency safe. Do not reenter the same attempt from those callbacks. Set `MaxResultBytes`, `MaxNamespaceBytes` and `MaxNamespaceRecords` for stored data. These are storage limits; they do not cap your process heap.
+
+## Use PostgreSQL and local transactions
+
+Apply `pgstore.Migrate` with a deployment pool and reviewed schema configuration, then `pgstore.New` with a caller-owned runtime pool. If a lost record must not allow a second send, use synchronous commit and replication. You can read the SQL through `pgstore.Migrations`. Apply it only with `Migrate`.
+
+Use `TxRunner` only for local transactional SQL. Its callback cannot perform provider I/O. This compiled source demonstrates transaction handling and distinguishes a known rollback from an unknown COMMIT:
+
+```go file=site/pro-source/examples/source/execution/pgstore/transactional_example_test.go
+```
+
+The database examples without `Output` compile during Go tests and require real pools to execute. Test them against your assigned backend before relying on commit behavior. A commit error does not authorize a second external effect or a new operation key.
+
+## Run reconciliation with an owned lifecycle
+
+Create one operator and keep it for the scheduler's lifetime. Map scopes explicitly. Set namespace and target authorization callbacks. Start the scheduler under an application context, cancel it at shutdown and join it. If `Run` stops with an error, a prepared request may still be pending.
+Retry it with the original operator before starting replacement work.
+
+```go file=site/pro-source/examples/source/execution/scheduler_example_test.go
+```
+
+Expose authorized inspection through `executionadmin` in the [console](/pro/admin/). Follow the client guidance for [operation uncertain](/pro/problems/operation-uncertain/), [policy changed](/pro/problems/operation-policy-changed/) and [result unavailable](/pro/problems/operation-result-unavailable/). If a saved result is missing, the middleware returns `operation_result_unavailable`. It does not rerun the handler.

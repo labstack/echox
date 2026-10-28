@@ -7,6 +7,7 @@ import { parseSourceDocument, visitCode } from '../plugins/source-document.mjs';
 import { localePrefixes } from '../src/locales.mjs';
 
 const docsDir = fileURLToPath(new URL('../src/content/docs', import.meta.url));
+const siteDir = fileURLToPath(new URL('..', import.meta.url));
 const processor = unified().use(remarkSourceCode);
 
 export function checkCookbookCode(tree, path) {
@@ -35,6 +36,19 @@ export function checkCookbook() {
       count++;
     }
   }
+  const pro = join(siteDir, 'pro-source/pages');
+  function checkPro(dir) {
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      const path = join(dir, entry.name);
+      if (entry.isDirectory()) { checkPro(path); continue; }
+      if (!/\.mdx?$/.test(path)) continue;
+      const tree = parseSourceDocument(readFileSync(path, 'utf8'), path);
+      checkCookbookCode(tree, path);
+      processor.runSync(tree, { path });
+      count++;
+    }
+  }
+  checkPro(pro);
   console.log(`Checked ${count} cookbook pages: source includes resolve and no programs are pasted`);
 }
 

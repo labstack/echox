@@ -1,0 +1,9 @@
+HTTP/1.1 401 Unauthorized
+Content-Type: application/problem+json
+
+{
+  "code": "unauthenticated",
+  "status": 401,
+  "title": "Unauthorized",
+  "type": "https://echo.labstack.com/pro/problems/unauthenticated"
+}

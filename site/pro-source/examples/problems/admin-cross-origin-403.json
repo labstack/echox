@@ -1,0 +1,7 @@
+{
+  "code": "admin_cross_origin",
+  "detail": "",
+  "status": 403,
+  "title": "Forbidden",
+  "type": "https://echo.labstack.com/pro/problems/admin-cross-origin"
+}

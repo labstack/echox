@@ -1,0 +1,127 @@
+---
+title: Webhook configuration reference
+description: Fields, defaults and constructors for webhook.
+---
+
+{/* Diataxis: reference */}
+
+import ConfigReference from '../../../../components/ConfigReference.astro';
+
+`echo.labstack.com/pro` v0.1.0. See the [task guide](/pro/guides/webhook/) for setup examples.
+
+## Required fields
+
+- `ReceiveConfig`: `Source`, `Verify` and `Inbox`; mount its terminal middleware on a dedicated route.
+- Sending store: a `ReplayWindow` matching how long the receiver deduplicates message IDs.
+- PostgreSQL: `StoreConfig` namespace, caps and retention values matching those saved by `Migrate`.
+
+`New` and `NewWorker` start no goroutines; `Run` blocks while the delivery loop runs.
+
+## `webhook.ReceiveConfig`
+
+Import `echo.labstack.com/pro/webhook`.
+
+<ConfigReference source="pro" name="webhook.ReceiveConfig" />
+
+## `webhook.StandardVerifierConfig`
+
+Import `echo.labstack.com/pro/webhook`.
+
+<ConfigReference source="pro" name="webhook.StandardVerifierConfig" />
+
+## `webhook.HTTPSenderConfig`
+
+Import `echo.labstack.com/pro/webhook`.
+
+<ConfigReference source="pro" name="webhook.HTTPSenderConfig" />
+
+## `webhook.Endpoint`
+
+Import `echo.labstack.com/pro/webhook`.
+
+<ConfigReference source="pro" name="webhook.Endpoint" />
+
+## `webhookpg.StoreConfig`
+
+Import `echo.labstack.com/pro/webhook/webhookpg`.
+
+<ConfigReference source="pro" name="webhookpg.StoreConfig" />
+
+## `webhookpg.RoutingConfig`
+
+Import `echo.labstack.com/pro/webhook/webhookpg`.
+
+<ConfigReference source="pro" name="webhookpg.RoutingConfig" />
+
+## `webhookpg.DestinationConfig`
+
+Import `echo.labstack.com/pro/webhook/webhookpg`.
+
+<ConfigReference source="pro" name="webhookpg.DestinationConfig" />
+
+## `webhookpg.WorkerConfig`
+
+Import `echo.labstack.com/pro/webhook/webhookpg`.
+
+<ConfigReference source="pro" name="webhookpg.WorkerConfig" />
+
+## `webhookadmin.Config`
+
+Import `echo.labstack.com/pro/webhook/webhookadmin`.
+
+<ConfigReference source="pro" name="webhookadmin.Config" />
+
+## `webhookmem.DestinationConfig`
+
+Import `echo.labstack.com/pro/webhook/webhookmem`.
+
+<ConfigReference source="pro" name="webhookmem.DestinationConfig" />
+
+## `webhookmem.RoutingConfig`
+
+Import `echo.labstack.com/pro/webhook/webhookmem`.
+
+<ConfigReference source="pro" name="webhookmem.RoutingConfig" />
+
+## `webhookmem.StoreConfig`
+
+Import `echo.labstack.com/pro/webhook/webhookmem`.
+
+<ConfigReference source="pro" name="webhookmem.StoreConfig" />
+
+## `webhookmem.WorkerConfig`
+
+Import `echo.labstack.com/pro/webhook/webhookmem`.
+
+<ConfigReference source="pro" name="webhookmem.WorkerConfig" />
+
+## Delivery and storage limits
+
+| Setting | Default or limit |
+| --- | --- |
+| `Endpoint.Secrets` | `whsec_` plus standard base64 of 24–64 random bytes |
+| `Endpoint.Secrets` / `StandardVerifierConfig.Secrets` | At most eight |
+| `StandardVerifierConfig.Tolerance` | Five minutes; range one second–five minutes; checks past and future skew |
+| Standard Webhooks headers | ID 128 bytes; timestamp 20 bytes; signature 4096 bytes |
+| `ReceiveConfig.MaxBodyBytes` | 256 KiB by default; at most 1 MiB |
+| `ReceiveConfig.Timeout` | Five seconds by default; covers body read, verification and acceptance |
+| `HTTPSenderConfig.Client.Timeout` | 15 seconds by default |
+| `HTTPSenderConfig` response body | Reads and discards at most 4 KiB |
+| Sender response header bytes | At most 16 KiB |
+| `webhookpg.StoreConfig.MaxMessages` | 100,000 by default |
+| `webhookpg.StoreConfig.MaxBytes` | 512 MiB by default |
+| `webhookpg.StoreConfig.PayloadRetention` | Seven days by default |
+| `webhookpg.StoreConfig.DedupeRetention` | 30 days by default |
+| `RoutingConfig.MaxAttempts` | Eight by default |
+| `RoutingConfig.MaxAge` | 72 hours by default |
+| Message attempt count | At most 32 |
+| `StoreConfig.Routing.Destinations[name].ReplayWindow` | Required; greater than `RequestTimeout + 5m`; at most 30 days |
+
+Set `ReplayWindow` on the sending store to the remote receiver's documented deduplication period.
+Keep the receiver's deduplication records for at least that long.
+
+Wait for `Run` and in-flight requests before closing stores and pools.
+
+## Related pages
+
+[Package explanation](/pro/webhook/) · [Task guide](/pro/guides/webhook/) · [Problem catalog](/pro/problems/)

@@ -1,0 +1,13 @@
+HTTP/1.1 429 Too Many Requests
+Content-Type: application/problem+json
+
+{
+  "code": "quota_exceeded",
+  "reset_at": "2030-01-01T00:00:00Z",
+  "status": 429,
+  "title": "Request cannot be satisfied as assigned quota has been exceeded",
+  "type": "https://iana.org/assignments/http-problem-types#quota-exceeded",
+  "violated-policies": [
+    "requests"
+  ]
+}

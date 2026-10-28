@@ -1,0 +1,67 @@
+---
+title: Tenant configuration reference
+description: Fields, defaults and constructors for tenant.
+---
+
+{/* Diataxis: reference */}
+
+import ConfigReference from '../../../../components/ConfigReference.astro';
+
+`echo.labstack.com/pro` v0.1.0. See the [task guide](/pro/guides/tenant/) for setup examples.
+
+## Required fields
+
+- `Config.Member`: needed for request-selected tenants unless the credential fixes the tenant.
+- `AuthorizeConfig`: `Authorizer`, `Action` and `Resource`, which resolves the resource owner.
+- `HTTPConfig`: a caller-owned `Client` and an explicit http(s) origin in `URL`.
+
+A zero `Config` does not let a request choose any tenant; the Cerbos and OpenFGA adapters start no goroutines and never close clients.
+
+## `tenant.Config`
+
+Import `echo.labstack.com/pro/tenant`.
+
+<ConfigReference source="pro" name="tenant.Config" />
+
+## `tenant.AuthorizeConfig`
+
+Import `echo.labstack.com/pro/tenant`.
+
+<ConfigReference source="pro" name="tenant.AuthorizeConfig" />
+
+## `tenant.HTTPConfig`
+
+Import `echo.labstack.com/pro/tenant`.
+
+<ConfigReference source="pro" name="tenant.HTTPConfig" />
+
+## `tenant.CerbosConfig`
+
+Import `echo.labstack.com/pro/tenant`.
+
+<ConfigReference source="pro" name="tenant.CerbosConfig" />
+
+## `tenant.OpenFGAConfig`
+
+Import `echo.labstack.com/pro/tenant`.
+
+<ConfigReference source="pro" name="tenant.OpenFGAConfig" />
+
+## Adapter limits
+
+| Setting | Default or limit |
+| --- | --- |
+| `Config.Selectors` | At most 16; copied during construction |
+| `tenant.ID` | `[A-Za-z0-9._:-]{1,128}` |
+| `AuthorizeConfig.Timeout` | Two seconds by default; at most 30 seconds |
+| `HTTPConfig.Timeout` | Two seconds by default |
+| `HTTPConfig.MaxConcurrent` | 16 by default; excess calls return `*AdapterError` with category `busy` |
+| HTTP adapter bodies | At most 64 KiB |
+| HTTP adapter redirects | Same host and scheme; at most five hops |
+| HTTP adapter work | None |
+
+Keep the authorization client open while requests are using it.
+
+## Related pages
+
+[Package explanation](/pro/tenant/) · [Task guide](/pro/guides/tenant/) · [Problem catalog](/pro/problems/)

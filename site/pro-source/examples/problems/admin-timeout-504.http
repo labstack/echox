@@ -1,0 +1,11 @@
+HTTP/1.1 504 Gateway Timeout
+Content-Type: application/problem+json
+Cache-Control: no-store
+
+{
+  "code": "admin_timeout",
+  "detail": "",
+  "status": 504,
+  "title": "Gateway Timeout",
+  "type": "https://echo.labstack.com/pro/problems/admin-timeout"
+}

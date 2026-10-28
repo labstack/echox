@@ -1,0 +1,79 @@
+---
+title: Configure API keys and bearer tokens
+description: Issue service keys, verify HTTPS access tokens and select tenants after authentication.
+---
+
+{/* Diataxis: how-to */}
+
+## When to use this guide
+
+Use these tasks to protect Echo routes with application-issued keys or issuer-signed access tokens. First [install Echo Pro](/pro/install/). The examples use public imports from the installed module. Run the examples from its source directory:
+
+```sh file=site/pro-source/examples/site-docs/commands.sh#test-auth
+```
+
+The [authentication overview](/pro/auth/) explains credential selection and JWKS failure policy. The [reference](/pro/reference/auth/) lists fields and defaults.
+
+## Issue and retain a service key
+
+Load a pepper ring from your runtime secret manager. Use a subject that never changes, such as `invoice-worker`. Set `KeyOptions.TenantRestriction` for a single-tenant service. Retain `StoredKey`; deliver the returned credential once. This example prints only lengths, the pepper version and tenant. It does not print the credential.
+
+```go file=site/pro-source/examples/source/auth/example_test.go#ExampleIssueKey
+```
+
+For revocation, persist a nonzero `StoredKey.RevokedAt` through your store implementation. Keep the old pepper while nonrevoked records still reference its version. Use a bounded memory store only for disposable state. Construct `auth.APIKey` with a namespace distinct from other schemes and an explicit header such as `X-API-Key`.
+
+## Replace the memory key store
+
+`auth.KeyStore` requires one method: `Lookup(context.Context, string) (auth.StoredKey, error)`.
+The string is the key ID. Look up the current record, including revocation, on every call.
+Missing keys return a zero record, an error, or both. Lookups must honor cancellation and support concurrent calls.
+Keep peppers separate from the database.
+
+This compiled example reads JSON records through `database/sql`. Your application supplies the opened pool, driver and table migration.
+Persist the `StoredKey` returned by `IssueKey` as the row's JSON record. Update `RevokedAt` in that row to revoke it.
+The example compiles without opening a database; test the query against your own table before serving.
+
+```go file=site/pro-source/examples/source/auth/keystore_example_test.go#persistent-keystore
+```
+
+## Verify an HTTPS issuer
+
+Set the exact issuer, accepted API audiences and a configured JWKS URL. The complete example uses a local HTTPS fixture with one Ed25519 key. It signs an access token, passes it through Echo and prints `200 employees:alice tenant=acme`.
+
+```go file=site/pro-source/examples/source/auth/site_example_test.go#ExampleNewBearer
+```
+
+Replace the fixture issuer and client with your trusted issuer origin and application client. Keep certificate verification enabled. Use `DiscoveryURL` instead of `JWKSURL` to discover the key location.
+A nonempty `AllowedJWKSHosts` must list every permitted discovered host, including the discovery host when needed. Set `Algorithms` only to the asymmetric algorithms your issuer uses. Retain only claims the application needs in `ClaimAllowlist`. Enable `TrustTenantClaim` only for an issuer authorized to restrict your application's tenants.
+
+## Authenticate and select tenants before quota
+
+Build `authbind.Middleware(authCfg, tenantCfg)` first. Construct `authbind.Quota()` for the quota callback. Register the guard before quota on the same Echo group. The combined program's `run` function also installs the problem error handler and closes limiter-owned work during shutdown.
+
+```go file=site/pro-source/examples/getting-started/main.go#site-auth
+```
+
+```go file=site/pro-source/examples/getting-started/main.go#site-quota
+```
+
+```go file=site/pro-source/examples/getting-started/main.go#site-group
+```
+
+Authenticate and select the tenant before a quota usage route too. For public operations, set `Fallback` explicitly and decide whether quota applies. Do not derive a quota tenant from an unverified request header.
+
+## Handle authentication failures
+
+Install `echoadapter.ErrorHandlerConfig{}.ToErrorHandler` as Echo's HTTP error handler, retaining the previous handler as fallback. The complete [API-key example](/pro/auth/) does this and checks media types. Missing and invalid credentials return [401 unauthenticated](/pro/problems/unauthenticated/). Insufficient scopes return [403 forbidden](/pro/problems/forbidden/). Read `WWW-Authenticate` before deciding whether the client needs a new token or a different grant.
+
+Test an absent credential, a malformed credential and a valid credential without the required scope. Test repeated credential fields and two credential mechanisms on one request. Verify that rejected requests never reach quota or the business handler. These examples use local fixtures without an external token issuer.
+Test discovery and key rotation against your deployed issuer.
+
+## Map an already verified MCP principal
+
+Use this when the MCP Go SDK has already verified the bearer token.
+
+`MCPMapping.Principal` accepts verified SDK `TokenInfo`. It does not authenticate tool arguments. Configure the namespace and the trusted extra-field name used for the tenant restriction. Keep this namespace distinct from unrelated HTTP schemes unless they intentionally produce the same principal IDs.
+
+```go file=site/pro-source/examples/source/auth/authbind/example_test.go#ExampleMCPMapping_Principal
+```

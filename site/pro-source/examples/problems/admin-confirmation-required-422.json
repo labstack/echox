@@ -1,0 +1,7 @@
+{
+  "code": "admin_confirmation_required",
+  "detail": "",
+  "status": 422,
+  "title": "Unprocessable Entity",
+  "type": "https://echo.labstack.com/pro/problems/admin-confirmation-required"
+}

@@ -1,0 +1,129 @@
+---
+title: Configure quota checks and accounting
+description: Protect routes, select plans, reserve work and connect shared stores.
+---
+
+{/* Diataxis: how-to */}
+
+## When to use this guide
+
+Use these tasks to add tenant budgets and weighted accounting to authenticated Echo routes. [Install Echo Pro](/pro/install/) and authenticate and select the tenant first. Run the source examples with:
+
+```sh file=site/pro-source/examples/site-docs/commands.sh#test-quota
+```
+
+The [quota overview](/pro/quota/) explains atomic limit checks and remote failure policy. The [configuration reference](/pro/reference/quota/) includes all middleware, memory, Redis, telemetry and export options.
+
+## Add quota to your Echo group
+
+Construct the limiter and its middleware after building an authentication and tenant guard.
+The callback from `authbind.Quota()` reads the verified principal and selected tenant.
+
+```go file=site/pro-source/examples/getting-started/main.go#site-quota
+```
+
+Run the guard before quota on the same group:
+
+```go file=site/pro-source/examples/getting-started/main.go#site-group
+```
+
+During shutdown, call `lim.Close(ctx)` after HTTP requests stop. See [getting started](/pro/getting-started/) for the complete program.
+
+## Select an application-owned subscription plan
+
+`MiddlewareConfig.Plan` has signature `func(*echo.Context, quota.Identity) (string, error)`.
+This example selects each tenant's plan from an immutable subscription map. It returns 200 twice, then 429. An administrative route without its required scope returns 403; a request without a credential returns 401.
+
+```go file=site/pro-source/examples/source/quota/auth_example_test.go#site-plans
+```
+
+Replace the immutable map with your subscription repository, using the Echo request context for blocking lookups. For unrestricted users, compose tenant membership first and use `authbind.Quota()` instead of reading `TenantRestriction` directly. Protect usage reads with the same chain. Quota uses the plan name you return as-is. It does not check it.
+
+## Assign weighted costs to routes
+
+Set `MiddlewareConfig.Cost` to `RouteCosts`. Keys use registered paths and methods. Call `CheckRouteCosts` in your route-registration test so a renamed route cannot silently fall back to cost one. The example consumes five units from a 100-unit plan and prints `200 95`.
+
+```go file=site/pro-source/examples/source/quota/middleware_example_test.go#ExampleRouteCosts
+```
+
+Use custom meters when requests and work have different budgets. Return explicit costs for each configured meter. Keep custom operation labels bounded, and test the unknown-path behavior of protected Echo groups.
+
+## Reserve estimated work and settle actual use
+
+Use `Reserve` for work whose final cost is unknown before work starts. Retain the reservation handle across settlement retries. This example reserves token units and settles to the actual amount:
+
+```go file=site/pro-source/examples/source/quota/accounting_example_test.go#ExampleLimiter_Settle
+```
+
+For HTTP handlers, set `Settle: true` and call `quota.Charge` with final amounts. An explicit zero refunds work. Omitted meters retain their reservations. Call `Close` during shutdown to drain asynchronous settlement. The [execution task](/pro/guides/execution/) demonstrates keeping two request attempts charged while charging actual token work once.
+
+## Bound dimensions and adjust customer quotas
+
+Use a controlled dimension vocabulary such as `small`, `large` and `other`. Set `ByDimension` on the limit and provide every configured dimension. The example also applies a numeric override without changing the subject's stored usage:
+
+```go file=site/pro-source/examples/source/quota/plans_example_test.go#ExampleLimit_ByDimension
+```
+
+Map unknown request values to a bounded value before quota. If override values come from a database, cache them in your application. Overrides run for each limit check and usage read. They do not provide a subscription repository or cache.
+
+For billing plans, use `PerBillingPeriod` and return the trusted subscription start and end from `MiddlewareConfig.Period`. End must exceed Start by at least one millisecond. A newer start resets the period; the same start retains use.
+
+```go file=site/pro-source/examples/source/quota/site_example_test.go#ExamplePerBillingPeriod
+```
+
+The billing fixture returns 204 twice, then 429. Its period is trusted subscription data. The store does not compute the period from the clock. It uses the dates you return. Calendar limits reset at their configured local times:
+
+```go file=site/pro-source/examples/source/quota/plans_example_test.go#ExampleLimit_In
+```
+
+## Release concurrent work and replay credit adjustments
+
+Use `Concurrent` for in-flight jobs. If you call the limiter directly, release the decision when the job ends. The fixture admits one job, refuses a second and admits a third after release. The middleware releases it when the handler returns.
+
+```go file=site/pro-source/examples/source/quota/site_example_test.go#ExampleConcurrent
+```
+
+Fund `Credits` with an authorized `AddCredits` call. Keep its ID and amount across a lost response. This fixture replays the same 100-unit adjustment without applying it twice, then detects a changed amount with `ErrCreditConflict`:
+
+```go file=site/pro-source/examples/source/quota/site_example_test.go#ExampleCredits
+```
+
+Credit adjustment IDs deduplicate for 30 days. Retain permanent business deduplication when the same invoice can reappear after that window. When the store is unavailable, credit writes fail. They never succeed without the store. The [credit conflict page](/pro/problems/credit-conflict/) describes client recovery.
+
+## Reload plans without replacing the limiter
+
+Parse a plan document with `ParsePlans` and handle file close errors.
+Call `Reload` from your file watcher or configuration callback. Invalid input preserves the old set. This executable reload example replaces a daily cap:
+
+```go file=site/pro-source/examples/source/quota/plans_example_test.go#ExampleLimiter_Reload
+```
+
+Keep shared limit IDs compatible when changing plans. Do not reuse an ID for another meter or scope to reset usage implicitly. To reset usage, use the reset action.
+
+## Share budgets through Redis or Valkey
+
+Create a dedicated client through `redisstore.Options`. The helper enables context deadlines and disables hidden retries. `New` validates effective settings without connecting. This example prints `true` for a remote store; it does not establish backend connectivity:
+
+```go file=site/pro-source/examples/source/quota/redisstore/example_test.go#ExampleNew
+```
+
+Use the corresponding helper for Sentinel or Cluster:
+
+```go file=site/pro-source/examples/source/quota/redisstore/example_test.go#ExampleFailoverOptions
+```
+
+```go file=site/pro-source/examples/source/quota/redisstore/example_test.go#ExampleClusterOptions
+```
+
+Supply the resulting store to `quota.Config.Store`. Use a scoped `Prefix`, Redis `noeviction`, and an application-owned client lifecycle. Close limiter-owned work before closing that client. Mark paid limits strict so a store outage produces 503 instead of unrecorded usage. Exercise your backend with authenticated, namespaced test resources before enabling billed traffic.
+
+## Observe decisions and respond to problems
+
+Attach hooks for decisions and lifecycle events to your own telemetry providers. This example prints event names and bounded result values:
+
+```go file=site/pro-source/examples/source/quota/observations_example_test.go#ExampleHooks
+```
+
+Use [quota telemetry](/pro/recipes/quota-otel/) for provider setup and shutdown. Use [Stripe export](/pro/recipes/stripe/) for durable event delivery. Add `quotaadmin` for operator inspection; enable credit/reset actions only with explicit operator and audit policy.
+
+On 429, retain `Retry-After` and show the violated budget. On [402 insufficient credits](/pro/problems/insufficient-credits/), fund the balance or reduce work. On [403 cost exceeds limit](/pro/problems/cost-exceeds-limit/), split or reduce the request; waiting cannot make it fit. Show a strict-store 503 as an outage, not as the customer running out of quota.

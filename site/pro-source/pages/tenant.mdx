@@ -1,0 +1,96 @@
+---
+title: Tenant resolution and authorization
+description: How tenant selectors, membership and resource policy constrain a verified principal.
+sidebar:
+  order: 4
+---
+
+{/* Diataxis: explanation */}
+
+`echo.labstack.com/pro/tenant` selects a tenant and checks access to its resources after authentication.
+The [task guide](/pro/guides/tenant/) shows wiring; the [reference](/pro/reference/tenant/) lists selectors, fields and limits.
+Use it when one credential can address several tenants, or a route names a tenant.
+The package starts no scheduler and performs no database migration.
+
+Handlers call `tenant.From(ctx)` to read the selected tenant.
+The example below selects a tenant for an explicitly public route. It shows selection without a login; protected routes also need authentication and membership checks.
+
+```go file=site/pro-source/examples/source/tenant/site_example_test.go#site-anchor
+```
+
+Selecting a tenant does not prove ownership of a resource.
+`AuthorizeConfig` loads the resource's stored owner before calling your policy engine.
+
+[Authbind](/pro/guides/auth/) runs authentication and tenant selection before [quota](/pro/quota/).
+
+## Every selector runs
+
+`FromCredential()` reads the verified credential's tenant restriction.
+`FromHeader`, `FromSubdomain` and `FromPathParam` return errors for invalid configuration.
+The middleware runs every configured selector.
+Malformed values and selector errors return 400. Valid selectors naming different tenants return 403.
+
+A credential restriction still limits selection when `FromCredential()` is absent.
+If other selectors return no value, that restriction becomes the selected tenant.
+`Required: true` returns 403 when no selector yields a tenant. Public OpenAPI operations are exempt.
+
+`FromHeader` rejects repeated header lines. `FromSubdomain` reads `Request.Host`, ignoring forwarded headers.
+It accepts one label below the configured base. Configure your proxy to preserve the intended host.
+
+## Membership and public requests
+
+If you set `Config.Member`, it runs for every authenticated request and checks the selected tenant.
+Only `(true, nil)` allows the request. False, errors and `(true, error)` return 403.
+With nil `Member`, only a credential-restricted tenant is allowed.
+Unrestricted user tokens need your membership callback.
+
+The callback receives the request context and must support concurrent calls.
+Use that context for database reads. Your application owns membership storage, caching and revocation.
+
+Anonymous requests need an explicit `AnonymousSelector`. Ordinary selectors and `Member` do not authorize anonymous tenant access.
+Public OpenAPI operations may omit a required tenant.
+With `openapi.AuthBySpec`, public operations skip the configured authentication, tenant and quota chain.
+If those routes need quotas, give them an explicit public policy, such as a trusted-IP limit.
+
+## Check resource ownership before policy
+
+`AuthorizeConfig` requires `Authorizer`, `Action` and `Resource`.
+The resolver returns the resource's type, ID and stored tenant.
+The middleware rejects a resource whose tenant differs from the selected tenant before calling the authorizer.
+
+The shared timeout covers resource lookup and authorization.
+The resolver receives its deadline through `c.Request().Context()`.
+The original request context is restored before your handler runs.
+Missing principals, callback errors, cancellation, unknown decisions and `(Allow, error)` all deny the request.
+The middleware waits for your callback and cannot stop it. Check `ctx.Done()` inside it.
+
+## Policy adapters
+
+`Static` copies scope grants for actions and resource types. An empty grant list denies every check.
+`AuthorizerFunc` adapts your application policy. It must return `(Allow, nil)` to allow the request.
+
+`Casbin` passes the principal ID, tenant, `Type+":"+ID` and action by default.
+Supply a custom mapping for another model. Your enforcer must support concurrent calls.
+The adapter checks cancellation around `Enforce` but cannot interrupt it.
+
+`Cerbos` needs a trusted mapping from principals to roles.
+It adds the selected tenant as resource attribute `tenant`.
+Only `EFFECT_ALLOW` for the requested resource and action allows access. It does not forward all claims.
+
+`OpenFGA` needs a pinned `AuthorizationModelID`, store ID and action-to-relation map.
+Default objects use `type:tenant/id`; each part is validated separately.
+Default users encode the principal ID. Missing actions or malformed `allowed` responses deny access.
+
+Both HTTP adapters require a service origin and caller-owned client.
+When all `MaxConcurrent` slots are busy, the adapter returns `*tenant.AdapterError` with category `busy`. Authorization middleware refuses access. They start no workers and perform no retries.
+Credentials require HTTPS unless `AllowInsecure` permits local-test HTTP.
+Transport failures return sanitized `AdapterError` categories.
+The [reference](/pro/reference/tenant/#adapter-limits) lists numeric limits.
+
+## Observe and test refusals
+
+Record latency and adapter error categories without logging raw claims or credentials.
+An unavailable policy service denies requests.
+`tenanttest.Authorizer` checks your own-tenant and foreign-tenant cases.
+`tenanttest.Refused` checks that your downstream counters remain unchanged. These helpers do not discover protected routes.
+Malformed selection uses [validation failed](/pro/problems/validation-failed/). Authorization failures use [forbidden](/pro/problems/forbidden/).

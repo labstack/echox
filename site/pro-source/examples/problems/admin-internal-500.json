@@ -1,0 +1,7 @@
+{
+  "code": "admin_internal",
+  "detail": "",
+  "status": 500,
+  "title": "Internal Server Error",
+  "type": "https://echo.labstack.com/pro/problems/admin-internal"
+}

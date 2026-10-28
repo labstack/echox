@@ -1,0 +1,9 @@
+{
+  "code": "invalid_request",
+  "status": 400,
+  "title": "Invalid quota administration request",
+  "type": "https://echo.labstack.com/pro/problems/invalid-request",
+  "violated-policies": [
+    "requests"
+  ]
+}

@@ -1,0 +1,105 @@
+---
+title: Usage plans and quotas
+description: Request budgets, weighted costs and shared Redis or Valkey storage.
+sidebar:
+  order: 5
+---
+
+{/* Diataxis: explanation */}
+
+`echo.labstack.com/pro/quota` checks every limit in a plan before allowing a request.
+The [task guide](/pro/guides/quota/) shows wiring; the [reference](/pro/reference/quota/) lists fields and defaults.
+If one limit denies the request, none of the limits consume usage.
+Use plans for tenant request budgets, weighted work, concurrent jobs or prepaid credits.
+
+This route uses a constructed limiter and a callback from `authbind.Quota()`.
+The `guard` runs authentication and tenant selection first.
+
+```go file=site/pro-source/examples/getting-started/main.go#site-group
+```
+
+The memory store enforces budgets within one process.
+`quota/redisstore` shares budgets across application instances through Redis or Valkey.
+Quota trusts the values returned by `MiddlewareConfig.Identity`; it does not authenticate them.
+`authbind.Quota()` returns an `Identity` with the selected tenant, principal ID, key ID and client IP.
+It uses an explicit IP callback or a configured Echo IP extractor. Otherwise authenticated requests omit IP.
+A subscription repository chooses the plan. Client-supplied headers do not establish a tenant or subscription.
+
+## Limits and subjects
+
+`PerSecond`, `PerMinute` and `PerHour` refill continuously.
+`PerDay` and `PerMonth` reset at UTC calendar times by default.
+`In(location)` moves day and month boundaries to that zone.
+If the reset day is the 31st, shorter months reset on their last day.
+`PerBillingPeriod` uses the trusted start and end returned by your application.
+
+`Concurrent` holds one slot until release or lease expiry. `Credits` debits a funded balance.
+Middleware returns 402 `insufficient_credits` for an unfunded request.
+It returns 403 `cost_exceeds_limit` when a request can never fit a limit.
+It returns 429 `quota_exceeded` with `Retry-After` when a time budget is exhausted.
+
+Limits default to tenant scope. All limits in a plan use one partition, tenant or IP. That lets the store check them in one atomic step.
+User, API-key and operation scopes divide usage within that partition.
+A dimension such as `model` splits usage by value. Each value tracks usage separately.
+Raw client values add subjects until `MaxKeys` rejects new ones; map them to a fixed set first.
+
+If two plans use the same limit ID, usage carries over when a tenant switches plans.
+An upgrade can raise capacity without losing usage. A downgrade can deny requests immediately.
+Usage carries over only when both limits have the same kind, meter, scopes, period, dimensions and partition.
+`Reload` validates the replacement before swapping it in. Invalid replacements leave the old plans active.
+Requests already running keep their previous plan snapshot.
+
+## Plan selection and accounting
+
+`MiddlewareConfig` requires a limiter and an `Identity` callback.
+With one configured plan, no plan callback is needed. Multiple plans require `Plan`.
+Its signature is `func(*echo.Context, quota.Identity) (string, error)`.
+The [per-tenant example](/pro/guides/quota/#select-an-application-owned-subscription-plan) selects a plan from trusted subscription data.
+Billing plans also require `Period`. Default cost is one `requests` unit.
+Unknown meters cause errors unless another configured plan uses them. Zero cost does not consume that meter or deny the request.
+
+`RouteCosts` uses registered method and path names, such as `GET /items/:id`.
+Other operations cost one request unit. Automatic HEAD uses the GET operation when enabled in Echo.
+Unknown paths still run protected-group middleware and consume the default cost.
+Keep custom operation names within a fixed set.
+
+`Settle: true` reserves estimated cost before the handler runs.
+`quota.Charge` supplies final amounts. Settlement runs asynchronously.
+Omitted meters keep their reserved amount. Explicit zero refunds a meter.
+`Limiter.Close(ctx)` waits for limiter-owned settlement work. Your application closes the store client afterward.
+[Execution preparation](/pro/guides/execution/) can refund unused work on replay while charging each HTTP attempt.
+
+`Exclusive: true` detects repeated quota middleware using the same limiter in one Echo context.
+It returns `ErrDuplicateAdmission` when it detects another check on the same limiter. Usage already counted by the first middleware stays counted. `Exclusive` does not detect direct limiter calls.
+Remove duplicate quota middleware when adopting it.
+
+## Store failures
+
+Remote store calls have a timeout; request cancellation can end them earlier.
+When a remote bucket store fails, local fallback uses `Fallback.Instances` and `Fallback.MaxKeys` to bound its per-process share and key count. Remote counters allow requests on failure unless marked strict.
+Use `.Strict()` on paid limits that must deny requests when storage cannot confirm available capacity.
+A strict-store outage returns 503 `temporary_reduced_capacity` with a retry header.
+
+The Redis option helpers enable context deadlines and disable hidden client retries.
+If a Redis call times out, do not retry it as a new charge. The first call may have applied. Your application owns the Redis client.
+Use scoped key prefixes and `noeviction`. Without persistence, a Redis restart resets usage. Replication and failover settings determine how much recent usage can be lost.
+
+The optional denial cache defaults off. A cached denial can hide resets or quota increases from other instances until it expires.
+It never caches credit, concurrency, cannot-fit or outage results. Leave it off when immediate recovery matters.
+
+## Hooks, outbox and usage reads
+
+Hooks run synchronously and can run concurrently across requests. Blocking hooks delay requests; panics propagate.
+Nil hooks are not called. A nil logger produces no logs.
+`OnStoreError` receives an operation name, such as `admit`, `settle` or `outbox`, followed by the error.
+`quotaprom` and `quotaotel` use caller-owned telemetry systems. Keep metric names and labels within fixed sets.
+
+An `Outbox` stores consumption and threshold events atomically with usage changes.
+Delivery is at least once and may arrive concurrently or out of order. Deduplicate by `Event.ID`.
+A permanently failing delivery blocks its partition. A full memory outbox makes writes needing events fail with 503.
+An outbox cannot be combined with synchronous consumption/threshold hooks or TopK.
+[Stripe export](/pro/recipes/stripe/) consumes these final usage events.
+
+Protect `UsageHandler` with the same authentication and plan callbacks as quota checks.
+Reads do not consume usage. `quotaadmin` adds usage and plan views, and optional write actions, to the [console](/pro/admin/).
+Partition resets affect every subject in that partition. They do not refund credits or release concurrent slots.

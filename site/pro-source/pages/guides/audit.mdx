@@ -1,0 +1,81 @@
+---
+title: Record and inspect business events
+description: Map verified actors, record intent and outcome, query retained events and audit denials.
+---
+
+{/* Diataxis: how-to */}
+
+## When to use this guide
+
+Use these tasks to record a trusted application action or inspect audit events for an authorized tenant. [Install Echo Pro](/pro/install/) first and load projection keys from your runtime secret manager. Run examples with:
+
+```sh file=site/pro-source/examples/site-docs/commands.sh#test-audit
+```
+
+The [audit overview](/pro/audit/) explains event preparation, capacity and database restores. The [reference](/pro/reference/audit/) lists configuration fields and defaults.
+
+## Record an event from a verified principal
+
+Register the public `amount` metadata field in the schema. Read the user ID from authentication and verify the tenant restriction before constructing the event. This complete example tests the authenticated actor, target and recorded amount:
+
+```go file=site/pro-source/examples/source/audit/business_example_test.go#ExampleSchema_businessEvent
+```
+
+For unrestricted users, resolve membership and read the selected tenant before preparation. Use `authbind`'s actor mapping so user and service principals get the right actor type. Generate the event ID once and call `Prepare` once. Retry `Record` with the same prepared event. Do not take actor ID, tenant authority or outcome from unchecked body fields.
+
+## Record intent before an external call
+
+Prepare separate intent and outcome events with one `OperationID`. Record intent before calling the effect. If that record fails, return without performing the effect. The example store holds one event, so recording the outcome fails after the effect runs:
+
+```go file=site/pro-source/examples/source/audit/auditpg/example_test.go
+```
+
+It prints `effect performed` followed by `true true`, confirming `*audit.OutcomeUnrecordedError` and `ErrCapacity`. Keep the operation ID and check whether the effect happened. Retrying the effect would risk duplication. For external sends that need journaled uncertainty and provider records, add [execution](/pro/execution/).
+
+## Record authentication and authorization refusals
+
+Install denial middleware outside the guard. By default it records responses with status 401 or 403. Configure `FailClosed` only when the refusal policy requires an audit record before sending the denial response. This fixture records one 403:
+
+```go file=site/pro-source/examples/source/audit/edges_example_test.go#ExampleDenialConfig_ToMiddleware
+```
+
+Denial callbacks must be safe for concurrent use and must honour cancellation. Recording uses its own context with a timeout, so a cancelled request does not stop it. Size `MaxInFlight` for your sink. When it is full, the event is not recorded. The request stays refused; `FailClosed` selects the recording-error response.
+
+## Query and export authorized events
+
+Authorize the exact tenant before every reader call, including continuation requests. The query example writes one event and prints its action, outcome and empty continuation:
+
+```go file=site/pro-source/examples/source/audit/reader_example_test.go#ExampleReader_Query
+```
+
+Resend the same filter with `Page.Next`. Treat search probe text as confidential. For a bulk export, provide a context with the desired end-to-end deadline and a writer owned by the caller:
+
+```go file=site/pro-source/examples/source/audit/reader_example_test.go#ExampleReader_Export
+```
+
+The example's trailer says `integrity=unauthenticated`.  It does not claim a signature or tamper-proof history. Configure an access recorder when export policy needs an audit record of the read itself.
+
+## Deploy PostgreSQL audit storage
+
+Provision the deployment NOLOGIN owner and the independent recorder, relay, maintenance and reader roles through your database administration process. Use `auditpg.Migrate(ctx, deploymentPool, cfg)` before constructing runtime stores. Supply the same schema and role configuration to `New`. It checks role grants, the cluster ID and stored transaction progress. Your application still owns and closes the pool.
+
+This compiled helper takes deployment and recorder pools connected to the same database. The roles must already exist. It applies the migration through the deployment connection and returns a recorder store through the runtime connection. It returns the original error from either call:
+
+```go file=site/pro-source/examples/source/audit/auditpg/example_test.go#postgres-pools
+```
+
+Replace the schema and role names with your provisioned names. Keep separate pools for relay, maintenance and authorized reads. Close them only after their application-owned work stops. This helper compiles with the package examples; it does not run PostgreSQL without the role topology. The real backend suite needs those independently assigned roles.
+
+Use READ COMMITTED for recorder transactions. Keep projection keys for the retained events you need to search. Run retention and relay work through bounded application-owned loops. After a restore, stop writes and follow the database restore procedure before `Rebind` or `Fork`.
+Reconnecting to the restored database does not make lost records safe to ignore.
+
+The [full console demo](/pro/recipes/admin-demo/) reports when these role requirements are unavailable and uses memory audit instead. Memory audit is fine for UI tests. It loses all records when the process exits. It does not test PostgreSQL recording or restore behavior.
+
+## Expose a reader in the console
+
+Build a reader with its access recorder and pass it to `auditadmin.NewPanel`. Showing unredacted values needs a separate reveal grant. The console checks it on every request. This executable construction prints the panel ID and view/action counts:
+
+```go file=site/pro-source/examples/source/audit/auditadmin/example_test.go#ExampleNewPanel
+```
+
+Mount it through the [admin console](/pro/admin/). A missing audit write for a console mutation returns [admin audit unavailable](/pro/problems/admin-audit-unavailable/) before the mutation. If the outcome record is missing, check both the business state and the audit sink.

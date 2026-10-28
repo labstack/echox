@@ -1,0 +1,81 @@
+---
+title: Receive and deliver signed events
+description: Wire durable acceptance, own the worker and retain permanent business deduplication.
+---
+
+{/* Diataxis: how-to */}
+
+## When to use this guide
+
+Use these tasks for a signed webhook endpoint or an application outbox. [Install Echo Pro](/pro/install/) first. Run examples without a backend using:
+
+```sh file=site/pro-source/examples/site-docs/commands.sh#test-webhook
+```
+
+The [webhook overview](/pro/webhook/) explains acceptance, delivery uncertainty and replay windows. The [reference](/pro/reference/webhook/) lists body bounds, routing and retention settings.
+
+## Mount a dedicated receiver
+
+Construct a verifier from trusted source and tenant configuration. Pass it and an inbox to `ReceiveConfig`. Attach the returned middleware to a dedicated POST route. It is terminal, so it does not forward accepted requests to your handler. This executable fixture exercises acceptance and repeated input:
+
+```go file=site/pro-source/examples/source/webhook/example_test.go#ExampleReceiveConfig_ToMiddleware
+```
+
+Set `MaxBodyBytes` for the provider's documented payload size and `Timeout` for verification plus acceptance. Keep all body-transforming middleware after verification or outside this route. Retain inbox deduplication for the provider's full replay window. A valid signature shows the sender holds the secret. It does not create an Echo principal.
+
+## Queue an event from your handler
+
+The combined example adds a POST handler to its protected Echo group.
+`id` comes from `tenant.From(c.Request().Context())`; `invoice` is the application's generated invoice ID.
+`outbox` is a configured memory store. The [getting-started program](/pro/getting-started/) constructs it and owns its worker.
+
+```go file=site/pro-source/examples/getting-started/main.go#site-group
+```
+
+The POST handler prepares and enqueues this event with the request context:
+
+```go file=site/pro-source/examples/getting-started/main.go#site-webhook
+```
+
+## Exercise a memory queue and worker
+
+The example prepares a fixed business key and inspects ready state.
+It starts one worker and verifies the signed request.
+It waits for the worker to stop after cancellation. It prints `ready`, `verified credit.add invoice_42/grant` and `done`.
+
+```go file=site/pro-source/examples/source/webhook/webhookmem/example_test.go
+```
+
+The response from this fixture acknowledges signature verification only. It has no durable inbox or business ledger. For durable acceptance, use the receive middleware with a PostgreSQL inbox.
+
+## Couple an outgoing command to a business transaction
+
+Use caller-owned deployment and runtime pools connected to the same database. Run `Migrate` during deployment, then apply the shipped runtime-role grants before `New`. Create the application's permanent ledger separately. The recipe uses `app.entitlements` with primary key `(tenant, invoice, action)` and a stored amount.
+
+The following compiled recipe inserts the ledger row and enqueues the frozen outgoing command in one READ COMMITTED transaction. It sets `synchronous_commit=on`. A repeated business key reads and compares the original amount. An existing identical grant does not enqueue again, even after queue deduplication expires.
+
+```go file=site/pro-source/examples/source/webhook/webhookpg/recipe_example_test.go#http-outbox
+```
+
+This function requires real pools and an endpoint; its unit example does not run database I/O. Test it against your assigned PostgreSQL backend. Retry the entire transaction with the same prepared message after a transient error or unknown COMMIT. A lost commit reply cannot prove rollback. Keep the permanent ledger after webhook payload compaction and deduplication retention expire.
+
+## Process incoming events
+
+For an incoming event that grants a business entitlement, register a transactional `ProcessFunc`. This compiled processor inserts an application ledger row and prepares an outgoing credit command only on its first business-key insertion:
+
+```go file=site/pro-source/examples/source/webhook/webhookpg/example_test.go#grantInvoice
+```
+
+The fixture treats the verified payload as an invoice identifier and fixes the amount at 100. Parse and validate your provider's signed payload in the real processor. The unique `(tenant, invoice, action)` ledger key permanently prevents a duplicate grant.
+
+## Configure delivery and shutdown
+
+Register each destination name in both store routing and sender endpoints. Set an immutable version and the receiver's actual deduplication horizon as `ReplayWindow`. Start the worker only after `New` returns without error. `Run` stops claiming on cancellation, drains dispatched work within `ShutdownTimeout` and returns. Join it before closing either pool.
+
+Choose `Concurrency` for available database and receiver capacity. Schedule `Maintain` separately with a bounded batch. Retain source processors and destination versions while ready or sending records reference them; removing live routing makes `New` refuse startup.
+
+## Handle inspection and uncertain sends
+
+Inspect attempt and replay history before deciding another business effect is safe. HTTP 2xx records receiver acceptance. HTTP timeouts and network failures can leave an outgoing delivery uncertain. A different webhook ID would defeat receiver deduplication. Preserve the key and payload.
+
+The [admin console](/pro/admin/) can expose authorized dead-record replay and explicit uncertain-delivery decisions through `webhookadmin`. It requires PostgreSQL. The [full demo](/pro/recipes/admin-demo/) exercises those panels with disposable data. Keep operator scope, confirmations and durable audit enabled for recovery actions.

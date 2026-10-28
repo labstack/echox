@@ -1,0 +1,96 @@
+---
+title: Audit configuration reference
+description: Fields, defaults and constructors for audit.
+---
+
+{/* Diataxis: reference */}
+
+import ConfigReference from '../../../../components/ConfigReference.astro';
+
+`echo.labstack.com/pro` v0.1.0. See the [task guide](/pro/guides/audit/) for setup examples.
+
+## Required fields
+
+- `SchemaConfig.Keys`: HMAC keys for the default storage policy; `Policy.AllowMaskFallback` permits masking instead.
+- `MemoryStoreConfig.Capacity`: positive event and byte capacities; a full store never evicts older events.
+- `auditpg`: caller-owned pools, a NOLOGIN deployment owner and four distinct runtime roles (`auditpg.Roles`).
+
+A reader pagination cursor does not grant access; authorize every read and continuation.
+
+## `audit.SchemaConfig`
+
+Import `echo.labstack.com/pro/audit`.
+
+<ConfigReference source="pro" name="audit.SchemaConfig" />
+
+## `audit.MemoryStoreConfig`
+
+Import `echo.labstack.com/pro/audit`.
+
+<ConfigReference source="pro" name="audit.MemoryStoreConfig" />
+
+## `audit.Capacity`
+
+Import `echo.labstack.com/pro/audit`.
+
+<ConfigReference source="pro" name="audit.Capacity" />
+
+## `audit.MiddlewareConfig`
+
+Import `echo.labstack.com/pro/audit`.
+
+<ConfigReference source="pro" name="audit.MiddlewareConfig" />
+
+## `audit.DenialConfig`
+
+Import `echo.labstack.com/pro/audit`.
+
+<ConfigReference source="pro" name="audit.DenialConfig" />
+
+## `audit.ReaderConfig`
+
+Import `echo.labstack.com/pro/audit`.
+
+<ConfigReference source="pro" name="audit.ReaderConfig" />
+
+## `audit.RelayConfig`
+
+Import `echo.labstack.com/pro/audit`.
+
+<ConfigReference source="pro" name="audit.RelayConfig" />
+
+## `auditpg.Roles`
+
+Import `echo.labstack.com/pro/audit/auditpg`.
+
+<ConfigReference source="pro" name="auditpg.Roles" />
+
+## `auditpg.SchemaConfig`
+
+Import `echo.labstack.com/pro/audit/auditpg`.
+
+<ConfigReference source="pro" name="auditpg.SchemaConfig" />
+
+## `auditadmin.PanelConfig`
+
+Import `echo.labstack.com/pro/audit/auditadmin`.
+
+<ConfigReference source="pro" name="auditadmin.PanelConfig" />
+
+## Event and read limits
+
+| Setting | Default or limit |
+| --- | --- |
+| `SchemaConfig.Fields` | At most 256 |
+| `Event.Action` | Two to eight dot-separated segments, at most 128 bytes. The `audit.` prefix is reserved. |
+| `DenialConfig.Timeout` / `MaxInFlight` | 500 ms recording timeout and 64 concurrent calls by default |
+| `auditpg.SchemaConfig.Schema` | `public` by default |
+| `auditpg.SchemaConfig.Timeout` | Five seconds by default |
+| `auditpg.SchemaConfig.MigrateTimeout` | One minute by default |
+| `QueryRequest.Limit` | 50 entries by default; at most 100 |
+
+Keep pools and stores open until requests, relay work and retention work have stopped.
+
+## Related pages
+
+[Package explanation](/pro/audit/) · [Task guide](/pro/guides/audit/) · [Problem catalog](/pro/problems/)

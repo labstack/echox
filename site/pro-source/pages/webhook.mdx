@@ -1,0 +1,112 @@
+---
+title: Signed webhooks
+description: Verify signed incoming webhooks on the raw body, store them in an inbox, and send signed outgoing webhooks with retry limits.
+sidebar:
+  order: 6
+---
+
+{/* Diataxis: explanation */}
+
+`echo.labstack.com/pro/webhook` verifies incoming event bytes and prepares outgoing messages.
+The [task guide](/pro/guides/webhook/) shows wiring; the [reference](/pro/reference/webhook/) lists fields and limits.
+Stores accept and deduplicate events. Workers process inbox events or send queued outbox messages.
+Use `webhookmem` for local tests and `webhookpg` for retained PostgreSQL state.
+
+A dedicated POST route uses the receive middleware. It ends the request and never calls a handler. `mw` is built with `ReceiveConfig{Verify: verify, Inbox: inbox, Source: "billing"}`.
+The verifier checks original bytes before the inbox accepts them.
+
+```go file=site/pro-source/examples/source/webhook/example_test.go#site-anchor
+```
+
+## Verify original bytes
+
+The Standard Webhooks sender signs `id + "." + timestamp + "." + payload` with HMAC-SHA256.
+`webhook-id` carries the stable message key. `webhook-timestamp` changes on each send.
+`webhook-signature` contains space-separated `v1,<base64>` signatures.
+The sender does not wrap, parse or rewrite the body.
+
+Configure distinct secrets per endpoint.
+Install a new verification key before signing with it. Keep the old key until senders stop using it.
+Constructors copy maps and decoded keys so later caller changes do not affect them.
+
+`StandardVerifierConfig` takes source, tenant, account, type and format from trusted configuration.
+It verifies the original bytes before returning `Incoming`, whose payload uses those bytes.
+If you read tenant or event type from the payload, do it after verification.
+Rewriting JSON or decompressing the body beforehand changes the signed input.
+Timestamp checks limit acceptable clock skew. They do not deduplicate replays within that time window.
+Duplicate header lines are rejected. Unknown signature versions are ignored.
+
+## Receive and process
+
+`ReceiveConfig.ToMiddleware()` verifies and accepts events through `Inbox`.
+It never calls the next handler. Successful acceptance means queued; it does not mean business processing has completed.
+
+The PostgreSQL inbox runs a registered `ProcessFunc` inside its transaction.
+Use only transactional SQL through the supplied `pgx.Tx`.
+Honor cancellation. Do not commit or retain the transaction. Do not call external services from this callback.
+One commit covers your business changes, any outgoing messages, the inbox status and the attempt record.
+Errors, panics and invalid outputs roll back that transaction.
+
+Use a permanent application business key for actions such as granting invoice credits.
+Provider event IDs can differ for the same invoice.
+The inbox forgets event IDs and payloads after their retention periods.
+A permanent ledger with a unique business key prevents another grant afterward.
+
+## Enqueue and send
+
+`PrepareOutgoing` validates an event and returns an immutable copy. Keep it and its stable key when retrying.
+`webhookpg.Store.Enqueue(ctx, tx, prepared)` uses your application's READ COMMITTED transaction.
+The receipt is provisional until commit.
+Retry the whole business transaction after a transient error or lost COMMIT reply.
+Retrying only `Enqueue` cannot determine whether the business change committed.
+
+`HTTPSenderConfig` maps destination names to endpoints.
+URLs require HTTPS without userinfo or fragments. Plain HTTP is limited to localhost or literal loopback addresses.
+Validate destination ownership and network access before registration.
+The sender trusts configuration; it does not protect arbitrary customer URLs against SSRF.
+
+The default client disables connection reuse and redirects to prevent hidden HTTP retries.
+It makes one request per attempt and retains no response body.
+It ignores the receiver's `Retry-After` header.
+2xx returns `Accepted`. HTTP 410, 413 and 415 return `Rejected`.
+Other 4xx except 408 return `Retry`, including 429.
+HTTP 408, 5xx, redirects, network failures and cancellation return `Unknown`.
+`Accepted` means the receiver accepted the request, not that it completed the business action.
+Worker policy decides whether another attempt fits the remaining time and attempt limits.
+
+## PostgreSQL setup and shutdown
+
+Run `webhookpg.Migrate` with the deployment-owner pool and apply the shipped runtime grants.
+Construct `New` with the runtime pool.
+It checks the schema, the namespace, and that every route referenced by stored messages is still configured.
+It starts no worker and performs no migration. An incomplete or mismatched schema prevents startup.
+After a migration COMMIT error, retry identical configuration to check whether it committed.
+
+`webhook_messages` stores queue state and payloads. `webhook_attempts` stores delivery attempts.
+`webhook_replays` stores replay and operator decisions.
+`webhook_meta` records the schema version, namespace, capacities and retention settings checked at startup.
+
+Set `StoreConfig.Routing.Destinations[name].ReplayWindow` on the sending store.
+It describes the remote receiver's documented deduplication period. It is not a receiver configuration field.
+The sender uses it to decide how long resending the same message remains safe.
+The [reference](/pro/reference/webhook/#delivery-and-storage-limits) lists its bounds and the other retention defaults.
+
+`NewWorker` validates configuration without starting work. `Run` blocks until shutdown or a stop error.
+Cancel its application context and wait for `Run` before closing pools.
+Schedule bounded maintenance separately.
+Investigate clock regression, permission and schema failures before replacing a stopped worker.
+
+## Inspect and recover deliveries
+
+A nil `Routing.Logger` produces no logs.
+Worker logs use fixed route, direction, outcome, code and error-category fields.
+`InspectRecord` returns retained state and attempts.
+The [webhook panel](/pro/admin/) requires PostgreSQL. Memory storage supports metadata inspection only.
+
+Replay resends a dead record with the same webhook ID and payload.
+Uncertain outgoing sends need an explicit operator decision.
+“Mark delivered” stores the operator's decision as audit evidence; it does not fabricate a 2xx attempt.
+Here audit evidence means a retained record of what the operator decided.
+Each redelivery counts against the replay limit. The record keeps a warning that the receiver may apply the event twice.
+Authorize and audit operator actions. Changing the key bypasses receiver deduplication.
+The [combined tutorial](/pro/getting-started/) runs loopback delivery; the [full console demo](/pro/recipes/admin-demo/) adds durable inspection.

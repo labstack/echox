@@ -1,0 +1,7 @@
+{
+  "code": "admin_in_progress",
+  "detail": "",
+  "status": 409,
+  "title": "Conflict",
+  "type": "https://echo.labstack.com/pro/problems/admin-in-progress"
+}

@@ -1,0 +1,13 @@
+HTTP/1.1 400 Bad Request
+Content-Type: application/problem+json
+Cache-Control: no-store
+
+{
+  "code": "invalid_request",
+  "status": 400,
+  "title": "Invalid quota administration request",
+  "type": "https://echo.labstack.com/pro/problems/invalid-request",
+  "violated-policies": [
+    "requests"
+  ]
+}

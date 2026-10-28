@@ -1,0 +1,9 @@
+{
+  "code": "credit_conflict",
+  "status": 409,
+  "title": "Credit ID was already used with a different amount",
+  "type": "https://echo.labstack.com/pro/problems/credit-conflict",
+  "violated-policies": [
+    "requests"
+  ]
+}

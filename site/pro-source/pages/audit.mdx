@@ -1,0 +1,108 @@
+---
+title: Business audit evidence
+description: Record business actions with classified fields, retention limits and separate PostgreSQL roles.
+sidebar:
+  order: 7
+---
+
+{/* Diataxis: explanation */}
+
+`echo.labstack.com/pro/audit` records who performed an application action and the outcome your application reported.
+The [task guide](/pro/guides/audit/) shows wiring; the [reference](/pro/reference/audit/) lists fields and defaults.
+The package stores what your application reports. It cannot check that the actor or outcome is correct.
+A request log shows `POST /refunds`; an audit event records who refunded which invoice and whether it succeeded.
+
+In this example, audit middleware sets a system actor and the route name. The handler reads both.
+Recording an event also needs a schema and store, as shown in the [task guide](/pro/guides/audit/).
+
+```go file=site/pro-source/examples/source/audit/middleware_example_test.go#site-anchor
+```
+
+## Prepare an event once
+
+`NewSchema` copies registered fields and their storage rules, such as masking or HMAC hashing.
+Register metadata names with their `redact.Class` before calling `Prepare`.
+The default storage policy requires HMAC keys. Keep the immutable `redact.Keyring` available while using the schema.
+If you enable the mask fallback, the schema works without HMAC keys. You then cannot search by exact value.
+`Schema.MaskFallback()` reports whether that fallback is enabled.
+
+Map the actor from the verified principal. Classify user and service IDs as identifiers.
+System and anonymous actors may omit their IDs.
+Choose tenant, action, target and metadata from trusted application state.
+Do not let a client-supplied actor field decide who performed the action.
+
+`Schema.Prepare` validates and copies the event into a `PreparedEvent` with serialized bytes and a digest.
+If the event has no ID or time, `Prepare` sets them.
+Keep the prepared event for retries. Preparing again can create a different event.
+Use one stable ID and identical content for each business event.
+
+Invalid event fields return `*audit.ValidationError`.
+Invalid schema or store configuration returns `*audit.ConfigError`; projection errors can return `*redact.ConfigError`.
+Inspect types with `errors.AsType` and stable error values with `errors.Is`.
+
+## Recording and business actions can fail separately
+
+`Record(ctx, prepared)` records the event.
+`Record` writes only the audit event. It cannot commit or undo an external call you made before it.
+If your policy requires a record before an action, record intent first. Stop the action when that recording fails.
+Record the outcome afterward with the same `OperationID` and a distinct event ID.
+
+An action can succeed while recording its outcome fails.
+`*audit.OutcomeUnrecordedError` reports the recording failure and preserves the operation ID.
+Do not repeat the business action because its audit outcome is missing.
+The [capacity failure example](/pro/guides/audit/) demonstrates that case.
+
+`MiddlewareConfig` maps the verified principal to an actor and adds the request route and tenant to its scope.
+`DenialConfig` records rejected requests on the routes where you install it.
+Put denial recording outside authentication and authorization so it can observe their refusals.
+Denial recording runs synchronously after the inner middleware returns. By default, a recording failure does not change the refusal.
+With `FailClosed`, a recording failure replaces the refusal with `*audit.DenialUnrecordedError`, if the response is not yet written.
+The rejected request still cannot reach the handler.
+
+## Choose a store
+
+`NewMemoryStore` requires event and byte capacities.
+It returns `ErrCapacity` when full instead of deleting old events to make room.
+It is safe for concurrent use. It loses all records when the process exits. Use it for tests and local demos.
+
+`auditpg` writes to one writable PostgreSQL primary, version 16 to 18.
+Your application supplies and closes its pools.
+Deployment requires a trusted NOLOGIN owner and separate recorder, relay, maintenance and reader roles.
+`Migrate` requires those roles to exist; it does not create logins.
+`New` checks that schema objects belong to the deployment owner and helper functions have the expected role grants. It rejects replicas, changed cluster IDs and transaction counters behind stored events or cursors.
+It does not migrate or close the pool. Recording requires READ COMMITTED transactions.
+
+Keep runtime roles separate from the deployment owner.
+A pooler must preserve each runtime role and READ COMMITTED transactions. The deployment owner also needs permission to run the cluster-ID helper.
+`audit_events` holds retained events; `audit_cursors` tracks relay progress.
+`audit_meta` stores the schema version, cluster ID, timeline and highest recorded transaction ID.
+`audit_admin_bindings` stops the console from recording the same action or note twice. It matches on ID and content hash.
+Pruning an event also removes its associated deduplication record.
+
+## Read, search and export
+
+Authorize the exact tenant before `Reader.Get`, `Query` and each continuation.
+A pagination token does not grant access. Keep the query filter unchanged across pages.
+Time ranges include the start and exclude the end. The reader stores and compares times in UTC with microsecond precision.
+
+To search, the reader hashes your search value with the same HMAC key used at write time. It matches that hash.
+Keep probe values and database parameters out of logs and URLs.
+Retain projection keys while you need to search the corresponding records.
+
+Exports write retained records and a trailer to your writer.
+Exports are not signed. The trailer says `integrity=unauthenticated`.
+To record who exported what, configure an access recorder on the reader.
+`SlogExporter` writes projected records to your logger and reports its output format.
+
+## Restore and operate
+
+Restoring a database can lose recently recorded events.
+At construction, `auditpg.New` checks the cluster ID, timeline and transaction counter against stored events and cursors. Relay checks also compare persisted progress with its witness.
+If it detects a restore, an operator must call `Rebind` or `Fork` with details of the restore.
+Do not delete progress markers or switch database IDs to clear this error.
+Your application schedules retention and relay work.
+
+`auditadmin` exposes an authorized reader in the [console](/pro/admin/).
+The [full demo](/pro/recipes/admin-demo/) uses memory audit storage when its login lacks the required PostgreSQL roles.
+That mode demonstrates the UI and does not test durable audit storage.
+[Execution](/pro/execution/) tracks uncertain external sends; audit records what the application reports about them.

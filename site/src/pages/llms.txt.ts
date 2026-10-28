@@ -26,7 +26,7 @@ export const GET: APIRoute = async () => {
     '',
   ];
 
-  for (const { title, prefix } of sections) {
+  for (const { title, prefix } of [...sections, ...(base === '/' ? [{ title: 'Echo Pro (commercial)', prefix: 'pro/' }] : [])]) {
     lines.push(`## ${title}`, '');
     const entries = englishPages
       .filter(({ id }) => id.startsWith(prefix))

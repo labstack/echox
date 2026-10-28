@@ -1,11 +1,16 @@
 import { defineConfig, fontProviders } from 'astro/config';
-import starlight from '@astrojs/starlight';
+import starlightBase from '@astrojs/starlight';
+import { englishOnlyPro } from './plugins/english-only-pro.mjs';
+const starlight = (options) => englishOnlyPro(starlightBase(options));
 import sitemap from '@astrojs/sitemap';
 import { unified } from '@astrojs/markdown-remark';
 import { redirects, retiredCookbookRedirects } from './src/redirects.mjs';
 import remarkSourceCode from './plugins/remark-source-code.mjs';
 import { locales } from './src/locales.mjs';
+import { preparePro } from './scripts/pro-source.mjs';
 import { isProPage } from './src/pro-page.mjs';
+
+preparePro();
 
 const next = process.env.DOCS_CHANNEL === 'next';
 
@@ -79,14 +84,17 @@ export default defineConfig({
         // Links with data-ga-event send that GA4 event on click; data-ga-plan
         // and data-ga-value add the plan name and USD value (begin_checkout);
         // data-ga-placement names where the link sits (nav, home_hero, ...).
-        { tag: 'script', attrs: { async: true, src: 'https://www.googletagmanager.com/gtag/js?id=G-H19TMZLQFN' } },
+        // Only the production host loads GA, so local and preview builds do
+        // not count as visits.
         {
           tag: 'script',
           content:
-            "window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-H19TMZLQFN',{anonymize_ip:true});" +
+            "(function(){if(location.hostname!=='echo.labstack.com')return;" +
+            "var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id=G-H19TMZLQFN';document.head.appendChild(s);" +
+            "window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}window.gtag=gtag;gtag('js',new Date());gtag('config','G-H19TMZLQFN',{anonymize_ip:true});" +
             "document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('[data-ga-event]');if(!a)return;var d=a.dataset,p={link_text:a.textContent.trim(),link_url:a.getAttribute('href')};" +
             "if(d.gaPlacement){p.placement=d.gaPlacement;}if(d.gaPlan){p.plan=d.gaPlan;}if(d.gaValue){var v=Number(d.gaValue);p.currency='USD';p.value=v;p.items=[{item_id:'echo_pro_'+d.gaPlan.toLowerCase(),item_name:'Echo Pro '+d.gaPlan,price:v,quantity:1}];}" +
-            "gtag('event',d.gaEvent,p);});",
+            "gtag('event',d.gaEvent,p);});})();",
         },
         // kapa.ai "Ask AI" widget — real answers from the indexed Echo docs.
         // We hide kapa's default floating launcher and open the modal from our
@@ -138,7 +146,7 @@ export default defineConfig({
       expressiveCode: { themes: ['github-dark', 'github-light'] },
     }),
     // Starlight adds @astrojs/sitemap only when it is missing; add it here with
-    // the same i18n mapping so the noindex /pro page stays out of the sitemap.
+    // the same i18n mapping and keep Pro only on the release site.
     sitemap({
       i18n: {
         defaultLocale: 'root',

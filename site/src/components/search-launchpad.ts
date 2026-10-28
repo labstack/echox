@@ -19,10 +19,20 @@ export const labels: Record<string, typeof en> = {
   'zh-cn': { start: '从这里开始', popular: '热门内容', quickstart: '快速入门', routing: '路由', binding: '数据绑定', guide: '指南', middleware: '中间件', cookbook: '示例', open: '打开', navigate: '导航', close: '关闭' },
 };
 
-export function launchpadHTML(locale: string, docsBase: string) {
+export function launchpadHTML(locale: string, docsBase: string, pro = false) {
   const l = labels[locale];
   const link = (path: string, icon: keyof typeof icons, text: string, section: string) =>
     `<a class="ess-link" href="${docsBase}${path}"><svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor">${icons[icon]}</svg> ${text} <span class="ess-sec">${section}</span></a>`;
+  if (pro) return `<div class="echo-search-empty">
+    <div class="ess-group"><div class="ess-label">Echo Pro · Start here</div>
+      ${link('/pro/install/', 'rocket', 'Install Echo Pro', 'Guide')}
+      ${link('/pro/getting-started/', 'open-book', 'Getting started', 'Guide')}
+      ${link('/pro/auth/', 'padlock', 'Authentication', 'Package')}
+      ${link('/pro/quota/', 'document', 'Quotas', 'Package')}
+      ${link('/pro/problems/', 'document', 'Problem types', 'Reference')}
+    </div>
+    <div class="ess-foot"><span><kbd>↵</kbd>open</span><span><kbd>Tab</kbd>navigate</span><span><kbd>esc</kbd>close</span></div>
+  </div>`;
   return `<div class="echo-search-empty">
     <div class="ess-group">
       <div class="ess-label">${l.start}</div>

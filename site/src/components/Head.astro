@@ -2,8 +2,12 @@
 // Starlight's head plus the self-hosted font faces from Astro's Fonts API.
 // Preload exactly two files: DM Sans (variable, latin) and Fragment Mono (latin).
 import Default from '@astrojs/starlight/components/Head.astro';
+import { isProPage } from '../pro-page.mjs';
 import { Font } from 'astro:assets';
 ---
 <Default />
 <Font cssVariable="--font-dm-sans" preload />
 <Font cssVariable="--font-fragment-mono" preload />
+
+<meta data-pagefind-filter="product[content]" content={isProPage(Astro.url.pathname) ? 'Echo Pro' : 'Echo'} />
+{isProPage(Astro.url.pathname) && Astro.url.pathname.replace(/\/$/, '') !== '/pro' && <meta data-pagefind-meta="title[content]" content={`${Astro.locals.starlightRoute.entry.data.title} · Echo Pro`} />}

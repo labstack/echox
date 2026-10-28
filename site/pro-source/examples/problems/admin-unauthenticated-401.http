@@ -1,0 +1,11 @@
+HTTP/1.1 401 Unauthorized
+Content-Type: application/problem+json
+Cache-Control: no-store
+
+{
+  "code": "admin_unauthenticated",
+  "detail": "",
+  "status": 401,
+  "title": "Unauthorized",
+  "type": "https://echo.labstack.com/pro/problems/admin-unauthenticated"
+}

@@ -1,0 +1,92 @@
+---
+title: Auth configuration reference
+description: Fields, defaults and constructors for auth.
+---
+
+{/* Diataxis: reference */}
+
+import ConfigReference from '../../../../components/ConfigReference.astro';
+
+`echo.labstack.com/pro` v0.1.0. See the [task guide](/pro/guides/auth/) for setup examples.
+
+## Required fields
+
+- `Config.Fallback`: `Deny`, `Anonymous` or `Require`; the zero value is invalid.
+- `APIKey`: `Namespace`, `Prefix`, `Peppers` and `Store`.
+- Bearer: one trusted issuer, audiences and either `JWKSURL` or `DiscoveryURL`.
+
+An empty `APIKey.Header` reads `Authorization: ApiKey`; bearer construction fetches JWKS once, and middleware construction starts no goroutines.
+
+## `auth.Config`
+
+Import `echo.labstack.com/pro/auth`.
+
+<ConfigReference source="pro" name="auth.Config" />
+
+## `auth.APIKey`
+
+Import `echo.labstack.com/pro/auth`.
+
+<ConfigReference source="pro" name="auth.APIKey" />
+
+## `auth.BearerConfig`
+
+Import `echo.labstack.com/pro/auth`.
+
+<ConfigReference source="pro" name="auth.BearerConfig" />
+
+## `auth.KeyOptions`
+
+Import `echo.labstack.com/pro/auth`.
+
+<ConfigReference source="pro" name="auth.KeyOptions" />
+
+## `auth.PrincipalConfig`
+
+Import `echo.labstack.com/pro/auth`.
+
+<ConfigReference source="pro" name="auth.PrincipalConfig" />
+
+## `authbind.QuotaConfig`
+
+Import `echo.labstack.com/pro/auth/authbind`.
+
+<ConfigReference source="pro" name="authbind.QuotaConfig" />
+
+## Token and key limits
+
+| Setting | Default or limit |
+| --- | --- |
+| `APIKey.Prefix` / `StoredKey.ID` | Prefix, 22-character base62 ID, 43-character base62 secret |
+| `APIKey.Peppers` | At most eight versions; 32–1024 random bytes per key |
+| `APIKey.Namespace` / `BearerConfig.Namespace` | `[a-z][a-z0-9-]{0,31}` |
+| `Principal.ID()` | At most 233 bytes |
+| `BearerConfig.Algorithms` | RS256, PS256, ES256, EdDSA |
+| `BearerConfig.ClockSkew` | 30 seconds by default; at most two minutes |
+| Bearer token bytes | At most 8 KiB |
+| JWT claims bytes | At most 16 KiB |
+| `Principal.Scopes()` | At most 64; at most 128 bytes each |
+| JWKS and discovery `resp.Body` | At most 64 KiB read from `resp.Body` |
+| JWKS `keys` | At most 32 raw entries |
+| RSA modulus size | 2048–8192 bits |
+| JWKS `kid` | Every entry with that ID is dropped |
+| `BearerConfig.Timeout` | Five seconds by default |
+| Unknown JWT `kid` | 30 seconds |
+| JWKS refresh failures | At most 32 minutes |
+| Cached JWKS keys | Usable for at most 24 hours after loading |
+
+By default, bearer accepts a discovered `jwks_uri` only on the discovery URL's host. A nonempty `AllowedJWKSHosts` replaces that rule.
+Each discovered host must match an exact list entry, including any port.
+The limit counts bytes after your transport decompresses the body. Bearer does not decompress.
+
+## Persistent key lookup
+
+`auth.KeyStore` requires `Lookup(context.Context, string) (auth.StoredKey, error)`.
+Lookups must support concurrent calls and return current revocation data.
+See the [compiled SQL sketch](/pro/guides/auth/#replace-the-memory-key-store).
+
+Stores, clients, clocks and loggers must support concurrent calls.
+
+## Related pages
+
+[Package explanation](/pro/auth/) · [Task guide](/pro/guides/auth/) · [Problem catalog](/pro/problems/)

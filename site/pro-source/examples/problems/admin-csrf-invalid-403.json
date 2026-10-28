@@ -1,0 +1,7 @@
+{
+  "code": "admin_csrf_invalid",
+  "detail": "",
+  "status": 403,
+  "title": "Forbidden",
+  "type": "https://echo.labstack.com/pro/problems/admin-csrf-invalid"
+}

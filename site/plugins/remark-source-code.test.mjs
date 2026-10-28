@@ -53,6 +53,14 @@ test('includes a named region inside a nested fence', (t) => {
   assert.equal(quote.children[0].meta, null);
 });
 
+test('includes hash-comment regions from shell and workflow sources', (t) => {
+  const { root } = fixture(t);
+  writeFileSync(join(root, 'commands.sh'), '# docs:start install\n  go mod verify\n# docs:end install\n');
+  const [code] = render('```sh file=commands.sh#install\n```', root).children;
+  assert.equal(code.value, 'go mod verify');
+  assert.throws(() => sourceSnippet('# docs:start install\n# docs:start install\n# docs:end install', 'install'), /matching docs:start\/docs:end pair/);
+});
+
 test('includes HTML and normalizes CRLF without dropping indentation', (t) => {
   const { root } = fixture(t);
   writeFileSync(join(root, 'index.html'), '<html>\r\n  <body></body>\r\n</html>\r\n');

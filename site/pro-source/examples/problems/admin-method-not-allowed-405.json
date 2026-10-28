@@ -1,0 +1,7 @@
+{
+  "code": "admin_method_not_allowed",
+  "detail": "",
+  "status": 405,
+  "title": "Method Not Allowed",
+  "type": "https://echo.labstack.com/pro/problems/admin-method-not-allowed"
+}

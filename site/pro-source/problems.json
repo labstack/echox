@@ -1,0 +1,502 @@
+[
+  {
+    "Code": "admin_action_id_reused",
+    "Type": "https://echo.labstack.com/pro/problems/admin-action-id-reused",
+    "Messages": [
+      {
+        "Status": 409,
+        "TitleEN": "Conflict",
+        "TitleJA": "競合が発生しました"
+      }
+    ]
+  },
+  {
+    "Code": "admin_audit_unavailable",
+    "Type": "https://echo.labstack.com/pro/problems/admin-audit-unavailable",
+    "Messages": [
+      {
+        "Status": 503,
+        "TitleEN": "Service Unavailable",
+        "TitleJA": "サービスを利用できません"
+      }
+    ]
+  },
+  {
+    "Code": "admin_backend_unavailable",
+    "Type": "https://echo.labstack.com/pro/problems/admin-backend-unavailable",
+    "Messages": [
+      {
+        "Status": 503,
+        "TitleEN": "Service Unavailable",
+        "TitleJA": "サービスを利用できません"
+      }
+    ]
+  },
+  {
+    "Code": "admin_busy",
+    "Type": "https://echo.labstack.com/pro/problems/admin-busy",
+    "Messages": [
+      {
+        "Status": 503,
+        "TitleEN": "Service Unavailable",
+        "TitleJA": "サービスを利用できません"
+      }
+    ]
+  },
+  {
+    "Code": "admin_confirmation_required",
+    "Type": "https://echo.labstack.com/pro/problems/admin-confirmation-required",
+    "Messages": [
+      {
+        "Status": 422,
+        "TitleEN": "Unprocessable Entity",
+        "TitleJA": "リクエストを処理できません"
+      }
+    ]
+  },
+  {
+    "Code": "admin_cross_origin",
+    "Type": "https://echo.labstack.com/pro/problems/admin-cross-origin",
+    "Messages": [
+      {
+        "Status": 403,
+        "TitleEN": "Forbidden",
+        "TitleJA": "アクセスが許可されていません"
+      }
+    ]
+  },
+  {
+    "Code": "admin_csrf_invalid",
+    "Type": "https://echo.labstack.com/pro/problems/admin-csrf-invalid",
+    "Messages": [
+      {
+        "Status": 403,
+        "TitleEN": "Forbidden",
+        "TitleJA": "アクセスが許可されていません"
+      }
+    ]
+  },
+  {
+    "Code": "admin_forbidden",
+    "Type": "https://echo.labstack.com/pro/problems/admin-forbidden",
+    "Messages": [
+      {
+        "Status": 403,
+        "TitleEN": "Forbidden",
+        "TitleJA": "アクセスが許可されていません"
+      }
+    ]
+  },
+  {
+    "Code": "admin_in_progress",
+    "Type": "https://echo.labstack.com/pro/problems/admin-in-progress",
+    "Messages": [
+      {
+        "Status": 409,
+        "TitleEN": "Conflict",
+        "TitleJA": "競合が発生しました"
+      }
+    ]
+  },
+  {
+    "Code": "admin_internal",
+    "Type": "https://echo.labstack.com/pro/problems/admin-internal",
+    "Messages": [
+      {
+        "Status": 500,
+        "TitleEN": "Internal Server Error",
+        "TitleJA": "サーバー内部エラー"
+      }
+    ]
+  },
+  {
+    "Code": "admin_invalid_request",
+    "Type": "https://echo.labstack.com/pro/problems/admin-invalid-request",
+    "Messages": [
+      {
+        "Status": 400,
+        "TitleEN": "Bad Request",
+        "TitleJA": "不正なリクエスト"
+      }
+    ]
+  },
+  {
+    "Code": "admin_method_not_allowed",
+    "Type": "https://echo.labstack.com/pro/problems/admin-method-not-allowed",
+    "Messages": [
+      {
+        "Status": 405,
+        "TitleEN": "Method Not Allowed",
+        "TitleJA": "このHTTPメソッドは許可されていません"
+      }
+    ]
+  },
+  {
+    "Code": "admin_not_found",
+    "Type": "https://echo.labstack.com/pro/problems/admin-not-found",
+    "Messages": [
+      {
+        "Status": 404,
+        "TitleEN": "Not Found",
+        "TitleJA": "見つかりません"
+      }
+    ]
+  },
+  {
+    "Code": "admin_not_ready",
+    "Type": "https://echo.labstack.com/pro/problems/admin-not-ready",
+    "Messages": [
+      {
+        "Status": 503,
+        "TitleEN": "Service Unavailable",
+        "TitleJA": "サービスを利用できません"
+      }
+    ]
+  },
+  {
+    "Code": "admin_rate_limited",
+    "Type": "https://echo.labstack.com/pro/problems/admin-rate-limited",
+    "Messages": [
+      {
+        "Status": 429,
+        "TitleEN": "Too Many Requests",
+        "TitleJA": "リクエストが多すぎます"
+      }
+    ]
+  },
+  {
+    "Code": "admin_reason_required",
+    "Type": "https://echo.labstack.com/pro/problems/admin-reason-required",
+    "Messages": [
+      {
+        "Status": 422,
+        "TitleEN": "Unprocessable Entity",
+        "TitleJA": "リクエストを処理できません"
+      }
+    ]
+  },
+  {
+    "Code": "admin_timeout",
+    "Type": "https://echo.labstack.com/pro/problems/admin-timeout",
+    "Messages": [
+      {
+        "Status": 504,
+        "TitleEN": "Gateway Timeout",
+        "TitleJA": "ゲートウェイのタイムアウト"
+      }
+    ]
+  },
+  {
+    "Code": "admin_unauthenticated",
+    "Type": "https://echo.labstack.com/pro/problems/admin-unauthenticated",
+    "Messages": [
+      {
+        "Status": 401,
+        "TitleEN": "Unauthorized",
+        "TitleJA": "認証が必要です"
+      }
+    ]
+  },
+  {
+    "Code": "binding_failed",
+    "Type": "https://echo.labstack.com/pro/problems/binding-failed",
+    "Messages": [
+      {
+        "Status": 400,
+        "TitleEN": "Bad Request",
+        "TitleJA": "不正なリクエスト"
+      }
+    ]
+  },
+  {
+    "Code": "body_too_large",
+    "Type": "https://echo.labstack.com/pro/problems/body-too-large",
+    "Messages": [
+      {
+        "Status": 413,
+        "TitleEN": "Request Entity Too Large",
+        "TitleJA": "リクエスト本文が大きすぎます"
+      }
+    ]
+  },
+  {
+    "Code": "cost_exceeds_limit",
+    "Type": "https://echo.labstack.com/pro/problems/cost-exceeds-limit",
+    "Messages": [
+      {
+        "Status": 403,
+        "TitleEN": "Request cost exceeds the plan's limit",
+        "TitleJA": "リクエストのコストがプランの上限を超えています"
+      }
+    ]
+  },
+  {
+    "Code": "credit_conflict",
+    "Type": "https://echo.labstack.com/pro/problems/credit-conflict",
+    "Messages": [
+      {
+        "Status": 409,
+        "TitleEN": "Credit ID was already used with a different amount",
+        "TitleJA": "クレジットIDは異なる金額ですでに使用されています"
+      }
+    ]
+  },
+  {
+    "Code": "execution_capacity",
+    "Type": "https://echo.labstack.com/pro/problems/execution-capacity",
+    "Messages": [
+      {
+        "Status": 503,
+        "TitleEN": "Service Unavailable",
+        "TitleJA": "サービスを利用できません"
+      }
+    ]
+  },
+  {
+    "Code": "execution_unavailable",
+    "Type": "https://echo.labstack.com/pro/problems/execution-unavailable",
+    "Messages": [
+      {
+        "Status": 503,
+        "TitleEN": "Service Unavailable",
+        "TitleJA": "サービスを利用できません"
+      }
+    ]
+  },
+  {
+    "Code": "forbidden",
+    "Type": "https://echo.labstack.com/pro/problems/forbidden",
+    "Messages": [
+      {
+        "Status": 403,
+        "TitleEN": "Forbidden",
+        "TitleJA": "アクセスが許可されていません"
+      }
+    ]
+  },
+  {
+    "Code": "idempotency_key_invalid",
+    "Type": "https://echo.labstack.com/pro/problems/idempotency-key-invalid",
+    "Messages": [
+      {
+        "Status": 400,
+        "TitleEN": "Bad Request",
+        "TitleJA": "不正なリクエスト"
+      }
+    ]
+  },
+  {
+    "Code": "idempotency_key_missing",
+    "Type": "https://echo.labstack.com/pro/problems/idempotency-key-missing",
+    "Messages": [
+      {
+        "Status": 400,
+        "TitleEN": "Bad Request",
+        "TitleJA": "不正なリクエスト"
+      }
+    ]
+  },
+  {
+    "Code": "idempotency_key_reused",
+    "Type": "https://echo.labstack.com/pro/problems/idempotency-key-reused",
+    "Messages": [
+      {
+        "Status": 422,
+        "TitleEN": "Unprocessable Entity",
+        "TitleJA": "リクエストを処理できません"
+      }
+    ]
+  },
+  {
+    "Code": "idempotency_request_invalid",
+    "Type": "https://echo.labstack.com/pro/problems/idempotency-request-invalid",
+    "Messages": [
+      {
+        "Status": 400,
+        "TitleEN": "Bad Request",
+        "TitleJA": "不正なリクエスト"
+      },
+      {
+        "Status": 413,
+        "TitleEN": "Request Entity Too Large",
+        "TitleJA": "リクエスト本文が大きすぎます"
+      }
+    ]
+  },
+  {
+    "Code": "insufficient_credits",
+    "Type": "https://echo.labstack.com/pro/problems/insufficient-credits",
+    "Messages": [
+      {
+        "Status": 402,
+        "TitleEN": "Request cannot be satisfied as prepaid credits are insufficient",
+        "TitleJA": "前払いクレジットが不足しているため、リクエストを処理できません"
+      }
+    ]
+  },
+  {
+    "Code": "invalid_request",
+    "Type": "https://echo.labstack.com/pro/problems/invalid-request",
+    "Messages": [
+      {
+        "Status": 400,
+        "TitleEN": "Invalid quota administration request",
+        "TitleJA": "クォータ管理リクエストが無効です"
+      }
+    ]
+  },
+  {
+    "Code": "operation_abandoned",
+    "Type": "https://echo.labstack.com/pro/problems/operation-abandoned",
+    "Messages": [
+      {
+        "Status": 409,
+        "TitleEN": "Conflict",
+        "TitleJA": "競合が発生しました"
+      }
+    ]
+  },
+  {
+    "Code": "operation_disputed",
+    "Type": "https://echo.labstack.com/pro/problems/operation-disputed",
+    "Messages": [
+      {
+        "Status": 409,
+        "TitleEN": "Conflict",
+        "TitleJA": "競合が発生しました"
+      }
+    ]
+  },
+  {
+    "Code": "operation_in_progress",
+    "Type": "https://echo.labstack.com/pro/problems/operation-in-progress",
+    "Messages": [
+      {
+        "Status": 409,
+        "TitleEN": "Conflict",
+        "TitleJA": "競合が発生しました"
+      }
+    ]
+  },
+  {
+    "Code": "operation_not_applied",
+    "Type": "https://echo.labstack.com/pro/problems/operation-not-applied",
+    "Messages": [
+      {
+        "Status": 409,
+        "TitleEN": "Conflict",
+        "TitleJA": "競合が発生しました"
+      }
+    ]
+  },
+  {
+    "Code": "operation_policy_changed",
+    "Type": "https://echo.labstack.com/pro/problems/operation-policy-changed",
+    "Messages": [
+      {
+        "Status": 409,
+        "TitleEN": "Conflict",
+        "TitleJA": "競合が発生しました"
+      }
+    ]
+  },
+  {
+    "Code": "operation_response_too_large",
+    "Type": "https://echo.labstack.com/pro/problems/operation-response-too-large",
+    "Messages": [
+      {
+        "Status": 500,
+        "TitleEN": "Internal Server Error",
+        "TitleJA": "サーバー内部エラー"
+      }
+    ]
+  },
+  {
+    "Code": "operation_result_expired",
+    "Type": "https://echo.labstack.com/pro/problems/operation-result-expired",
+    "Messages": [
+      {
+        "Status": 409,
+        "TitleEN": "Conflict",
+        "TitleJA": "競合が発生しました"
+      }
+    ]
+  },
+  {
+    "Code": "operation_result_unavailable",
+    "Type": "https://echo.labstack.com/pro/problems/operation-result-unavailable",
+    "Messages": [
+      {
+        "Status": 409,
+        "TitleEN": "Conflict",
+        "TitleJA": "競合が発生しました"
+      }
+    ]
+  },
+  {
+    "Code": "operation_uncertain",
+    "Type": "https://echo.labstack.com/pro/problems/operation-uncertain",
+    "Messages": [
+      {
+        "Status": 409,
+        "TitleEN": "Conflict",
+        "TitleJA": "競合が発生しました"
+      }
+    ]
+  },
+  {
+    "Code": "quota_exceeded",
+    "Type": "https://iana.org/assignments/http-problem-types#quota-exceeded",
+    "Messages": [
+      {
+        "Status": 429,
+        "TitleEN": "Request cannot be satisfied as assigned quota has been exceeded",
+        "TitleJA": "割り当てられたクォータを超過したため、リクエストを処理できません"
+      }
+    ]
+  },
+  {
+    "Code": "temporary_reduced_capacity",
+    "Type": "https://iana.org/assignments/http-problem-types#temporary-reduced-capacity",
+    "Messages": [
+      {
+        "Status": 503,
+        "TitleEN": "Request cannot be satisfied due to temporary server capacity constraints",
+        "TitleJA": "一時的なサーバー容量の制約により、リクエストを処理できません"
+      }
+    ]
+  },
+  {
+    "Code": "unauthenticated",
+    "Type": "https://echo.labstack.com/pro/problems/unauthenticated",
+    "Messages": [
+      {
+        "Status": 401,
+        "TitleEN": "Unauthorized",
+        "TitleJA": "認証が必要です"
+      }
+    ]
+  },
+  {
+    "Code": "unsupported_media_type",
+    "Type": "https://echo.labstack.com/pro/problems/unsupported-media-type",
+    "Messages": [
+      {
+        "Status": 415,
+        "TitleEN": "Unsupported Media Type",
+        "TitleJA": "未対応のメディアタイプ"
+      }
+    ]
+  },
+  {
+    "Code": "validation_failed",
+    "Type": "https://echo.labstack.com/pro/problems/validation-failed",
+    "Messages": [
+      {
+        "Status": 400,
+        "TitleEN": "Bad Request",
+        "TitleJA": "不正なリクエスト"
+      }
+    ]
+  }
+]
