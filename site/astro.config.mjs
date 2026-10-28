@@ -143,7 +143,8 @@ export default defineConfig({
         defaultLocale: 'root',
         locales: Object.fromEntries(Object.entries(locales).map(([locale, { lang }]) => [locale, lang])),
       },
-      filter: (page) => !isProPage(new URL(page).pathname),
+      // List the launched /pro page; skip only the /next/pro redirect stub.
+      filter: (page) => { const path = new URL(page).pathname; return !(isProPage(path) && path.startsWith('/next/')); },
     }),
   ],
 });

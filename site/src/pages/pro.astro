@@ -4,7 +4,7 @@
 // theme. Code-library product pattern: hero with real code, trust row, request
 // path, package table, pricing, install, FAQ. Every snippet is trimmed from the
 // echo-pro package READMEs and must keep matching their APIs.
-// Buying is by email until checkout launches; noindex until then.
+// Buying goes through live Stripe Payment Links; billing through the Stripe customer portal.
 import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
 import { Code } from '@astrojs/starlight/components';
 import { Image } from 'astro:assets';
@@ -15,12 +15,16 @@ import consoleLight from '../assets/pro/admin-console-light.webp';
 if (process.env.DOCS_CHANNEL === 'next') return Astro.redirect('/pro');
 
 // Flip to true at launch (with indexing) to emit SoftwareApplication + Offer JSON-LD.
-const ENABLE_STRUCTURED_DATA = false;
+const ENABLE_STRUCTURED_DATA = true;
 // Set to an absolute URL (1200x630) to give /pro its own social card.
 const OG_IMAGE: string | undefined = undefined;
 
-const buy = (plan: string) =>
-  `mailto:support@labstack.com?subject=${encodeURIComponent(`Buy Echo Pro ${plan}`)}`;
+// Live Stripe Payment Links (registry scripts/stripe-setup.ts, live catalog).
+const checkout = {
+  Team: 'https://buy.stripe.com/5kQ14o5UU9WM3Gt0DU4sE00',
+  Business: 'https://buy.stripe.com/3cI7sM8320mcfpb5Ye4sE01',
+};
+const billingPortal = 'https://billing.stripe.com/p/login/5kQ14o5UU9WM3Gt0DU4sE00';
 
 // Trimmed from auth/README.md (quickstart) and auth/authbind/README.md.
 // apiKey is the quickstart's auth.APIKey scheme (store, prefix and peppers).
@@ -131,12 +135,12 @@ const plans = [
   {
     name: 'Team', was: '$1,500', price: '$990', unit: '/ year', note: 'Up to 20 developers',
     items: ['Everything in Echo', 'Every Echo Pro package', 'Every release while subscribed', 'Access tokens for go.labstack.io'],
-    cta: { label: 'Buy Team by email', href: buy('Team'), primary: true },
+    cta: { label: 'Buy Team', href: checkout.Team, primary: true },
   },
   {
     name: 'Business', was: '$4,500', price: '$2,970', unit: '/ year', note: 'Up to 100 developers',
     items: ['Everything in Team'],
-    cta: { label: 'Buy Business by email', href: buy('Business'), primary: false },
+    cta: { label: 'Buy Business', href: checkout.Business, primary: false },
   },
 ];
 
@@ -201,7 +205,6 @@ const structuredData = {
 
 const head = [
   { tag: 'title', content: 'Echo Pro — Multi-tenant building blocks for Echo v5' },
-  { tag: 'meta', attrs: { name: 'robots', content: 'noindex' } },
   ...(OG_IMAGE ? [
     { tag: 'meta', attrs: { property: 'og:image', content: OG_IMAGE } },
     { tag: 'meta', attrs: { name: 'twitter:image', content: OG_IMAGE } },
@@ -381,7 +384,7 @@ const head = [
           </div>
         ))}
       </div>
-      <p class="pro-pending">Online checkout opens at launch. Until then, email us to buy.</p>
+      <p class="pro-pending">Secure checkout by Stripe; enter code <code>FOUNDING</code> for the founding price. Invoices, payment method and cancellation: <a class="pro-link" href={billingPortal}>billing portal</a>.</p>
 
       <div class="pro-extra">
         <div>
