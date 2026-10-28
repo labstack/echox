@@ -17,12 +17,21 @@ const labels = {
 }[locale];
 // /pro is a release-site product page, not versioned documentation.
 const isProduct = isProPage(path);
+// Echo Pro launch note: the English release home only, in place of the
+// version strip. Remove it about four weeks after launch, or when the
+// founding offer ends on 31 Mar 2027 if GA still shows pro_click traffic.
+const isLaunchHome = !isNext && path === '/';
 const counterpart = /\/(?:404|404\.html)\/?$/.test(path)
   ? (isNext ? '/' : '/next/')
   : isNext ? path.replace(/^\/next/, '') || '/' : `/next${path}`;
 ---
 
-{!isProduct && <nav class="echo-version-banner" aria-label="Documentation version" data-pagefind-ignore>
+{isLaunchHome && <aside class="echo-version-banner launch" aria-label="Announcement" data-pagefind-ignore>
+  <span><strong>New: Echo Pro</strong> — multi-tenant auth, quotas and webhooks for Echo v5. Founding price until 31&nbsp;Mar&nbsp;2027</span>
+  <a class="switch" href="/pro" data-ga-event="pro_click">See Echo Pro →</a>
+</aside>}
+
+{!isProduct && !isLaunchHome && <nav class="echo-version-banner" aria-label="Documentation version" data-pagefind-ignore>
   <strong>{isNext ? labels.next : `${labels.release} · Echo ${stable.release}`}</strong>
   <span>· {labels.source} <a href={`https://github.com/labstack/echo/tree/${revision}`}>{formatRevision(revision)}</a></span>
   <a class="switch" data-version-switch href={counterpart}>{labels.switch}</a>
@@ -34,5 +43,6 @@ const counterpart = /\/(?:404|404\.html)\/?$/.test(path)
   .echo-version-banner strong { color: var(--sl-color-white); font-weight: 600; }
   .echo-version-banner a { color: var(--echo-cyan-text); text-decoration: underline; text-underline-offset: .15em; }
   .echo-version-banner .switch { margin-inline-start: .7rem; font-weight: 600; }
+  .echo-version-banner.launch span { text-align: center; text-wrap: balance; }
   .echo-version-banner a:focus-visible { outline: 2px solid var(--echo-cyan-text); outline-offset: 2px; }
 </style>
