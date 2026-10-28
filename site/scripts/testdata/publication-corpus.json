@@ -1,0 +1,1089 @@
+{
+  "files": {
+    "examples/demo.go": "// docs:start demo\npackage main\n// docs:end demo\n",
+    "pages/auth.mdx": ""
+  },
+  "cases": [
+    {
+      "id": "frontmatter-head",
+      "name": "pages/reference/auth.mdx",
+      "content": "---\nhead:\n  - tag: script\n    content: |\n      alert(1)\n---\nText",
+      "allowed": false,
+      "reason": "unreviewed frontmatter key"
+    },
+    {
+      "id": "frontmatter-prev",
+      "name": "pages/reference/auth.mdx",
+      "content": "---\nprev:\n  link: ../../.env\n---\nText",
+      "allowed": false,
+      "reason": "unreviewed frontmatter key"
+    },
+    {
+      "id": "frontmatter-hero",
+      "name": "pages/reference/auth.mdx",
+      "content": "---\nhero:\n  image:\n    file: ../../../echo-pro/.tmp/x.png\n---\nText",
+      "allowed": false,
+      "reason": "unreviewed frontmatter key"
+    },
+    {
+      "id": "frontmatter-title-type",
+      "name": "pages/reference/auth.mdx",
+      "content": "---\ntitle: 12\n---\nText",
+      "allowed": false,
+      "reason": "invalid frontmatter"
+    },
+    {
+      "id": "frontmatter-description-type",
+      "name": "pages/reference/auth.mdx",
+      "content": "---\ndescription: [x]\n---\nText",
+      "allowed": false,
+      "reason": "invalid frontmatter"
+    },
+    {
+      "id": "frontmatter-sidebar-key",
+      "name": "pages/reference/auth.mdx",
+      "content": "---\nsidebar: {label: x}\n---\nText",
+      "allowed": false,
+      "reason": "unreviewed frontmatter key"
+    },
+    {
+      "id": "frontmatter-order-type",
+      "name": "pages/reference/auth.mdx",
+      "content": "---\nsidebar: {order: \"1\"}\n---\nText",
+      "allowed": false,
+      "reason": "invalid frontmatter"
+    },
+    {
+      "id": "frontmatter-duplicate",
+      "name": "pages/reference/auth.mdx",
+      "content": "---\ntitle: one\ntitle: two\n---\nText",
+      "allowed": false,
+      "reason": "invalid frontmatter"
+    },
+    {
+      "id": "frontmatter-alias",
+      "name": "pages/reference/auth.mdx",
+      "content": "---\ntitle: &x hi\ndescription: *x\n---\nText",
+      "allowed": false,
+      "reason": "invalid frontmatter"
+    },
+    {
+      "id": "frontmatter-tag",
+      "name": "pages/reference/auth.mdx",
+      "content": "---\ntitle: !!str hi\n---\nText",
+      "allowed": false,
+      "reason": "invalid frontmatter"
+    },
+    {
+      "id": "frontmatter-merge",
+      "name": "pages/reference/auth.mdx",
+      "content": "---\ntitle: hi\n<<: {description: test}\n---\nText",
+      "allowed": false,
+      "reason": "unreviewed frontmatter key"
+    },
+    {
+      "id": "frontmatter-invalid",
+      "name": "pages/reference/auth.mdx",
+      "content": "---\ntitle: [\n---\nText",
+      "allowed": false,
+      "reason": "invalid frontmatter"
+    },
+    {
+      "id": "frontmatter-block-string",
+      "name": "pages/reference/auth.mdx",
+      "content": "---\ntitle: |\n  Guide\ndescription: >\n  Some words\nsidebar: {order: 2}\n---\nText",
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "frontmatter-standard",
+      "name": "pages/reference/auth.mdx",
+      "content": "---\ntitle: Guide\ndescription: Words\nsidebar:\n  order: 1\n---\n{/* Diataxis: tutorial */}\n\n# Heading\n\nA **bold** [route](/pro/auth/) and `{}.`",
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "reviewed-component",
+      "name": "pages/reference/auth.mdx",
+      "content": "import ConfigReference from '../../../../components/ConfigReference.astro';\n\n<ConfigReference source=\"pro\" name=\"auth.Config\" />\n\n{/* Diataxis: reference */}",
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "import-same-block",
+      "name": "pages/reference/auth.mdx",
+      "content": "import ConfigReference from '../../../../components/ConfigReference.astro';import S from '../../x?raw';\n\nText",
+      "allowed": false,
+      "reason": "unreviewed MDX import or export"
+    },
+    {
+      "id": "import-no-blank",
+      "name": "pages/reference/auth.mdx",
+      "content": "import ConfigReference from '../../../../components/ConfigReference.astro';\n<ConfigReference source=\"pro\" name=\"auth.Config\" />",
+      "allowed": false,
+      "reason": "reviewed import requires blank line"
+    },
+    {
+      "id": "raw",
+      "name": "pages/reference/auth.mdx",
+      "content": "import S from '../../x?raw';",
+      "allowed": false,
+      "reason": "unreviewed MDX import or export"
+    },
+    {
+      "id": "esm",
+      "name": "pages/reference/auth.mdx",
+      "content": "export const x = 1;",
+      "allowed": false,
+      "reason": "unreviewed MDX import or export"
+    },
+    {
+      "id": "quoted-esm",
+      "name": "pages/reference/auth.mdx",
+      "content": "> import S from '../../x?raw';",
+      "allowed": false,
+      "reason": "unreviewed MDX import or export"
+    },
+    {
+      "id": "list-esm",
+      "name": "pages/reference/auth.mdx",
+      "content": "- import S from '../../x?raw';",
+      "allowed": false,
+      "reason": "unreviewed MDX import or export"
+    },
+    {
+      "id": "expression",
+      "name": "pages/reference/auth.mdx",
+      "content": "{process.env.SECRET}",
+      "allowed": false,
+      "reason": "MDX expressions are not allowed"
+    },
+    {
+      "id": "dynamic-import",
+      "name": "pages/reference/auth.mdx",
+      "content": "{await import('node:fs')}",
+      "allowed": false,
+      "reason": "MDX expressions are not allowed"
+    },
+    {
+      "id": "jsx-expression",
+      "name": "pages/reference/auth.mdx",
+      "content": "import ConfigReference from '../../../../components/ConfigReference.astro';\n\n<ConfigReference source={process.env.SECRET} name=\"auth.Config\" />",
+      "allowed": false,
+      "reason": "unreviewed MDX component or HTML"
+    },
+    {
+      "id": "html",
+      "name": "pages/reference/auth.mdx",
+      "content": "<script />",
+      "allowed": false,
+      "reason": "unreviewed MDX component or HTML"
+    },
+    {
+      "id": "info-backtick",
+      "name": "pages/reference/auth.mdx",
+      "content": "```{process.env.SECRET}` file=site/pro-source/examples/demo.go\n```",
+      "allowed": false,
+      "reason": "backtick in fence info"
+    },
+    {
+      "id": "span-blank-line",
+      "name": "pages/reference/auth.mdx",
+      "content": "`words\n\n{process.env.SECRET}\n`",
+      "allowed": false,
+      "reason": "inline code must stay on one line"
+    },
+    {
+      "id": "span-block-boundary",
+      "name": "pages/reference/auth.mdx",
+      "content": "`words\n# {process.env.SECRET}\n`",
+      "allowed": false,
+      "reason": "inline code must stay on one line"
+    },
+    {
+      "id": "span-width",
+      "name": "pages/reference/auth.mdx",
+      "content": "``words` {process.env.SECRET}",
+      "allowed": false,
+      "reason": "unclosed inline code"
+    },
+    {
+      "id": "tilde",
+      "name": "pages/reference/auth.mdx",
+      "content": "~~~go file=site/pro-source/examples/demo.go\n~~~",
+      "allowed": false,
+      "reason": "unsupported source fence"
+    },
+    {
+      "id": "nested-fence-> ",
+      "name": "pages/reference/auth.mdx",
+      "content": "> ```go file=site/pro-source/examples/demo.go\n> ```",
+      "allowed": false,
+      "reason": "unsupported source fence"
+    },
+    {
+      "id": "nested-fence-- ",
+      "name": "pages/reference/auth.mdx",
+      "content": "- ```go file=site/pro-source/examples/demo.go\n- ```",
+      "allowed": false,
+      "reason": "unsupported source fence"
+    },
+    {
+      "id": "nested-fence-1. ",
+      "name": "pages/reference/auth.mdx",
+      "content": "1. ```go file=site/pro-source/examples/demo.go\n1. ```",
+      "allowed": false,
+      "reason": "unsupported source fence"
+    },
+    {
+      "id": "nested-fence-> - ",
+      "name": "pages/reference/auth.mdx",
+      "content": "> - ```go file=site/pro-source/examples/demo.go\n> - ```",
+      "allowed": false,
+      "reason": "unsupported source fence"
+    },
+    {
+      "id": "nested-fence-  ",
+      "name": "pages/reference/auth.mdx",
+      "content": "  ```go file=site/pro-source/examples/demo.go\n  ```",
+      "allowed": false,
+      "reason": "unsupported source fence"
+    },
+    {
+      "id": "source-fence",
+      "name": "pages/reference/auth.mdx",
+      "content": "```go file=site/pro-source/examples/demo.go#demo\n```",
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "pasted-fence",
+      "name": "pages/reference/auth.mdx",
+      "content": "```go file=site/pro-source/examples/demo.go\npasted\n```",
+      "allowed": false,
+      "reason": "source fences must be empty"
+    },
+    {
+      "id": "missing-source",
+      "name": "pages/reference/auth.mdx",
+      "content": "```go file=site/pro-source/examples/missing.go\n```",
+      "allowed": false,
+      "reason": "unexported snippet"
+    },
+    {
+      "id": "missing-region",
+      "name": "pages/reference/auth.mdx",
+      "content": "```go file=site/pro-source/examples/demo.go#missing\n```",
+      "allowed": false,
+      "reason": "missing or ambiguous snippet region"
+    },
+    {
+      "id": "fence-extra",
+      "name": "pages/reference/auth.mdx",
+      "content": "```go file=site/pro-source/examples/demo.go extra\n```",
+      "allowed": false,
+      "reason": "every code fence must be an empty source include"
+    },
+    {
+      "id": "fence-language",
+      "name": "pages/reference/auth.mdx",
+      "content": "```{x} file=site/pro-source/examples/demo.go\n```",
+      "allowed": false,
+      "reason": "every code fence must be an empty source include"
+    },
+    {
+      "id": "link-outside",
+      "name": "pages/reference/auth.mdx",
+      "content": "[source](../../config.toml)",
+      "allowed": false,
+      "reason": "file outside Pro bundle"
+    },
+    {
+      "id": "link-case",
+      "name": "pages/reference/auth.mdx",
+      "content": "[source](Auth.mdx)",
+      "allowed": false,
+      "reason": "file outside Pro bundle"
+    },
+    {
+      "id": "link-encoded",
+      "name": "pages/reference/auth.mdx",
+      "content": "[source](%2e%2e/%2e%2e/config.toml)",
+      "allowed": false,
+      "reason": "file outside Pro bundle"
+    },
+    {
+      "id": "link-double-encoded",
+      "name": "pages/reference/auth.mdx",
+      "content": "[source](%252e%252e/%252e%252e/config.toml)",
+      "allowed": false,
+      "reason": "file outside Pro bundle"
+    },
+    {
+      "id": "link-file",
+      "name": "pages/reference/auth.mdx",
+      "content": "[source](file:///etc/passwd)",
+      "allowed": false,
+      "reason": "non-public URL"
+    },
+    {
+      "id": "link-entity",
+      "name": "pages/reference/auth.mdx",
+      "content": "[source](&#46;&#46;/&#46;&#46;/config.toml)",
+      "allowed": false,
+      "reason": "file outside Pro bundle"
+    },
+    {
+      "id": "link-internal",
+      "name": "pages/reference/auth.mdx",
+      "content": "[source](../%69nternal/key)",
+      "allowed": false,
+      "reason": "private reference"
+    },
+    {
+      "id": "link-env",
+      "name": "pages/reference/auth.mdx",
+      "content": "[source](../../.env)",
+      "allowed": false,
+      "reason": "private reference"
+    },
+    {
+      "id": "link-sql",
+      "name": "pages/reference/auth.mdx",
+      "content": "[source](schema.sql)",
+      "allowed": false,
+      "reason": "private reference"
+    },
+    {
+      "id": "image-outside",
+      "name": "pages/reference/auth.mdx",
+      "content": "![source](../../config.toml)",
+      "allowed": false,
+      "reason": "file outside Pro bundle"
+    },
+    {
+      "id": "definition-",
+      "name": "pages/reference/auth.mdx",
+      "content": "[x]: ../../config.toml",
+      "allowed": false,
+      "reason": "file outside Pro bundle"
+    },
+    {
+      "id": "definition-> ",
+      "name": "pages/reference/auth.mdx",
+      "content": "> [x]: ../../config.toml",
+      "allowed": false,
+      "reason": "file outside Pro bundle"
+    },
+    {
+      "id": "definition-- ",
+      "name": "pages/reference/auth.mdx",
+      "content": "- [x]: ../../config.toml",
+      "allowed": false,
+      "reason": "file outside Pro bundle"
+    },
+    {
+      "id": "definition-1. ",
+      "name": "pages/reference/auth.mdx",
+      "content": "1. [x]: ../../config.toml",
+      "allowed": false,
+      "reason": "file outside Pro bundle"
+    },
+    {
+      "id": "definition-> - ",
+      "name": "pages/reference/auth.mdx",
+      "content": "> - [x]: ../../config.toml",
+      "allowed": false,
+      "reason": "file outside Pro bundle"
+    },
+    {
+      "id": "autolink",
+      "name": "pages/reference/auth.mdx",
+      "content": "<https://example.org/internal/key>",
+      "allowed": false,
+      "reason": "private reference"
+    },
+    {
+      "id": "autolink-file",
+      "name": "pages/reference/auth.mdx",
+      "content": "<file:///etc/passwd>",
+      "allowed": false,
+      "reason": "non-public URL"
+    },
+    {
+      "id": "autolink-public",
+      "name": "pages/reference/auth.mdx",
+      "content": "<https://go.dev/doc/>",
+      "allowed": false,
+      "reason": "autolinks are not allowed"
+    },
+    {
+      "id": "inline-code",
+      "name": "pages/reference/auth.mdx",
+      "content": "`{notExecutable}` and ``a ` b``",
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "public-links",
+      "name": "pages/reference/auth.mdx",
+      "content": "[one](auth.mdx) [two](/pro/auth/) [three](https://go.dev/doc/) [four](#x)",
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-admin.mdx",
+      "name": "pages/admin.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-audit.mdx",
+      "name": "pages/audit.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-auth.mdx",
+      "name": "pages/auth.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-execution.mdx",
+      "name": "pages/execution.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-getting-started.mdx",
+      "name": "pages/getting-started.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-guides/admin.mdx",
+      "name": "pages/guides/admin.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-guides/audit.mdx",
+      "name": "pages/guides/audit.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-guides/auth.mdx",
+      "name": "pages/guides/auth.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-guides/execution.mdx",
+      "name": "pages/guides/execution.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-guides/index.mdx",
+      "name": "pages/guides/index.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-guides/quota.mdx",
+      "name": "pages/guides/quota.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-guides/tenant.mdx",
+      "name": "pages/guides/tenant.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-guides/webhook.mdx",
+      "name": "pages/guides/webhook.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-install.mdx",
+      "name": "pages/install.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-problems/admin-action-id-reused.mdx",
+      "name": "pages/problems/admin-action-id-reused.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-problems/admin-audit-unavailable.mdx",
+      "name": "pages/problems/admin-audit-unavailable.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-problems/admin-backend-unavailable.mdx",
+      "name": "pages/problems/admin-backend-unavailable.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-problems/admin-busy.mdx",
+      "name": "pages/problems/admin-busy.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-problems/admin-confirmation-required.mdx",
+      "name": "pages/problems/admin-confirmation-required.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-problems/admin-cross-origin.mdx",
+      "name": "pages/problems/admin-cross-origin.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-problems/admin-csrf-invalid.mdx",
+      "name": "pages/problems/admin-csrf-invalid.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-problems/admin-forbidden.mdx",
+      "name": "pages/problems/admin-forbidden.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-problems/admin-in-progress.mdx",
+      "name": "pages/problems/admin-in-progress.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-problems/admin-internal.mdx",
+      "name": "pages/problems/admin-internal.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-problems/admin-invalid-request.mdx",
+      "name": "pages/problems/admin-invalid-request.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-problems/admin-method-not-allowed.mdx",
+      "name": "pages/problems/admin-method-not-allowed.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-problems/admin-not-found.mdx",
+      "name": "pages/problems/admin-not-found.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-problems/admin-not-ready.mdx",
+      "name": "pages/problems/admin-not-ready.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-problems/admin-rate-limited.mdx",
+      "name": "pages/problems/admin-rate-limited.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-problems/admin-reason-required.mdx",
+      "name": "pages/problems/admin-reason-required.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-problems/admin-timeout.mdx",
+      "name": "pages/problems/admin-timeout.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-problems/admin-unauthenticated.mdx",
+      "name": "pages/problems/admin-unauthenticated.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-problems/binding-failed.mdx",
+      "name": "pages/problems/binding-failed.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-problems/body-too-large.mdx",
+      "name": "pages/problems/body-too-large.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-problems/cost-exceeds-limit.mdx",
+      "name": "pages/problems/cost-exceeds-limit.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-problems/credit-conflict.mdx",
+      "name": "pages/problems/credit-conflict.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-problems/execution-capacity.mdx",
+      "name": "pages/problems/execution-capacity.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-problems/execution-unavailable.mdx",
+      "name": "pages/problems/execution-unavailable.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-problems/forbidden.mdx",
+      "name": "pages/problems/forbidden.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-problems/idempotency-key-invalid.mdx",
+      "name": "pages/problems/idempotency-key-invalid.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-problems/idempotency-key-missing.mdx",
+      "name": "pages/problems/idempotency-key-missing.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-problems/idempotency-key-reused.mdx",
+      "name": "pages/problems/idempotency-key-reused.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-problems/idempotency-request-invalid.mdx",
+      "name": "pages/problems/idempotency-request-invalid.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-problems/index.mdx",
+      "name": "pages/problems/index.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-problems/insufficient-credits.mdx",
+      "name": "pages/problems/insufficient-credits.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-problems/invalid-request.mdx",
+      "name": "pages/problems/invalid-request.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-problems/operation-abandoned.mdx",
+      "name": "pages/problems/operation-abandoned.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-problems/operation-disputed.mdx",
+      "name": "pages/problems/operation-disputed.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-problems/operation-in-progress.mdx",
+      "name": "pages/problems/operation-in-progress.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-problems/operation-not-applied.mdx",
+      "name": "pages/problems/operation-not-applied.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-problems/operation-policy-changed.mdx",
+      "name": "pages/problems/operation-policy-changed.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-problems/operation-response-too-large.mdx",
+      "name": "pages/problems/operation-response-too-large.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-problems/operation-result-expired.mdx",
+      "name": "pages/problems/operation-result-expired.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-problems/operation-result-unavailable.mdx",
+      "name": "pages/problems/operation-result-unavailable.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-problems/operation-uncertain.mdx",
+      "name": "pages/problems/operation-uncertain.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-problems/quota-exceeded.mdx",
+      "name": "pages/problems/quota-exceeded.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-problems/unauthenticated.mdx",
+      "name": "pages/problems/unauthenticated.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-problems/unsupported-media-type.mdx",
+      "name": "pages/problems/unsupported-media-type.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-problems/validation-failed.mdx",
+      "name": "pages/problems/validation-failed.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-quota.mdx",
+      "name": "pages/quota.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-recipes/admin-demo.mdx",
+      "name": "pages/recipes/admin-demo.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-recipes/admin.mdx",
+      "name": "pages/recipes/admin.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-recipes/index.mdx",
+      "name": "pages/recipes/index.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-recipes/quota-otel.mdx",
+      "name": "pages/recipes/quota-otel.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-recipes/stripe.mdx",
+      "name": "pages/recipes/stripe.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-reference/admin.mdx",
+      "name": "pages/reference/admin.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-reference/audit.mdx",
+      "name": "pages/reference/audit.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-reference/auth.mdx",
+      "name": "pages/reference/auth.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-reference/execution.mdx",
+      "name": "pages/reference/execution.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-reference/index.mdx",
+      "name": "pages/reference/index.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-reference/quota.mdx",
+      "name": "pages/reference/quota.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-reference/tenant.mdx",
+      "name": "pages/reference/tenant.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-reference/webhook.mdx",
+      "name": "pages/reference/webhook.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-tenant.mdx",
+      "name": "pages/tenant.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "current-webhook.mdx",
+      "name": "pages/webhook.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "crlf",
+      "name": "pages/auth.mdx",
+      "content": "---\r\nprev:\r\n  link: ../../config.toml\r\n---\r\nText",
+      "allowed": false,
+      "reason": "publication requires LF text without BOM"
+    },
+    {
+      "id": "bom",
+      "name": "pages/auth.mdx",
+      "content": "\ufeff---\nprev: {link: ../../config.toml}\n---\nText",
+      "allowed": false,
+      "reason": "publication requires LF text without BOM"
+    },
+    {
+      "id": "padded-marker",
+      "name": "pages/auth.mdx",
+      "content": "--- \nprev: {link: ../../config.toml}\n---\nText",
+      "allowed": false,
+      "reason": "invalid frontmatter"
+    },
+    {
+      "id": "second-document",
+      "name": "pages/auth.mdx",
+      "content": "---\ntitle: Hi\n...\nhead: x\n---\nText",
+      "allowed": false,
+      "reason": "invalid frontmatter"
+    },
+    {
+      "id": "date",
+      "name": "pages/auth.mdx",
+      "content": "---\ntitle: 2026-10-28\n---\nText",
+      "allowed": false,
+      "reason": "invalid frontmatter"
+    },
+    {
+      "id": "order-float",
+      "name": "pages/auth.mdx",
+      "content": "---\nsidebar: {order: 1.0}\n---\nText",
+      "allowed": false,
+      "reason": "invalid frontmatter"
+    },
+    {
+      "id": "order-octal",
+      "name": "pages/auth.mdx",
+      "content": "---\nsidebar: {order: 012}\n---\nText",
+      "allowed": false,
+      "reason": "invalid frontmatter"
+    },
+    {
+      "id": "order-large",
+      "name": "pages/auth.mdx",
+      "content": "---\nsidebar: {order: 9007199254740992}\n---\nText",
+      "allowed": false,
+      "reason": "invalid frontmatter"
+    },
+    {
+      "id": "autolink-code-literal",
+      "name": "pages/auth.mdx",
+      "content": "`<https://go.dev/doc/>`",
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "multiline-definition-",
+      "name": "pages/auth.mdx",
+      "content": "[x]:\n../../config.toml",
+      "allowed": false,
+      "reason": "reference definitions require same-line destination"
+    },
+    {
+      "id": "multiline-definition-> ",
+      "name": "pages/auth.mdx",
+      "content": "> [x]:\n> ../../config.toml",
+      "allowed": false,
+      "reason": "reference definitions require same-line destination"
+    },
+    {
+      "id": "multiline-definition-- ",
+      "name": "pages/auth.mdx",
+      "content": "- [x]:\n- ../../config.toml",
+      "allowed": false,
+      "reason": "reference definitions require same-line destination"
+    },
+    {
+      "id": "multiline-definition-1. ",
+      "name": "pages/auth.mdx",
+      "content": "1. [x]:\n1. ../../config.toml",
+      "allowed": false,
+      "reason": "reference definitions require same-line destination"
+    },
+    {
+      "id": "jsx-spread",
+      "name": "pages/reference/auth.mdx",
+      "content": "import ConfigReference from '../../../../components/ConfigReference.astro';\n\n<ConfigReference source=\"pro\" name=\"auth.Config\" {...props} />",
+      "allowed": false,
+      "reason": "unreviewed MDX component or HTML"
+    },
+    {
+      "id": "escaped-reference-label",
+      "name": "pages/auth.mdx",
+      "content": "[a\\]]: ../../config.toml",
+      "allowed": false,
+      "reason": "unsupported reference label"
+    },
+    {
+      "id": "multiline-reference-label",
+      "name": "pages/auth.mdx",
+      "content": "[a\nb]: ../../config.toml",
+      "allowed": false,
+      "reason": "unsupported reference label"
+    }
+  ],
+  "inputs": [
+    {
+      "id": "wrong-case",
+      "kind": "case",
+      "reason": "publication input requires exact case"
+    },
+    {
+      "id": "symlink",
+      "kind": "symlink",
+      "reason": "symlink publication input"
+    },
+    {
+      "id": "hard-link",
+      "kind": "hardlink",
+      "reason": "hard-linked publication input"
+    }
+  ]
+}

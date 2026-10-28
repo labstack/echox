@@ -1,3 +1,4 @@
+import { parseDocument, isMap, isScalar } from 'yaml';
 import { posix } from 'node:path';
 import { decodeNamedCharacterReference } from 'decode-named-character-reference';
 import { parseSourceDocument } from '../plugins/source-document.mjs';
@@ -27,11 +28,11 @@ export function checkDestination(name, input, files) {
   // Check components before URL normalization can erase them with '..'.
   const path = lower.split(/[?#]/)[0];
   if (/(^|\/)(internal|private|\.tmp|fixtures?|\.env)(\/|$)/.test(path) || /(^|\/)docs\/.*\.md($|[?#])/.test(lower) || /\.sql($|[?#])/.test(lower) || /(?:github\.com|raw\.githubusercontent\.com)\/labstack\/echo-pro(?:[/?#]|$)/.test(lower)) {
-    throw new Error(`${name}: Private reference`);
+    throw new Error(`${name}: private reference`);
   }
   if (/^[a-z][a-z\d+.-]*:|^\/\//i.test(destination)) {
     const url = new URL(destination, 'https://echo.labstack.com');
-    if (/(?:^|\.)(?:github\.com|githubusercontent\.com)$/.test(url.hostname.replace(/\.$/, '')) && posix.normalize(url.pathname).includes('/labstack/echo-pro')) throw new Error(`${name}: Private repository URL`);
+    if (/(?:^|\.)(?:github\.com|githubusercontent\.com)$/.test(url.hostname.replace(/\.$/, '')) && posix.normalize(url.pathname).includes('/labstack/echo-pro')) throw new Error(`${name}: private reference`);
     if (!['https:', 'http:'].includes(url.protocol) || url.username || url.password) throw new Error(`${name}: non-public URL`);
     return;
   }
@@ -42,7 +43,9 @@ export function checkDestination(name, input, files) {
 }
 
 export function checkMDX(name, content, files, api) {
-  checkTextURLs(name, content, files);
+  const body = checkFrontmatter(name, content);
+  checkTextURLs(name, body, files);
+  checkPublicationSyntax(name, body, files);
   let tree;
   try { tree = parseSourceDocument(content, name); }
   catch { throw new Error(`${name}: invalid MDX syntax`); }
@@ -57,7 +60,7 @@ export function checkMDX(name, content, files, api) {
     } else if (node.type === 'mdxJsxFlowElement' || node.type === 'mdxJsxTextElement') {
       const attributes = node.attributes;
       if (!imported || node.name !== 'ConfigReference' || node.children.length || attributes.length !== 2 || attributes.some((a) => a.type !== 'mdxJsxAttribute' || typeof a.value !== 'string') || attributes[0].name !== 'source' || attributes[0].value !== 'pro' || attributes[1].name !== 'name' || !api.configs.some((c) => c.name === attributes[1].value)) {
-        throw new Error(`${name}: unreviewed MDX component, HTML, or attributes`);
+        throw new Error(`${name}: unreviewed MDX component or HTML`);
       }
     } else if (!markdownNodes.has(node.type)) {
       throw new Error(`${name}: unreviewed MDX node ${node.type}`);
@@ -91,5 +94,95 @@ function checkTextURLs(name, content, files) {
     let target = match[0].replace(/[),.;:!?]+$/, '');
     if (/^www\./i.test(target)) target = `https://${target}`;
     checkDestination(name, target, files);
+  }
+}
+
+// Complete frontmatter allowlist: page metadata and navigation order only.
+// YAML aliases, anchors, explicit tags and duplicate keys are unnecessary.
+function checkFrontmatter(name, content) {
+  if (/[\r\uFEFF]/.test(content)) throw new Error(`${name}: publication requires LF text without BOM`);
+  if (!content.startsWith('---\n')) {
+    if (content.split('\n')[0].trim() === '---') throw new Error(`${name}: invalid frontmatter`);
+    return content;
+  }
+  const end = content.indexOf('\n---\n', 4);
+  const invalid = () => { throw new Error(`${name}: invalid frontmatter`); };
+  if (end < 0) invalid();
+  const doc = parseDocument(content.slice(4, end), { schema: 'core', customTags: ['timestamp'], uniqueKeys: true });
+  if (doc.errors.length || doc.warnings.length) invalid();
+  function validate(node, sidebar = false) {
+    if (!isMap(node) || node.anchor || node.tag) invalid();
+    for (const { key, value } of node.items) {
+      if (!isScalar(key) || typeof key.value !== 'string' || key.anchor || key.tag) invalid();
+      if (!sidebar && ['title', 'description'].includes(key.value)) {
+        if (!isScalar(value) || typeof value.value !== 'string') invalid();
+      } else if (!sidebar && key.value === 'sidebar') validate(value, true);
+      else if (sidebar && key.value === 'order') {
+        if (!isScalar(value) || !Number.isSafeInteger(value.value) || !/^[+-]?(?:0|[1-9][0-9]*)$/.test(value.source)) invalid();
+      } else throw new Error(`${name}: unreviewed frontmatter key`);
+      if (value?.anchor || value?.tag) invalid();
+    }
+  }
+  validate(doc.contents);
+  return content.slice(end + 5);
+}
+
+function stripContainers(line) {
+  for (;;) {
+    line = line.trim();
+    const prefix = /^(?:>[ \t]*|(?:[-+*]|[0-9]+[.)])[ \t]+)/.exec(line)?.[0];
+    if (!prefix) return line;
+    line = line.slice(prefix.length);
+  }
+}
+
+function checkPublicationSyntax(name, body, files) {
+  const lines = body.split('\n');
+  const fail = (reason) => { throw new Error(`${name}: ${reason}`); };
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const trimmed = stripContainers(line);
+    // Keep reference labels in the same small single-line grammar as Go.
+    if (trimmed.startsWith('[')) {
+      const end = trimmed.indexOf(']');
+      if (end < 0 || /[\[\\]/.test(trimmed.slice(1, end))) fail('unsupported reference label');
+    }
+    if (trimmed.startsWith('~~~') || trimmed.startsWith('```') && !line.startsWith('```')) fail('unsupported source fence');
+    if (line.startsWith('```')) {
+      if (line.slice(3).includes('`')) fail('backtick in fence info');
+      if (lines[++i] !== '```') fail('source fences must be empty');
+      const attrs = line.slice(3).trim().split(/\s+/);
+      if (attrs.length !== 2 || !/^[a-zA-Z][a-zA-Z0-9_-]*$/.test(attrs[0]) || !attrs[1].startsWith('file=site/pro-source/')) fail('every code fence must be an empty source include');
+      const [path, region, extra] = attrs[1].slice('file=site/pro-source/'.length).split('#');
+      if (!path.startsWith('examples/') || !files.has(path)) fail('unexported snippet');
+      if (region !== undefined) {
+        const escaped = region.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const marks = [...files.get(path).toString().matchAll(new RegExp(`^\\s*(?://|#)\\s*docs:(start|end) ${escaped}\\s*$`, 'gm'))];
+        if (!region || extra !== undefined || marks.length !== 2 || marks[0][1] !== 'start' || marks[1][1] !== 'end') fail('missing or ambiguous snippet region');
+      }
+      continue;
+    }
+    if (/^\[[^\]\n]+\]:[ \t]*$/.test(trimmed)) fail('reference definitions require same-line destination');
+    if (/^(?:import|export)\b/.test(trimmed)) {
+      if (line !== reviewedImport) fail('unreviewed MDX import or export');
+      if (lines[i + 1] !== '') fail('reviewed import requires blank line');
+      continue;
+    }
+    for (let j = 0; j < line.length;) {
+      if (line[j] === '\\') { j += 2; continue; }
+      const autolink = /^<([a-zA-Z][a-zA-Z0-9+.-]*:[^<>]*)>/.exec(line.slice(j));
+      if (autolink) { checkDestination(name, autolink[1], files); fail('autolinks are not allowed'); }
+      if (line[j] !== '`') { j++; continue; }
+      const width = /^`+/.exec(line.slice(j))[0].length;
+      j += width;
+      let closed = false;
+      while (j < line.length) {
+        if (line[j] !== '`') { j++; continue; }
+        const run = /^`+/.exec(line.slice(j))[0].length;
+        j += run;
+        if (run === width) { closed = true; break; }
+      }
+      if (!closed) fail(i + 1 < lines.length ? 'inline code must stay on one line' : 'unclosed inline code');
+    }
   }
 }

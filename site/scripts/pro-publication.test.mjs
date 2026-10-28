@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import { readFileSync } from 'node:fs';
+import { readPro } from './pro-source.mjs';
 import { checkMDX, checkJSONReferences, checkDestination } from './pro-publication.mjs';
 
 const reviewedImport = "import ConfigReference from '../../../../components/ConfigReference.astro';";
@@ -56,4 +58,19 @@ test('unframed URLs and JSON documentation cannot point at private repositories'
     assert.throws(() => checkMDX('pages/auth.mdx', `Source: ${target}.`, files, api));
     assert.throws(() => checkJSONReferences('config-fields.json', JSON.stringify({ doc: `Source: ${target}.` }), files));
   }
+});
+
+const corpus = JSON.parse(readFileSync(new URL('./testdata/publication-corpus.json', import.meta.url)));
+test('shared publication corpus', async (t) => {
+  const current = readPro();
+  assert.deepEqual(corpus.cases.filter((c) => c.currentPage).map((c) => c.name).sort(), [...current.files.keys()].filter((name) => name.startsWith('pages/')).sort(), 'current pages must all appear in the shared corpus');
+  for (const c of corpus.cases) await t.test(c.id, () => {
+    const files = c.currentPage ? new Map(current.files) : new Map(Object.entries(corpus.files));
+    const content = c.currentPage ? files.get(c.name)?.toString() : c.content;
+    assert.equal(typeof content, 'string', 'missing corpus page');
+    files.set(c.name, content);
+    const check = () => checkMDX(c.name, content, files, c.currentPage ? current.api : api);
+    if (c.allowed) assert.doesNotThrow(check);
+    else assert.throws(check, (error) => error.message === `${c.name}: ${c.reason}`, c.id);
+  });
 });

@@ -17,8 +17,11 @@ const installExamples = new Set(["site-docs/commands.sh", "site-docs/netrc.examp
 
 function filesIn(dir, prefix = '') {
   return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
-    if (entry.isSymbolicLink()) throw new Error('Pro bundle must not contain symlinks');
+    if (entry.isSymbolicLink()) throw new Error('symlink publication input: Pro bundle must not contain symlinks');
     const name = prefix + entry.name;
+    const info = lstatSync(join(dir, entry.name));
+    if (!info.isDirectory() && !info.isFile()) throw new Error('Pro bundle must contain only regular files');
+    if (info.isFile() && info.nlink > 1) throw new Error('hard-linked publication input: Pro bundle must not contain hard links');
     return entry.isDirectory() ? filesIn(join(dir, entry.name), `${name}/`) : [name];
   }).sort();
 }
@@ -26,17 +29,18 @@ function filesIn(dir, prefix = '') {
 /** Validate only the committed public snapshot. Never access the private repo. */
 export function readPro(dir = join(siteDir, 'pro-source')) {
   if (lstatSync(dir).isSymbolicLink()) throw new Error('Pro bundle root must not be a symlink');
+  const entries = filesIn(dir); // Inspect provenance before reading any payload.
   const provenance = JSON.parse(readFileSync(join(dir, 'pro-source.json'), 'utf8'));
   if (provenance.module !== 'echo.labstack.com/pro' || !/^v\d+\.\d+\.\d+$/.test(provenance.version) || !/^[a-f0-9]{40}$/.test(provenance.commit)) {
     throw new Error('Invalid Pro provenance');
   }
-  const names = filesIn(dir).filter((name) => name !== 'pro-source.json');
+  const names = entries.filter((name) => name !== 'pro-source.json');
   if (JSON.stringify(names) !== JSON.stringify(Object.keys(provenance.hashes).sort())) throw new Error('Pro bundle inventory differs from provenance');
   const files = new Map();
   for (const name of names) {
     const isExample = name.startsWith('examples/') && (example.test(name.slice(9)) || installExamples.has(name.slice(9)) || (name.startsWith('examples/source/') && sourceExamples.has(name.slice(16))));
     if (!['go.mod', 'config-fields.json', 'problems.json'].includes(name) && !(name.startsWith('pages/') && page.test(name.slice(6))) && !problemExample.test(name) && !isExample) {
-      throw new Error(`Unreviewed Pro bundle path: ${name}`);
+      throw new Error(`publication input requires exact case or reviewed path: ${name}`);
     }
     const content = readFileSync(join(dir, name));
     if (createHash('sha256').update(content).digest('hex') !== provenance.hashes[name]) throw new Error(`Pro content hash mismatch: ${name}`);
