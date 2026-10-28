@@ -18,8 +18,8 @@ const labels = {
 // /pro is a release-site product page, not versioned documentation.
 const isProduct = isProPage(path);
 // Echo Pro launch note: the English release home only, in place of the
-// version strip. Remove it about four weeks after launch, or when the
-// founding offer ends on 31 Mar 2027 if GA still shows pro_click traffic.
+// version strip; it also hides the hero's Pro line (global style below).
+// Remove this block and that style by 25 Nov 2026.
 const isLaunchHome = !isNext && path === '/';
 const counterpart = /\/(?:404|404\.html)\/?$/.test(path)
   ? (isNext ? '/' : '/next/')
@@ -27,8 +27,8 @@ const counterpart = /\/(?:404|404\.html)\/?$/.test(path)
 ---
 
 {isLaunchHome && <aside class="echo-version-banner launch" aria-label="Announcement" data-pagefind-ignore>
-  <span><strong>New: Echo Pro</strong> — multi-tenant auth, quotas and webhooks for Echo v5. Founding price until 31&nbsp;Mar&nbsp;2027</span>
-  <a class="switch" href="/pro" data-ga-event="pro_click">See Echo Pro →</a>
+  <span><strong>New: Echo Pro</strong> — multi-tenant auth, quotas and signed webhooks for Echo&nbsp;v5.<span class="detail"> Founding pricing for the first 25 organisations.</span></span>
+  <a class="switch" href="/pro" data-ga-event="pro_click" data-ga-placement="launch_banner">See Echo Pro <span aria-hidden="true">→</span></a>
 </aside>}
 
 {!isProduct && !isLaunchHome && <nav class="echo-version-banner" aria-label="Documentation version" data-pagefind-ignore>
@@ -45,4 +45,13 @@ const counterpart = /\/(?:404|404\.html)\/?$/.test(path)
   .echo-version-banner .switch { margin-inline-start: .7rem; font-weight: 600; }
   .echo-version-banner.launch span { text-align: center; text-wrap: balance; }
   .echo-version-banner a:focus-visible { outline: 2px solid var(--echo-cyan-text); outline-offset: 2px; }
+  @media (max-width: 40rem) {
+    .echo-version-banner.launch .detail { display: none; }
+    .echo-version-banner.launch .switch { margin-inline-start: 0; }
+  }
+</style>
+
+<style is:global>
+  /* The launch note carries the Pro pitch while it runs. */
+  body:has(.echo-version-banner.launch) .hh-pro { display: none; }
 </style>

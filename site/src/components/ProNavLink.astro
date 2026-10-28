@@ -4,4 +4,4 @@
 import { isProPage } from '../pro-page.mjs';
 const current = isProPage(Astro.url.pathname);
 ---
-<a class="echo-nav-pro" href="/pro" data-ga-event="pro_click" aria-current={current ? 'page' : undefined}>Pro</a>
+<a class="echo-nav-pro" href="/pro" data-ga-event="pro_click" data-ga-placement="nav" aria-current={current ? 'page' : undefined}>Pro</a>

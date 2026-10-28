@@ -11,7 +11,7 @@ const isProduct = isProPage(Astro.url.pathname);
 <footer class="echo-docfoot">
   <span>© {year} LabStack LLC. {isProduct ? 'Echo is released under the MIT License; Echo Pro is commercial software.' : 'Released under the MIT License.'}</span>
   <div class="echo-social">
-    <a class="echo-docfoot-pro" href="/pro" data-ga-event="pro_click">Echo Pro</a>
+    <a class="echo-docfoot-pro" href="/pro" data-ga-event="pro_click" data-ga-placement="footer">Echo Pro</a>
     <a href="https://x.com/labstack" target="_blank" rel="noopener noreferrer" aria-label="LabStack on X">
       <Icon name="x.com" />
     </a>

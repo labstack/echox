@@ -77,14 +77,15 @@ export default defineConfig({
       head: [
         // Google Analytics (carried over from the Docusaurus site, anonymized IP).
         // Links with data-ga-event send that GA4 event on click; data-ga-plan
-        // and data-ga-value add the plan name and USD value (begin_checkout).
+        // and data-ga-value add the plan name and USD value (begin_checkout);
+        // data-ga-placement names where the link sits (nav, home_hero, ...).
         { tag: 'script', attrs: { async: true, src: 'https://www.googletagmanager.com/gtag/js?id=G-H19TMZLQFN' } },
         {
           tag: 'script',
           content:
             "window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-H19TMZLQFN',{anonymize_ip:true});" +
             "document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('[data-ga-event]');if(!a)return;var d=a.dataset,p={link_text:a.textContent.trim(),link_url:a.getAttribute('href')};" +
-            "if(d.gaPlan){p.plan=d.gaPlan;}if(d.gaValue){var v=Number(d.gaValue);p.currency='USD';p.value=v;p.items=[{item_id:'echo_pro_'+d.gaPlan.toLowerCase(),item_name:'Echo Pro '+d.gaPlan,price:v,quantity:1}];}" +
+            "if(d.gaPlacement){p.placement=d.gaPlacement;}if(d.gaPlan){p.plan=d.gaPlan;}if(d.gaValue){var v=Number(d.gaValue);p.currency='USD';p.value=v;p.items=[{item_id:'echo_pro_'+d.gaPlan.toLowerCase(),item_name:'Echo Pro '+d.gaPlan,price:v,quantity:1}];}" +
             "gtag('event',d.gaEvent,p);});",
         },
         // kapa.ai "Ask AI" widget — real answers from the indexed Echo docs.
