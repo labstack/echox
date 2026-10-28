@@ -1,7 +1,7 @@
 {
   "module": "echo.labstack.com/pro",
   "version": "v0.1.0",
-  "commit": "63947886d155e3e4adf1256edcd7110d29a2a2b4",
+  "commit": "ada525775159e173670ee2062c8da3679a6ac020",
   "hashes": {
     "config-fields.json": "621970f1cd7de6a9bc3a6fe20dbad5dde2ab670f446cac16e0692e04f838a19b",
     "examples/admin-demo/audit.go": "e332591665875ea7a9d36e756089cf34c8eca947ded969bac6014472c0d206a3",

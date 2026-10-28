@@ -43,7 +43,7 @@ export function checkDestination(name, input, files) {
 }
 
 export function checkMDX(name, content, files, api) {
-  const body = checkFrontmatter(name, content);
+  const { body } = checkFrontmatter(name, content);
   checkTextURLs(name, body, files);
   checkPublicationSyntax(name, body, files);
   let tree;
@@ -99,11 +99,11 @@ function checkTextURLs(name, content, files) {
 
 // Complete frontmatter allowlist: page metadata and navigation order only.
 // YAML aliases, anchors, explicit tags and duplicate keys are unnecessary.
-function checkFrontmatter(name, content) {
+export function checkFrontmatter(name, content) {
   if (/[\r\uFEFF]/.test(content)) throw new Error(`${name}: publication requires LF text without BOM`);
   if (!content.startsWith('---\n')) {
-    if (content.split('\n')[0].trim() === '---') throw new Error(`${name}: invalid frontmatter`);
-    return content;
+    if (/^(?:---|\+\+\+)/.test(content.trimStart())) throw new Error(`${name}: invalid frontmatter`);
+    return { body: content, frontmatter: {} };
   }
   const end = content.indexOf('\n---\n', 4);
   const invalid = () => { throw new Error(`${name}: invalid frontmatter`); };
@@ -124,7 +124,7 @@ function checkFrontmatter(name, content) {
     }
   }
   validate(doc.contents);
-  return content.slice(end + 5);
+  return { body: content.slice(end + 5), frontmatter: doc.toJS() };
 }
 
 function stripContainers(line) {

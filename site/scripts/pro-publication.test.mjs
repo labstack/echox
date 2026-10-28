@@ -1,8 +1,12 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { tmpdir } from 'node:os';
+import { parseFrontmatter } from '@astrojs/internal-helpers/frontmatter';
 import { readPro } from './pro-source.mjs';
-import { checkMDX, checkJSONReferences, checkDestination } from './pro-publication.mjs';
+import { checkMDX, checkFrontmatter, checkJSONReferences, checkDestination } from './pro-publication.mjs';
 
 const reviewedImport = "import ConfigReference from '../../../../components/ConfigReference.astro';";
 const api = { configs: [{ name: 'auth.Config' }] };
@@ -72,5 +76,53 @@ test('shared publication corpus', async (t) => {
     const check = () => checkMDX(c.name, content, files, c.currentPage ? current.api : api);
     if (c.allowed) assert.doesNotThrow(check);
     else assert.throws(check, (error) => error.message === `${c.name}: ${c.reason}`, c.id);
+  });
+});
+
+test('Astro frontmatter agrees with every accepted corpus case', async (t) => {
+  const current = readPro();
+  for (const c of corpus.cases) await t.test(c.id, () => {
+    const files = c.currentPage ? new Map(current.files) : new Map(Object.entries(corpus.files));
+    const content = c.currentPage ? files.get(c.name).toString() : c.content;
+    files.set(c.name, content);
+    const validate = () => checkMDX(c.name, content, files, c.currentPage ? current.api : api);
+    let astro;
+    try { astro = parseFrontmatter(content); }
+    catch {
+      assert.throws(validate, undefined, 'Astro parse failures must be rejected');
+      return;
+    }
+    if (!astro.rawFrontmatter) return;
+    try { validate(); } catch { return; }
+    const { frontmatter } = checkFrontmatter(c.name, content);
+    assert.deepEqual(frontmatter, astro.frontmatter);
+    assert.ok(Object.keys(frontmatter).every((key) => ['title', 'description', 'sidebar'].includes(key)));
+    if (frontmatter.sidebar) assert.ok(Object.keys(frontmatter.sidebar).every((key) => key === 'order'));
+  });
+});
+
+test('synthetic corpus traverses readPro and its source include validation', async (t) => {
+  for (const c of corpus.cases.filter((c) => !c.currentPage)) await t.test(c.id, (t) => {
+    const root = mkdtempSync(join(tmpdir(), 'pro-publication-corpus-'));
+    t.after(() => rmSync(root, { recursive: true, force: true }));
+    const payloads = {
+      ...corpus.files,
+      'go.mod': 'module echo.labstack.com/pro-site-snapshot\n\ngo 1.26.0\n',
+      'config-fields.json': JSON.stringify({ ...api, module: 'echo.labstack.com/pro', revision: 'v0.1.0' }),
+      'problems.json': '[]',
+      [c.name]: c.content,
+    };
+    const provenance = { module: 'echo.labstack.com/pro', version: 'v0.1.0', commit: 'a'.repeat(40), hashes: {} };
+    for (const [name, content] of Object.entries(payloads)) {
+      mkdirSync(dirname(join(root, name)), { recursive: true });
+      writeFileSync(join(root, name), content);
+      provenance.hashes[name] = createHash('sha256').update(content).digest('hex');
+    }
+    writeFileSync(join(root, 'pro-source.json'), JSON.stringify(provenance));
+    const check = () => readPro(root);
+    if (c.allowed) assert.doesNotThrow(check);
+    // The bundle's raw private-reference check may reject before MDX parsing.
+    else assert.throws(check, (error) => error.message === `${c.name}: ${c.reason}` ||
+      c.reason === 'private reference' && error.message === `Private reference in Pro bundle: ${c.name}`, c.id);
   });
 });

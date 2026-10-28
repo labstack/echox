@@ -1,9 +1,51 @@
 {
   "files": {
-    "examples/demo.go": "// docs:start demo\npackage main\n// docs:end demo\n",
-    "pages/auth.mdx": ""
+    "pages/auth.mdx": "",
+    "examples/getting-started/main.go": "// docs:start demo\npackage main\n// docs:end demo\n"
   },
   "cases": [
+    {
+      "id": "frontmatter-leading-blank",
+      "name": "pages/reference/auth.mdx",
+      "content": "\n---\nhead:\n  - tag: script\n    content: alert(1)\n---\nText",
+      "allowed": false,
+      "reason": "invalid frontmatter"
+    },
+    {
+      "id": "frontmatter-leading-whitespace",
+      "name": "pages/reference/auth.mdx",
+      "content": " \t\n\n---\nhead:\n  - tag: script\n    content: alert(1)\n---\nText",
+      "allowed": false,
+      "reason": "invalid frontmatter"
+    },
+    {
+      "id": "frontmatter-toml",
+      "name": "pages/reference/auth.mdx",
+      "content": "+++\nslug = \"elsewhere\"\nprev.link = \"../../.env\"\n+++\nText",
+      "allowed": false,
+      "reason": "invalid frontmatter"
+    },
+    {
+      "id": "frontmatter-leading-toml",
+      "name": "pages/reference/auth.mdx",
+      "content": "\n \t\n+++\nslug = \"elsewhere\"\nprev.link = \"../../.env\"\n+++\nText",
+      "allowed": false,
+      "reason": "invalid frontmatter"
+    },
+    {
+      "id": "link-title-expression",
+      "name": "pages/reference/auth.mdx",
+      "content": "[a](/pro/quota/ \"t\" {import.meta.env})",
+      "allowed": false,
+      "reason": "MDX expressions are not allowed"
+    },
+    {
+      "id": "link-invalid-expression",
+      "name": "pages/reference/auth.mdx",
+      "content": "[a](x y z {import.meta.env})",
+      "allowed": false,
+      "reason": "MDX expressions are not allowed"
+    },
     {
       "id": "frontmatter-head",
       "name": "pages/reference/auth.mdx",
@@ -182,7 +224,7 @@
     {
       "id": "info-backtick",
       "name": "pages/reference/auth.mdx",
-      "content": "```{process.env.SECRET}` file=site/pro-source/examples/demo.go\n```",
+      "content": "```{process.env.SECRET}` file=site/pro-source/examples/getting-started/main.go\n```",
       "allowed": false,
       "reason": "backtick in fence info"
     },
@@ -210,56 +252,56 @@
     {
       "id": "tilde",
       "name": "pages/reference/auth.mdx",
-      "content": "~~~go file=site/pro-source/examples/demo.go\n~~~",
+      "content": "~~~go file=site/pro-source/examples/getting-started/main.go\n~~~",
       "allowed": false,
       "reason": "unsupported source fence"
     },
     {
       "id": "nested-fence-> ",
       "name": "pages/reference/auth.mdx",
-      "content": "> ```go file=site/pro-source/examples/demo.go\n> ```",
+      "content": "> ```go file=site/pro-source/examples/getting-started/main.go\n> ```",
       "allowed": false,
       "reason": "unsupported source fence"
     },
     {
       "id": "nested-fence-- ",
       "name": "pages/reference/auth.mdx",
-      "content": "- ```go file=site/pro-source/examples/demo.go\n- ```",
+      "content": "- ```go file=site/pro-source/examples/getting-started/main.go\n- ```",
       "allowed": false,
       "reason": "unsupported source fence"
     },
     {
       "id": "nested-fence-1. ",
       "name": "pages/reference/auth.mdx",
-      "content": "1. ```go file=site/pro-source/examples/demo.go\n1. ```",
+      "content": "1. ```go file=site/pro-source/examples/getting-started/main.go\n1. ```",
       "allowed": false,
       "reason": "unsupported source fence"
     },
     {
       "id": "nested-fence-> - ",
       "name": "pages/reference/auth.mdx",
-      "content": "> - ```go file=site/pro-source/examples/demo.go\n> - ```",
+      "content": "> - ```go file=site/pro-source/examples/getting-started/main.go\n> - ```",
       "allowed": false,
       "reason": "unsupported source fence"
     },
     {
       "id": "nested-fence-  ",
       "name": "pages/reference/auth.mdx",
-      "content": "  ```go file=site/pro-source/examples/demo.go\n  ```",
+      "content": "  ```go file=site/pro-source/examples/getting-started/main.go\n  ```",
       "allowed": false,
       "reason": "unsupported source fence"
     },
     {
       "id": "source-fence",
       "name": "pages/reference/auth.mdx",
-      "content": "```go file=site/pro-source/examples/demo.go#demo\n```",
+      "content": "```go file=site/pro-source/examples/getting-started/main.go#demo\n```",
       "allowed": true,
       "reason": ""
     },
     {
       "id": "pasted-fence",
       "name": "pages/reference/auth.mdx",
-      "content": "```go file=site/pro-source/examples/demo.go\npasted\n```",
+      "content": "```go file=site/pro-source/examples/getting-started/main.go\npasted\n```",
       "allowed": false,
       "reason": "source fences must be empty"
     },
@@ -273,21 +315,21 @@
     {
       "id": "missing-region",
       "name": "pages/reference/auth.mdx",
-      "content": "```go file=site/pro-source/examples/demo.go#missing\n```",
+      "content": "```go file=site/pro-source/examples/getting-started/main.go#missing\n```",
       "allowed": false,
       "reason": "missing or ambiguous snippet region"
     },
     {
       "id": "fence-extra",
       "name": "pages/reference/auth.mdx",
-      "content": "```go file=site/pro-source/examples/demo.go extra\n```",
+      "content": "```go file=site/pro-source/examples/getting-started/main.go extra\n```",
       "allowed": false,
       "reason": "every code fence must be an empty source include"
     },
     {
       "id": "fence-language",
       "name": "pages/reference/auth.mdx",
-      "content": "```{x} file=site/pro-source/examples/demo.go\n```",
+      "content": "```{x} file=site/pro-source/examples/getting-started/main.go\n```",
       "allowed": false,
       "reason": "every code fence must be an empty source include"
     },
@@ -966,7 +1008,7 @@
     {
       "id": "bom",
       "name": "pages/auth.mdx",
-      "content": "\ufeff---\nprev: {link: ../../config.toml}\n---\nText",
+      "content": "﻿---\nprev: {link: ../../config.toml}\n---\nText",
       "allowed": false,
       "reason": "publication requires LF text without BOM"
     },
@@ -1067,6 +1109,69 @@
       "content": "[a\nb]: ../../config.toml",
       "allowed": false,
       "reason": "unsupported reference label"
+    },
+    {
+      "id": "link-quoted-title",
+      "name": "pages/reference/auth.mdx",
+      "content": "[a](/pro/quota/ \"title {literal} <literal>\")",
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "link-single-quoted-title",
+      "name": "pages/reference/auth.mdx",
+      "content": "[a](/pro/quota/ 'title {literal} <literal>')",
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "link-angle-title",
+      "name": "pages/reference/auth.mdx",
+      "content": "[a](</pro/quota/> \"title\")",
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "link-title-html",
+      "name": "pages/reference/auth.mdx",
+      "content": "[a](/pro/quota/ \"t\" <script />)",
+      "allowed": false,
+      "reason": "unreviewed MDX component or HTML"
+    },
+    {
+      "id": "frontmatter-inline-yaml-marker",
+      "name": "pages/reference/auth.mdx",
+      "content": "\n---title: Guide\n---\nText",
+      "allowed": false,
+      "reason": "invalid frontmatter"
+    },
+    {
+      "id": "frontmatter-inline-toml-marker",
+      "name": "pages/reference/auth.mdx",
+      "content": "+++slug = \"elsewhere\"\n+++\nText",
+      "allowed": false,
+      "reason": "invalid frontmatter"
+    },
+    {
+      "id": "link-blank-line-title-expression",
+      "name": "pages/reference/auth.mdx",
+      "content": "[a](/pro/quota/ \"t\n\n{import.meta.env}\")",
+      "allowed": false,
+      "reason": "MDX expressions are not allowed"
+    },
+    {
+      "id": "link-blank-line-destination-expression",
+      "name": "pages/reference/auth.mdx",
+      "content": "[a](\n\n/pro/quota/ \"t {import.meta.env}\")",
+      "allowed": false,
+      "reason": "MDX expressions are not allowed"
+    },
+    {
+      "id": "link-blank-line-before-title-expression",
+      "name": "pages/reference/auth.mdx",
+      "content": "[a](/pro/quota/\n\n\"t {import.meta.env}\")",
+      "allowed": false,
+      "reason": "MDX expressions are not allowed"
     }
   ],
   "inputs": [
