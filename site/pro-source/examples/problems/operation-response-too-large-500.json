@@ -1,5 +1,4 @@
 {
-  "Cache-Control": "",
   "code": "operation_response_too_large",
   "operation_ref": "AAAAAAAAAAAAAAAAAAAAAAAA",
   "operation_state": "failed",

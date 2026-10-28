@@ -19,7 +19,7 @@ description: HTTP 400 and client guidance for invalid_request.
 
 ## When it occurs
 
-A quota administration route rejected its input. Check for unknown or repeated query parameters and invalid periods. Send one JSON object of at most 64 KiB with `Content-Type: application/json`.
+A quota administration route rejected its input. Causes include unknown or repeated query parameters, an invalid period, or a body other than one JSON object of at most 64 KiB sent as `application/json`.
 
 ## Client handling
 
@@ -27,27 +27,25 @@ A quota administration route rejected its input. Check for unknown or repeated q
 
 ## Example response
 
-The package may omit diagnostic text or return it empty. Operation references do not grant access. Custom handlers can replace the body.
+If your application installs a custom handler, the body may differ.
 
-HTTP 400:
-
-```json file=site/pro-source/examples/problems/invalid-request-400.json
+```http file=site/pro-source/examples/problems/invalid-request-400.http
 ```
 
-## How to fix
+## Server correction
 
-Correct the quota administration parameters, including the selected plan, partition and credit operation ID. This code is not a generic code for every application's HTTP 400.
+Validate quota administration parameters, including plan, partition and credit operation ID. Do not use this code for your application's unrelated 400 responses.
 
 ## Response fields
 
-### quota administration routes
+### Quota administration routes
 
 - `code` (string, always): The stable code above.
 - `type` (string, always): The exact type URI above.
 - `title` (string, always): English title. Quota administration routes use their own titles for some codes.
 - `status` (integer, always): The HTTP status of the response.
 - `detail` (string, optional): Human-readable explanation, omitted when empty. Its wording is not a stable format.
-- `violated-policies` (array, always): IDs of the limits involved: `[]` when there are none, never null. The hyphenated name is a legacy exception to the naming rule for new members.
+- `violated-policies` (array, always): IDs of the limits involved: `[]` when there are none, never null.
 
 Headers:
 
@@ -55,11 +53,8 @@ Headers:
 
 Notes:
 
-- The members match the quota middleware's. The body ends with a newline. HEAD responses have no body.
-- The title is `Invalid quota administration request`.
+- Quota administration rejected the request.
 
 ## Related behavior
 
-See [quota](/pro/quota/) for plan, credit and administration behavior. Check the verified tenant and principal, the selected plan and request cost before retrying.
-
-See the [problem catalog](/pro/problems/) for related type URIs and response rules.
+See [quota](/pro/quota/) for plans, credit adjustments and usage.

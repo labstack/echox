@@ -13,7 +13,7 @@ Run one local Echo application and observe its authentication, tenant selection 
 
 ## Prerequisites
 
-Complete [installation](/pro/install/) in an application module using Go 1.26 or later. Port 8080 must be free on loopback. Have `curl` and a browser available. You do not need Redis, PostgreSQL or a frontend build. Use a new path for the disposable API-key file.
+Complete [installation](/pro/install/) in an application module using Go 1.26 or later. Port 8080 must be free on loopback. Have `curl` and a browser available. You do not need Redis, PostgreSQL or a frontend build. Pick a file path that does not exist yet. The program writes a disposable API key there.
 
 ## Step 1: start the application
 
@@ -27,9 +27,9 @@ Run its compiled example:
 ```sh file=site/pro-source/examples/site-docs/commands.sh#getting-started
 ```
 
-The program creates the key file with mode 600 and refuses an existing path. It prints the API URL ending in `/v1/tenants/acme/invoices` and the admin URL. Keep this terminal running. The key is restricted to `acme` and has invoice read/write and admin-read scopes. The process keeps its pepper in memory.
+The program writes the key to that path with mode 600. It exits with an error if the file already exists. It prints the API URL ending in `/v1/tenants/acme/invoices` and the admin URL. Keep this terminal running. The key is restricted to `acme` and has invoice read/write and admin-read scopes. The pepper exists only in memory, so the key stops working when the process exits.
 
-The `-browser` option grants local browser requests read-only console access at the exact listener authority. Anyone able to use that loopback listener can use this demonstration access. Replace it with validated login in a deployed application.
+With `-browser`, browser requests whose Host is exactly `127.0.0.1:8080` get read-only console access. Any local user or process that can reach that address gets the same access. In a deployed application, replace it with your own login.
 
 ## Step 2: check authentication
 
@@ -38,14 +38,14 @@ In another terminal, make an unauthenticated request:
 ```sh file=site/pro-source/examples/site-docs/commands.sh#unauthenticated
 ```
 
-Expect HTTP 401 and `Content-Type: application/problem+json`. The guard refuses the request before tenant resolution, quota checks and the invoice handler.
+Expect HTTP 401 and `Content-Type: application/problem+json`. The authentication guard rejects it before tenant selection, quota or the invoice handler runs.
 
-Send the credential using curl's header-file input. The command reads it directly from the private file and does not place its value in command arguments:
+Send the key as a header. curl reads the header from standard input (`--header @-`), so the key never appears in command arguments:
 
 ```sh file=site/pro-source/examples/site-docs/commands.sh#authenticated
 ```
 
-Expect HTTP 200. The JSON contains tenant `acme` and invoice `inv-1`. This is the first admitted request against the free plan's three-per-UTC-day budget.
+Expect HTTP 200. The JSON contains tenant `acme` and invoice `inv-1`. This request uses 1 of the 3 requests the `free` plan allows per UTC day.
 
 ## Step 3: verify tenant isolation
 
@@ -54,7 +54,7 @@ Use the same key on a different tenant path:
 ```sh file=site/pro-source/examples/site-docs/commands.sh#cross-tenant
 ```
 
-Expect HTTP 403. The path selector and credential restriction disagree. Quota does not consume a request for this refusal. Changing a URL cannot expand the service key's tenant authority.
+Expect HTTP 403. The URL names a different tenant from the one the key is restricted to. This refusal does not count against the quota. Editing the URL does not let a key reach another tenant.
 
 ## Step 4: queue an event
 
@@ -63,22 +63,22 @@ Create a demonstration invoice:
 ```sh file=site/pro-source/examples/site-docs/commands.sh#create-invoice
 ```
 
-Expect HTTP 202 with `invoice` and `webhook_ref` fields. The generated invoice ID changes each run. This is the second admitted request. The program queues a frozen event with a stable key derived from that invoice ID. The local worker signs it and sends it to the loopback receiver.
+Expect HTTP 202 with `invoice` and `webhook_ref` fields. The generated invoice ID changes each run. This request uses the second of the three. The handler queues an immutable event. Its webhook ID is derived from the invoice ID. The local worker signs it and sends it to the loopback receiver.
 
-The server terminal prints `Webhook delivered: verified invoice.created` after verification. The receiver checks the original bytes. It does not persist invoices or deduplicate business effects. The enqueue response means queued; it does not wait for delivery.
+The server terminal prints `Webhook delivered: verified invoice.created` after verification. The receiver verifies the signature over the raw request body. It does not store invoices or skip duplicate events. The 202 returns as soon as the event is queued. It does not wait for delivery.
 
 ## Step 5: exhaust the daily quota
 
-Repeat the authenticated GET from Step 2 once. It returns 200 and uses the third unit. Repeat it again. The fourth authenticated request returns HTTP 429 with code `quota_exceeded`, `type: https://iana.org/assignments/http-problem-types#quota-exceeded` and `Retry-After`. The response identifies the violated policy. Unauthenticated and foreign-tenant refusals did not spend that budget.
+Repeat the authenticated GET from Step 2 once. It returns 200 and uses the third unit. Repeat it again. The fourth authenticated request returns HTTP 429 with code `quota_exceeded`. Its `type` is `https://iana.org/assignments/http-problem-types#quota-exceeded`. The `violated-policies` field names the limit that was exceeded. Use `reset_at` for the next UTC day. Daily limits do not send `Retry-After`. The 401 from step 2 and the 403 from step 3 did not count.
 
-The counter follows a UTC day. Restarting this memory-only demo clears its usage. A deployed budget shared across processes needs [Redis or Valkey](/pro/guides/quota/); restarting one application instance must not reset paid usage.
+The counter follows a UTC day. Restarting this memory-only demo clears its usage. In a deployment, use the [Redis or Valkey store](/pro/guides/quota/). It shares the budget across instances, and a restart does not reset it.
 
 ## Step 6: inspect and stop
 
-Open `http://127.0.0.1:8080/admin`. Select Quota, then Usage, with tenant `acme` and plan `free`. The panel reads the same limiter. It does not consume a request. This local console enables no writes.
+Open `http://127.0.0.1:8080/admin`. Select Quota, then Usage, with tenant `acme` and plan `free`. The panel reads usage from the limiter the API uses. It does not consume a request. This console has no write actions.
 
-Press Ctrl-C in the server terminal. HTTP serving stops first. The application then joins the webhook worker and drains limiter-owned work.
-Finally, it removes only the key file it created. An unclean process exit can leave the file behind; remove that stale disposable file before restarting with the same path.
+Press Ctrl-C in the server terminal. HTTP serving stops first. The program then waits for the webhook worker to stop and for pending quota settlement to finish.
+Finally, it removes only the key file it created. If the process crashes, the file stays. Delete it before you restart with the same path.
 
 ## Source and verification
 
@@ -96,6 +96,6 @@ Run the example regression tests from the installed module directory:
 
 Replace `MemoryKeyStore` with a store implementing `Lookup(context.Context, string) (auth.StoredKey, error)`.
 See the [compiled lookup example](/pro/guides/auth/#replace-the-memory-key-store).
-Return current revocation data and load retained peppers through your runtime secret manager. Keep authentication and tenant membership before quota. Select subscription plans from trusted application state. Use `redisstore` for shared budgets.
+Your store must return current revocation data. Load peppers from your secret manager. Keep authentication and tenant checks ahead of quota. Choose the plan from your subscription records, not from request data. Use `redisstore` for shared budgets.
 
-Use `webhookpg` for durable inbox/outbox state and a permanent application business key for effects. Retain receiver deduplication for the sender's replay horizon. Replace the demo console credential injection with validated sessions and exact origins. The [package explanations](/pro/auth/) and [full console tutorial](/pro/recipes/admin-demo/) explain storage and operator requirements.
+Use `webhookpg` to keep inbox and outbox state in PostgreSQL. Give each business effect a permanent key, such as the invoice ID, stored in your own table. Keep receiver deduplication records for as long as the sender can resend an event. Replace the demo's injected console credential with your login sessions. List exact allowed origins. The [package explanations](/pro/auth/) and [full console tutorial](/pro/recipes/admin-demo/) explain storage and operator requirements.

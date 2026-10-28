@@ -19,7 +19,7 @@ description: HTTP 405 and client guidance for admin_method_not_allowed.
 
 ## When it occurs
 
-The console does not serve this HTTP method here. It serves GET and HEAD, and POST only when actions or POST reads are enabled. Middleware that returns HTTP 405 is reported with this code too.
+The console does not serve this HTTP method here. It serves GET and HEAD, and POST only when actions or POST reads are enabled. The console also uses this code when `Config.Middleware` returns HTTP 405.
 
 ## Client handling
 
@@ -27,39 +27,35 @@ Use a method that the `Allow` header lists.
 
 ## Example response
 
-The package may omit diagnostic text or return it empty. Operation references do not grant access. Custom handlers can replace the body.
+If your application installs a custom handler, the body may differ.
 
-HTTP 405:
-
-```json file=site/pro-source/examples/problems/admin-method-not-allowed-405.json
+```http file=site/pro-source/examples/problems/admin-method-not-allowed-405.http
 ```
 
-## How to fix
+## Server correction
 
-Use the console endpoint's declared method and inspect Allow when supplied. Read navigation uses GET; action preview and commit use the declared POST protocol.
+Check the client's method and the endpoint's `Allow` header. Ordinary views use GET. Declared POST lookups, action preview and commit use POST.
 
 ## Response fields
 
-### admin console
+### Admin console
 
 - `code` (string, always): The stable code above.
-- `detail` (string, always): Always present and often empty. Contains safe display text without underlying errors.
+- `detail` (string, always): The console always sends `detail`. It is often empty and never contains the underlying error.
 - `status` (integer, always): The HTTP status of the response.
-- `title` (string, always): The HTTP status text, unless the problem carries a classified title.
+- `title` (string, always): The HTTP status text, such as `Conflict`, unless the panel supplies its own title.
 - `type` (string, always): The exact type URI above.
 
 Headers:
 
-- `Cache-Control` (always): `no-store` on every console problem response, together with the console's security headers.
+- `Cache-Control` (always): `no-store`. The console sends it on every problem response, along with its usual security headers.
 - `Allow` (conditional): Methods the console serves: `GET, HEAD`, plus `POST` when enabled. Sent when the console's own method check refused the request.
 
 Notes:
 
-- Fields are written in key order. The body ends with a newline. The type URI uses `https://echo.labstack.com/pro/problems/` followed by the hyphenated code. HEAD responses have no body.
-- Every 404 response is rewritten to `admin_not_found` with an empty `detail`.
+- Fields are written in alphabetical order.
+- The console rewrites every 404 response to `admin_not_found` with an empty `detail`.
 
 ## Related behavior
 
-The [admin console](/pro/admin/) returns this problem. Check the authenticated role, resolved scope and requested action. For backend failures, inspect application diagnostics before retrying a mutation with its original action ID.
-
-See the [problem catalog](/pro/problems/) for related type URIs and response rules.
+See the [admin console](/pro/admin/) for access checks, action IDs and audit failures.

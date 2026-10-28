@@ -19,7 +19,7 @@ description: HTTP 401 and client guidance for unauthenticated.
 
 ## When it occurs
 
-The application refused the request because authentication failed or was missing. It returns this code only for a refusal it knows is an authentication failure, and keeps its own `WWW-Authenticate` challenge.
+The application refused the request because authentication failed or was missing. It returns this code only when it knows authentication failed. It keeps its own `WWW-Authenticate` challenge.
 
 ## Client handling
 
@@ -27,26 +27,24 @@ Authenticate as the `WWW-Authenticate` challenge describes, then retry.
 
 ## Example response
 
-The package may omit diagnostic text or return it empty. Operation references do not grant access. Custom handlers can replace the body.
+If your application installs a custom handler, the body may differ.
 
-HTTP 401:
-
-```json file=site/pro-source/examples/problems/unauthenticated-401.json
+```http file=site/pro-source/examples/problems/unauthenticated-401.http
 ```
 
-## How to fix
+## Server correction
 
-Supply a current supported credential and inspect WWW-Authenticate. Verify API-key revocation and pepper versions or bearer issuer, audience, signature and expiry. Never log the rejected credential.
+For API keys, check revocation and the pepper version. For bearer tokens, check issuer, audience, signature and expiry. Never log the rejected credential.
 
 ## Response fields
 
-### application call sites
+### Your application (`problem.NewError`)
 
 - `type` (string, always): The exact type URI above.
 - `title` (string, always): The catalog title in the rendered language: English by default, Japanese only when the application selects it.
 - `status` (integer, always): The HTTP status of the response.
 - `code` (string, always): The stable code above.
-- `detail` (string, optional): Display text projected by the caller, at most 256 bytes with `problem.NewError`; omitted when the caller supplies none.
+- `detail` (string, optional): Display text that your application sets, up to 256 bytes with `problem.NewError`. Omitted when you set none.
 
 Headers:
 
@@ -57,10 +55,8 @@ Headers:
 Notes:
 
 - The adapter keeps existing `WWW-Authenticate`, `Allow` and `Retry-After` headers and adds no challenge or retry advice of its own.
-- The body ends with a newline. HEAD responses have no body; their Content-Length equals the GET body's length.
+- On HEAD, the adapter's `Content-Length` equals the GET body's length.
 
 ## Related behavior
 
-Check the request and its authentication or validation policy before retrying. See [authentication](/pro/auth/) and [tenant authorization](/pro/tenant/).
-
-See the [problem catalog](/pro/problems/) for related type URIs and response rules.
+See the [problem catalog](/pro/problems/) for application error handling.

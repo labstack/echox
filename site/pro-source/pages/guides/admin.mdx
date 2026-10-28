@@ -21,13 +21,13 @@ Construct `quotaadmin.New` with the existing limiter. Map a validated session to
 ```go file=site/pro-source/examples/source/admin/example_test.go
 ```
 
-Replace the fixture `Authenticate` callback with a validated login or trusted authbinding. Populate `Session` from that login's session ID. A fixed application-wide session cannot represent separate browser logins. Header-only credentials use `HeaderCredential` as in the complete [read-only example](/pro/admin/).
+Replace the fixture `Authenticate` callback with your login check or an `authbind` mapping. Populate `Session` from that login's session ID. A fixed application-wide session cannot represent separate browser logins. Header-only credentials use `HeaderCredential` as in the complete [read-only example](/pro/admin/).
 
-Register the remaining application routes, then call `VerifyRoutes` before serving. Keep the console prefix reserved. Set `PublicPath` when a reverse proxy exposes another path and configure the exact deployment origins.
+Register the remaining application routes, then call `VerifyRoutes` before serving. Keep the console prefix reserved. Set `PublicPath` if a reverse proxy serves the console under another path. Set `Origins` to your exact deployment origins.
 
 ## Keep outer middleware compatible
 
-Let console requests reach the console wrapper for origin and CSRF enforcement. The local program skips outer CORS middleware for console routes.
+Make outer middleware pass console requests through unchanged. The console checks origin and CSRF itself. The local program skips outer CORS middleware for console routes.
 It mounts the panel and closes the limiter at shutdown:
 
 ```go file=site/pro-source/examples/admin/main.go
@@ -37,17 +37,17 @@ Run it through the [local admin tutorial](/pro/recipes/admin/). Keep its fixed l
 
 ## Add execution, audit or webhook panels
 
-Pass a journal operator to `executionadmin`. Pass an authorized `audit.Reader` to `auditadmin.NewPanel`. A webhook panel needs `*webhookpg.Store` and global scope. Memory webhook inspection does not implement that panel.
+Pass a journal operator to `executionadmin`. Pass an authorized `audit.Reader` to `auditadmin.NewPanel`. A webhook panel needs `*webhookpg.Store` and global scope. The memory webhook store cannot back that panel.
 
-The [full console tutorial](/pro/recipes/admin-demo/) shows the complete wiring and the PostgreSQL prerequisites. Preserve every pool until workers and in-flight console reads have stopped. Keep durable audit's independent roles; the demo uses bounded memory when those requirements are unavailable.
+The [full console tutorial](/pro/recipes/admin-demo/) shows the complete wiring and the PostgreSQL prerequisites. Close pools only after workers and in-flight console reads stop. Durable audit needs its separate PostgreSQL roles. Without them, the demo falls back to memory audit.
 
 ## Enable mutations deliberately
 
 Enable the specific panel action, then grant the required Operator role and scope. Configure audit and signing keys before mounting write actions. Keep previews, typed confirmations, acknowledgements and required reasons. Preserve action IDs and business inputs across retries.
 
-Quota credit operations and partition reset need different application policy. A reset affects every subject in the partition and carries expected generations. Execution resolution and uncertain webhook decisions require verified provider records. An HTTP timeout does not prove that a provider did nothing. Use the same operation key when rereading an ambiguous mutation.
+Enable credit actions with `EnableCredits` and destructive partition resets with `EnableReset`. Configure each action's role, reason and confirmation requirements before mounting. A reset clears every subject in the partition. Its preview records the expected reset generations; a later reset makes those generations stale. Execution resolution and uncertain webhook decisions require verified provider records. An HTTP timeout does not prove that a provider did nothing. Use the same action ID when you retry an action with an unknown result.
 
-This executable credit fixture calls the actual preview and commit protocol. It explicitly opts out of audit for disposable local state. Replace that opt-out with a durable audit sink in a deployment. Its output is `200 10 true applied`:
+This executable credit fixture calls the actual preview and commit protocol. It explicitly opts out of audit for disposable local state. Replace that opt-out with a durable audit sink in a deployment. It prints the HTTP status, new balance, whether the credit applied, and audit outcome: `200 10 true applied`:
 
 ```go file=site/pro-source/examples/source/quota/quotaadmin/credits_example_test.go#ExamplePanel_creditWrites
 ```
@@ -59,6 +59,6 @@ Build a tenant-scoped test principal without global or reveal permission:
 ```go file=site/pro-source/examples/source/admin/admintest/example_test.go#ExampleTenantPrincipal
 ```
 
-Exercise both permitted and denied views. Test revoked access on continuation and receipt replay. Check that malformed target input still passes authorization before the console discloses its validation result. For mutations, assert that preview performs no effect and a failed audit intent performs no mutation.
+Exercise both permitted and denied views. Test revoked access on continuation and receipt replay. Check that the console checks access before it reports a malformed target. For mutations, assert that preview performs no effect and a failed audit intent performs no mutation.
 
 Handle [admin unauthenticated](/pro/problems/admin-unauthenticated/) by obtaining a valid login. Handle [CSRF invalid](/pro/problems/admin-csrf-invalid/) by refreshing controls in the current session. On [admin timeout](/pro/problems/admin-timeout/), narrow an expensive read; after a mutation, reread state before choosing another action. The [problem catalog](/pro/problems/) distinguishes these cases.

@@ -27,26 +27,24 @@ Send a well-formed body and parameters in the format the API documents. Sending 
 
 ## Example response
 
-The package may omit diagnostic text or return it empty. Operation references do not grant access. Custom handlers can replace the body.
+If your application installs a custom handler, the body may differ.
 
-HTTP 400:
-
-```json file=site/pro-source/examples/problems/binding-failed-400.json
+```http file=site/pro-source/examples/problems/binding-failed-400.http
 ```
 
-## How to fix
+## Server correction
 
-Correct the request body or parameter representation rejected by the binder. Keep the request media type consistent with the API. Check the concrete binding error in sanitized application diagnostics.
+Check the binder's error in sanitized server logs. Keep the documented body and parameter formats aligned with the binder.
 
 ## Response fields
 
-### application call sites
+### Your application (`problem.NewError`)
 
 - `type` (string, always): The exact type URI above.
 - `title` (string, always): The catalog title in the rendered language: English by default, Japanese only when the application selects it.
 - `status` (integer, always): The HTTP status of the response.
 - `code` (string, always): The stable code above.
-- `detail` (string, optional): Display text projected by the caller, at most 256 bytes with `problem.NewError`; omitted when the caller supplies none.
+- `detail` (string, optional): Display text that your application sets, up to 256 bytes with `problem.NewError`. Omitted when you set none.
 
 Headers:
 
@@ -56,10 +54,8 @@ Headers:
 Notes:
 
 - The adapter keeps existing `WWW-Authenticate`, `Allow` and `Retry-After` headers and adds no challenge or retry advice of its own.
-- The body ends with a newline. HEAD responses have no body; their Content-Length equals the GET body's length.
+- On HEAD, the adapter's `Content-Length` equals the GET body's length.
 
 ## Related behavior
 
-Check the request and its authentication or validation policy before retrying. See [authentication](/pro/auth/) and [tenant authorization](/pro/tenant/).
-
-See the [problem catalog](/pro/problems/) for related type URIs and response rules.
+See the [problem catalog](/pro/problems/) for application error handling.

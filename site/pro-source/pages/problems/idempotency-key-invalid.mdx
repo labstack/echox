@@ -19,7 +19,7 @@ description: HTTP 400 and client guidance for idempotency_key_invalid.
 
 ## When it occurs
 
-The idempotency key header is not valid. Send exactly one field line of at most 300 bytes. It must contain one RFC 8941 string, such as `"order-42"`, or one token. Lists and repeated lines are rejected. Nothing was recorded, and the handler did not run.
+The idempotency key header is invalid. It must be one field line of at most 300 bytes, containing one RFC 8941 string, such as `"order-42"`, or one token. Execution rejects lists and repeated lines. Nothing was recorded, and the handler did not run.
 
 ## Client handling
 
@@ -27,28 +27,26 @@ Send the key once as a quoted string or token. Keep that value when retrying the
 
 ## Example response
 
-The package may omit diagnostic text or return it empty. Operation references do not grant access. Custom handlers can replace the body.
+If your application installs a custom handler, the body may differ.
 
-HTTP 400:
-
-```json file=site/pro-source/examples/problems/idempotency-key-invalid-400.json
+```http file=site/pro-source/examples/problems/idempotency-key-invalid-400.http
 ```
 
-## How to fix
+## Server correction
 
-Send exactly one Idempotency-Key field line, at most 300 bytes, using an accepted item string or bare token without parameters. Remove duplicate lines, lists and unsupported syntax.
+Check that clients and proxies preserve one `Idempotency-Key` field line. Reject duplicate lines, lists and unsupported syntax.
 
 ## Response fields
 
-### execution middleware
+### Execution middleware
 
 - `type` (string, always): The exact type URI above.
 - `title` (string, always): The HTTP status text.
 - `status` (integer, always): The HTTP status of the response.
 - `code` (string, always): The stable code above.
-- `operation_ref` (string, always): Reference to the operation, shown only after replay authorization. Empty when no operation was found. The reference helps locate the operation. It does not authorize access.
-- `operation_state` (string, always): `started`, `uncertain`, `completed` or `failed`; empty when no operation was located.
-- `safe_new_key` (boolean, always): True only when a new key is safe. Empty operation fields never allow a new key.
+- `operation_ref` (string, always): An opaque reference to the operation. It is set only after `ReplayCheck` allows the request, and is empty when no operation was found. Use it to look up the operation; it does not grant access.
+- `operation_state` (string, always): `started`, `uncertain`, `completed` or `failed`; empty when no operation was found.
+- `safe_new_key` (boolean, always): `true` only when the client may retry with a new key. It is always `false` when `operation_ref` and `operation_state` are empty.
 
 Headers:
 
@@ -56,11 +54,8 @@ Headers:
 
 Notes:
 
-- `operation_ref`, `operation_state` and `safe_new_key` are always present, even when empty or false. `Idempotent-Replayed` is removed. The body ends with a newline. HEAD responses have no body.
-- Replay returns stored responses unchanged, including problem responses. Execution does not reclassify or translate them. Only headers listed in `ReplayHeaders` are replayed. Replay adds `Idempotent-Replayed: true`.
+- Execution removes any `Idempotent-Replayed` header from problem responses.
 
 ## Related behavior
 
-See [execution](/pro/execution/) for operation state and replay rules. Preserve the operation key. An uncertain outcome requires provider records and reconciliation. A timeout alone never proves that an effect did not occur.
-
-See the [problem catalog](/pro/problems/) for related type URIs and response rules.
+See [execution](/pro/execution/) for operation state and replay rules.

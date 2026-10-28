@@ -27,27 +27,25 @@ To retry the original credit, resend it with the same ID and the original amount
 
 ## Example response
 
-The package may omit diagnostic text or return it empty. Operation references do not grant access. Custom handlers can replace the body.
+If your application installs a custom handler, the body may differ.
 
-HTTP 409:
-
-```json file=site/pro-source/examples/problems/credit-conflict-409.json
+```http file=site/pro-source/examples/problems/credit-conflict-409.http
 ```
 
-## How to fix
+## Server correction
 
-Recover the original credit operation's amount and reuse its ID only with that amount. A genuinely new adjustment needs its own ID. Do not mint another ID to conceal an unknown earlier credit outcome.
+Check the original credit operation's ID and amount. If its outcome is unknown, do not retry under a new ID.
 
 ## Response fields
 
-### quota administration routes
+### Quota administration routes
 
 - `code` (string, always): The stable code above.
 - `type` (string, always): The exact type URI above.
 - `title` (string, always): English title. Quota administration routes use their own titles for some codes.
 - `status` (integer, always): The HTTP status of the response.
 - `detail` (string, optional): Human-readable explanation, omitted when empty. Its wording is not a stable format.
-- `violated-policies` (array, always): IDs of the limits involved: `[]` when there are none, never null. The hyphenated name is a legacy exception to the naming rule for new members.
+- `violated-policies` (array, always): IDs of the limits involved: `[]` when there are none, never null.
 
 Headers:
 
@@ -55,30 +53,27 @@ Headers:
 
 Notes:
 
-- The members match the quota middleware's. The body ends with a newline. HEAD responses have no body.
 - Returned by `POST /credits`.
 
-### admin console
+### Admin console
 
 - `code` (string, always): The stable code above.
-- `detail` (string, always): Always present and often empty. Contains safe display text without underlying errors.
+- `detail` (string, always): The console always sends `detail`. It is often empty and never contains the underlying error.
 - `status` (integer, always): The HTTP status of the response.
-- `title` (string, always): The HTTP status text, unless the problem carries a classified title.
+- `title` (string, always): The HTTP status text, such as `Conflict`, unless the panel supplies its own title.
 - `type` (string, always): The exact type URI above.
 
 Headers:
 
-- `Cache-Control` (always): `no-store` on every console problem response, together with the console's security headers.
+- `Cache-Control` (always): `no-store`. The console sends it on every problem response, along with its usual security headers.
 
 Notes:
 
-- Fields are written in key order. The body ends with a newline. The type URI uses `https://echo.labstack.com/pro/problems/` followed by the hyphenated code. HEAD responses have no body.
-- Every 404 response is rewritten to `admin_not_found` with an empty `detail`.
-- The console renders this ID in its own shape when a panel returns it as an `admin.Problem` outside an action commit. Its title is the console's status text, `Conflict`, unless a classified title is supplied.
-- A credit action's conflict at commit is not a problem response: it is an application/json action result whose `audit.code` is `credit_conflict` and whose outcome is `refused`.
+- Fields are written in alphabetical order.
+- The console rewrites every 404 response to `admin_not_found` with an empty `detail`.
+- The console renders this problem in its own format when a panel returns it as an `admin.Problem` outside an action commit. Its title is `Conflict` unless the panel supplies one.
+- When a credit action conflicts at commit, the console does not return a problem. It returns an `application/json` action result with `audit.code` set to `credit_conflict` and outcome `refused`.
 
 ## Related behavior
 
-See [quota](/pro/quota/) for plan, credit and administration behavior. Check the verified tenant and principal, the selected plan and request cost before retrying.
-
-See the [problem catalog](/pro/problems/) for related type URIs and response rules.
+See [quota](/pro/quota/) for plans, credit adjustments and usage.

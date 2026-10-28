@@ -1,5 +1,5 @@
 ---
-title: Admin action id reused
+title: Admin action ID reused
 description: HTTP 409 and client guidance for admin_action_id_reused.
 ---
 
@@ -19,7 +19,7 @@ description: HTTP 409 and client guidance for admin_action_id_reused.
 
 ## When it occurs
 
-The console refused an action commit because it could not tie the commit to one consistent action. The confirmation token may be missing, malformed or invalid for this action and input. The receipt cache may hold different input under this `action_id`. The audit sink may also report the same action ID with different content.
+The console refused an action commit. The confirmation token is missing, malformed or invalid for this action and input; the receipt cache holds different input under this `action_id`; or the audit sink already has this action ID with different content.
 
 ## Client handling
 
@@ -27,38 +27,34 @@ When the confirmation does not verify, request a new preview and commit with the
 
 ## Example response
 
-The package may omit diagnostic text or return it empty. Operation references do not grant access. Custom handlers can replace the body.
+If your application installs a custom handler, the body may differ.
 
-HTTP 409:
-
-```json file=site/pro-source/examples/problems/admin-action-id-reused-409.json
+```http file=site/pro-source/examples/problems/admin-action-id-reused-409.http
 ```
 
-## How to fix
+## Server correction
 
-Restore the original action ID and business input for a retry. If this is a different intended action, obtain a fresh preview and action ID. Do not change the ID merely because the previous mutation's response was lost.
+Check that action forms preserve their `action_id`, confirmation and input across retries. A different action needs a new preview. A lost response must not generate a new action ID.
 
 ## Response fields
 
-### admin console
+### Admin console
 
 - `code` (string, always): The stable code above.
-- `detail` (string, always): Always present and often empty. Contains safe display text without underlying errors.
+- `detail` (string, always): The console always sends `detail`. It is often empty and never contains the underlying error.
 - `status` (integer, always): The HTTP status of the response.
-- `title` (string, always): The HTTP status text, unless the problem carries a classified title.
+- `title` (string, always): The HTTP status text, such as `Conflict`, unless the panel supplies its own title.
 - `type` (string, always): The exact type URI above.
 
 Headers:
 
-- `Cache-Control` (always): `no-store` on every console problem response, together with the console's security headers.
+- `Cache-Control` (always): `no-store`. The console sends it on every problem response, along with its usual security headers.
 
 Notes:
 
-- Fields are written in key order. The body ends with a newline. The type URI uses `https://echo.labstack.com/pro/problems/` followed by the hyphenated code. HEAD responses have no body.
-- Every 404 response is rewritten to `admin_not_found` with an empty `detail`.
+- Fields are written in alphabetical order.
+- The console rewrites every 404 response to `admin_not_found` with an empty `detail`.
 
 ## Related behavior
 
-The [admin console](/pro/admin/) returns this problem. Check the authenticated role, resolved scope and requested action. For backend failures, inspect application diagnostics before retrying a mutation with its original action ID.
-
-See the [problem catalog](/pro/problems/) for related type URIs and response rules.
+See the [admin console](/pro/admin/) for access checks, action IDs and audit failures.

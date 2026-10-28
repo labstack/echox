@@ -16,7 +16,7 @@ The [execution overview](/pro/execution/) explains permits, proof limits and ret
 
 ## Bind a route and replay a conditional result
 
-Construct one `MiddlewareConfig` for an explicit operation in the journal's policy map. `Identity` supplies tenant and subject. `ReplayCheck` authorizes current access before new work or replay. This complete source file includes the shared configuration and request helper. Its first example executes the handler once across two requests and replays the second response with `Idempotent-Replayed: true`.
+Create one `MiddlewareConfig` per operation. The operation must exist in the journal's policy map. `Identity` supplies tenant and subject. `ReplayCheck` authorizes current access before new work or replay. This complete source file includes the shared configuration and request helper. Its first example executes the handler once across two requests and replays the second response with `Idempotent-Replayed: true`.
 
 ```go file=site/pro-source/examples/source/execution/http_example_test.go
 ```
@@ -25,7 +25,7 @@ The fixture callbacks use fixed tenant and subject values and permissive replay 
 
 ## Place preparation before quota and validation
 
-Use `Prepare()` before quota when malformed keys should refuse before quota charges the request. Keep authentication before preparation. Put request validation between quota and execution when its attempts are charged. `NotExecuted` refunds unused work through `quota.Charge` while leaving omitted request units charged.
+Put `Prepare()` before quota if requests with a malformed key should fail without a quota charge. Keep authentication before preparation. Put validation between quota and execution if failed validation should still count against quota. `NotExecuted` refunds unused work through `quota.Charge` while leaving omitted request units charged.
 
 The complete HTTP source's `ExampleMiddlewareConfig_Prepare` reserves 100 tokens, charges actual use of 60, and performs a replay. It drains settlement with `Limiter.Close`. Its output is two successful HTTP attempts, `requests: 2` and `tokens: 60`. Validation that exits before execution must perform its own refund.
 
@@ -34,7 +34,7 @@ The complete HTTP source's `ExampleMiddlewareConfig_Prepare` reserves 100 tokens
 `ExampleAttemptFrom` in the same HTTP source persists an intent and simulates interruption after provider success. Its retry returns 409 `operation_uncertain` with `safe_new_key=false`. The authorized operator reads the record and verifies provider success.
 It prepares an applied resolution with a reconstructed HTTP result. The next request replays `200 recovered true`.
 
-Replace simulated provider success with one identical provider request under the permit deadline. Reconstruct it from a durable payload reference. Disable hidden SDK retries and redirects. Persist the decision ID and prepared operator request across a lost response. Do not switch keys to work around uncertainty.
+Replace simulated provider success with one identical provider request under the permit deadline. Reconstruct it from a durable payload reference. Disable hidden SDK retries and redirects. Store the decision ID and the prepared request, so you can retry if the response is lost. Do not switch keys to work around uncertainty.
 
 ## Freeze problem responses through Echo's error handler
 
@@ -44,7 +44,7 @@ It changes rendering language and checks that replay keeps the original English 
 ```go file=site/pro-source/examples/source/execution/problem_example_test.go
 ```
 
-Problem middleware inside execution cannot render into its private buffered writer. Use the configured error handler. Classify a known business refusal with `execution.Failed` before returning the typed error. An unclassified error after intent remains uncertain.
+Do not render problems with middleware placed inside execution. Execution buffers the response, and that middleware cannot write to the buffer. Use the configured error handler. Classify a known business refusal with `execution.Failed` before returning the typed error. An unclassified error after intent remains uncertain.
 
 ## Instrument provider timing without resending
 
@@ -53,11 +53,11 @@ Capture the local start before obtaining a permit. Pass the permit and start to 
 ```go file=site/pro-source/examples/source/execution/call_example_test.go
 ```
 
-Keep `OnTransition` and `OnError` prompt and concurrency safe. Do not reenter the same attempt from those callbacks. Size result, record and namespace budgets independently of the process heap.
+Keep `OnTransition` and `OnError` prompt and concurrency safe. Do not reenter the same attempt from those callbacks. Set `MaxResultBytes`, `MaxNamespaceBytes` and `MaxNamespaceRecords` for stored data. These are storage limits; they do not cap your process heap.
 
 ## Use PostgreSQL and local transactions
 
-Apply `pgstore.Migrate` with a deployment pool and reviewed schema configuration, then `pgstore.New` with a caller-owned runtime pool. Keep synchronous commit, replication and restore policy consistent with your retry guarantee. Inspect the shipped migration through `pgstore.Migrations`; it is a template and only `Migrate` is the supported application path.
+Apply `pgstore.Migrate` with a deployment pool and reviewed schema configuration, then `pgstore.New` with a caller-owned runtime pool. If a lost record must not allow a second send, use synchronous commit and replication. You can read the SQL through `pgstore.Migrations`. Apply it only with `Migrate`.
 
 Use `TxRunner` only for local transactional SQL. Its callback cannot perform provider I/O. This compiled source demonstrates transaction handling and distinguishes a known rollback from an unknown COMMIT:
 
@@ -68,10 +68,10 @@ The database examples without `Output` compile during Go tests and require real 
 
 ## Run reconciliation with an owned lifecycle
 
-Use one retained operator and explicit scope mappings. Set namespace and target authorization callbacks. Start the scheduler under an application context, cancel it at shutdown and join it. A stop error can retain a pending prepared request.
+Create one operator and keep it for the scheduler's lifetime. Map scopes explicitly. Set namespace and target authorization callbacks. Start the scheduler under an application context, cancel it at shutdown and join it. If `Run` stops with an error, a prepared request may still be pending.
 Retry it with the original operator before starting replacement work.
 
 ```go file=site/pro-source/examples/source/execution/scheduler_example_test.go
 ```
 
-Expose authorized inspection through `executionadmin` in the [console](/pro/admin/). Follow the client guidance for [operation uncertain](/pro/problems/operation-uncertain/), [policy changed](/pro/problems/operation-policy-changed/) and [result unavailable](/pro/problems/operation-result-unavailable/). A retained result missing from storage does not rerun its handler.
+Expose authorized inspection through `executionadmin` in the [console](/pro/admin/). Follow the client guidance for [operation uncertain](/pro/problems/operation-uncertain/), [policy changed](/pro/problems/operation-policy-changed/) and [result unavailable](/pro/problems/operation-result-unavailable/). If a saved result is missing, the middleware returns `operation_result_unavailable`. It does not rerun the handler.

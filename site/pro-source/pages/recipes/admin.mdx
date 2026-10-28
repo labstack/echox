@@ -27,13 +27,13 @@ Start the example:
 ```sh file=site/pro-source/examples/site-docs/commands.sh#admin
 ```
 
-The process listens on `127.0.0.1:8080`. It remains running until Ctrl-C. It does not print a startup banner on successful construction. Open `http://127.0.0.1:8080/admin` in your browser.
+The process listens on `127.0.0.1:8080`. It remains running until Ctrl-C. It prints nothing when it starts. Open `http://127.0.0.1:8080/admin` in your browser.
 
 ## Step 2: inspect the quota panel
 
 The principal is `local-reader`, restricted to tenant `demo`, with the default Viewer role. Select the `team` plan in quota usage. The plan has a 100-unit daily `calls` counter and a `credits` balance on the `tokens` meter. The program registers no business routes that consume them, so this is an inspection fixture.
 
-Write actions are absent. This is a useful first check: a successful login alone does not enable credit changes or reset. The view reads the same limiter supplied to `quotaadmin.New`.
+The panel shows no write actions. Login alone does not enable credit changes or reset. The view reads the same limiter supplied to `quotaadmin.New`.
 
 ## Step 3: inspect middleware order
 
@@ -44,7 +44,7 @@ Read the complete runnable source:
 ```go file=site/pro-source/examples/admin/main.go
 ```
 
-`Authenticate` returns a fixed principal because this is a local fixture. The random session binding lasts for one process. A production callback maps a real validated login and its session ID. Use exact deployment origins and retain signing keys when continuations or actions span instances.
+`Authenticate` returns a fixed principal because this is a local fixture. The random session binding lasts for one process. A production callback maps a real validated login and its session ID. Set exact deployment origins. If page cursors or actions can reach other instances, share the signing keys.
 
 ## Step 4: stop the program
 

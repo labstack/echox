@@ -27,39 +27,31 @@ Add credits or reduce the request's cost before retrying. An unchanged request r
 
 ## Example response
 
-The package may omit diagnostic text or return it empty. Operation references do not grant access. Custom handlers can replace the body.
+If your application installs a custom handler, the body may differ.
 
-HTTP 402:
-
-```json file=site/pro-source/examples/problems/insufficient-credits-402.json
+```http file=site/pro-source/examples/problems/insufficient-credits-402.http
 ```
 
-## How to fix
+## Server correction
 
-Fund the correct prepaid balance or reduce the work cost. Check the trusted tenant, selected plan and meter before applying credits. Reuse a credit adjustment ID only with its original amount.
+Check the verified tenant, selected plan and credit meter before adding funds. Reuse a credit adjustment ID only with its original amount.
 
 ## Response fields
 
-### quota middleware
+### Quota middleware
 
 - `code` (string, always): The stable code above.
 - `type` (string, always): The exact type URI above.
 - `title` (string, always): English title. Quota administration routes use their own titles for some codes.
 - `status` (integer, always): The HTTP status of the response.
 - `detail` (string, optional): Human-readable explanation, omitted when empty. Its wording is not a stable format.
-- `violated-policies` (array, always): IDs of the limits involved: `[]` when there are none, never null. The hyphenated name is a legacy exception to the naming rule for new members.
+- `violated-policies` (array, always): IDs of the limits involved: `[]` when there are none, never null.
 
 Headers:
 
-- `RateLimit-Policy`, `RateLimit` (conditional): Draft-11 rate-limit fields, sent by the middleware when `Headers` is `Draft11` (the default) or `Draft11AndLegacy` and the plan has a limit to report. `UsageHandler` does not send them.
+- `RateLimit-Policy`, `RateLimit` (conditional): Draft-11 rate-limit fields. The middleware sends them when `Headers` is `Draft11` (the default) or `Draft11AndLegacy`. It skips them when the plan has no limit to report. `UsageHandler` never sends them.
 - `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset` (conditional): Legacy rate-limit fields, sent by the middleware when `Headers` is `Legacy` or `Draft11AndLegacy`.
-
-Notes:
-
-- Optional members are omitted when absent, and the body ends with a newline. HEAD responses have no body.
 
 ## Related behavior
 
-See [quota](/pro/quota/) for plan, credit and administration behavior. Check the verified tenant and principal, the selected plan and request cost before retrying.
-
-See the [problem catalog](/pro/problems/) for related type URIs and response rules.
+See [quota](/pro/quota/) for plans, credit adjustments and usage.

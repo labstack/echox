@@ -16,7 +16,7 @@ The [authentication overview](/pro/auth/) explains credential selection and JWKS
 
 ## Issue and retain a service key
 
-Load a pepper ring from your runtime secret manager. Set the subject to a stable application subject. Set `KeyOptions.TenantRestriction` for a single-tenant service. Retain `StoredKey`; deliver the returned credential once. This example prints only lengths, the pepper version and tenant. It does not print the credential.
+Load a pepper ring from your runtime secret manager. Use a subject that never changes, such as `invoice-worker`. Set `KeyOptions.TenantRestriction` for a single-tenant service. Retain `StoredKey`; deliver the returned credential once. This example prints only lengths, the pepper version and tenant. It does not print the credential.
 
 ```go file=site/pro-source/examples/source/auth/example_test.go#ExampleIssueKey
 ```
@@ -60,7 +60,7 @@ Build `authbind.Middleware(authCfg, tenantCfg)` first. Construct `authbind.Quota
 ```go file=site/pro-source/examples/getting-started/main.go#site-group
 ```
 
-Authenticate and select the tenant before a quota usage route too. Public operations need an explicit fallback policy and metering decision. Do not derive a quota tenant from an unverified request header.
+Authenticate and select the tenant before a quota usage route too. For public operations, set `Fallback` explicitly and decide whether quota applies. Do not derive a quota tenant from an unverified request header.
 
 ## Handle authentication failures
 
@@ -70,6 +70,8 @@ Test an absent credential, a malformed credential and a valid credential without
 Test discovery and key rotation against your deployed issuer.
 
 ## Map an already verified MCP principal
+
+Use this when the MCP Go SDK has already verified the bearer token.
 
 `MCPMapping.Principal` accepts verified SDK `TokenInfo`. It does not authenticate tool arguments. Configure the namespace and the trusted extra-field name used for the tenant restriction. Keep this namespace distinct from unrelated HTTP schemes unless they intentionally produce the same principal IDs.
 

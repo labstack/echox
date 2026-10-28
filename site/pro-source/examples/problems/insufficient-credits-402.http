@@ -1,0 +1,12 @@
+HTTP/1.1 402 Payment Required
+Content-Type: application/problem+json
+
+{
+  "code": "insufficient_credits",
+  "status": 402,
+  "title": "Request cannot be satisfied as prepaid credits are insufficient",
+  "type": "https://echo.labstack.com/pro/problems/insufficient-credits",
+  "violated-policies": [
+    "requests"
+  ]
+}

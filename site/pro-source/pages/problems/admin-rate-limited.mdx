@@ -19,7 +19,7 @@ description: HTTP 429 and client guidance for admin_rate_limited.
 
 ## When it occurs
 
-The principal sent more console requests than its rate limit allows. Each principal gets separate default buckets for reads, writes and probes. Reads allow 10 requests per second with burst 30. Writes allow 12 per minute with burst 12. Probes allow six per minute with burst six. `Config.RateLimit` replaces these buckets. Middleware that returns HTTP 429 is reported with this code too.
+The principal sent more console requests than its rate limit allows. Each principal gets separate default buckets for reads, writes and probes. Reads allow 10 requests per second with burst 30. Writes allow 12 per minute with burst 12. Probes allow six per minute with burst six. `Config.RateLimit` replaces these buckets. The console also uses this code when `Config.Middleware` returns HTTP 429.
 
 ## Client handling
 
@@ -27,39 +27,35 @@ Wait for the number of seconds in `Retry-After`, then retry. Reduce automated po
 
 ## Example response
 
-The package may omit diagnostic text or return it empty. Operation references do not grant access. Custom handlers can replace the body.
+If your application installs a custom handler, the body may differ.
 
-HTTP 429:
-
-```json file=site/pro-source/examples/problems/admin-rate-limited-429.json
+```http file=site/pro-source/examples/problems/admin-rate-limited-429.http
 ```
 
-## How to fix
+## Server correction
 
-Reduce console request frequency and respect the supplied retry advice. Avoid automatic view polling. A mutation retry keeps the same action ID after limit check becomes available.
+Reduce automated polling and check `Config.RateLimit`. Action clients must preserve the action ID when retrying.
 
 ## Response fields
 
-### admin console
+### Admin console
 
 - `code` (string, always): The stable code above.
-- `detail` (string, always): Always present and often empty. Contains safe display text without underlying errors.
+- `detail` (string, always): The console always sends `detail`. It is often empty and never contains the underlying error.
 - `status` (integer, always): The HTTP status of the response.
-- `title` (string, always): The HTTP status text, unless the problem carries a classified title.
+- `title` (string, always): The HTTP status text, such as `Conflict`, unless the panel supplies its own title.
 - `type` (string, always): The exact type URI above.
 
 Headers:
 
-- `Cache-Control` (always): `no-store` on every console problem response, together with the console's security headers.
+- `Cache-Control` (always): `no-store`. The console sends it on every problem response, along with its usual security headers.
 - `Retry-After` (conditional): Whole seconds, at least 1. Sent when the console's rate limit, built in or `Config.RateLimit`, refused the request.
 
 Notes:
 
-- Fields are written in key order. The body ends with a newline. The type URI uses `https://echo.labstack.com/pro/problems/` followed by the hyphenated code. HEAD responses have no body.
-- Every 404 response is rewritten to `admin_not_found` with an empty `detail`.
+- Fields are written in alphabetical order.
+- The console rewrites every 404 response to `admin_not_found` with an empty `detail`.
 
 ## Related behavior
 
-The [admin console](/pro/admin/) returns this problem. Check the authenticated role, resolved scope and requested action. For backend failures, inspect application diagnostics before retrying a mutation with its original action ID.
-
-See the [problem catalog](/pro/problems/) for related type URIs and response rules.
+See the [admin console](/pro/admin/) for access checks, action IDs and audit failures.

@@ -19,46 +19,42 @@ description: HTTP 503 and client guidance for admin_audit_unavailable.
 
 ## When it occurs
 
-The console could not durably record the audit intent of an action, so it did not run the action. Either no audit sink is configured and unaudited writes are not allowed, or the sink failed.
+The console could not write the action's intent record to the audit sink, so it did not run the action. This happens when `Config.Audit` is nil and `AllowUnauditedWrites` is false, or when the sink returns an error.
 
 ## Client handling
 
-No change was made. Retry later with the same `action_id` and input. Operators should check the audit sink.
+No change was made. Retry later with the same `action_id` and input.
 
 ## Example response
 
-The package may omit diagnostic text or return it empty. Operation references do not grant access. Custom handlers can replace the body.
+If your application installs a custom handler, the body may differ.
 
-HTTP 503:
-
-```json file=site/pro-source/examples/problems/admin-audit-unavailable-503.json
+```http file=site/pro-source/examples/problems/admin-audit-unavailable-503.http
 ```
 
-## How to fix
+## Server correction
 
-Restore the configured audit sink's ability to accept an intent record. Check capacity, permissions and its recording deadline. The refused attempt performed no mutation; retain the original action ID when retrying.
+Fix the audit sink so it accepts intent records. Check capacity, permissions and the recording deadline. No mutation ran for this attempt.
 
 ## Response fields
 
-### admin console
+### Admin console
 
 - `code` (string, always): The stable code above.
-- `detail` (string, always): Always present and often empty. Contains safe display text without underlying errors.
+- `detail` (string, always): The console always sends `detail`. It is often empty and never contains the underlying error.
 - `status` (integer, always): The HTTP status of the response.
-- `title` (string, always): The HTTP status text, unless the problem carries a classified title.
+- `title` (string, always): The HTTP status text, such as `Conflict`, unless the panel supplies its own title.
 - `type` (string, always): The exact type URI above.
 
 Headers:
 
-- `Cache-Control` (always): `no-store` on every console problem response, together with the console's security headers.
+- `Cache-Control` (always): `no-store`. The console sends it on every problem response, along with its usual security headers.
 
 Notes:
 
-- Fields are written in key order. The body ends with a newline. The type URI uses `https://echo.labstack.com/pro/problems/` followed by the hyphenated code. HEAD responses have no body.
-- Every 404 response is rewritten to `admin_not_found` with an empty `detail`.
+- Fields are written in alphabetical order.
+- The console rewrites every 404 response to `admin_not_found` with an empty `detail`.
 
 ## Related behavior
 
-The [admin console](/pro/admin/) returns this problem. Check the authenticated role, resolved scope and requested action. For backend failures, inspect application diagnostics before retrying a mutation with its original action ID.
-
-See the [problem catalog](/pro/problems/) for related type URIs and response rules.
+See the [admin console](/pro/admin/) for access checks, action IDs and audit failures.

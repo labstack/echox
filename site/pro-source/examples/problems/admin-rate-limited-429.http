@@ -1,0 +1,11 @@
+HTTP/1.1 429 Too Many Requests
+Content-Type: application/problem+json
+Cache-Control: no-store
+
+{
+  "code": "admin_rate_limited",
+  "detail": "",
+  "status": 429,
+  "title": "Too Many Requests",
+  "type": "https://echo.labstack.com/pro/problems/admin-rate-limited"
+}

@@ -7,13 +7,15 @@ sidebar:
 
 {/* Diataxis: how-to */}
 
-## When to use this guide
+## Before you start
 
-Install `echo.labstack.com/pro v0.1.0` through `go.labstack.io`. You need Go 1.26 or later, an application module and an organisation download token. The module requires Echo v5.4.2. Private repository access is unnecessary. The token authenticates module downloads and is not an application runtime license key.
+Use this page before your first `go get`, and when you set up CI, Docker or an offline build.
+
+Install `echo.labstack.com/pro v0.1.0` through `go.labstack.io`. You need Go 1.26 or later, an application module and an organisation download token. The module requires Echo v5.4.2. You do not need access to a private Git repository. The token only authenticates module downloads. Your application never checks it at run time.
 
 ## Set up local development
 
-1. Open your private `.netrc` in a local editor. On Unix it is `~/.netrc`; Windows uses `%USERPROFILE%\_netrc`. Add the following entry, substituting your organisation slug and token in that editor. Keep the value in your credential manager and out of source control, shell history and logs.
+1. Open your `.netrc` file in an editor. On Unix it is `~/.netrc`; Windows uses `%USERPROFILE%\_netrc`. Add the entry below. Replace the organisation slug and token with your own. Keep the value in your credential manager and out of source control, shell history and logs.
 
 ```text file=site/pro-source/examples/site-docs/netrc.example
 ```
@@ -28,40 +30,40 @@ Install `echo.labstack.com/pro v0.1.0` through `go.labstack.io`. You need Go 1.2
 ```sh file=site/pro-source/examples/site-docs/commands.sh#install
 ```
 
-If you already have `GOPRIVATE` patterns, append `echo.labstack.com` to that comma-separated list instead of replacing it. Use the bare host pattern. `echo.labstack.com/*` does not cover the bare-host discovery lookup used by the verified registry flow. Preserve existing private patterns in `GONOSUMDB` and `GONOPROXY` too if those variables are set explicitly.
+If you already have `GOPRIVATE` patterns, append `echo.labstack.com` to that comma-separated list instead of replacing it. The pattern must include the bare host. If you set `GONOSUMDB` or `GONOPROXY` yourself, append to those lists too.
 
-Go fetches `https://echo.labstack.com/pro?go-get=1` and discovers the module proxy at `https://go.labstack.io`. Credentials belong to the registry host. An entry for only `echo.labstack.com` does not authenticate registry downloads. `GOPRIVATE` bypasses the public proxy and checksum database for matching modules. Public dependencies continue through their normal public services.
+Go fetches `https://echo.labstack.com/pro?go-get=1` and discovers the module proxy at `https://go.labstack.io`. Put the credentials on the `go.labstack.io` machine entry. A `.netrc` entry for `echo.labstack.com` alone does not authenticate downloads. `GOPRIVATE` bypasses the public proxy and checksum database for matching modules. Public dependencies continue through their normal public services.
 
-Successful installation records the version in `go.mod` and hashes in `go.sum`. `go mod verify` reports `all modules verified` when the downloaded cache matches its recorded hashes. Commit both module files. Start with the [local application tutorial](/pro/getting-started/) to exercise a compiled example.
+`go get` writes the version to `go.mod` and its hashes to `go.sum`. `go mod verify` reports `all modules verified` when the downloaded cache matches its recorded hashes. Commit both module files. Next, run the [getting-started tutorial](/pro/getting-started/).
 
 ## Use a corporate module mirror
 
-Configure `go.labstack.io` as an authenticated upstream of your corporate mirror. Keep the registry token on that upstream, according to the mirror's credential policy. Use the mirror as the Go proxy:
+Configure `go.labstack.io` as an authenticated upstream of your corporate mirror. Store the registry token in the mirror's upstream configuration. Use the mirror as the Go proxy:
 
 ```sh file=site/pro-source/examples/site-docs/commands.sh#mirror
 ```
 
-`GONOPROXY=none` is necessary here because an inherited `GOPRIVATE` would otherwise bypass the explicit mirror. `GONOSUMDB=echo.labstack.com` excludes Pro from the public checksum database. Preserve your organisation's other private patterns.
+Set `GONOPROXY=none`. Without it, `GOPRIVATE` makes Go skip the mirror for Pro. `GONOSUMDB=echo.labstack.com` excludes Pro from the public checksum database. Preserve your organisation's other private patterns.
 
-A proxy chain that asks a public proxy before `go.labstack.io` sends module paths and requested versions to that public service. Go advances a comma-separated proxy chain on 404 or 410. A 401 or 403 is an authentication or entitlement error and does not authorize a public fallback for private source. Use direct private discovery or the approved mirror when module names must remain private.
+If `GOPROXY` lists a public proxy before `go.labstack.io`, Go sends the Pro module path and version to that public proxy. Go advances a comma-separated proxy chain on 404 or 410. A 401 or 403 means the token is missing, invalid or not entitled. Fix the token; do not add a public proxy as a fallback. To keep module names private, use direct discovery or your approved mirror.
 
 ## Configure GitHub Actions
 
-Store a customer registry token as the repository or environment secret `ECHO_PRO_TOKEN`. The workflow writes a temporary mode-600 netrc and disables module caching.
+Store a customer registry token as the repository or environment secret `ECHO_PRO_TOKEN`. The workflow writes a temporary netrc with mode 600. It turns off module caching.
 It downloads and verifies modules, then tests and builds the application.
-An always-run step removes the credential. It uses full-SHA Action pins and Go 1.27.3.
+An always-run step removes the credential. The workflow pins each Action to a full commit SHA and uses Go 1.27.3.
 
 ```yaml file=site/pro-source/examples/site-docs/github-actions.yml
 ```
 
-Save the workflow in your application's workflow directory. Keep `go.mod` pinned to v0.1.0 and `go.sum` committed before enabling the job. Run this credentialed job only where the secret is available to trusted code. Fork pull requests do not receive repository secrets by default.
-Run public checks separately or use your approved internal workflow for those changes. Restrict any private-module cache to licensed users if you later enable caching.
+Save the workflow in your application's workflow directory. Before you enable the job, commit `go.mod` (pinned to v0.1.0) and `go.sum`. Run this job only for trusted code. Any step in the job can read the secret. Fork pull requests do not receive repository secrets by default.
+Run checks for fork pull requests in a separate workflow that has no secret. If you turn on module caching later, restrict the cache to licensed users.
 
-`NETRC` points Go at the temporary credential file. The token appears only in the credential-setup step's environment. Shell tracing is disabled before it is written. A failed download still reaches cleanup. Check the action pins against your application's update policy when adopting the example.
+`NETRC` points Go at the temporary credential file. The token appears only in the credential-setup step's environment. That step turns off shell tracing before it writes the file. The cleanup step runs even when the download fails. When you copy the workflow, update the Action pins under your own update policy.
 
 ## Build an application image with Docker
 
-Use a BuildKit-capable Docker builder. Copy this Dockerfile into an application whose entry point is `./cmd/server`; change that path for your application. The download step mounts the netrc as a secret. The build step runs with network access disabled after dependencies are present.
+Use a BuildKit-capable Docker builder. The Dockerfile builds `./cmd/server`, which your application supplies. Echo Pro does not ship that command. Change the path to your main package. The download step mounts the netrc as a secret. The build step runs without network access.
 
 ```dockerfile file=site/pro-source/examples/site-docs/Dockerfile
 ```
@@ -71,13 +73,13 @@ Pass the credential as a build secret:
 ```sh file=site/pro-source/examples/site-docs/commands.sh#docker-build
 ```
 
-Keep `.netrc` outside the build context and exclude any local credential/configuration files through your application's `.dockerignore`. Never pass the token as a build argument, environment instruction or copied file. The final image contains the static binary and CA certificates. Supply runtime application secrets separately. Copy time-zone data too if your application loads named time zones at runtime. Pin the builder image to a reviewed digest in your application's image-update process.
+Keep `.netrc` outside the build context. List local credential and config files in `.dockerignore`. Never pass the token as a build argument, environment instruction or copied file. The final image contains the static binary and CA certificates. Pass runtime secrets to the container when it starts, not during the build. Copy time-zone data too if your application loads named time zones at runtime. Pin the builder image to a reviewed digest in your application's image-update process.
 
-The Dockerfile is an application build template. Its `./cmd/server` entry point is supplied by your application; it is not a command shipped by Echo Pro. The documentation checks validate the file and how it handles credentials. A licensed application's Docker build still needs an entitled token and its own build verification.
+The Dockerfile is an application build template. Echo Pro's documentation tests validate this file and its credential handling. Your own build still needs an entitled token, and you must test it.
 
 ## Build without registry access
 
-Vendor dependencies on an entitled machine and transfer the reviewed source and vendor tree through your approved private artifact path:
+On a machine with registry access, vendor the dependencies. Move the source and `vendor` directory to the offline builder through your approved private channel:
 
 ```sh file=site/pro-source/examples/site-docs/commands.sh#vendor
 ```
@@ -91,20 +93,36 @@ Probe the exact pinned metadata URL without printing the credential or response 
 ```sh file=site/pro-source/examples/site-docs/commands.sh#proxy-probe
 ```
 
-A 200 confirms that this credential can read v0.1.0 metadata. A 401 means missing or invalid credentials. Check the machine name `go.labstack.io`, the password field, `NETRC`/home selection and token revocation. The registry ignores login and checks only the password. A wrong slug does not cause 401. Do not put the token in a URL or paste it into diagnostics.
+A 200 confirms that this credential can read v0.1.0 metadata. A 401 means missing or invalid credentials. Check four things: the machine name is `go.labstack.io`; `password` holds the token; Go reads the netrc you expect (`NETRC` or your home directory); the token is not revoked. The registry ignores `login` and checks only `password`. A wrong slug does not cause 401. Do not put the token in a URL or paste it into diagnostics.
 
-A 403 means a valid token failed organisation or version entitlement. Check the requested version and organisation state through your onboarding/support channel. A lapsed subscription can retain access to previously entitled versions; revoked organisations are refused. Clearing the module cache or disabling checksums cannot repair entitlement.
+A 403 means the token is valid, but your organisation is not entitled to that version. Check the version you requested. Then ask support to check your organisation's status. After a subscription lapses, the token can still download versions you were entitled to. A revoked organisation gets 403. Clearing the module cache or turning off checksums does not fix a 403.
 
-## Repair checksum lookups and module updates
+## Check checksum settings
 
-Inspect these settings locally before sharing a sanitized diagnosis:
+Print these settings locally. Remove credentials before you share the output:
 
 ```sh file=site/pro-source/examples/site-docs/commands.sh#settings
 ```
 
-If Go contacts `sum.golang.org` for Pro, check the effective `GONOSUMDB` and `GOPRIVATE` patterns. An explicit `GONOSUMDB` overrides the default inherited from `GOPRIVATE`. Exclude the private host while leaving public checksums enabled. Keep existing `go.sum` hashes. On a checksum mismatch, compare the downloaded module against the release manifest verification instructions and public signing key from onboarding. Do not delete an expected hash merely to accept different bytes.
+If Go contacts `sum.golang.org` for Pro, check the effective `GONOSUMDB` and `GOPRIVATE` patterns. An explicit `GONOSUMDB` overrides the default inherited from `GOPRIVATE`. Exclude only `echo.labstack.com`, so public modules still use the checksum database.
+
+## Verify a checksum mismatch
+
+Keep existing `go.sum` hashes. On a checksum mismatch, verify the download with the release manifest and the public signing key from onboarding. Do not delete the `go.sum` line to make the build pass.
+
+## Update module files
 
 `-mod=readonly` has been the default for builds since Go 1.16 when vendoring is not selected.
-It rejects builds that need to update `go.mod`. Use `go get` for an intentional dependency update, then review `go.mod` and `go.sum`. The `go get` command omits the `-mod` flag and ignores that setting in `GOFLAGS`. `GOFLAGS=-mod=vendor` makes builds and tests use the vendor tree; a new import remains unavailable until you regenerate that tree. For the Docker template, download the complete dependency set before the offline readonly build.
+It rejects builds that need to update `go.mod`. Use `go get` for an intentional dependency update, then review `go.mod` and `go.sum`. `go get` has no `-mod` flag, and it ignores `-mod` in `GOFLAGS`.
 
-If a corporate proxy is unexpectedly bypassed, inspect `GONOPROXY`. If registry authentication is unexpectedly absent, inspect `GOAUTH` and the selected `NETRC` path. Do not print a proxy URL containing credentials into CI logs. The [getting-started tutorial](/pro/getting-started/) requires no runtime registry credential once dependencies are installed.
+## Refresh vendor files
+
+`GOFLAGS=-mod=vendor` makes builds and tests use the vendor tree. A new import fails until you run `go mod vendor` again. In the Dockerfile, the download step must fetch every dependency, because the build step is offline.
+
+## Check proxy routing
+
+If a corporate proxy is unexpectedly bypassed, inspect `GONOPROXY`.
+
+## Check registry credentials
+
+If Go sends no credentials to the registry, check `GOAUTH` and the `NETRC` path. Do not print a proxy URL containing credentials into CI logs.

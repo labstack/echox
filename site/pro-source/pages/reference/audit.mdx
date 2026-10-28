@@ -7,27 +7,21 @@ description: Fields, defaults and constructors for audit.
 
 import ConfigReference from '../../../../components/ConfigReference.astro';
 
-This reference describes `echo.labstack.com/pro` v0.1.0. [Install the module](/pro/install/) once; subpackages use that same version. The [package explanation](/pro/audit/) describes behavior and limits. The [task guide](/pro/guides/audit/) contains source-backed examples and route wiring.
+`echo.labstack.com/pro` v0.1.0. See the [task guide](/pro/guides/audit/) for setup examples.
 
-## Defaults
+## Required fields
 
-`SchemaConfig` at zero selects the redact storage policy, which requires HMAC keys unless mask fallback is explicit. A memory store requires capacity. It never evicts audit events to record new ones. PostgreSQL stores require caller-owned pools and validated separate roles. Reader continuations do not grant access.
+- `SchemaConfig.Keys`: HMAC keys for the default storage policy; `Policy.AllowMaskFallback` permits masking instead.
+- `MemoryStoreConfig.Capacity`: positive event and byte capacities; a full store never evicts older events.
+- `auditpg`: caller-owned pools, a NOLOGIN deployment owner and four distinct runtime roles (`auditpg.Roles`).
 
-The tables list each field's Go type, source comment and default or requirement.
-A shared comment may describe several fields. Use the enclosing type's instructions when a field has no stated default.
-The tables do not infer constructor defaults from Go zero values.
+A reader pagination cursor does not grant access; authorize every read and continuation.
 
-## `audit.Capacity`
-
-Import `echo.labstack.com/pro/audit`.
-
-<ConfigReference source="pro" name="audit.Capacity" />
-
-## `audit.DenialConfig`
+## `audit.SchemaConfig`
 
 Import `echo.labstack.com/pro/audit`.
 
-<ConfigReference source="pro" name="audit.DenialConfig" />
+<ConfigReference source="pro" name="audit.SchemaConfig" />
 
 ## `audit.MemoryStoreConfig`
 
@@ -35,11 +29,23 @@ Import `echo.labstack.com/pro/audit`.
 
 <ConfigReference source="pro" name="audit.MemoryStoreConfig" />
 
+## `audit.Capacity`
+
+Import `echo.labstack.com/pro/audit`.
+
+<ConfigReference source="pro" name="audit.Capacity" />
+
 ## `audit.MiddlewareConfig`
 
 Import `echo.labstack.com/pro/audit`.
 
 <ConfigReference source="pro" name="audit.MiddlewareConfig" />
+
+## `audit.DenialConfig`
+
+Import `echo.labstack.com/pro/audit`.
+
+<ConfigReference source="pro" name="audit.DenialConfig" />
 
 ## `audit.ReaderConfig`
 
@@ -53,18 +59,6 @@ Import `echo.labstack.com/pro/audit`.
 
 <ConfigReference source="pro" name="audit.RelayConfig" />
 
-## `audit.SchemaConfig`
-
-Import `echo.labstack.com/pro/audit`.
-
-<ConfigReference source="pro" name="audit.SchemaConfig" />
-
-## `auditadmin.PanelConfig`
-
-Import `echo.labstack.com/pro/audit/auditadmin`.
-
-<ConfigReference source="pro" name="auditadmin.PanelConfig" />
-
 ## `auditpg.Roles`
 
 Import `echo.labstack.com/pro/audit/auditpg`.
@@ -77,18 +71,26 @@ Import `echo.labstack.com/pro/audit/auditpg`.
 
 <ConfigReference source="pro" name="auditpg.SchemaConfig" />
 
+## `auditadmin.PanelConfig`
+
+Import `echo.labstack.com/pro/audit/auditadmin`.
+
+<ConfigReference source="pro" name="auditadmin.PanelConfig" />
+
 ## Event and read limits
 
 | Setting | Default or limit |
 | --- | --- |
-| Registered metadata fields | At most 256 |
-| Action names | Two–eight dot-separated segments; at most 128 bytes; `audit.` reserved |
-| Detached denial recording | 500 ms by default; at most 64 in-flight writes by default |
-| PostgreSQL schema | `public` by default |
-| PostgreSQL operation timeout | Five seconds by default |
-| Migration timeout | One minute by default |
-| Query page | 50 entries by default; at most 100 |
+| `SchemaConfig.Fields` | At most 256 |
+| `Event.Action` | Two to eight dot-separated segments, at most 128 bytes. The `audit.` prefix is reserved. |
+| `DenialConfig.Timeout` / `MaxInFlight` | 500 ms recording timeout and 64 concurrent calls by default |
+| `auditpg.SchemaConfig.Schema` | `public` by default |
+| `auditpg.SchemaConfig.Timeout` | Five seconds by default |
+| `auditpg.SchemaConfig.MigrateTimeout` | One minute by default |
+| `QueryRequest.Limit` | 50 entries by default; at most 100 |
+
+Keep pools and stores open until requests, relay work and retention work have stopped.
 
 ## Related pages
 
-Use the [problem catalog](/pro/problems/) for exact statuses and type URIs. The [audit task guide](/pro/guides/audit/) links the executable examples that exercise these settings. Retain caller-owned clients until in-flight operations and package-owned work have stopped.
+[Package explanation](/pro/audit/) · [Task guide](/pro/guides/audit/) · [Problem catalog](/pro/problems/)

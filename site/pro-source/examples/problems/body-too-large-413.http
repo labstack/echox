@@ -1,0 +1,9 @@
+HTTP/1.1 413 Request Entity Too Large
+Content-Type: application/problem+json
+
+{
+  "code": "body_too_large",
+  "status": 413,
+  "title": "Request Entity Too Large",
+  "type": "https://echo.labstack.com/pro/problems/body-too-large"
+}

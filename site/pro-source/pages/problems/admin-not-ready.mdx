@@ -23,42 +23,38 @@ The OpenAPI panel has no bound report yet. Until `Bind` succeeds with the report
 
 ## Client handling
 
-Retrying does not help until the application binds a report. Operators should bind the `*openapi.Report` returned by a successful `openapi.MiddlewareConfig.Mount`.
+Retrying does not help until the application binds a report.
 
 ## Example response
 
-The package may omit diagnostic text or return it empty. Operation references do not grant access. Custom handlers can replace the body.
+If your application installs a custom handler, the body may differ.
 
-HTTP 503:
-
-```json file=site/pro-source/examples/problems/admin-not-ready-503.json
+```http file=site/pro-source/examples/problems/admin-not-ready-503.http
 ```
 
-## How to fix
+## Server correction
 
-Complete the panel's required initialization or readiness checks before using the view or action. Keep an unavailable observation distinct from a healthy backend. Inspect the backend without bypassing authorization.
+Call the panel's `Bind` with the `*openapi.Report` returned by a successful `openapi.MiddlewareConfig.Mount`.
 
 ## Response fields
 
-### admin console
+### Admin console
 
 - `code` (string, always): The stable code above.
-- `detail` (string, always): Always present and often empty. Contains safe display text without underlying errors.
+- `detail` (string, always): The console always sends `detail`. It is often empty and never contains the underlying error.
 - `status` (integer, always): The HTTP status of the response.
-- `title` (string, always): The HTTP status text, unless the problem carries a classified title.
+- `title` (string, always): The HTTP status text, such as `Conflict`, unless the panel supplies its own title.
 - `type` (string, always): The exact type URI above.
 
 Headers:
 
-- `Cache-Control` (always): `no-store` on every console problem response, together with the console's security headers.
+- `Cache-Control` (always): `no-store`. The console sends it on every problem response, along with its usual security headers.
 
 Notes:
 
-- Fields are written in key order. The body ends with a newline. The type URI uses `https://echo.labstack.com/pro/problems/` followed by the hyphenated code. HEAD responses have no body.
-- Every 404 response is rewritten to `admin_not_found` with an empty `detail`.
+- Fields are written in alphabetical order.
+- The console rewrites every 404 response to `admin_not_found` with an empty `detail`.
 
 ## Related behavior
 
-The [admin console](/pro/admin/) returns this problem. Check the authenticated role, resolved scope and requested action. For backend failures, inspect application diagnostics before retrying a mutation with its original action ID.
-
-See the [problem catalog](/pro/problems/) for related type URIs and response rules.
+See the [admin console](/pro/admin/) for access checks, action IDs and audit failures.

@@ -679,6 +679,7 @@
     "/pro/problems/operation-result-expired/",
     "/pro/problems/operation-result-unavailable/",
     "/pro/problems/operation-uncertain/",
+    "/pro/problems/quota-exceeded/",
     "/pro/problems/unauthenticated/",
     "/pro/problems/unsupported-media-type/",
     "/pro/problems/validation-failed/",

@@ -37,7 +37,7 @@ This example selects each tenant's plan from an immutable subscription map. It r
 ```go file=site/pro-source/examples/source/quota/auth_example_test.go#site-plans
 ```
 
-Replace the immutable map with your subscription repository, using the Echo request context for blocking lookups. For unrestricted users, compose tenant membership first and use `authbind.Quota()` instead of reading `TenantRestriction` directly. Protect usage reads with the same chain. A successful plan lookup is application policy; quota does not authenticate it.
+Replace the immutable map with your subscription repository, using the Echo request context for blocking lookups. For unrestricted users, compose tenant membership first and use `authbind.Quota()` instead of reading `TenantRestriction` directly. Protect usage reads with the same chain. Quota uses the plan name you return as-is. It does not check it.
 
 ## Assign weighted costs to routes
 
@@ -64,21 +64,21 @@ Use a controlled dimension vocabulary such as `small`, `large` and `other`. Set 
 ```go file=site/pro-source/examples/source/quota/plans_example_test.go#ExampleLimit_ByDimension
 ```
 
-Map unknown request values to a bounded value before quota. Cache enterprise-deal reads in application code. Overrides run for each limit check and usage read. They do not provide a subscription repository or cache.
+Map unknown request values to a bounded value before quota. If override values come from a database, cache them in your application. Overrides run for each limit check and usage read. They do not provide a subscription repository or cache.
 
 For billing plans, use `PerBillingPeriod` and return the trusted subscription start and end from `MiddlewareConfig.Period`. End must exceed Start by at least one millisecond. A newer start resets the period; the same start retains use.
 
 ```go file=site/pro-source/examples/source/quota/site_example_test.go#ExamplePerBillingPeriod
 ```
 
-The billing fixture returns 204 twice, then 429. Its period is trusted subscription data. The store does not choose subscription membership from wall-clock time. Calendar limits reset at their configured local times:
+The billing fixture returns 204 twice, then 429. Its period is trusted subscription data. The store does not compute the period from the clock. It uses the dates you return. Calendar limits reset at their configured local times:
 
 ```go file=site/pro-source/examples/source/quota/plans_example_test.go#ExampleLimit_In
 ```
 
 ## Release concurrent work and replay credit adjustments
 
-Use `Concurrent` for in-flight jobs. Direct callers release the admitted decision when work ends. The fixture admits one job, refuses a second and admits a third after release. HTTP quota middleware owns this release when the handler exits.
+Use `Concurrent` for in-flight jobs. If you call the limiter directly, release the decision when the job ends. The fixture admits one job, refuses a second and admits a third after release. The middleware releases it when the handler returns.
 
 ```go file=site/pro-source/examples/source/quota/site_example_test.go#ExampleConcurrent
 ```
@@ -88,7 +88,7 @@ Fund `Credits` with an authorized `AddCredits` call. Keep its ID and amount acro
 ```go file=site/pro-source/examples/source/quota/site_example_test.go#ExampleCredits
 ```
 
-Credit adjustment IDs deduplicate for 30 days. Retain permanent business deduplication when the same invoice can reappear after that window. Balance writes have no fail-open fallback. The [credit conflict page](/pro/problems/credit-conflict/) describes client recovery.
+Credit adjustment IDs deduplicate for 30 days. Retain permanent business deduplication when the same invoice can reappear after that window. When the store is unavailable, credit writes fail. They never succeed without the store. The [credit conflict page](/pro/problems/credit-conflict/) describes client recovery.
 
 ## Reload plans without replacing the limiter
 
@@ -98,7 +98,7 @@ Call `Reload` from your file watcher or configuration callback. Invalid input pr
 ```go file=site/pro-source/examples/source/quota/plans_example_test.go#ExampleLimiter_Reload
 ```
 
-Keep shared limit IDs compatible when changing plans. Do not reuse an ID for another meter or scope to reset usage implicitly. Use explicit support reset policy when a reset is intended.
+Keep shared limit IDs compatible when changing plans. Do not reuse an ID for another meter or scope to reset usage implicitly. To reset usage, use the reset action.
 
 ## Share budgets through Redis or Valkey
 
@@ -126,4 +126,4 @@ Attach hooks for decisions and lifecycle events to your own telemetry providers.
 
 Use [quota telemetry](/pro/recipes/quota-otel/) for provider setup and shutdown. Use [Stripe export](/pro/recipes/stripe/) for durable event delivery. Add `quotaadmin` for operator inspection; enable credit/reset actions only with explicit operator and audit policy.
 
-On 429, retain `Retry-After` and show the violated budget. On [402 insufficient credits](/pro/problems/insufficient-credits/), fund the balance or reduce work. On [403 cost exceeds limit](/pro/problems/cost-exceeds-limit/), split or reduce the request; waiting cannot make it fit. A strict-store 503 is an availability failure. Keep it distinct from exhausted customer usage.
+On 429, retain `Retry-After` and show the violated budget. On [402 insufficient credits](/pro/problems/insufficient-credits/), fund the balance or reduce work. On [403 cost exceeds limit](/pro/problems/cost-exceeds-limit/), split or reduce the request; waiting cannot make it fit. Show a strict-store 503 as an outage, not as the customer running out of quota.

@@ -9,13 +9,13 @@ sidebar:
 
 ## Goal
 
-Run the console over seeded quota, Stripe, OpenAPI, execution, webhook and audit observations. Inspect preview/confirmation/commit behavior and retained execution or delivery records. The demo uses caller-supplied PostgreSQL and creates uniquely named demonstration schemas. It never starts a database service.
+Run the console with seeded quota, Stripe, OpenAPI, execution, webhook and audit data. Inspect preview/confirmation/commit behavior and retained execution or delivery records. The demo uses caller-supplied PostgreSQL and creates uniquely named demonstration schemas. It never starts a database service.
 
 ## Prerequisites
 
 [Install Echo Pro](/pro/install/) with Go 1.26 or later. Supply an existing disposable PostgreSQL 18 database where your assigned login can create and remove its own schemas. Use resources you are authorized to modify. Inject `ADMIN_DEMO_POSTGRES_URL` at runtime; do not place the connection URL in command arguments or logs. Make loopback port 8080 available.
 
-An ordinary database owner without `CREATEROLE` runs the development-owner path. Execution and webhook use that one owner, and audit events stay in bounded memory. Durable audit requires its separate role topology and privileges to inspect the database cluster. Do not grant extra shared privileges merely to make this tutorial pass.
+If your login owns the database but lacks `CREATEROLE`, the demo uses that one login for everything. Execution and webhook use that one owner, and audit events stay in bounded memory. Durable audit needs its own set of roles and permission to read cluster metadata. Do not grant extra shared privileges merely to make this tutorial pass.
 
 ## Step 1: start the console
 
@@ -29,7 +29,7 @@ With the database URL already injected, run:
 ```sh file=site/pro-source/examples/site-docs/commands.sh#admin-demo
 ```
 
-The program checks the listener is a literal loopback IP. It connects to the supplied database and seeds only this run's `admin_demo_...` schemas. It prints an admin URL, seed directory URL and fulfillment-console URL. Open `http://127.0.0.1:8080/` for the seeded record links and `/admin` for the payments console. `/admin-fulfillment` binds the other execution namespace.
+The program checks the listener is a literal loopback IP. It connects to the supplied database and seeds only this run's `admin_demo_...` schemas. It prints an admin URL, seed directory URL and fulfillment-console URL. Open `http://127.0.0.1:8080/` for the seeded record links and `/admin` for the payments console. `/admin-fulfillment` shows the second execution namespace.
 
 ## Step 2: verify the privilege mode
 
@@ -39,15 +39,15 @@ The privileged fixture path creates its own roles and schemas, applies migration
 
 ## Step 3: understand authentication
 
-If `ADMIN_DEMO_API_KEY` is absent, browser mode issues an ephemeral local key and injects it only for requests without `Authorization`. The key stays in memory and is never printed. A supplied invalid credential still fails. The local listener authority constrains this fixture access.
+If `ADMIN_DEMO_API_KEY` is absent, browser mode issues an ephemeral local key and injects it only for requests without `Authorization`. The key stays in memory and is never printed. A supplied invalid credential still fails. Only requests sent to the loopback address get this access.
 
-If `ADMIN_DEMO_API_KEY` is injected, strict mode requires `Authorization: ApiKey <credential>` on every request. Configure that mode through a secure client or trusted local proxy. The demo's import mapping is disposable. A deployed application persists the original issued record and manages retained pepper versions.
+If `ADMIN_DEMO_API_KEY` is injected, strict mode requires `Authorization: ApiKey <credential>` on every request. Configure that mode through a secure client or trusted local proxy. The demo imports the supplied key into a memory store that is discarded at exit. A deployed application stores the `StoredKey` from `IssueKey` and keeps old pepper versions.
 
 ## Step 4: inspect panels and actions
 
 Open the seeded directory and follow the record links instead of inventing references. Inspect an execution's holder/send timeline and replay state. Compare webhook queue state with attempt history. Quota usage is seeded in memory; Stripe history is demonstration data and does not dispatch real Stripe usage.
 
-Startup exercises real console CSRF, preview, confirmation and commit calls to produce audit records of actions. The demo does not fabricate those admin audit events. Keep the displayed action ID when inspecting a retry. A missing outcome does not establish rollback.
+At startup the demo runs real console actions, with CSRF, preview, confirmation and commit. These produce the audit records you see. The demo does not fabricate those admin audit events. Keep the displayed action ID when inspecting a retry. A missing outcome does not establish rollback.
 
 The entry point wires all panels, authentication and lifecycle:
 
@@ -73,6 +73,6 @@ Those tests do not replace PostgreSQL migration, permission or restore checks. A
 
 ## Change for deployment
 
-Replace ephemeral credentials with validated application login. Use distinct deployment and runtime roles, exact origins and retained signing keys. Disable actions your operators do not need. Configure a durable audit sink before mutation policy. Preserve the per-package storage and restore requirements in [audit](/pro/audit/), [execution](/pro/execution/) and [webhooks](/pro/webhook/).
+Replace ephemeral credentials with validated application login. Use distinct deployment and runtime roles, exact origins and retained signing keys. Disable actions your operators do not need. Configure a durable audit sink before you enable write actions. Preserve the per-package storage and restore requirements in [audit](/pro/audit/), [execution](/pro/execution/) and [webhooks](/pro/webhook/).
 
 The [admin task guide](/pro/guides/admin/) covers mounting and protocol tests. The [configuration reference](/pro/reference/admin/) lists shell defaults; each package reference lists its panel settings. Use [problem pages](/pro/problems/) to distinguish failed authorization, denied requests and uncertain mutation outcomes.

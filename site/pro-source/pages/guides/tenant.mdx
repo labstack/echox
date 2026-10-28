@@ -16,7 +16,7 @@ The [tenant overview](/pro/tenant/) explains selector conflicts, anonymous acces
 
 ## Select a path tenant and enforce stored ownership
 
-Construct `FromPathParam("tenant")` before serving and handle its error. Include it with `FromCredential()`. Keep `Required: true` on tenant API routes. Add `Member` for unrestricted users; return membership from trusted data with the request context.
+Construct `FromPathParam("tenant")` before serving and handle its error. Add it alongside `FromCredential()`. Keep `Required: true` on tenant API routes. Add `Member` for unrestricted users; return membership from trusted data with the request context.
 
 The complete example issues a restricted key, resolves a path tenant and authorizes an invoice from its stored owner. Its immutable map is the fixture repository. The three requests print 204, 403 and 403. The foreign invoice never reaches the handler even though its path names `acme`.
 
@@ -32,7 +32,7 @@ This executable fixture combines path, header and subdomain selectors for an unr
 ```go file=site/pro-source/examples/source/tenant/site_example_test.go#ExampleConfig_selectors
 ```
 
-Use `FromHeader` for a header selection only after a credential or membership rule establishes authority. Keep header-duplication refusal. Use `FromSubdomain` when one tenant label sits directly below a trusted base host. The selector reads `Request.Host`, so configure proxy host handling explicitly. Both constructors validate configuration and return errors.
+Use `FromHeader` only with a credential restriction or a `Member` check. Otherwise the header alone picks the tenant.  Use `FromSubdomain` when one tenant label sits directly below a trusted base host. The selector reads `Request.Host`, so configure proxy host handling explicitly. Both constructors validate configuration and return errors.
 
 For tenant-addressed public pages, set `AnonymousSelector` deliberately. Ordinary selectors do not authorize anonymous tenant access. Keep public metering separate if `AuthBySpec` skips the authenticated chain. Test empty selectors, conflicting selectors, malformed IDs and membership errors before shipping a route change.
 
@@ -57,7 +57,7 @@ Pin the authorization model used to evaluate the tuple. Supply the action-to-rel
 ```go file=site/pro-source/examples/source/tenant/site_example_test.go#ExampleOpenFGA
 ```
 
-Replace the fixture identifiers with your existing store and reviewed model ID. Missing action mappings deny. Keep type, tenant and resource IDs within their validated alphabets so a separator cannot alias another tenant. Configure `User` only when your model needs a different trusted user mapping.
+Replace the fixture identifiers with your existing store and reviewed model ID. Missing action mappings deny. Use the validated type, tenant and resource IDs. The OpenFGA adapter rejects characters that could inject object separators. Configure `User` only when your model needs a different trusted user mapping.
 
 ## Use an application policy or Casbin
 
@@ -75,7 +75,7 @@ This executable fixture checks both the default four-argument model and a custom
 Build own-tenant and foreign-tenant test tables for every resource type. Assert that resource mismatch, policy error and cancellation leave quota/store/handler counters unchanged. `tenanttest.Authorizer` and `tenanttest.Refused` provide those checks. For [403 forbidden](/pro/problems/forbidden/), obtain the correct grant or select an allowed resource.
 Automatic retries cannot fix a tenant mismatch.
 
-This test checks the policy table and sends a foreign-owned invoice through Echo. Its counters prove that ownership refusal happens before the authorizer and handler run:
+This test checks the policy table and sends a foreign-owned invoice through Echo. Its counters show that the ownership check rejects the request before the authorizer or handler runs:
 
 ```go file=site/pro-source/examples/source/tenant/site_example_test.go#isolation-test
 ```

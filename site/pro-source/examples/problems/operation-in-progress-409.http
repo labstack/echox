@@ -1,0 +1,13 @@
+HTTP/1.1 409 Conflict
+Content-Type: application/problem+json
+Cache-Control: no-store
+
+{
+  "code": "operation_in_progress",
+  "operation_ref": "AAAAAAAAAAAAAAAAAAAAAAAA",
+  "operation_state": "started",
+  "safe_new_key": false,
+  "status": 409,
+  "title": "Conflict",
+  "type": "https://echo.labstack.com/pro/problems/operation-in-progress"
+}

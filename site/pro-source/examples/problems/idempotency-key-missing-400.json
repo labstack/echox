@@ -1,5 +1,4 @@
 {
-  "Cache-Control": "",
   "code": "idempotency_key_missing",
   "operation_ref": "",
   "operation_state": "",

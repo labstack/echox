@@ -10,16 +10,17 @@ sidebar:
 `echo.labstack.com/pro/tenant` selects a tenant and checks access to its resources after authentication.
 The [task guide](/pro/guides/tenant/) shows wiring; the [reference](/pro/reference/tenant/) lists selectors, fields and limits.
 Use it when one credential can address several tenants, or a route names a tenant.
+The package starts no scheduler and performs no database migration.
 
 Handlers call `tenant.From(ctx)` to read the selected tenant.
-This explicitly public route selects its tenant from the path. Protected routes use authentication and membership checks first.
+The example below selects a tenant for an explicitly public route. It shows selection without a login; protected routes also need authentication and membership checks.
 
 ```go file=site/pro-source/examples/source/tenant/site_example_test.go#site-anchor
 ```
 
 Selecting a tenant does not prove ownership of a resource.
 `AuthorizeConfig` loads the resource's stored owner before calling your policy engine.
-A path parameter or operation name cannot prove ownership.
+
 [Authbind](/pro/guides/auth/) runs authentication and tenant selection before [quota](/pro/quota/).
 
 ## Every selector runs
@@ -38,7 +39,7 @@ It accepts one label below the configured base. Configure your proxy to preserve
 
 ## Membership and public requests
 
-`Config.Member` checks each authenticated request's selected tenant when configured.
+If you set `Config.Member`, it runs for every authenticated request and checks the selected tenant.
 Only `(true, nil)` allows the request. False, errors and `(true, error)` return 403.
 With nil `Member`, only a credential-restricted tenant is allowed.
 Unrestricted user tokens need your membership callback.
@@ -48,7 +49,7 @@ Use that context for database reads. Your application owns membership storage, c
 
 Anonymous requests need an explicit `AnonymousSelector`. Ordinary selectors and `Member` do not authorize anonymous tenant access.
 Public OpenAPI operations may omit a required tenant.
-`AuthBySpec` can skip the entire authenticated chain for public operations.
+With `openapi.AuthBySpec`, public operations skip the configured authentication, tenant and quota chain.
 If those routes need quotas, give them an explicit public policy, such as a trusted-IP limit.
 
 ## Check resource ownership before policy
@@ -81,14 +82,13 @@ Default objects use `type:tenant/id`; each part is validated separately.
 Default users encode the principal ID. Missing actions or malformed `allowed` responses deny access.
 
 Both HTTP adapters require a service origin and caller-owned client.
-They reject requests immediately when all call slots are busy. They start no workers and perform no retries.
+When all `MaxConcurrent` slots are busy, the adapter returns `*tenant.AdapterError` with category `busy`. Authorization middleware refuses access. They start no workers and perform no retries.
 Credentials require HTTPS unless `AllowInsecure` permits local-test HTTP.
 Transport failures return sanitized `AdapterError` categories.
 The [reference](/pro/reference/tenant/#adapter-limits) lists numeric limits.
 
 ## Observe and test refusals
 
-The package starts no scheduler or database migration.
 Record latency and adapter error categories without logging raw claims or credentials.
 An unavailable policy service denies requests.
 `tenanttest.Authorizer` checks your own-tenant and foreign-tenant cases.

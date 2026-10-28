@@ -7,81 +7,84 @@ description: Echo Pro error codes, type URIs, HTTP statuses and retry rules.
 
 Echo Pro problems have an exact `type` URI and snake_case `code`. Match both fields when handling errors.
 Titles and `detail` are display text. They can change or be translated.
-An application can define its own absolute type URIs.
-Reusing a built-in code with your own type URI does not create a built-in problem type.
+Your application can define problem types with absolute type URIs.
+A built-in `code` with your own `type` names your application's problem type.
 
 ## HTTP responses
 
 Default responses use `Content-Type: application/problem+json`. HEAD responses have no body.
 Each package defines its own extension fields and retry headers.
 A status alone does not tell you whether a mutation applied.
-Install `problem/echoadapter` as Echo's error handler for errors implementing `Problem() problem.Details`.
-Keep the previous handler as fallback.
-The adapter preserves existing `WWW-Authenticate`, `Allow` and `Retry-After` headers. It does not add permission to retry.
+Pass your previous Echo error handler to `problem/echoadapter.ErrorHandlerConfig.ToErrorHandler(fallback)`.
+The adapter renders errors implementing `Problem() problem.Details` and passes other errors to that fallback.
+The adapter preserves existing `WWW-Authenticate`, `Allow` and `Retry-After` headers. It adds no `Retry-After` header of its own.
 
 Quota denials include `violated-policies`.
 Execution problems include `operation_ref`, `operation_state` and `safe_new_key`.
 Console problems always include `detail`, which may be empty.
+Execution replay returns stored problem responses unchanged. It does not translate or reclassify them.
+Replay sends only headers listed in `ReplayHeaders` and adds `Idempotent-Replayed: true`.
 Your application can replace these bodies with custom handlers. Update clients if you change the response fields.
 
 ## Catalog
 
-| Code | Type | HTTP status |
-| --- | --- | --- |
-| `admin_action_id_reused` | [https://echo.labstack.com/pro/problems/admin-action-id-reused](https://echo.labstack.com/pro/problems/admin-action-id-reused) | 409 |
-| `admin_audit_unavailable` | [https://echo.labstack.com/pro/problems/admin-audit-unavailable](https://echo.labstack.com/pro/problems/admin-audit-unavailable) | 503 |
-| `admin_backend_unavailable` | [https://echo.labstack.com/pro/problems/admin-backend-unavailable](https://echo.labstack.com/pro/problems/admin-backend-unavailable) | 503 |
-| `admin_busy` | [https://echo.labstack.com/pro/problems/admin-busy](https://echo.labstack.com/pro/problems/admin-busy) | 503 |
-| `admin_confirmation_required` | [https://echo.labstack.com/pro/problems/admin-confirmation-required](https://echo.labstack.com/pro/problems/admin-confirmation-required) | 422 |
-| `admin_cross_origin` | [https://echo.labstack.com/pro/problems/admin-cross-origin](https://echo.labstack.com/pro/problems/admin-cross-origin) | 403 |
-| `admin_csrf_invalid` | [https://echo.labstack.com/pro/problems/admin-csrf-invalid](https://echo.labstack.com/pro/problems/admin-csrf-invalid) | 403 |
-| `admin_forbidden` | [https://echo.labstack.com/pro/problems/admin-forbidden](https://echo.labstack.com/pro/problems/admin-forbidden) | 403 |
-| `admin_in_progress` | [https://echo.labstack.com/pro/problems/admin-in-progress](https://echo.labstack.com/pro/problems/admin-in-progress) | 409 |
-| `admin_internal` | [https://echo.labstack.com/pro/problems/admin-internal](https://echo.labstack.com/pro/problems/admin-internal) | 500 |
-| `admin_invalid_request` | [https://echo.labstack.com/pro/problems/admin-invalid-request](https://echo.labstack.com/pro/problems/admin-invalid-request) | 400 |
-| `admin_method_not_allowed` | [https://echo.labstack.com/pro/problems/admin-method-not-allowed](https://echo.labstack.com/pro/problems/admin-method-not-allowed) | 405 |
-| `admin_not_found` | [https://echo.labstack.com/pro/problems/admin-not-found](https://echo.labstack.com/pro/problems/admin-not-found) | 404 |
-| `admin_not_ready` | [https://echo.labstack.com/pro/problems/admin-not-ready](https://echo.labstack.com/pro/problems/admin-not-ready) | 503 |
-| `admin_rate_limited` | [https://echo.labstack.com/pro/problems/admin-rate-limited](https://echo.labstack.com/pro/problems/admin-rate-limited) | 429 |
-| `admin_reason_required` | [https://echo.labstack.com/pro/problems/admin-reason-required](https://echo.labstack.com/pro/problems/admin-reason-required) | 422 |
-| `admin_timeout` | [https://echo.labstack.com/pro/problems/admin-timeout](https://echo.labstack.com/pro/problems/admin-timeout) | 504 |
-| `admin_unauthenticated` | [https://echo.labstack.com/pro/problems/admin-unauthenticated](https://echo.labstack.com/pro/problems/admin-unauthenticated) | 401 |
-| `binding_failed` | [https://echo.labstack.com/pro/problems/binding-failed](https://echo.labstack.com/pro/problems/binding-failed) | 400 |
-| `body_too_large` | [https://echo.labstack.com/pro/problems/body-too-large](https://echo.labstack.com/pro/problems/body-too-large) | 413 |
-| `cost_exceeds_limit` | [https://echo.labstack.com/pro/problems/cost-exceeds-limit](https://echo.labstack.com/pro/problems/cost-exceeds-limit) | 403 |
-| `credit_conflict` | [https://echo.labstack.com/pro/problems/credit-conflict](https://echo.labstack.com/pro/problems/credit-conflict) | 409 |
-| `execution_capacity` | [https://echo.labstack.com/pro/problems/execution-capacity](https://echo.labstack.com/pro/problems/execution-capacity) | 503 |
-| `execution_unavailable` | [https://echo.labstack.com/pro/problems/execution-unavailable](https://echo.labstack.com/pro/problems/execution-unavailable) | 503 |
-| `forbidden` | [https://echo.labstack.com/pro/problems/forbidden](https://echo.labstack.com/pro/problems/forbidden) | 403 |
-| `idempotency_key_invalid` | [https://echo.labstack.com/pro/problems/idempotency-key-invalid](https://echo.labstack.com/pro/problems/idempotency-key-invalid) | 400 |
-| `idempotency_key_missing` | [https://echo.labstack.com/pro/problems/idempotency-key-missing](https://echo.labstack.com/pro/problems/idempotency-key-missing) | 400 |
-| `idempotency_key_reused` | [https://echo.labstack.com/pro/problems/idempotency-key-reused](https://echo.labstack.com/pro/problems/idempotency-key-reused) | 422 |
-| `idempotency_request_invalid` | [https://echo.labstack.com/pro/problems/idempotency-request-invalid](https://echo.labstack.com/pro/problems/idempotency-request-invalid) | 400, 413 |
-| `insufficient_credits` | [https://echo.labstack.com/pro/problems/insufficient-credits](https://echo.labstack.com/pro/problems/insufficient-credits) | 402 |
-| `invalid_request` | [https://echo.labstack.com/pro/problems/invalid-request](https://echo.labstack.com/pro/problems/invalid-request) | 400 |
-| `operation_abandoned` | [https://echo.labstack.com/pro/problems/operation-abandoned](https://echo.labstack.com/pro/problems/operation-abandoned) | 409 |
-| `operation_disputed` | [https://echo.labstack.com/pro/problems/operation-disputed](https://echo.labstack.com/pro/problems/operation-disputed) | 409 |
-| `operation_in_progress` | [https://echo.labstack.com/pro/problems/operation-in-progress](https://echo.labstack.com/pro/problems/operation-in-progress) | 409 |
-| `operation_not_applied` | [https://echo.labstack.com/pro/problems/operation-not-applied](https://echo.labstack.com/pro/problems/operation-not-applied) | 409 |
-| `operation_policy_changed` | [https://echo.labstack.com/pro/problems/operation-policy-changed](https://echo.labstack.com/pro/problems/operation-policy-changed) | 409 |
-| `operation_response_too_large` | [https://echo.labstack.com/pro/problems/operation-response-too-large](https://echo.labstack.com/pro/problems/operation-response-too-large) | 500 |
-| `operation_result_expired` | [https://echo.labstack.com/pro/problems/operation-result-expired](https://echo.labstack.com/pro/problems/operation-result-expired) | 409 |
-| `operation_result_unavailable` | [https://echo.labstack.com/pro/problems/operation-result-unavailable](https://echo.labstack.com/pro/problems/operation-result-unavailable) | 409 |
-| `operation_uncertain` | [https://echo.labstack.com/pro/problems/operation-uncertain](https://echo.labstack.com/pro/problems/operation-uncertain) | 409 |
-| `quota_exceeded` | [https://iana.org/assignments/http-problem-types#quota-exceeded](https://iana.org/assignments/http-problem-types#quota-exceeded) | 429 |
-| `temporary_reduced_capacity` | [https://iana.org/assignments/http-problem-types#temporary-reduced-capacity](https://iana.org/assignments/http-problem-types#temporary-reduced-capacity) | 503 |
-| `unauthenticated` | [https://echo.labstack.com/pro/problems/unauthenticated](https://echo.labstack.com/pro/problems/unauthenticated) | 401 |
-| `unsupported_media_type` | [https://echo.labstack.com/pro/problems/unsupported-media-type](https://echo.labstack.com/pro/problems/unsupported-media-type) | 415 |
-| `validation_failed` | [https://echo.labstack.com/pro/problems/validation-failed](https://echo.labstack.com/pro/problems/validation-failed) | 400 |
+| Problem code | HTTP status |
+| --- | --- |
+| [`admin_action_id_reused`](https://echo.labstack.com/pro/problems/admin-action-id-reused) | 409 |
+| [`admin_audit_unavailable`](https://echo.labstack.com/pro/problems/admin-audit-unavailable) | 503 |
+| [`admin_backend_unavailable`](https://echo.labstack.com/pro/problems/admin-backend-unavailable) | 503 |
+| [`admin_busy`](https://echo.labstack.com/pro/problems/admin-busy) | 503 |
+| [`admin_confirmation_required`](https://echo.labstack.com/pro/problems/admin-confirmation-required) | 422 |
+| [`admin_cross_origin`](https://echo.labstack.com/pro/problems/admin-cross-origin) | 403 |
+| [`admin_csrf_invalid`](https://echo.labstack.com/pro/problems/admin-csrf-invalid) | 403 |
+| [`admin_forbidden`](https://echo.labstack.com/pro/problems/admin-forbidden) | 403 |
+| [`admin_in_progress`](https://echo.labstack.com/pro/problems/admin-in-progress) | 409 |
+| [`admin_internal`](https://echo.labstack.com/pro/problems/admin-internal) | 500 |
+| [`admin_invalid_request`](https://echo.labstack.com/pro/problems/admin-invalid-request) | 400 |
+| [`admin_method_not_allowed`](https://echo.labstack.com/pro/problems/admin-method-not-allowed) | 405 |
+| [`admin_not_found`](https://echo.labstack.com/pro/problems/admin-not-found) | 404 |
+| [`admin_not_ready`](https://echo.labstack.com/pro/problems/admin-not-ready) | 503 |
+| [`admin_rate_limited`](https://echo.labstack.com/pro/problems/admin-rate-limited) | 429 |
+| [`admin_reason_required`](https://echo.labstack.com/pro/problems/admin-reason-required) | 422 |
+| [`admin_timeout`](https://echo.labstack.com/pro/problems/admin-timeout) | 504 |
+| [`admin_unauthenticated`](https://echo.labstack.com/pro/problems/admin-unauthenticated) | 401 |
+| [`binding_failed`](https://echo.labstack.com/pro/problems/binding-failed) | 400 |
+| [`body_too_large`](https://echo.labstack.com/pro/problems/body-too-large) | 413 |
+| [`cost_exceeds_limit`](https://echo.labstack.com/pro/problems/cost-exceeds-limit) | 403 |
+| [`credit_conflict`](https://echo.labstack.com/pro/problems/credit-conflict) | 409 |
+| [`execution_capacity`](https://echo.labstack.com/pro/problems/execution-capacity) | 503 |
+| [`execution_unavailable`](https://echo.labstack.com/pro/problems/execution-unavailable) | 503 |
+| [`forbidden`](https://echo.labstack.com/pro/problems/forbidden) | 403 |
+| [`idempotency_key_invalid`](https://echo.labstack.com/pro/problems/idempotency-key-invalid) | 400 |
+| [`idempotency_key_missing`](https://echo.labstack.com/pro/problems/idempotency-key-missing) | 400 |
+| [`idempotency_key_reused`](https://echo.labstack.com/pro/problems/idempotency-key-reused) | 422 |
+| [`idempotency_request_invalid`](https://echo.labstack.com/pro/problems/idempotency-request-invalid) | 400, 413 |
+| [`insufficient_credits`](https://echo.labstack.com/pro/problems/insufficient-credits) | 402 |
+| [`invalid_request`](https://echo.labstack.com/pro/problems/invalid-request) | 400 |
+| [`operation_abandoned`](https://echo.labstack.com/pro/problems/operation-abandoned) | 409 |
+| [`operation_disputed`](https://echo.labstack.com/pro/problems/operation-disputed) | 409 |
+| [`operation_in_progress`](https://echo.labstack.com/pro/problems/operation-in-progress) | 409 |
+| [`operation_not_applied`](https://echo.labstack.com/pro/problems/operation-not-applied) | 409 |
+| [`operation_policy_changed`](https://echo.labstack.com/pro/problems/operation-policy-changed) | 409 |
+| [`operation_response_too_large`](https://echo.labstack.com/pro/problems/operation-response-too-large) | 500 |
+| [`operation_result_expired`](https://echo.labstack.com/pro/problems/operation-result-expired) | 409 |
+| [`operation_result_unavailable`](https://echo.labstack.com/pro/problems/operation-result-unavailable) | 409 |
+| [`operation_uncertain`](https://echo.labstack.com/pro/problems/operation-uncertain) | 409 |
+| [`quota_exceeded`](/pro/problems/quota-exceeded/) | 429 |
+| [`temporary_reduced_capacity`](https://iana.org/assignments/http-problem-types#temporary-reduced-capacity) | 503 |
+| [`unauthenticated`](https://echo.labstack.com/pro/problems/unauthenticated) | 401 |
+| [`unsupported_media_type`](https://echo.labstack.com/pro/problems/unsupported-media-type) | 415 |
+| [`validation_failed`](https://echo.labstack.com/pro/problems/validation-failed) | 400 |
 
 ## Quota type URIs
 
-Quota uses `https://iana.org/assignments/http-problem-types#quota-exceeded` for exhausted time budgets.
+Quota uses `https://iana.org/assignments/http-problem-types#quota-exceeded` when a request exceeds a bucket, day, month, billing-period or concurrency limit.
 It returns 429 with code `quota_exceeded`. Respect `Retry-After` and inspect `violated-policies`.
-Strict-store failures use `https://iana.org/assignments/http-problem-types#temporary-reduced-capacity`.
-They return 503 with code `temporary_reduced_capacity` and a retry header.
+When a strict limit cannot reach its store, quota uses `https://iana.org/assignments/http-problem-types#temporary-reduced-capacity`.
+The response has status 503 and code `temporary_reduced_capacity`.
+The middleware sends `Retry-After` when it has a delay; quota administration routes send none.
 An unavailable store does not mean the customer exhausted their budget.
-These URI strings do not claim IANA registration.
+Echo Pro does not claim that IANA has registered these URIs.
 
 ## Related pages
 
@@ -89,4 +92,4 @@ These URI strings do not claim IANA registration.
 [Quota](/pro/quota/) explains exhausted budgets and unavailable stores.
 [Execution](/pro/execution/) explains uncertain sends and when `safe_new_key` allows a new operation key.
 [Admin](/pro/admin/) explains preview, commit and audit failures.
-[Execution tasks](/pro/guides/execution/) show typed application problems and replaying saved responses.
+[Execution tasks](/pro/guides/execution/) show how to return typed problems and replay saved responses.

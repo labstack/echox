@@ -7,16 +7,40 @@ description: Fields, defaults and constructors for quota.
 
 import ConfigReference from '../../../../components/ConfigReference.astro';
 
-This reference describes `echo.labstack.com/pro` v0.1.0. [Install the module](/pro/install/) once; subpackages use that same version. The [package explanation](/pro/quota/) describes behavior and limits. The [task guide](/pro/guides/quota/) contains source-backed examples and route wiring.
+`echo.labstack.com/pro` v0.1.0. See the [task guide](/pro/guides/quota/) for setup examples.
 
-## Defaults
+## Required fields
 
-`Config.Store` and `Plans` are required. Middleware needs an `Identity` callback using verified application data. One plan selects itself. Multiple plans require `Plan`. Billing periods require `Period`. Hooks, fallback and outbox behavior are documented with their fields.
-If you leave a telemetry callback nil, the package does not call it. Redis constructors validate options without connecting. Your application closes the client.
+- `Config.Store` and `Config.Plans`: a store and at least one plan.
+- `MiddlewareConfig.Identity`: the paying subject from verified application data.
+- `MiddlewareConfig.Plan`: required with several plans; nil selects the only configured plan.
+- `MiddlewareConfig.Period`: required for billing-period limits.
 
-The tables list each field's Go type, source comment and default or requirement.
-A shared comment may describe several fields. Use the enclosing type's instructions when a field has no stated default.
-The tables do not infer constructor defaults from Go zero values.
+Redis constructors check options without connecting; your application owns and closes the client.
+
+## `quota.Config`
+
+Import `echo.labstack.com/pro/quota`.
+
+<ConfigReference source="pro" name="quota.Config" />
+
+## `quota.MiddlewareConfig`
+
+Import `echo.labstack.com/pro/quota`.
+
+<ConfigReference source="pro" name="quota.MiddlewareConfig" />
+
+## `quota.MemoryConfig`
+
+Import `echo.labstack.com/pro/quota`.
+
+<ConfigReference source="pro" name="quota.MemoryConfig" />
+
+## `redisstore.Config`
+
+Import `echo.labstack.com/pro/quota/redisstore`.
+
+<ConfigReference source="pro" name="redisstore.Config" />
 
 ## `quota.AdminConfig`
 
@@ -30,12 +54,6 @@ Import `echo.labstack.com/pro/quota`.
 
 <ConfigReference source="pro" name="quota.Breaker" />
 
-## `quota.Config`
-
-Import `echo.labstack.com/pro/quota`.
-
-<ConfigReference source="pro" name="quota.Config" />
-
 ## `quota.Fallback`
 
 Import `echo.labstack.com/pro/quota`.
@@ -47,18 +65,6 @@ Import `echo.labstack.com/pro/quota`.
 Import `echo.labstack.com/pro/quota`.
 
 <ConfigReference source="pro" name="quota.Hooks" />
-
-## `quota.MemoryConfig`
-
-Import `echo.labstack.com/pro/quota`.
-
-<ConfigReference source="pro" name="quota.MemoryConfig" />
-
-## `quota.MiddlewareConfig`
-
-Import `echo.labstack.com/pro/quota`.
-
-<ConfigReference source="pro" name="quota.MiddlewareConfig" />
 
 ## `quota.Outbox`
 
@@ -114,12 +120,6 @@ Import `echo.labstack.com/pro/quota/quotastripe`.
 
 <ConfigReference source="pro" name="quotastripe.StoreConfig" />
 
-## `redisstore.Config`
-
-Import `echo.labstack.com/pro/quota/redisstore`.
-
-<ConfigReference source="pro" name="redisstore.Config" />
-
 ## `stripeadmin.Config`
 
 Import `echo.labstack.com/pro/quota/quotastripe/stripeadmin`.
@@ -130,14 +130,16 @@ Import `echo.labstack.com/pro/quota/quotastripe/stripeadmin`.
 
 | Setting | Default or limit |
 | --- | --- |
-| Limits in a plan | 1–16 |
-| Limit IDs and meters | `[a-z0-9][a-z0-9_]{0,31}` |
-| Refill burst | Refill amount by default |
-| Concurrent lease | Five minutes by default |
-| Subject parts and operations | At most 256 bytes each |
-| Remote store timeout | 25 ms by default; caller cancellation can end it sooner |
-| Denial cache | Off by default; at most ten seconds and never longer than the retry delay |
+| `Plan.Limits` | 1–16 |
+| `LimitInfo.ID` / `LimitInfo.Meter` | `[a-z0-9][a-z0-9_]{0,31}` |
+| `Limit.Burst()` | Equals the refill amount unless set |
+| `Limit.Lease()` | Five minutes by default |
+| `Identity` / operation strings | At most 256 bytes each |
+| `Config.StoreTimeout` | 25 ms by default; caller cancellation can end it sooner |
+| `Config.DenyCache` | Off by default; at most ten seconds and never longer than the retry delay |
+
+Call `Limiter.Close` before closing its store or Redis client.
 
 ## Related pages
 
-Use the [problem catalog](/pro/problems/) for exact statuses and type URIs. The [quota task guide](/pro/guides/quota/) links the executable examples that exercise these settings. Retain caller-owned clients until in-flight operations and package-owned work have stopped.
+[Package explanation](/pro/quota/) · [Task guide](/pro/guides/quota/) · [Problem catalog](/pro/problems/)

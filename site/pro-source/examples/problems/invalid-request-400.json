@@ -1,5 +1,4 @@
 {
-  "Cache-Control": "",
   "code": "invalid_request",
   "status": 400,
   "title": "Invalid quota administration request",

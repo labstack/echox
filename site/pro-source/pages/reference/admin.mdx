@@ -7,15 +7,16 @@ description: Fields, defaults and constructors for admin.
 
 import ConfigReference from '../../../../components/ConfigReference.astro';
 
-This reference describes `echo.labstack.com/pro` v0.1.0. [Install the module](/pro/install/) once; subpackages use that same version. The [package explanation](/pro/admin/) describes behavior and limits. The [task guide](/pro/guides/admin/) contains source-backed examples and route wiring.
+`echo.labstack.com/pro` v0.1.0. See the [task guide](/pro/guides/admin/) for setup examples.
 
-## Defaults
+## Required fields
 
-`Panels` and `Authenticate` are required. Viewer is the default authenticated role. Write actions need separate role, scope, confirmation and audit policy. `PublicPath` defaults to the mount prefix. Empty `Theme.Mode` follows the system. The caller owns each panel's backend, authentication lifecycle and any configured audit sink.
+- `Config.Panels`: 1–64 panel adapters.
+- `Config.Authenticate`: your per-request login check.
+- Write actions: enable each panel action and configure its role, scope, confirmations and `Audit` sink.
+- `Config.Keys`: required for pagination, digest views, POST reads and actions.
 
-The tables list each field's Go type, source comment and default or requirement.
-A shared comment may describe several fields. Use the enclosing type's instructions when a field has no stated default.
-The tables do not infer constructor defaults from Go zero values.
+Viewer is the default role; `PublicPath` defaults to the mount prefix and an empty `Theme.Mode` follows the system scheme.
 
 ## `admin.Config`
 
@@ -33,13 +34,16 @@ Import `echo.labstack.com/pro/admin`.
 
 | Setting | Default or limit |
 | --- | --- |
-| Request timeout | Ten seconds; range one millisecond–one minute; includes middleware |
-| Expensive concurrent reads | Two; range 1–64 |
-| Cursor lifetime | 15 minutes |
-| CSRF token lifetime | One hour |
+| `Config.Timeout` | Ten seconds; range one millisecond–one minute; includes middleware |
+| `Config.MaxExpensive` | Two; range 1–64 |
+| `Config.CursorTTL` | 15 minutes by default; range 1s–24h |
+| `Config.CSRFTTL` | One hour by default; range 1s–24h |
+| `Config.RateLimit` | Reads 10/s, burst 30; writes 12/min, burst 12; probes 6/min, burst 6 |
 
-Saturation rejects the console request with a classified problem response.
+When every expensive-view slot is busy, the console returns 503 with code `admin_busy`.
+
+The console never closes panel backends, authentication resources or the audit sink.
 
 ## Related pages
 
-Use the [problem catalog](/pro/problems/) for exact statuses and type URIs. The [admin task guide](/pro/guides/admin/) links the executable examples that exercise these settings. Retain caller-owned clients until in-flight operations and package-owned work have stopped.
+[Package explanation](/pro/admin/) · [Task guide](/pro/guides/admin/) · [Problem catalog](/pro/problems/)

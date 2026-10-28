@@ -42,7 +42,7 @@ const tabs = [
 
 // Plain text, plus a package path (the only part set in mono) where one applies.
 const requirements: Array<{ text: string; pkg?: string }> = [
-  { text: 'Go 1.26 and 1.27' },
+  { text: 'Go 1.26 or later' },
   { text: 'Echo v5.4.2 or later' },
   { text: 'PostgreSQL 16 through 18' },
   { text: 'Redis or Valkey (optional) for', pkg: 'quota/redisstore' },
@@ -52,7 +52,7 @@ const trust = [
   ['No telemetry', 'Telemetry exporters run only when you configure them.'],
   ['No license checks at run time', 'Your token only downloads modules.'],
   ['Keep what you bought', 'Versions you received stay licensed after you stop paying.'],
-  ['Plain go get', 'A private Go module proxy and your go.sum.'],
+  ['Plain go get', 'Install through a private Go module proxy, checked against your go.sum.'],
 ];
 
 const flagships = [
@@ -82,22 +82,22 @@ const packages = [
   ['quota/redisstore', 'Atomic Redis and Valkey store: standalone, Sentinel and Cluster.'],
   ['quota/quotamcp', 'Plan quotas and metering for MCP tools on the official MCP Go SDK.'],
   ['quota/quotastripe', 'Stripe meter export of final usage, with receipts and reconciliation.'],
-  ['quota/quotaclient', 'Client-side RateLimit parsing, problems and polite retries.'],
+  ['quota/quotaclient', 'Client helpers that parse RateLimit headers and problem responses, and wait before retrying.'],
   ['quota/quotaprom, quota/quotaotel', 'Opt-in Prometheus and OpenTelemetry hooks into your own systems.'],
   ['audit, audit/auditpg', 'Durable business audit events with redaction, recorded in PostgreSQL 16 through 18.'],
-  ['execution, execution/pgstore', 'Records of declared external effects, with operator recovery.'],
+  ['execution, execution/pgstore', 'Records each external call under a stable key, so retries replay the saved result. Operators resolve uncertain calls.'],
   ['webhook, webhook/webhookpg', 'Signed inbox and outbox, retry workers and replay, durable on PostgreSQL.'],
-  ['openapi', 'Operation-policy coverage reports and an ordered auth, quota and validation chain.'],
+  ['openapi', 'Checks that every OpenAPI operation has an auth and quota policy, and runs auth, quota and validation in order.'],
   ['problem', 'RFC 9457 problem catalog and Echo error rendering.'],
   ['redact', 'Classifies fields and removes or hashes sensitive values before storage.'],
-  ['admin', 'The embedded console, with panels for every package above.'],
+  ['admin', 'The embedded console, with panels for quota, Stripe, audit, execution, webhooks and OpenAPI.'],
   ['cmd/quota', 'Command line for plan checks, usage, resets, credits, keys and the outbox.'],
 ];
 
-const founding = 'Code FOUNDING discounts the first three annual invoices for the first 25 organisations. Available until 31 Mar 2027.';
+const founding = 'Code FOUNDING takes 34% off the first three annual invoices, for the first 25 organisations. Available until 31 Mar 2027.';
 const plans = [
   {
-    name: 'Echo', price: 'Free', unit: 'MIT license', note: 'For every Go team',
+    name: 'Echo', price: 'Free', unit: 'MIT license', note: 'Free and open source',
     items: ['The Echo framework and built-in middleware', 'echo-jwt, echo-otel, echo-prometheus, echo-contrib', 'Community support on GitHub'],
     cta: { label: 'Get started', href: '/guide/quickstart/', primary: false },
   },
@@ -126,7 +126,7 @@ const comparison: Array<[string, Array<[string, ...Array<boolean | string>]>]> =
   ['Updates', [
     ['New releases', true, 'While subscribed', 'While subscribed'],
     ['Keep received versions after the subscription ends', true, true, true],
-    ['Security fixes on owned release lines after it ends', false, true, true],
+    ['Security fixes for your release lines after the subscription ends', false, true, true],
   ]],
   ['Support', [
     ['Community support on GitHub', true, true, true],
@@ -145,9 +145,9 @@ const faq = [
   ['What stays free?', 'Echo, its built-in middleware and the official packages (echo-jwt, echo-otel, echo-prometheus and echo-contrib) are open source under the MIT license. Echo Pro is a separate module that builds on them.'],
   ['Is Echo going closed source?', 'No. Echo stays open source under the MIT license. Echo Pro is a separate module that builds on Echo and does not change its license.'],
   ['Why paid?', 'Echo Pro includes authentication, tenant checks, quotas and durable stores. Backend tests run against PostgreSQL 16 through 18, Redis and Valkey. Subscriptions pay for that work and fund Echo\'s maintenance.'],
-  ['What license is Echo Pro under?', 'The Echo Pro commercial license. While subscribed, your organisation may use, copy and modify Echo Pro. You may include it in applications you distribute and services you operate. You may not pass its source to third parties. You may not offer it as a standalone library or competing product.'],
+  ['What license is Echo Pro under?', 'Echo Pro uses a commercial license. While subscribed, your organisation may use, copy and modify Echo Pro. You may include it in applications you distribute and services you operate. You may not pass its source to third parties. You may not offer it as a standalone library or competing product.'],
   ['Does Echo Pro send telemetry or check a license at run time?', 'No. The library does not send telemetry or perform runtime license checks. Configure metrics and tracing through hooks into your own systems.'],
-  ['What happens when the subscription ends?', 'You keep the versions you already have, plus security fixes on the release lines you owned. New versions need an active subscription.'],
+  ['What happens when the subscription ends?', 'You keep the versions you already have. You also keep access to security fixes for the release lines you owned. New versions need an active subscription.'],
   ['Can we evaluate before buying, or get a refund?', 'There is no free trial. Review the package documentation and code samples before buying. If Echo Pro is not right for you, you get a full refund within 30 days of purchase.'],
   ['Invoices and purchase orders?', 'Team and Business are billed annually per organisation. Support and Enterprise are invoiced annually. Email support@labstack.com for billing details your company needs.'],
 ];
@@ -168,7 +168,7 @@ const structuredData = {
 };
 
 const head = [
-  { tag: 'title', content: 'Echo Pro: Tenant APIs and operations for Echo v5' },
+  { tag: 'title', content: 'Echo Pro: authentication, tenant quotas, audit and webhooks for Echo v5' },
   ...(OG_IMAGE ? [
     { tag: 'meta', attrs: { property: 'og:image', content: OG_IMAGE } },
     { tag: 'meta', attrs: { name: 'twitter:image', content: OG_IMAGE } },
@@ -196,7 +196,7 @@ const head = [
   <div class="pro not-content">
     <section class="pro-hero" aria-labelledby="pro-title">
       <div class="pro-hero-copy">
-        <h1 id="pro-title">Authentication, tenant quotas and operations for Echo v5.</h1>
+        <h1 id="pro-title">Authentication, tenant quotas, audit and webhooks for Echo v5.</h1>
         <p class="pro-lead">
           Add authentication, tenant checks, quotas, audit records, webhooks and an admin console to your Echo application.
           Install LabStack's commercial Go module with the standard Go toolchain.
@@ -295,7 +295,7 @@ const head = [
     </section>
 
     <section id="features" aria-labelledby="features-title">
-      <h2 id="features-title">What's in the box</h2>
+      <h2 id="features-title">Packages</h2>
       <p class="pro-intro">One module, <code>echo.labstack.com/pro</code>. Runnable examples, tests and package READMEs ship with it.</p>
 
       <div class="pro-flagships">
@@ -330,7 +330,7 @@ const head = [
 
     <section id="pricing" aria-labelledby="pricing-title">
       <h2 id="pricing-title">Pricing</h2>
-      <p class="pro-intro">Billed annually per organisation. Echo stays open source under the MIT license; Echo Pro subscriptions fund its maintenance.</p>
+      <p class="pro-intro">Billed annually per organisation.</p>
 
       <div class="pro-plans">
         {plans.map((plan) => (
@@ -404,7 +404,7 @@ const head = [
       <h3>In CI</h3>
       <p class="pro-muted">GitHub Actions: store the token as a repository secret and create a job-scoped credential file before <code>go</code> runs.</p>
       <Code code={ciSnippet} lang="yaml" title=".github/workflows/ci.yml" frame="code" />
-      <p class="pro-muted">See <a href="/pro/install/">installation</a> for corporate mirrors, <code>GOPROXY</code> chains and CI.</p>
+      <p class="pro-muted">See <a href="/pro/install/">installation</a> for corporate mirrors, <code>GOPROXY</code> chains, Docker and offline builds.</p>
 
       <h3 id="docs">Read the docs</h3>
       <p class="pro-muted">Start with installation and a local app, then choose the packages your application needs. These pages cover Echo Pro v0.1.0.</p>
@@ -431,9 +431,9 @@ const head = [
     </section>
 
     <section class="pro-close" aria-labelledby="close-title">
-      <h2 id="close-title">Install Echo Pro in your Echo application.</h2>
+      <h2 id="close-title">Run the getting-started tutorial.</h2>
       <div class="pro-actions">
-        <a class="hh-btn pri" href="#pricing" data-ga-event="view_pricing">See pricing</a>
+        <a class="hh-btn pri" href="/pro/getting-started/">Start the tutorial</a>
         <a class="hh-btn sec" href="mailto:support@labstack.com?subject=Echo%20Pro" data-ga-event="generate_lead">Email us</a>
       </div>
     </section>
@@ -537,7 +537,7 @@ const head = [
   .pro-diagram :global(.d-read) { fill: none; stroke: var(--sl-color-gray-4); stroke-width: 1.25; stroke-dasharray: 4 4; }
   .pro-diagram :global(.d-head) { fill: var(--sl-color-gray-4); }
 
-  /* What's in the box */
+  /* Packages */
   .pro-flagships { display: grid; gap: 12px; margin-bottom: 2rem; }
   @media (min-width: 64rem) { .pro-flagships { grid-template-columns: repeat(2, minmax(0, 1fr)); } .pro-flagship.has-media { grid-column: 1 / -1; } }
   .pro-flagship { padding: 22px; display: grid; gap: 18px; }

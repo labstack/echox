@@ -19,46 +19,42 @@ description: HTTP 503 and client guidance for admin_backend_unavailable.
 
 ## When it occurs
 
-A built-in panel failed to read its quota store, execution store or Stripe export status. The backend error stays internal.
+A built-in panel failed to read its quota store, execution store or Stripe export status. The response does not include the backend error.
 
 ## Client handling
 
-Retry later. If the error persists, operators should check the backend's health and the server logs.
+Retry later.
 
 ## Example response
 
-The package may omit diagnostic text or return it empty. Operation references do not grant access. Custom handlers can replace the body.
+If your application installs a custom handler, the body may differ.
 
-HTTP 503:
-
-```json file=site/pro-source/examples/problems/admin-backend-unavailable-503.json
+```http file=site/pro-source/examples/problems/admin-backend-unavailable-503.http
 ```
 
-## How to fix
+## Server correction
 
-Inspect the panel backend and restore its connection, permissions or capacity. For a failed mutation, reload the target before deciding the next action. A backend error alone does not prove rollback.
+Restore the panel backend's connection, permissions or capacity. For a failed mutation, reload the target before deciding what to do next. A backend error does not mean the change rolled back.
 
 ## Response fields
 
-### admin console
+### Admin console
 
 - `code` (string, always): The stable code above.
-- `detail` (string, always): Always present and often empty. Contains safe display text without underlying errors.
+- `detail` (string, always): The console always sends `detail`. It is often empty and never contains the underlying error.
 - `status` (integer, always): The HTTP status of the response.
-- `title` (string, always): The HTTP status text, unless the problem carries a classified title.
+- `title` (string, always): The HTTP status text, such as `Conflict`, unless the panel supplies its own title.
 - `type` (string, always): The exact type URI above.
 
 Headers:
 
-- `Cache-Control` (always): `no-store` on every console problem response, together with the console's security headers.
+- `Cache-Control` (always): `no-store`. The console sends it on every problem response, along with its usual security headers.
 
 Notes:
 
-- Fields are written in key order. The body ends with a newline. The type URI uses `https://echo.labstack.com/pro/problems/` followed by the hyphenated code. HEAD responses have no body.
-- Every 404 response is rewritten to `admin_not_found` with an empty `detail`.
+- Fields are written in alphabetical order.
+- The console rewrites every 404 response to `admin_not_found` with an empty `detail`.
 
 ## Related behavior
 
-The [admin console](/pro/admin/) returns this problem. Check the authenticated role, resolved scope and requested action. For backend failures, inspect application diagnostics before retrying a mutation with its original action ID.
-
-See the [problem catalog](/pro/problems/) for related type URIs and response rules.
+See the [admin console](/pro/admin/) for access checks, action IDs and audit failures.

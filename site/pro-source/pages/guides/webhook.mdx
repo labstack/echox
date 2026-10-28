@@ -21,7 +21,7 @@ Construct a verifier from trusted source and tenant configuration. Pass it and a
 ```go file=site/pro-source/examples/source/webhook/example_test.go#ExampleReceiveConfig_ToMiddleware
 ```
 
-Set `MaxBodyBytes` for the provider's documented payload size and `Timeout` for verification plus acceptance. Keep all body-transforming middleware after verification or outside this route. Retain inbox deduplication for the provider's full replay window. A signature verifies bytes and sender possession of a key; it does not identify an authenticated Echo principal.
+Set `MaxBodyBytes` for the provider's documented payload size and `Timeout` for verification plus acceptance. Keep all body-transforming middleware after verification or outside this route. Retain inbox deduplication for the provider's full replay window. A valid signature shows the sender holds the secret. It does not create an Echo principal.
 
 ## Queue an event from your handler
 
@@ -46,7 +46,7 @@ It waits for the worker to stop after cancellation. It prints `ready`, `verified
 ```go file=site/pro-source/examples/source/webhook/webhookmem/example_test.go
 ```
 
-The response from this fixture acknowledges signature verification only. It has no durable inbox or business ledger. Replace it with the terminal receive middleware and PostgreSQL processing before using acceptance as a durable queue guarantee.
+The response from this fixture acknowledges signature verification only. It has no durable inbox or business ledger. For durable acceptance, use the receive middleware with a PostgreSQL inbox.
 
 ## Couple an outgoing command to a business transaction
 
@@ -59,7 +59,7 @@ The following compiled recipe inserts the ledger row and enqueues the frozen out
 
 This function requires real pools and an endpoint; its unit example does not run database I/O. Test it against your assigned PostgreSQL backend. Retry the entire transaction with the same prepared message after a transient error or unknown COMMIT. A lost commit reply cannot prove rollback. Keep the permanent ledger after webhook payload compaction and deduplication retention expire.
 
-## Configure delivery and shutdown
+## Process incoming events
 
 For an incoming event that grants a business entitlement, register a transactional `ProcessFunc`. This compiled processor inserts an application ledger row and prepares an outgoing credit command only on its first business-key insertion:
 
@@ -68,7 +68,9 @@ For an incoming event that grants a business entitlement, register a transaction
 
 The fixture treats the verified payload as an invoice identifier and fixes the amount at 100. Parse and validate your provider's signed payload in the real processor. The unique `(tenant, invoice, action)` ledger key permanently prevents a duplicate grant.
 
-Register each destination name in both store routing and sender endpoints. Set an immutable version and the receiver's actual deduplication horizon as `ReplayWindow`. Start a worker only after schema and live-route validation succeeds. `Run` stops claiming on cancellation, drains dispatched work within `ShutdownTimeout` and returns. Join it before closing either pool.
+## Configure delivery and shutdown
+
+Register each destination name in both store routing and sender endpoints. Set an immutable version and the receiver's actual deduplication horizon as `ReplayWindow`. Start the worker only after `New` returns without error. `Run` stops claiming on cancellation, drains dispatched work within `ShutdownTimeout` and returns. Join it before closing either pool.
 
 Choose `Concurrency` for available database and receiver capacity. Schedule `Maintain` separately with a bounded batch. Retain source processors and destination versions while ready or sending records reference them; removing live routing makes `New` refuse startup.
 

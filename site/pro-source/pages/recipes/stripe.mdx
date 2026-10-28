@@ -1,6 +1,6 @@
 ---
 title: Stripe usage export
-description: Move final quota consumption into an offline export history before enabling sandbox dispatch.
+description: Export final quota usage to Stripe meters. Run offline first, then against a Stripe sandbox.
 sidebar:
   order: 11
 ---
@@ -9,7 +9,7 @@ sidebar:
 
 ## Goal
 
-Consume 12 token units and deliver the quota event to a Stripe exporter. Inspect the accepted open amount. The default run makes no Stripe API calls. It shows event delivery without a sandbox account.
+Consume 12 token units and deliver the quota event to a Stripe exporter. Check the accepted usage still in the `Open` state, before the exporter seals it for sending. The default run makes no Stripe API calls. It shows event delivery without a sandbox account.
 
 ## Prerequisites
 
@@ -28,10 +28,10 @@ Run the default command:
 ```
 
 The program prints `accepted open units: 12` and `offline demo: no Stripe API calls`, then exits. It uses a strict 100-token daily plan and consumes 12 units.
-It waits for its outbox delivery callback to accept the event. It closes the limiter before claiming the source is caught up.
+It waits for its outbox delivery callback to accept the event. It closes the limiter before it reports `Drained`.
 
 `quotastripe.Config.Meters` maps `tokens` to a Stripe meter, event name and payload keys.
-`Customer` chooses the customer for the first accepted event. Keep that mapping stable while history remains.
+`Customer` maps an event to a Stripe customer. The first accepted mapping is stored. Keep it stable while export history exists.
 The example reports `Drained` only after requests stop and outbox processing returns.
 There are no pending reservations or future settlements in this demo.
 In your application, wait for those too before claiming all usage through a cutoff has been exported.
@@ -44,29 +44,31 @@ Read the complete program:
 
 ## Step 2: configure and run sandbox dispatch
 
-Use your own authorized Stripe sandbox resources. Inject `STRIPE_SANDBOX_KEY`, `STRIPE_SANDBOX_CUSTOMER_ID`, `STRIPE_SANDBOX_METER_ID` and `STRIPE_SANDBOX_EVENT_NAME` through your runtime secret manager. The meter must match the exporter's raw-ingestion sum mapping. Keep the credential out of arguments and logs.
+Use your own authorized Stripe sandbox resources. Inject `STRIPE_SANDBOX_KEY`, `STRIPE_SANDBOX_CUSTOMER_ID`, `STRIPE_SANDBOX_METER_ID` and `STRIPE_SANDBOX_EVENT_NAME` through your runtime secret manager. Create the Stripe meter with sum aggregation over raw events. Keep the credential out of arguments and logs.
 
 Only after those resources are configured, choose the networked run:
 
 ```sh file=site/pro-source/examples/site-docs/commands.sh#stripe-online
 ```
 
-`-online` starts the dispatcher. `Run` performs preflight and acquires the namespace lease. `Flush` returns `ErrNotRunning` until that readiness succeeds. The example waits until the current UTC minute ends before flushing its range. It reports targeted, sent and unresolved amounts. Reconciliation then reports an aggregate verdict when the flush succeeds.
+`-online` starts the dispatcher. `Run` checks the Stripe configuration and takes a lease so only one dispatcher sends for the namespace. `Flush` returns `ErrNotRunning` until that readiness succeeds. The example waits until the current UTC minute ends before flushing its range. It reports targeted, sent and unresolved amounts. After a successful flush, reconciliation reports whether Stripe's totals match.
 
 The online path performs real sandbox API operations. Its output depends on the account, meter and retained history. Do not replace an unresolved request with a new event ID just to make a retry succeed. Preserve the frozen request, receipt and source event ID.
 
 ## Step 3: stop and inspect failures
 
-The online command cancels and joins the dispatcher before returning. Ctrl-C cancels its parent context. A provider timeout can be ambiguous. Inspect retained state before deciding another send is safe. `OnError` and `OnBacklog` have documented callback limits; observe those categories without logging request bodies or API keys.
+A strict quota check can return 503 before billed work starts.
+An unresolved Stripe send happens later, while exporting recorded usage.
+
+The online command cancels and joins the dispatcher before returning. Ctrl-C cancels its parent context. A provider timeout can be ambiguous. Inspect retained state before deciding another send is safe. See the [callback limits](/pro/reference/quota/#quotastripeconfig). Log `OnError` and `OnBacklog` categories without request bodies or API keys.
 
 The offline example verifies event acceptance only. It does not certify a live Stripe account, invoice correctness or reconciliation coverage. Test online dispatch with your sandbox and the package's pinned Stripe API version before enabling billed traffic.
 
 ## Change for deployment
 
-Replace both memory stores with persistent stores. Use a stable namespace for one account's immutable state history. Configure store capacity, retention and exporter settings consistently. Keep final usage strict so an unavailable store cannot admit unrecorded billed work. Deduplicate quota events by `Event.ID` because the outbox can deliver them more than once and out of order.
+Replace both memory stores with persistent stores. Use a fixed namespace for each export history within a Stripe account. Configure store capacity, retention and exporter settings consistently. Keep final usage strict so an unavailable store cannot admit unrecorded billed work. Deduplicate quota events by `Event.ID` because the outbox can deliver them more than once and out of order.
 
-Coordinate dispatcher leases, source progress records and shutdown across instances. Plan for an exporter outage long enough to fill the quota outbox or exporter backlog. Keep an operator route for unresolved records.
+Coordinate dispatcher leases, source progress records and shutdown across instances. Size the quota outbox and exporter backlog for the longest Stripe outage you expect. Keep an operator route for unresolved records.
 The optional Stripe panel exposes status and reviewed reconciliation/flush actions through [the console](/pro/admin/).
 
-See [quota events and failure policy](/pro/quota/), [accounting tasks](/pro/guides/quota/) and [Stripe configuration fields](/pro/reference/quota/). A strict quota check can return 503 before billed work starts.
-An unresolved Stripe send happens later, while exporting recorded usage.
+See [quota events and failure policy](/pro/quota/), [accounting tasks](/pro/guides/quota/) and [Stripe configuration fields](/pro/reference/quota/).

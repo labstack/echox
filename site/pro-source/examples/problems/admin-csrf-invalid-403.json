@@ -1,5 +1,4 @@
 {
-  "Cache-Control": "",
   "code": "admin_csrf_invalid",
   "detail": "",
   "status": 403,

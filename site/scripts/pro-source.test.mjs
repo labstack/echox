@@ -47,3 +47,32 @@ test('all Pro code languages require source includes even with updated hashes', 
     assert.throws(() => readPro(root), /every Pro code block/);
   }
 });
+
+test('valid hashes cannot authorize executable MDX or private references', (t) => {
+  const root = mkdtempSync(join(tmpdir(), 'pro-source-policy-'));
+  t.after(() => rmSync(root, { recursive: true, force: true }));
+  cpSync(join(siteDir, 'pro-source'), root, { recursive: true });
+  const provenancePath = join(root, 'pro-source.json');
+  const provenance = JSON.parse(readFileSync(provenancePath, 'utf8'));
+  function replace(name, content) {
+    writeFileSync(join(root, name), content);
+    provenance.hashes[name] = createHash('sha256').update(content).digest('hex');
+    writeFileSync(provenancePath, JSON.stringify(provenance));
+  }
+  const name = 'pages/auth.mdx';
+  const original = readFileSync(join(root, name), 'utf8');
+  for (const content of [
+    "import fs from 'node:fs';\n\n{fs.readFileSync('/private/source.go', 'utf8')}",
+    "import privateSource from '/private/source.go?raw';\n\n<pre>{privateSource}</pre>",
+    '[source](../internal/secrets.go)', '[notes](../docs/ARCHITECTURE%2emd)',
+  ]) {
+    replace(name, content);
+    assert.throws(() => readPro(root));
+  }
+  replace(name, original);
+  const apiName = 'config-fields.json';
+  const api = JSON.parse(readFileSync(join(root, apiName), 'utf8'));
+  api.configs[0].file = '../%69nternal/private.go';
+  replace(apiName, JSON.stringify(api));
+  assert.throws(() => readPro(root), /Private|private|source location/);
+});

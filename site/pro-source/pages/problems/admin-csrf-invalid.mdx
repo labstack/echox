@@ -1,5 +1,5 @@
 ---
-title: Admin csrf invalid
+title: Admin CSRF invalid
 description: HTTP 403 and client guidance for admin_csrf_invalid.
 ---
 
@@ -19,7 +19,7 @@ description: HTTP 403 and client guidance for admin_csrf_invalid.
 
 ## When it occurs
 
-A POST that used ambient credentials, such as a cookie, did not carry a valid CSRF token. The token was missing, malformed or expired, or it belongs to another session.
+A POST authenticated by a cookie or another credential that the browser sends automatically did not carry a valid CSRF token. The token was missing, malformed or expired, or it belongs to another session.
 
 ## Client handling
 
@@ -27,38 +27,34 @@ Reload the page to get a fresh form and token, then submit again. API clients ca
 
 ## Example response
 
-The package may omit diagnostic text or return it empty. Operation references do not grant access. Custom handlers can replace the body.
+If your application installs a custom handler, the body may differ.
 
-HTTP 403:
-
-```json file=site/pro-source/examples/problems/admin-csrf-invalid-403.json
+```http file=site/pro-source/examples/problems/admin-csrf-invalid-403.http
 ```
 
-## How to fix
+## Server correction
 
-Refresh the console controls in the current authenticated session. Verify the session binding and retained signing keys across instances. Submit the server-issued CSRF token through the console protocol.
+Check `Principal.Session` and retained `Config.Keys` across instances. Cookie-authenticated POSTs need the token issued for the same session.
 
 ## Response fields
 
-### admin console
+### Admin console
 
 - `code` (string, always): The stable code above.
-- `detail` (string, always): Always present and often empty. Contains safe display text without underlying errors.
+- `detail` (string, always): The console always sends `detail`. It is often empty and never contains the underlying error.
 - `status` (integer, always): The HTTP status of the response.
-- `title` (string, always): The HTTP status text, unless the problem carries a classified title.
+- `title` (string, always): The HTTP status text, such as `Conflict`, unless the panel supplies its own title.
 - `type` (string, always): The exact type URI above.
 
 Headers:
 
-- `Cache-Control` (always): `no-store` on every console problem response, together with the console's security headers.
+- `Cache-Control` (always): `no-store`. The console sends it on every problem response, along with its usual security headers.
 
 Notes:
 
-- Fields are written in key order. The body ends with a newline. The type URI uses `https://echo.labstack.com/pro/problems/` followed by the hyphenated code. HEAD responses have no body.
-- Every 404 response is rewritten to `admin_not_found` with an empty `detail`.
+- Fields are written in alphabetical order.
+- The console rewrites every 404 response to `admin_not_found` with an empty `detail`.
 
 ## Related behavior
 
-The [admin console](/pro/admin/) returns this problem. Check the authenticated role, resolved scope and requested action. For backend failures, inspect application diagnostics before retrying a mutation with its original action ID.
-
-See the [problem catalog](/pro/problems/) for related type URIs and response rules.
+See the [admin console](/pro/admin/) for access checks, action IDs and audit failures.

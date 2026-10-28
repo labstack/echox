@@ -19,49 +19,46 @@ description: HTTP 413 and client guidance for body_too_large.
 
 ## When it occurs
 
-The request body is larger than the server accepts. The declared Content-Length or an actual bounded read exceeded the limit.
+The request body is larger than the server accepts. Either the `Content-Length` header or the bytes actually read exceeded the limit.
 
 ## Client handling
 
-Clients should reduce their request body before retrying.
+Send a smaller body.
 
 ## Example response
 
-The package may omit diagnostic text or return it empty. Operation references do not grant access. Custom handlers can replace the body.
+If your application installs a custom handler, the body may differ.
 
-HTTP 413:
-
-```json file=site/pro-source/examples/problems/body-too-large-413.json
+```http file=site/pro-source/examples/problems/body-too-large-413.http
 ```
 
-## How to fix
+## Server correction
 
-Reduce the body to the configured limit. If the API intentionally accepts larger payloads, review and raise its explicit body bound before deployment. A committed response cannot be replaced by a later 413.
+If the API must accept larger bodies, raise `MaxBodyBytes` before deployment. After the response starts, the server cannot replace it with a 413.
 
 ## Response fields
 
-### OpenAPI chain
+### OpenAPI middleware chain
 
 - `type` (string, always): The exact type URI above.
 - `title` (string, always): The HTTP status text.
 - `status` (integer, always): The HTTP status of the response.
-- `detail` (string, optional): Optional explanation, omitted when empty.
+- `detail` (string, optional): Explanation text. Left out when empty.
 - `code` (string, always): The stable code above.
 
 Notes:
 
-- HEAD responses have no body.
-- The declared Content-Length or an actual bounded read exceeded `MaxBodyBytes` (default 1 MiB). The default openapi ProblemHandler writes RFC 9457 JSON with `type`, `title`, `status` and `code`, using application/problem+json. HEAD has no body.
-- The chain never pre-reads before authentication. An overflow found during Auth has no quota debit. Overflow after limit check retains the charge, subject to the operation's settlement policy. Partial reads may not detect overflow.
-- Once the response is committed, the chain reports a typed BodyTooLargeError through OnError and cannot replace the response with 413.
+- The limit is `MaxBodyBytes` (default 1 MiB). The default OpenAPI `ProblemHandler` writes RFC 9457 JSON with `type`, `title`, `status` and `code`.
+- The chain does not read the body before authentication. If auth finds the overflow, quota charges nothing. If quota already checked the request, the charge stays, subject to its settlement policy. A handler that reads only part of the body may not detect overflow.
+- Once the response starts, the chain passes a `*BodyTooLargeError` to `OnError`. It cannot replace the response with 413.
 
-### application call sites
+### Your application (`problem.NewError`)
 
 - `type` (string, always): The exact type URI above.
 - `title` (string, always): The catalog title in the rendered language: English by default, Japanese only when the application selects it.
 - `status` (integer, always): The HTTP status of the response.
 - `code` (string, always): The stable code above.
-- `detail` (string, optional): Display text projected by the caller, at most 256 bytes with `problem.NewError`; omitted when the caller supplies none.
+- `detail` (string, optional): Display text that your application sets, up to 256 bytes with `problem.NewError`. Omitted when you set none.
 
 Headers:
 
@@ -71,11 +68,9 @@ Headers:
 Notes:
 
 - The adapter keeps existing `WWW-Authenticate`, `Allow` and `Retry-After` headers and adds no challenge or retry advice of its own.
-- The body ends with a newline. HEAD responses have no body; their Content-Length equals the GET body's length.
-- Return it only where a known body limiter rejected the request; another 413 keeps its own meaning.
+- On HEAD, the adapter's `Content-Length` equals the GET body's length.
+- Return this code only when your body limiter rejected the request. Other 413 responses are not this problem.
 
 ## Related behavior
 
-Check the request and its authentication or validation policy before retrying. See [authentication](/pro/auth/) and [tenant authorization](/pro/tenant/).
-
-See the [problem catalog](/pro/problems/) for related type URIs and response rules.
+See the [problem catalog](/pro/problems/) for application error handling.
