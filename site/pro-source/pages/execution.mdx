@@ -1,0 +1,114 @@
+---
+title: Execution and replay safety
+description: Stable operation bindings, conservative send permits and recovery from uncertain external effects.
+sidebar:
+  order: 8
+---
+
+{/* Diataxis: explanation */}
+
+`echo.labstack.com/pro/execution` records external sends under stable operation keys so retries can reuse recorded results.
+The [task guide](/pro/guides/execution/) shows wiring; the [reference](/pro/reference/execution/) lists fields and limits.
+Use it when retrying a request could duplicate a provider operation.
+The journal records what your application reports. It cannot guarantee that a provider applies an operation exactly once.
+
+This Echo route classifies a response that can be replayed. `mw` comes from a constructed execution configuration.
+
+```go file=site/pro-source/examples/source/execution/http_example_test.go#site-anchor
+```
+
+## Keys, authorization and fingerprints
+
+`JournalConfig` requires a namespace, store and named policies.
+Each policy declares its effects and safety/reconciler versions. `New` validates and copies policies without starting goroutines.
+An operation key contains trusted tenant, subject, scope and a stable value.
+Reuse the same key and business input when retrying.
+
+Check current authorization before looking up or replaying a record.
+A record reference helps locate a record; it does not authorize reading it.
+[Authbind](/pro/guides/auth/) supplies callbacks for the verified principal and selected tenant.
+Recheck changed logins and revoked resource grants before returning a saved result.
+
+Fingerprint descriptors specify which request inputs must match on retries.
+HTTP supports `http/v1` and `http/v1+json`. Custom profiles require a descriptor and callback.
+Include claims, cookies or query ordering when they change the operation.
+Changed business input under the same key returns 422 `idempotency_key_reused`.
+
+## Record intent before sending
+
+Call `Attempt.Intent` before every external send.
+It records the effect name, durable payload reference, digest and a distinct send token.
+A rejected intent permits no send. Rebuild the identical provider request from durable application data.
+Disable SDK retries and redirects unless your declared policy accounts for them.
+
+Take a monotonic local start time immediately before `Intent` or `Resend`.
+Compute `start.Add(permit.ValidFor)` and check it before sending.
+Taking the start time before the call makes request latency count against the window instead of extending it.
+Reusing a send token does not extend the stored deadline. The journal does not send the provider request itself.
+
+`Attempt.Call` invokes the provider callback once before the permit deadline and records send timing.
+A timing-recording failure does not turn a successful provider response into a failed operation.
+Use `RecordSendTiming` to retry recording timing. Do not call the provider again to repair diagnostics.
+
+## A timeout leaves the result uncertain
+
+A provider can apply a request after the caller times out.
+A cancelled request, an expired lease or a read that finds no record does not prove the provider stopped processing a send.
+An interrupted holder with an intent can become uncertain. Preserve its key and records for reconciliation or an operator decision.
+
+Only `SafeNewKey` permits using a new operation key.
+It requires proof that no send applied and no duplicate risk remains.
+The library checks proof structure and coverage. Your application must verify that the provider's answer is trustworthy.
+Applied, disputed, abandoned and uncertain records do not permit a fresh key.
+Uncertain records never expire automatically.
+
+`Operator.PrepareResolve` freezes the operator's decision for `Resolve`.
+Keep that prepared request and operator instance if the response is lost.
+Applied and not-applied decisions need different proofs.
+Accepting duplicate risk does not prove a send never happened.
+The [recovery example](/pro/guides/execution/) records a simulated provider success and replays its recovered response.
+
+## Freeze Echo responses
+
+HTTP middleware requires `Journal`, `Operation`, `Identity` and `ReplayCheck`.
+Missing or invalid operation keys return 400 before the handler runs.
+Run body-size checks, authentication, optional `Prepare`, quota, validation, execution and your handler in that order.
+`Prepare` validates and fingerprints without store I/O.
+Execution rechecks the principal and replay permission.
+A validator that returns early must refund its unused work reservation.
+`NotExecuted` can set work cost to zero on replay while keeping the HTTP request charge.
+
+Call `Classify(c, Completed)` or `Classify(c, Failed)` explicitly. The first classification wins.
+The response freezes after the handler and error renderer return.
+Without classification, the operation releases before intent and becomes uncertain after intent, regardless of HTTP status.
+A classified business refusal can replay its 4xx response.
+Panics trigger bounded cleanup and propagate. Put panic recovery outside execution middleware.
+
+The response writer buffers output and rejects streaming, upgrades and trailers.
+Live-response and stored-result sizes have separate limits.
+A live response can exceed the storage limit and still reach the client.
+Duplicates then receive `operation_result_unavailable`; they do not rerun the handler.
+
+Replay sends only allowlisted headers. Nil `ReplayHeaders` means `Content-Type`; an explicit empty slice means no headers.
+Add `Content-Language` and `Cache-Control` when saving problem responses.
+Cookies, hop-by-hop headers and `Content-Length` cannot be replayed.
+Replay adds `Idempotent-Replayed: true` and preserves saved response bytes.
+
+## Stores and shutdown
+
+Publish your result and key retention periods to clients.
+Deleting a completed record allows its key to run again.
+`pgstore` persists records on PostgreSQL 16 through 18.
+Asynchronous failover or a database restore can lose records and allow a key to run again.
+Configure synchronous commit, replication and restores accordingly.
+
+Run `pgstore.Migrate` during deployment. Construct the store with a caller-owned runtime pool.
+`New` starts no workers. The separate transactional runner supports SQL-only operations through its supplied transaction.
+Do not send provider requests from that transaction callback.
+Maintenance must preserve unresolved operations and their records.
+
+`OnTransition` observes committed records. `OnError` reports recording failures without replacing the operation's answer.
+Callbacks run synchronously and can run concurrently for different attempts.
+Attempt callbacks hold its mutex; do not call back into that attempt.
+The [console](/pro/admin/) exposes authorized records and recovery actions.
+A reconciliation scheduler's `Run(ctx)` returns after `ctx` is cancelled. Wait for it to return before closing its store.

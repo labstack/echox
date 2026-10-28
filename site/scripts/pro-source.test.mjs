@@ -1,0 +1,49 @@
+import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
+import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { tmpdir } from 'node:os';
+import test from 'node:test';
+import { readPro, apiSnapshot, siteDir } from './pro-source.mjs';
+
+test('Pro snapshot has complete catalog coverage and source-owned programs', () => {
+  const bundle = readPro();
+  assert.equal(bundle.provenance.version, 'v0.1.0');
+  for (const [name, content] of bundle.files) {
+    if (name.startsWith('pages/') && content.toString().includes('package main')) assert.fail(`${name} pasted a program`);
+  }
+  const api = apiSnapshot(bundle);
+  assert.ok(api.configs['quota.MiddlewareConfig']);
+  assert.ok(api.functions['quota.MiddlewareConfig.ToMiddleware']);
+  assert.ok(!Object.values(api.functions).some((signature) => signature.includes('{')));
+});
+
+test('unreviewed bundle files and modified payloads fail closed', (t) => {
+  const root = mkdtempSync(join(tmpdir(), 'pro-source-'));
+  t.after(() => rmSync(root, { recursive: true, force: true }));
+  cpSync(join(siteDir, 'pro-source'), root, { recursive: true });
+  const file = join(root, 'pages/auth.mdx');
+  const original = readFileSync(file);
+  writeFileSync(file, 'modified');
+  assert.throws(() => readPro(root), /hash mismatch/);
+  writeFileSync(file, original);
+  writeFileSync(join(root, 'PRIVATE.md'), 'unreviewed');
+  assert.throws(() => readPro(root), /inventory differs/);
+});
+
+test('all Pro code languages require source includes even with updated hashes', (t) => {
+  const root = mkdtempSync(join(tmpdir(), 'pro-source-fence-'));
+  t.after(() => rmSync(root, { recursive: true, force: true }));
+  cpSync(join(siteDir, 'pro-source'), root, { recursive: true });
+  const file = join(root, 'pages/auth.mdx');
+  const provenancePath = join(root, 'pro-source.json');
+  const original = readFileSync(file, 'utf8');
+  const provenance = JSON.parse(readFileSync(provenancePath, 'utf8'));
+  for (const lang of ['sh', 'yaml', 'json', 'go']) {
+    const page = `${original}\n\x60\x60\x60${lang}\npasted content\n\x60\x60\x60\n`;
+    writeFileSync(file, page);
+    provenance.hashes['pages/auth.mdx'] = createHash('sha256').update(page).digest('hex');
+    writeFileSync(provenancePath, JSON.stringify(provenance));
+    assert.throws(() => readPro(root), /every Pro code block/);
+  }
+});

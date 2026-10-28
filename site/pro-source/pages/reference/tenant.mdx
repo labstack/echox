@@ -1,0 +1,65 @@
+---
+title: Tenant configuration reference
+description: Fields, defaults and constructors for tenant.
+---
+
+{/* Diataxis: reference */}
+
+import ConfigReference from '../../../../components/ConfigReference.astro';
+
+This reference describes `echo.labstack.com/pro` v0.1.0. [Install the module](/pro/install/) once; subpackages use that same version. The [package explanation](/pro/tenant/) describes behavior and limits. The [task guide](/pro/guides/tenant/) contains source-backed examples and route wiring.
+
+## Defaults
+
+`Config` does not grant unrestricted membership at zero. Nil `Member` permits only a credential-restricted tenant. `AuthorizeConfig` requires an authorizer, action and ownership resolver. `HTTPConfig` requires a client and explicit origin. No adapter starts a worker or owns client shutdown.
+
+The tables list each field's Go type, source comment and default or requirement.
+A shared comment may describe several fields. Use the enclosing type's instructions when a field has no stated default.
+The tables do not infer constructor defaults from Go zero values.
+
+## `tenant.AuthorizeConfig`
+
+Import `echo.labstack.com/pro/tenant`.
+
+<ConfigReference source="pro" name="tenant.AuthorizeConfig" />
+
+## `tenant.CerbosConfig`
+
+Import `echo.labstack.com/pro/tenant`.
+
+<ConfigReference source="pro" name="tenant.CerbosConfig" />
+
+## `tenant.Config`
+
+Import `echo.labstack.com/pro/tenant`.
+
+<ConfigReference source="pro" name="tenant.Config" />
+
+## `tenant.HTTPConfig`
+
+Import `echo.labstack.com/pro/tenant`.
+
+<ConfigReference source="pro" name="tenant.HTTPConfig" />
+
+## `tenant.OpenFGAConfig`
+
+Import `echo.labstack.com/pro/tenant`.
+
+<ConfigReference source="pro" name="tenant.OpenFGAConfig" />
+
+## Adapter limits
+
+| Setting | Default or limit |
+| --- | --- |
+| Selectors | At most 16; copied during construction |
+| Tenant ID | `[A-Za-z0-9._:-]{1,128}` |
+| Authorization timeout | Two seconds by default; at most 30 seconds |
+| HTTP adapter timeout | Two seconds by default |
+| Concurrent HTTP adapter calls | 16 by default; saturation rejects immediately |
+| Request and decompressed response bodies | At most 64 KiB |
+| Redirects | Same host and scheme; at most five hops |
+| Adapter retries and background workers | None |
+
+## Related pages
+
+Use the [problem catalog](/pro/problems/) for exact statuses and type URIs. The [tenant task guide](/pro/guides/tenant/) links the executable examples that exercise these settings. Retain caller-owned clients until in-flight operations and package-owned work have stopped.

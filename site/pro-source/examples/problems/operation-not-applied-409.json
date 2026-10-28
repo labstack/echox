@@ -1,0 +1,10 @@
+{
+  "Cache-Control": "",
+  "code": "operation_not_applied",
+  "operation_ref": "AAAAAAAAAAAAAAAAAAAAAAAA",
+  "operation_state": "failed",
+  "safe_new_key": false,
+  "status": 409,
+  "title": "Conflict",
+  "type": "https://echo.labstack.com/pro/problems/operation-not-applied"
+}

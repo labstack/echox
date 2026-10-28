@@ -1,0 +1,86 @@
+---
+title: Authentication
+description: How API keys and bearer access tokens become verified principals in Echo v5.
+sidebar:
+  order: 3
+---
+
+{/* Diataxis: explanation */}
+
+`echo.labstack.com/pro/auth` verifies API keys and bearer tokens before calling your Echo handler.
+The [task guide](/pro/guides/auth/) shows setup; the [reference](/pro/reference/auth/) lists fields and limits.
+Handlers read the verified principal with `auth.From(ctx)` or `auth.FromEcho(c)`.
+
+This route requires an API key with `invoice:read`. `ring` holds retained peppers; `store` looks up issued key records.
+
+```go file=site/pro-source/examples/source/auth/quickstart_example_test.go#site-anchor
+```
+
+Use API keys for credentials your application issues and revokes.
+Use bearer tokens for access tokens from your configured issuer.
+The package does not implement browser sign-in or cookie sessions.
+[Tenant middleware](/pro/tenant/) runs after authentication. [Quota](/pro/quota/) uses the selected tenant and verified principal.
+
+## Store and rotate API keys
+
+`IssueKey` returns the credential and its `StoredKey` verifier record. Deliver the credential once through a secure channel.
+Persist the record, rather than the credential. Keep peppers in your secret manager, separate from those records.
+
+The first `PepperRing` version issues new credentials. Retained versions verify existing records.
+Removing an old pepper makes its records unusable. Setting `StoredKey.RevokedAt` revokes that credential.
+`MemoryKeyStore` supports concurrent calls but loses records at process exit.
+Your persistent store must return current revocation data and honor lookup cancellation.
+The [persistent lookup example](/pro/guides/auth/#replace-the-memory-key-store) shows the required `KeyStore` method.
+The library does not create an API-key database table.
+
+## Namespaces and principals
+
+Each authentication scheme has a distinct namespace. A simple subject produces an ID such as `billing:invoice-worker`.
+Other subjects use a bounded ID derived with SHA-256.
+Changing the namespace changes the IDs used by quota and execution.
+Rotating a key preserves the principal ID when namespace and subject stay the same.
+
+The principal copies scopes and retains only allowlisted string claims.
+`NewPrincipal` creates a principal for trusted application mappings and tests. It does not verify a credential or change request context.
+A client header cannot establish a verified principal.
+`TenantRestriction` limits later tenant selection. Unrestricted users still need your application's membership check.
+
+## Bearer tokens and JWKS
+
+`NewBearer(ctx, cfg)` validates configuration and loads signing keys before returning.
+Set the exact issuer and API audiences. Set exactly one of `JWKSURL` or `DiscoveryURL`; both require HTTPS.
+Discovery runs once. With empty `AllowedJWKSHosts`, the discovered `jwks_uri` must use the discovery host.
+With a nonempty list, its host must match an exact entry, including any port.
+Token headers never choose a fetch URL.
+
+The default profile requires `typ: at+jwt` or `typ: application/at+jwt`.
+Subject, audience and expiration are required. Symmetric HS algorithms and `none` are rejected.
+`ProfileJWT` accepts `typ: JWT` when explicitly configured. Keep API audiences separate from ID-token audiences.
+`TrustTenantClaim` defaults to false. Enable it only for an issuer allowed to restrict your tenants.
+
+Concurrent refreshes share one fetch. Cancelling a waiter does not cancel that shared fetch.
+A bad signature for a known key does not trigger refresh. Expired caches refresh even known keys, allowing removal to take effect.
+Failed refreshes back off. Last good keys remain usable only for the configured maximum age.
+`Bearer` starts no persistent worker and needs no `Close`.
+See the [JWKS limits](/pro/reference/auth/#token-and-key-limits) for sizes, timeouts and refresh intervals.
+
+## Route policies and failures
+
+`Config.Fallback` is required. `Deny()` rejects requests. `Anonymous()` ignores credentials.
+`Require(...)` accepts named schemes with required scopes. Each alternative uses one scheme; multi-scheme AND requirements are unsupported.
+Multiple credentials, duplicate credential headers and malformed credentials return 401.
+Failed verification never tries a different scheme. A verified credential missing required scopes returns 403.
+
+Public OpenAPI operations ignore supplied credentials.
+Optional authenticated operations allow absent credentials but return 401 for invalid credentials.
+Passing `Report` checks scheme names and scope alternatives during construction.
+An invalid runtime policy returns 500 if startup validation did not catch it.
+
+The [problem adapter](/pro/problems/) renders authentication failures before tenant selection, quota or your handler runs.
+`WWW-Authenticate` contains a scheme-only challenge for missing credentials.
+Invalid bearer tokens get `invalid_token`. Insufficient scopes get `insufficient_scope`.
+
+Optional loggers belong to your application. A nil logger produces no logs.
+Refusal logs contain the scheme and category, without raw credentials.
+The package registers no global metrics collector.
+The [combined tutorial](/pro/getting-started/) runs authentication, tenant selection and quota together.

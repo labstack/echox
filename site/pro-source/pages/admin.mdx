@@ -1,0 +1,92 @@
+---
+title: Admin console
+description: Embedded operator UI with current authorization, explicit mutation policy and audited actions.
+sidebar:
+  order: 9
+---
+
+{/* Diataxis: explanation */}
+
+`echo.labstack.com/pro/admin` serves embedded console assets and APIs from your Echo application.
+The [task guide](/pro/guides/admin/) shows mounting; the [reference](/pro/reference/admin/) lists fields and limits.
+Register panels to inspect your existing quota, execution, audit and durable webhook stores.
+Customers need no frontend build or separate console service.
+
+This mounts a read-only quota panel. `operatorKey` is a disposable fixture credential; `panel` uses the application's limiter.
+
+```go file=site/pro-source/examples/source/admin/quickstart_example_test.go#site-anchor
+```
+
+## Your application authenticates operators
+
+`Authenticate` maps a validated login, bearer credential or trusted sign-in proxy to an admin principal.
+The console provides no browser sign-in or session cookie.
+A principal needs a nonempty ID. Viewer is the default role.
+Set explicit tenant or global access. Authentication alone does not allow writes.
+
+Browser sessions supply a per-login `Principal.Session` value.
+Header-only authentication sets `HeaderCredential`.
+Keep the validated session value stable across requests and change it when the login changes.
+Accept forwarded user headers only after your application validates the trusted proxy.
+[Authbind](/pro/guides/auth/) maps verified scopes to explicit console grants.
+
+The webhook panel covers a store namespace without trusted per-row tenants, so it requires global access.
+A global principal narrowed to a tenant cannot use it.
+Quota views resolve the partition before checking access.
+Each record read checks authorization; a navigation link does not grant access.
+
+## Mount before serving
+
+`Config.Mount(e, prefix)` validates configuration and reserves the prefix with two RouteAny routes.
+Call `VerifyRoutes` after registering all routes to detect routes that bypass that reservation.
+`PublicPath` can name the public console path when a reverse proxy rewrites the URL.
+
+`Config.Middleware` runs inside the console's security and timeout checks.
+Outer CORS middleware must pass console requests through. The [local tutorial](/pro/recipes/admin/) shows that setup.
+The console checks origins and CSRF tokens for its requests.
+`Origins` lists allowed deployment origins. Cookie-session mutations require session-bound CSRF controls.
+
+`Keys` signs pagination cursors, CSRF tokens and confirmations.
+Use the same retained key ring across instances when requests can move between them.
+Keep old key versions while issued tokens remain usable.
+
+## Reads and pagination
+
+Views use bounded pagination.
+A pagination cursor embeds the query and the principal it was issued to; another principal cannot use it.
+Authentication and authorization run again on each page request.
+Confidential filters, such as actor probes, use CSRF-protected POST bodies.
+Keep them out of URLs and browser storage.
+Missing observations display Unknown. They do not prove a backend is healthy.
+
+Memory quota data belongs to the local limiter process.
+Execution and audit panels use their configured stores.
+`webhookadmin` requires `*webhookpg.Store`; memory webhook storage cannot supply that panel.
+Trend counts group retained records by time. They do not contain every state transition.
+Pruning records removes them from those counts.
+
+## Mutations and audit records
+
+Writes are opt-in. Each panel enables specific actions.
+The console checks the operator's current role, tenant/global access and action policy.
+Actions require preview, confirmation and commit. Destructive actions require their configured acknowledgements and target confirmation.
+Keep the same action ID and input when retrying.
+
+The receipt cache prevents repeated local dispatch while it retains the action ID.
+Replaying a cached receipt still checks current authorization.
+The cache does not prevent duplicate backend actions across instances or after eviction.
+Reusing an action ID with changed input returns 409 `admin_action_id_reused`.
+
+Configure a durable audit sink before enabling writes.
+Failed intent recording returns 503 `admin_audit_unavailable` before the mutation runs.
+Outcome recording can fail after the backend changes state.
+The response keeps the mutation result and reports missing audit evidence: a missing record of the application's action.
+Reread backend state when the mutation result is unknown. Neither a timeout nor a missing audit outcome proves rollback.
+
+## Test access and recovery
+
+Use `admintest` with your application's principals, targets and enabled actions.
+Test tenant changes, expired sessions, pagination and cached receipts.
+Test that preview performs no mutation and a failed audit intent prevents mutation.
+The [full demo](/pro/recipes/admin-demo/) seeds operator panels and states its database privilege limits.
+The [problem catalog](/pro/problems/) distinguishes failed authorization, unavailable backends and uncertain mutations.

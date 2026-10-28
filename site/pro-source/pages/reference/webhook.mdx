@@ -1,0 +1,125 @@
+---
+title: Webhook configuration reference
+description: Fields, defaults and constructors for webhook.
+---
+
+{/* Diataxis: reference */}
+
+import ConfigReference from '../../../../components/ConfigReference.astro';
+
+This reference describes `echo.labstack.com/pro` v0.1.0. [Install the module](/pro/install/) once; subpackages use that same version. The [package explanation](/pro/webhook/) describes behavior and limits. The [task guide](/pro/guides/webhook/) contains source-backed examples and route wiring.
+
+## Defaults
+
+`ReceiveConfig` requires source, verifier and inbox and is terminal middleware. `New` and `NewWorker` start no worker; `Run` owns the blocking work loop. `ReplayWindow` is a required receiver guarantee, not an inferred retry duration. PostgreSQL cap and retention values persisted at migration must agree at startup.
+
+The tables list each field's Go type, source comment and default or requirement.
+A shared comment may describe several fields. Use the enclosing type's instructions when a field has no stated default.
+The tables do not infer constructor defaults from Go zero values.
+
+## `webhook.Endpoint`
+
+Import `echo.labstack.com/pro/webhook`.
+
+<ConfigReference source="pro" name="webhook.Endpoint" />
+
+## `webhook.HTTPSenderConfig`
+
+Import `echo.labstack.com/pro/webhook`.
+
+<ConfigReference source="pro" name="webhook.HTTPSenderConfig" />
+
+## `webhook.ReceiveConfig`
+
+Import `echo.labstack.com/pro/webhook`.
+
+<ConfigReference source="pro" name="webhook.ReceiveConfig" />
+
+## `webhook.StandardVerifierConfig`
+
+Import `echo.labstack.com/pro/webhook`.
+
+<ConfigReference source="pro" name="webhook.StandardVerifierConfig" />
+
+## `webhookadmin.Config`
+
+Import `echo.labstack.com/pro/webhook/webhookadmin`.
+
+<ConfigReference source="pro" name="webhookadmin.Config" />
+
+## `webhookmem.DestinationConfig`
+
+Import `echo.labstack.com/pro/webhook/webhookmem`.
+
+<ConfigReference source="pro" name="webhookmem.DestinationConfig" />
+
+## `webhookmem.RoutingConfig`
+
+Import `echo.labstack.com/pro/webhook/webhookmem`.
+
+<ConfigReference source="pro" name="webhookmem.RoutingConfig" />
+
+## `webhookmem.StoreConfig`
+
+Import `echo.labstack.com/pro/webhook/webhookmem`.
+
+<ConfigReference source="pro" name="webhookmem.StoreConfig" />
+
+## `webhookmem.WorkerConfig`
+
+Import `echo.labstack.com/pro/webhook/webhookmem`.
+
+<ConfigReference source="pro" name="webhookmem.WorkerConfig" />
+
+## `webhookpg.DestinationConfig`
+
+Import `echo.labstack.com/pro/webhook/webhookpg`.
+
+<ConfigReference source="pro" name="webhookpg.DestinationConfig" />
+
+## `webhookpg.RoutingConfig`
+
+Import `echo.labstack.com/pro/webhook/webhookpg`.
+
+<ConfigReference source="pro" name="webhookpg.RoutingConfig" />
+
+## `webhookpg.StoreConfig`
+
+Import `echo.labstack.com/pro/webhook/webhookpg`.
+
+<ConfigReference source="pro" name="webhookpg.StoreConfig" />
+
+## `webhookpg.WorkerConfig`
+
+Import `echo.labstack.com/pro/webhook/webhookpg`.
+
+<ConfigReference source="pro" name="webhookpg.WorkerConfig" />
+
+## Delivery and storage limits
+
+| Setting | Default or limit |
+| --- | --- |
+| Signing secrets | `whsec_` plus standard base64 of 24–64 random bytes |
+| Signing/verification key count | At most eight |
+| Timestamp tolerance | Five minutes; range one second–five minutes; checks past and future skew |
+| Header sizes | ID 128 bytes; timestamp 20 bytes; signature 4096 bytes |
+| Receiver body | 256 KiB by default; at most 1 MiB |
+| Receiver timeout | Five seconds by default; verification and acceptance together |
+| Sender client timeout | 15 seconds by default |
+| Sender discarded response body | At most 4 KiB; body is not retained |
+| Sender response headers | At most 16 KiB |
+| PostgreSQL message capacity | 100,000 by default |
+| PostgreSQL logical-byte capacity | 512 MiB by default |
+| Payload retention | Seven days by default |
+| Deduplication retention | 30 days by default |
+| Attempts per cycle | Eight by default |
+| Age per cycle | 72 hours by default |
+| Cumulative attempts | At most 32 |
+| `StoreConfig.Routing.Destinations[name].ReplayWindow` | Required; greater than `RequestTimeout + 5m`; at most 30 days |
+
+Set `ReplayWindow` on the sending store to the remote receiver's documented deduplication period.
+Keep the receiver's deduplication records for at least that long.
+
+## Related pages
+
+Use the [problem catalog](/pro/problems/) for exact statuses and type URIs. The [webhook task guide](/pro/guides/webhook/) links the executable examples that exercise these settings. Retain caller-owned clients until in-flight operations and package-owned work have stopped.

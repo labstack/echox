@@ -145,3 +145,24 @@ lockfile.
 ## License
 
 [MIT](LICENSE)
+
+## Echo Pro documentation
+
+`site/pro-source/` is a reviewed export from the private Echo Pro repository.
+Public builds never fetch that repository or need registry credentials. A minimal
+nested `site/pro-source/go.mod` keeps the exported examples out of root Go tests. Edit the
+canonical pages under `echo-pro/docs/site/`, then run `just site-docs` with this
+repository's absolute `site/pro-source` path. Do not edit snapshot files here.
+The provenance file records version, base commit and SHA-256 of every payload.
+
+`npm run pro:check` verifies hashes, the publication allowlist, the problem
+catalog and a separate declaration baseline. Review API changes before running
+`npm run pro:accept`. ConfigReference's `source="pro"` mode shows source paths
+and lines without private GitHub links. Empty code fences use
+`file=site/pro-source/examples/...` through the shared source plugin.
+
+Astro materializes the pages into ignored `site/src/content/docs/pro/` during
+configuration. The docs route retains Starlight rendering and filters synthetic
+locale fallbacks. Next builds omit the Pro collection. Pro has its own sidebar,
+version strip and Pagefind product filter; OSS navigation and the MIT Cookbook
+stay independent. The custom `/pro` page remains the product entry point.

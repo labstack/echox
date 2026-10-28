@@ -1,0 +1,14 @@
+---
+// Preserve Starlight's renderer and routing data while excluding English-only
+// Pro pages from automatic locale fallbacks and the OSS next channel.
+import { getStaticPaths as starlightPaths } from '@astrojs/starlight/routes/static/index.astro';
+import CommonPage from '@astrojs/starlight/routes/common.astro';
+import { includeDocsRoute } from './pro-page.mjs';
+
+export const prerender = true;
+export async function getStaticPaths() {
+  const paths = await starlightPaths();
+  return paths.filter(({ params }) => includeDocsRoute(params.slug, process.env.DOCS_CHANNEL === 'next'));
+}
+---
+<CommonPage />

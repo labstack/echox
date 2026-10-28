@@ -1,0 +1,101 @@
+---
+title: Getting started
+description: Run and test a local Echo application with authentication, tenant isolation, quota and signed delivery.
+sidebar:
+  order: 2
+---
+
+{/* Diataxis: tutorial */}
+
+## Goal
+
+Run one local Echo application and observe its authentication, tenant selection and quota checks. Queue a signed `invoice.created` event and inspect tenant usage in the embedded console. This tutorial uses memory stores. All key, usage and webhook state disappears when the process exits.
+
+## Prerequisites
+
+Complete [installation](/pro/install/) in an application module using Go 1.26 or later. Port 8080 must be free on loopback. Have `curl` and a browser available. You do not need Redis, PostgreSQL or a frontend build. Use a new path for the disposable API-key file.
+
+## Step 1: start the application
+
+From your application module directory, find the installed module directory:
+
+```sh file=site/pro-source/examples/site-docs/commands.sh#module-directory
+```
+
+Run its compiled example:
+
+```sh file=site/pro-source/examples/site-docs/commands.sh#getting-started
+```
+
+The program creates the key file with mode 600 and refuses an existing path. It prints the API URL ending in `/v1/tenants/acme/invoices` and the admin URL. Keep this terminal running. The key is restricted to `acme` and has invoice read/write and admin-read scopes. The process keeps its pepper in memory.
+
+The `-browser` option grants local browser requests read-only console access at the exact listener authority. Anyone able to use that loopback listener can use this demonstration access. Replace it with validated login in a deployed application.
+
+## Step 2: check authentication
+
+In another terminal, make an unauthenticated request:
+
+```sh file=site/pro-source/examples/site-docs/commands.sh#unauthenticated
+```
+
+Expect HTTP 401 and `Content-Type: application/problem+json`. The guard refuses the request before tenant resolution, quota checks and the invoice handler.
+
+Send the credential using curl's header-file input. The command reads it directly from the private file and does not place its value in command arguments:
+
+```sh file=site/pro-source/examples/site-docs/commands.sh#authenticated
+```
+
+Expect HTTP 200. The JSON contains tenant `acme` and invoice `inv-1`. This is the first admitted request against the free plan's three-per-UTC-day budget.
+
+## Step 3: verify tenant isolation
+
+Use the same key on a different tenant path:
+
+```sh file=site/pro-source/examples/site-docs/commands.sh#cross-tenant
+```
+
+Expect HTTP 403. The path selector and credential restriction disagree. Quota does not consume a request for this refusal. Changing a URL cannot expand the service key's tenant authority.
+
+## Step 4: queue an event
+
+Create a demonstration invoice:
+
+```sh file=site/pro-source/examples/site-docs/commands.sh#create-invoice
+```
+
+Expect HTTP 202 with `invoice` and `webhook_ref` fields. The generated invoice ID changes each run. This is the second admitted request. The program queues a frozen event with a stable key derived from that invoice ID. The local worker signs it and sends it to the loopback receiver.
+
+The server terminal prints `Webhook delivered: verified invoice.created` after verification. The receiver checks the original bytes. It does not persist invoices or deduplicate business effects. The enqueue response means queued; it does not wait for delivery.
+
+## Step 5: exhaust the daily quota
+
+Repeat the authenticated GET from Step 2 once. It returns 200 and uses the third unit. Repeat it again. The fourth authenticated request returns HTTP 429 with code `quota_exceeded`, `type: https://iana.org/assignments/http-problem-types#quota-exceeded` and `Retry-After`. The response identifies the violated policy. Unauthenticated and foreign-tenant refusals did not spend that budget.
+
+The counter follows a UTC day. Restarting this memory-only demo clears its usage. A deployed budget shared across processes needs [Redis or Valkey](/pro/guides/quota/); restarting one application instance must not reset paid usage.
+
+## Step 6: inspect and stop
+
+Open `http://127.0.0.1:8080/admin`. Select Quota, then Usage, with tenant `acme` and plan `free`. The panel reads the same limiter. It does not consume a request. This local console enables no writes.
+
+Press Ctrl-C in the server terminal. HTTP serving stops first. The application then joins the webhook worker and drains limiter-owned work.
+Finally, it removes only the key file it created. An unclean process exit can leave the file behind; remove that stale disposable file before restarting with the same path.
+
+## Source and verification
+
+This is the complete program used above. Its tests exercise the live loopback routes, refusals, signed delivery and shutdown:
+
+```go file=site/pro-source/examples/getting-started/main.go
+```
+
+Run the example regression tests from the installed module directory:
+
+```sh file=site/pro-source/examples/site-docs/commands.sh#test-recipes
+```
+
+## Change for deployment
+
+Replace `MemoryKeyStore` with a store implementing `Lookup(context.Context, string) (auth.StoredKey, error)`.
+See the [compiled lookup example](/pro/guides/auth/#replace-the-memory-key-store).
+Return current revocation data and load retained peppers through your runtime secret manager. Keep authentication and tenant membership before quota. Select subscription plans from trusted application state. Use `redisstore` for shared budgets.
+
+Use `webhookpg` for durable inbox/outbox state and a permanent application business key for effects. Retain receiver deduplication for the sender's replay horizon. Replace the demo console credential injection with validated sessions and exact origins. The [package explanations](/pro/auth/) and [full console tutorial](/pro/recipes/admin-demo/) explain storage and operator requirements.

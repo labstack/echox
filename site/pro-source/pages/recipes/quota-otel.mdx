@@ -1,0 +1,65 @@
+---
+title: Quota telemetry
+description: Observe a local Echo request and MCP tool call through owned OpenTelemetry providers.
+sidebar:
+  order: 10
+---
+
+{/* Diataxis: tutorial */}
+
+## Goal
+
+Trace one Echo request and one metered MCP tool call. Export their spans and quota metrics to stdout, then stop the providers and limiter. This tutorial uses the same compiled program for the HTTP request and tool call. No collector or external model service runs.
+
+## Prerequisites
+
+[Install Echo Pro](/pro/install/) with Go 1.26 or later. The program binds a temporary loopback port and opens an in-process MCP connection. It needs no stable listening port, Redis, database or credential. Keep stdout local if you add application attributes to the example.
+
+## Step 1: run the demonstration
+
+Find the installed module directory:
+
+```sh file=site/pro-source/examples/site-docs/commands.sh#module-directory
+```
+
+Run the program:
+
+```sh file=site/pro-source/examples/site-docs/commands.sh#quota-otel
+```
+
+The program makes its own HTTP request and tool call and then exits. You do not need curl. Stdout contains OpenTelemetry JSON from the trace and metric exporters. Timestamps, trace IDs and durations vary. The HTTP span is named `HTTP GET`; the tool path meters `search`. Inspect the emitted quota decision events and token/request instruments. Generated IDs differ between runs.
+
+## Step 2: follow the HTTP context
+
+The tracing middleware starts the span before quota and replaces the request context. Quota hooks therefore observe that span. `quota.JoinHooks` combines tracing, metrics and lifecycle observations. The limiter has plan `team`, a ten-unit `daily` request limit and a 1000-unit `tokens` limit on the token meter.
+
+The HTTP callback returns fixed tenant `demo`. This fixed value is for the demo. Replace it with [authbind callbacks](/pro/guides/auth/) after authentication and tenant resolution in a deployed application.
+
+## Step 3: follow tool accounting
+
+The program registers `search` on an MCP server and connects an in-process client. `quotamcp` applies an explicit tool policy and the same limiter. MCP telemetry uses a bounded allowlist for plan, tool and meter names. It does not trust model-generated arguments as tenant authority.
+
+The full source owns both providers, creates the failure counter and joins the HTTP server and MCP sessions:
+
+```go file=site/pro-source/examples/quota-otel/main.go
+```
+
+## Step 4: verify the lifecycle
+
+Run the example tests:
+
+```sh file=site/pro-source/examples/site-docs/commands.sh#test-recipes
+```
+
+The program stops HTTP serving, closes limiter-owned settlement work and shuts down meter and tracer providers through bounded cleanup contexts. It does not change global telemetry providers. An exporter failure is returned to the caller; the example does not silently drop it from the final process result.
+
+For a smaller tracing-only fixture, this executable example prints `true quota.decision`:
+
+```go file=site/pro-source/examples/source/quota/quotaotel/tracing_example_test.go
+```
+
+## Change for deployment
+
+Replace stdout exporters with your own provider/export path. Keep the providers caller-owned and drain them at shutdown after work stops. Define allowlists from controlled plan, limit, tool and meter names. Do not label metrics with raw tenant IDs, credentials or arbitrary tool arguments.
+
+Use Redis or Valkey for budgets shared across processes. Keep allow/deny decisions separate from final consumption and settlement metrics. Tracing a denied attempt does not mean it consumed work. See [quota accounting tasks](/pro/guides/quota/) for reserve/settle examples and [the configuration reference](/pro/reference/quota/) for telemetry bounds.

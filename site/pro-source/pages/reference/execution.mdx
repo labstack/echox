@@ -1,0 +1,79 @@
+---
+title: Execution configuration reference
+description: Fields, defaults and constructors for execution.
+---
+
+{/* Diataxis: reference */}
+
+import ConfigReference from '../../../../components/ConfigReference.astro';
+
+This reference describes `echo.labstack.com/pro` v0.1.0. [Install the module](/pro/install/) once; subpackages use that same version. The [package explanation](/pro/execution/) describes behavior and limits. The [task guide](/pro/guides/execution/) contains source-backed examples and route wiring.
+
+## Defaults
+
+Journal namespace, store and policies are required. The HTTP adapter also requires `Identity` and `ReplayCheck` callbacks. Namespace caps and shard count are persisted and must agree across instances. `MaxResponseBytes` and the journal's `MaxResultBytes` are independent bounds. Uncertain bindings do not expire through terminal retention.
+
+The tables list each field's Go type, source comment and default or requirement.
+A shared comment may describe several fields. Use the enclosing type's instructions when a field has no stated default.
+The tables do not infer constructor defaults from Go zero values.
+
+## `execution.JournalConfig`
+
+Import `echo.labstack.com/pro/execution`.
+
+<ConfigReference source="pro" name="execution.JournalConfig" />
+
+## `execution.MiddlewareConfig`
+
+Import `echo.labstack.com/pro/execution`.
+
+<ConfigReference source="pro" name="execution.MiddlewareConfig" />
+
+## `execution.ReconcileSchedulerConfig`
+
+Import `echo.labstack.com/pro/execution`.
+
+<ConfigReference source="pro" name="execution.ReconcileSchedulerConfig" />
+
+## `executionadmin.Config`
+
+Import `echo.labstack.com/pro/execution/executionadmin`.
+
+<ConfigReference source="pro" name="executionadmin.Config" />
+
+## `pgstore.StoreConfig`
+
+Import `echo.labstack.com/pro/execution/pgstore`.
+
+<ConfigReference source="pro" name="pgstore.StoreConfig" />
+
+## `pgstore.TxRunnerConfig`
+
+Import `echo.labstack.com/pro/execution/pgstore`.
+
+<ConfigReference source="pro" name="pgstore.TxRunnerConfig" />
+
+## Public policy aliases
+
+These records are public aliases used by journal and HTTP configuration.
+
+<ConfigReference source="pro" name="execution.Policy" />
+<ConfigReference source="pro" name="execution.Effect" />
+<ConfigReference source="pro" name="execution.Limits" />
+<ConfigReference source="pro" name="execution.FingerprintSpec" />
+
+## HTTP and retention limits
+
+| Setting | Default or limit |
+| --- | --- |
+| Key header | `Idempotency-Key` |
+| Key syntax | One field line, at most 300 bytes; RFC 8941 Item String without parameters or a bare token |
+| Request fingerprint | 1 MiB by default; at most 8 MiB |
+| Live HTTP response | 1 MiB by default; at most 8 MiB |
+| Stored result | 64 KiB by default; at most 1 MiB |
+| Result retention | 24 hours by default |
+| Operation key retention | Seven days by default; unresolved records do not expire automatically |
+
+## Related pages
+
+Use the [problem catalog](/pro/problems/) for exact statuses and type URIs. The [execution task guide](/pro/guides/execution/) links the executable examples that exercise these settings. Retain caller-owned clients until in-flight operations and package-owned work have stopped.

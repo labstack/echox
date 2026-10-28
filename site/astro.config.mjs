@@ -1,11 +1,16 @@
 import { defineConfig, fontProviders } from 'astro/config';
-import starlight from '@astrojs/starlight';
+import starlightBase from '@astrojs/starlight';
+import { englishOnlyPro } from './plugins/english-only-pro.mjs';
+const starlight = (options) => englishOnlyPro(starlightBase(options));
 import sitemap from '@astrojs/sitemap';
 import { unified } from '@astrojs/markdown-remark';
 import { redirects, retiredCookbookRedirects } from './src/redirects.mjs';
 import remarkSourceCode from './plugins/remark-source-code.mjs';
 import { locales } from './src/locales.mjs';
+import { preparePro } from './scripts/pro-source.mjs';
 import { isProPage } from './src/pro-page.mjs';
+
+preparePro();
 
 const next = process.env.DOCS_CHANNEL === 'next';
 
@@ -138,7 +143,7 @@ export default defineConfig({
       expressiveCode: { themes: ['github-dark', 'github-light'] },
     }),
     // Starlight adds @astrojs/sitemap only when it is missing; add it here with
-    // the same i18n mapping so the noindex /pro page stays out of the sitemap.
+    // the same i18n mapping and keep Pro only on the release site.
     sitemap({
       i18n: {
         defaultLocale: 'root',

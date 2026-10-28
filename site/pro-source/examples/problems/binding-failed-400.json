@@ -1,0 +1,6 @@
+{
+  "code": "binding_failed",
+  "status": 400,
+  "title": "Bad Request",
+  "type": "https://echo.labstack.com/pro/problems/binding-failed"
+}

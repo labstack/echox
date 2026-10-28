@@ -1,4 +1,5 @@
 ---
+import pro from '../../pro-source/pro-source.json';
 import stable from '../generated/echo-source.json';
 import manifest from '../generated/config-fields.json';
 import { formatRevision } from '../data/source.mjs';
@@ -29,6 +30,10 @@ const counterpart = /\/(?:404|404\.html)\/?$/.test(path)
 {isLaunchHome && <aside class="echo-version-banner launch" aria-label="Announcement" data-pagefind-ignore>
   <span><strong>New: Echo Pro</strong> — multi-tenant auth, quotas and signed webhooks for Echo&nbsp;v5.<span class="detail"> Founding pricing for the first 25 organisations.</span></span>
   <a class="switch" href="/pro" data-ga-event="pro_click" data-ga-placement="launch_banner">See Echo Pro <span aria-hidden="true">→</span></a>
+</aside>}
+
+{isProduct && path.replace(/\/$/, '') !== '/pro' && <aside class="echo-version-banner" aria-label="Echo Pro version" data-pagefind-ignore>
+  <strong>Echo Pro {pro.version}</strong><span>· Go 1.26+ · Echo v5.4.2</span><a href="/pro/install/">Install</a>
 </aside>}
 
 {!isProduct && !isLaunchHome && <nav class="echo-version-banner" aria-label="Documentation version" data-pagefind-ignore>

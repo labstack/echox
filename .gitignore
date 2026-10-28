@@ -12,3 +12,6 @@ site/src/generated/
 site/dist/
 site/dist-next/
 site/node_modules/
+
+# Materialized from the tracked, private-repo export bundle.
+site/src/content/docs/pro/

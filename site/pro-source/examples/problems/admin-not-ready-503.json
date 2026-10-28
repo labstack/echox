@@ -1,0 +1,8 @@
+{
+  "Cache-Control": "",
+  "code": "admin_not_ready",
+  "detail": "",
+  "status": 503,
+  "title": "Service Unavailable",
+  "type": "https://echo.labstack.com/pro/problems/admin-not-ready"
+}

@@ -1,0 +1,57 @@
+---
+title: Local admin console
+description: Run a read-only quota panel and inspect the console authentication checks.
+sidebar:
+  order: 12
+---
+
+{/* Diataxis: tutorial */}
+
+## Goal
+
+Mount a quota panel in a loopback Echo application. Inspect usage through a Viewer principal and identify the authentication callback you must replace for deployment. The example uses a process-local session binding and disposable memory quota state.
+
+## Prerequisites
+
+[Install Echo Pro](/pro/install/) and make port 8080 available. You need a browser and Go 1.26 or later. No database, Redis or frontend toolchain is required. The example has fixed local authentication, so keep its listener on loopback.
+
+## Step 1: run the program
+
+Find the installed source directory:
+
+```sh file=site/pro-source/examples/site-docs/commands.sh#module-directory
+```
+
+Start the example:
+
+```sh file=site/pro-source/examples/site-docs/commands.sh#admin
+```
+
+The process listens on `127.0.0.1:8080`. It remains running until Ctrl-C. It does not print a startup banner on successful construction. Open `http://127.0.0.1:8080/admin` in your browser.
+
+## Step 2: inspect the quota panel
+
+The principal is `local-reader`, restricted to tenant `demo`, with the default Viewer role. Select the `team` plan in quota usage. The plan has a 100-unit daily `calls` counter and a `credits` balance on the `tokens` meter. The program registers no business routes that consume them, so this is an inspection fixture.
+
+Write actions are absent. This is a useful first check: a successful login alone does not enable credit changes or reset. The view reads the same limiter supplied to `quotaadmin.New`.
+
+## Step 3: inspect middleware order
+
+The outer CORS middleware skips the console prefix and its descendants for every method. Console requests reach the console's own origin and CSRF wrapper. `Config.Mount` validates the panel and authentication callback, and `VerifyRoutes` checks the reserved prefix before serving.
+
+Read the complete runnable source:
+
+```go file=site/pro-source/examples/admin/main.go
+```
+
+`Authenticate` returns a fixed principal because this is a local fixture. The random session binding lasts for one process. A production callback maps a real validated login and its session ID. Use exact deployment origins and retain signing keys when continuations or actions span instances.
+
+## Step 4: stop the program
+
+Press Ctrl-C. The server has a five-second shutdown bound. The limiter closes through a separate bounded cleanup context. Memory quota state and the fixture session disappear. Restarting produces a fresh fixture.
+
+## Change for deployment
+
+Replace fixed authentication with your login or trusted authbind mapping. Keep the console prefix reserved and verify it after all route registration. Use shared quota storage when the application has multiple instances. Configure explicit Operator scope, audit and confirmation policy before enabling mutations.
+
+Run the [admin examples](/pro/guides/admin/) to test valid and missing credentials. Use the [configuration reference](/pro/reference/admin/) for shell defaults. The [full console demo](/pro/recipes/admin-demo/) adds store-backed execution, audit and webhook panels and reports its database privilege limitations.

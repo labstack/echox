@@ -1,0 +1,143 @@
+---
+title: Quota configuration reference
+description: Fields, defaults and constructors for quota.
+---
+
+{/* Diataxis: reference */}
+
+import ConfigReference from '../../../../components/ConfigReference.astro';
+
+This reference describes `echo.labstack.com/pro` v0.1.0. [Install the module](/pro/install/) once; subpackages use that same version. The [package explanation](/pro/quota/) describes behavior and limits. The [task guide](/pro/guides/quota/) contains source-backed examples and route wiring.
+
+## Defaults
+
+`Config.Store` and `Plans` are required. Middleware needs an `Identity` callback using verified application data. One plan selects itself. Multiple plans require `Plan`. Billing periods require `Period`. Hooks, fallback and outbox behavior are documented with their fields.
+If you leave a telemetry callback nil, the package does not call it. Redis constructors validate options without connecting. Your application closes the client.
+
+The tables list each field's Go type, source comment and default or requirement.
+A shared comment may describe several fields. Use the enclosing type's instructions when a field has no stated default.
+The tables do not infer constructor defaults from Go zero values.
+
+## `quota.AdminConfig`
+
+Import `echo.labstack.com/pro/quota`.
+
+<ConfigReference source="pro" name="quota.AdminConfig" />
+
+## `quota.Breaker`
+
+Import `echo.labstack.com/pro/quota`.
+
+<ConfigReference source="pro" name="quota.Breaker" />
+
+## `quota.Config`
+
+Import `echo.labstack.com/pro/quota`.
+
+<ConfigReference source="pro" name="quota.Config" />
+
+## `quota.Fallback`
+
+Import `echo.labstack.com/pro/quota`.
+
+<ConfigReference source="pro" name="quota.Fallback" />
+
+## `quota.Hooks`
+
+Import `echo.labstack.com/pro/quota`.
+
+<ConfigReference source="pro" name="quota.Hooks" />
+
+## `quota.MemoryConfig`
+
+Import `echo.labstack.com/pro/quota`.
+
+<ConfigReference source="pro" name="quota.MemoryConfig" />
+
+## `quota.MiddlewareConfig`
+
+Import `echo.labstack.com/pro/quota`.
+
+<ConfigReference source="pro" name="quota.MiddlewareConfig" />
+
+## `quota.Outbox`
+
+Import `echo.labstack.com/pro/quota`.
+
+<ConfigReference source="pro" name="quota.Outbox" />
+
+## `quotaadmin.Config`
+
+Import `echo.labstack.com/pro/quota/quotaadmin`.
+
+<ConfigReference source="pro" name="quotaadmin.Config" />
+
+## `quotamcp.MiddlewareConfig`
+
+Import `echo.labstack.com/pro/quota/quotamcp`.
+
+<ConfigReference source="pro" name="quotamcp.MiddlewareConfig" />
+
+## `quotamcp.Policy`
+
+Import `echo.labstack.com/pro/quota/quotamcp`.
+
+<ConfigReference source="pro" name="quotamcp.Policy" />
+
+## `quotaotel.LifecycleConfig`
+
+Import `echo.labstack.com/pro/quota/quotaotel`.
+
+<ConfigReference source="pro" name="quotaotel.LifecycleConfig" />
+
+## `quotaotel.TraceConfig`
+
+Import `echo.labstack.com/pro/quota/quotaotel`.
+
+<ConfigReference source="pro" name="quotaotel.TraceConfig" />
+
+## `quotaprom.LifecycleConfig`
+
+Import `echo.labstack.com/pro/quota/quotaprom`.
+
+<ConfigReference source="pro" name="quotaprom.LifecycleConfig" />
+
+## `quotastripe.Config`
+
+Import `echo.labstack.com/pro/quota/quotastripe`.
+
+<ConfigReference source="pro" name="quotastripe.Config" />
+
+## `quotastripe.StoreConfig`
+
+Import `echo.labstack.com/pro/quota/quotastripe`.
+
+<ConfigReference source="pro" name="quotastripe.StoreConfig" />
+
+## `redisstore.Config`
+
+Import `echo.labstack.com/pro/quota/redisstore`.
+
+<ConfigReference source="pro" name="redisstore.Config" />
+
+## `stripeadmin.Config`
+
+Import `echo.labstack.com/pro/quota/quotastripe/stripeadmin`.
+
+<ConfigReference source="pro" name="stripeadmin.Config" />
+
+## Plan and store limits
+
+| Setting | Default or limit |
+| --- | --- |
+| Limits in a plan | 1–16 |
+| Limit IDs and meters | `[a-z0-9][a-z0-9_]{0,31}` |
+| Refill burst | Refill amount by default |
+| Concurrent lease | Five minutes by default |
+| Subject parts and operations | At most 256 bytes each |
+| Remote store timeout | 25 ms by default; caller cancellation can end it sooner |
+| Denial cache | Off by default; at most ten seconds and never longer than the retry delay |
+
+## Related pages
+
+Use the [problem catalog](/pro/problems/) for exact statuses and type URIs. The [quota task guide](/pro/guides/quota/) links the executable examples that exercise these settings. Retain caller-owned clients until in-flight operations and package-owned work have stopped.

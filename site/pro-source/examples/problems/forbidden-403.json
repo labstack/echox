@@ -1,0 +1,6 @@
+{
+  "code": "forbidden",
+  "status": 403,
+  "title": "Forbidden",
+  "type": "https://echo.labstack.com/pro/problems/forbidden"
+}

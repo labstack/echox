@@ -1,0 +1,1 @@
+machine go.labstack.io login <org> password <token>

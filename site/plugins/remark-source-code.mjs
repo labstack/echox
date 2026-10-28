@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { parseSourceDocument, visitCode } from './source-document.mjs';
 
 const repoRoot = fileURLToPath(new URL('../..', import.meta.url));
-const regionMarker = /^\s*\/\/\s*docs:(start|end)\s+(\S+)\s*$/;
+const regionMarker = /^\s*(?:\/\/|#)\s*docs:(start|end)\s+(\S+)\s*$/;
 
 export function sourceReference(node) {
   // Tokenize whole attributes so file= inside a quoted title is ordinary text.

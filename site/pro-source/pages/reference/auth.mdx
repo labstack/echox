@@ -1,0 +1,90 @@
+---
+title: Auth configuration reference
+description: Fields, defaults and constructors for auth.
+---
+
+{/* Diataxis: reference */}
+
+import ConfigReference from '../../../../components/ConfigReference.astro';
+
+This reference describes `echo.labstack.com/pro` v0.1.0. [Install the module](/pro/install/) once; subpackages use that same version. The [package explanation](/pro/auth/) describes behavior and limits. The [task guide](/pro/guides/auth/) contains source-backed examples and route wiring.
+
+## Defaults
+
+`Config.Fallback` has no implicit policy. A zero requirement is invalid. `APIKey` requires namespace, prefix, peppers and a store. An empty API-key header selects `Authorization: ApiKey`. Bearer construction fetches the initial configured JWKS; middleware construction starts no persistent worker. Caller-owned stores, clients, clocks and loggers must support the documented concurrent calls.
+
+The tables list each field's Go type, source comment and default or requirement.
+A shared comment may describe several fields. Use the enclosing type's instructions when a field has no stated default.
+The tables do not infer constructor defaults from Go zero values.
+
+## `auth.APIKey`
+
+Import `echo.labstack.com/pro/auth`.
+
+<ConfigReference source="pro" name="auth.APIKey" />
+
+## `auth.BearerConfig`
+
+Import `echo.labstack.com/pro/auth`.
+
+<ConfigReference source="pro" name="auth.BearerConfig" />
+
+## `auth.Config`
+
+Import `echo.labstack.com/pro/auth`.
+
+<ConfigReference source="pro" name="auth.Config" />
+
+## `auth.KeyOptions`
+
+Import `echo.labstack.com/pro/auth`.
+
+<ConfigReference source="pro" name="auth.KeyOptions" />
+
+## `auth.PrincipalConfig`
+
+Import `echo.labstack.com/pro/auth`.
+
+<ConfigReference source="pro" name="auth.PrincipalConfig" />
+
+## `authbind.QuotaConfig`
+
+Import `echo.labstack.com/pro/auth/authbind`.
+
+<ConfigReference source="pro" name="authbind.QuotaConfig" />
+
+## Token and key limits
+
+| Setting | Default or limit |
+| --- | --- |
+| API-key format | Prefix, 22-character base62 ID, 43-character base62 secret |
+| Pepper ring | At most eight versions; 32–1024 random bytes per key |
+| Namespace | `[a-z][a-z0-9-]{0,31}` |
+| Principal ID | At most 233 bytes |
+| Default JWT algorithms | RS256, PS256, ES256, EdDSA |
+| Clock skew | 30 seconds by default; at most two minutes |
+| Token size | At most 8 KiB |
+| Claims size | At most 16 KiB |
+| Scopes | At most 64; at most 128 bytes each |
+| JWKS and discovery reads | At most 64 KiB read from `resp.Body`; bearer adds no decompression step |
+| JWKS entries | At most 32 raw entries |
+| RSA keys | 2048–8192 bits |
+| Duplicate key IDs | Every entry with that ID is dropped |
+| Fetch timeout | Five seconds by default |
+| Unknown-key refresh cooldown | 30 seconds |
+| Failed-refresh backoff | At most 32 minutes |
+| Last good keys | Usable for at most 24 hours after loading |
+
+`AllowedJWKSHosts` replaces the discovery-host default when nonempty.
+Each discovered host must match an exact list entry, including any port.
+The HTTP client's transport may decompress `resp.Body`; bearer itself only limits bytes read from that body.
+
+## Persistent key lookup
+
+`auth.KeyStore` requires `Lookup(context.Context, string) (auth.StoredKey, error)`.
+Lookups must support concurrent calls and return current revocation data.
+See the [compiled SQL sketch](/pro/guides/auth/#replace-the-memory-key-store).
+
+## Related pages
+
+Use the [problem catalog](/pro/problems/) for exact statuses and type URIs. The [auth task guide](/pro/guides/auth/) links the executable examples that exercise these settings. Retain caller-owned clients until in-flight operations and package-owned work have stopped.

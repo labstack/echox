@@ -1,6 +1,10 @@
-// /pro is an English-only product page on the release site; the next preview
-// (base /next/) only redirects there. One check for every place that treats it
-// differently: header, footer, banner, route data and the sitemap filter.
+// Pro is English-only and independent of the OSS preview channel.
 export function isProPage(pathname) {
-  return pathname.replace(/^\/next(?=\/|$)/, '').replace(/\/$/, '') === '/pro';
+  return /^\/pro(?:\/|$)/.test(pathname.replace(/^\/next(?=\/|$)/, ''));
+}
+
+// Starlight synthesizes locale fallbacks. Filter them before static rendering.
+export function includeDocsRoute(slug = '', next = false) {
+  if (/^(?:es|ja|pt-br|zh-cn)\/pro(?:\/|$)/.test(slug)) return false;
+  return !(next && /^pro(?:\/|$)/.test(slug));
 }

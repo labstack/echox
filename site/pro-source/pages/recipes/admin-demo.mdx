@@ -1,0 +1,78 @@
+---
+title: Full console demo
+description: Inspect seeded operator panels with disposable PostgreSQL schemas and explicit privilege limits.
+sidebar:
+  order: 13
+---
+
+{/* Diataxis: tutorial */}
+
+## Goal
+
+Run the console over seeded quota, Stripe, OpenAPI, execution, webhook and audit observations. Inspect preview/confirmation/commit behavior and retained execution or delivery records. The demo uses caller-supplied PostgreSQL and creates uniquely named demonstration schemas. It never starts a database service.
+
+## Prerequisites
+
+[Install Echo Pro](/pro/install/) with Go 1.26 or later. Supply an existing disposable PostgreSQL 18 database where your assigned login can create and remove its own schemas. Use resources you are authorized to modify. Inject `ADMIN_DEMO_POSTGRES_URL` at runtime; do not place the connection URL in command arguments or logs. Make loopback port 8080 available.
+
+An ordinary database owner without `CREATEROLE` runs the development-owner path. Execution and webhook use that one owner, and audit events stay in bounded memory. Durable audit requires its separate role topology and privileges to inspect the database cluster. Do not grant extra shared privileges merely to make this tutorial pass.
+
+## Step 1: start the console
+
+Find the installed module directory:
+
+```sh file=site/pro-source/examples/site-docs/commands.sh#module-directory
+```
+
+With the database URL already injected, run:
+
+```sh file=site/pro-source/examples/site-docs/commands.sh#admin-demo
+```
+
+The program checks the listener is a literal loopback IP. It connects to the supplied database and seeds only this run's `admin_demo_...` schemas. It prints an admin URL, seed directory URL and fulfillment-console URL. Open `http://127.0.0.1:8080/` for the seeded record links and `/admin` for the payments console. `/admin-fulfillment` binds the other execution namespace.
+
+## Step 2: verify the privilege mode
+
+Without `CREATEROLE`, startup reports that role-separation checks and durable PostgreSQL audit are skipped, and that audit records disappear on exit. Treat this as a limitation of this run. Execution and webhook still use the real database, but this mode does not test restricted runtime-role grants.
+
+The privileged fixture path creates its own roles and schemas, applies migrations and cleans up only those names. Use that path only on an independently owned disposable fixture authorized for role changes. It is not required to inspect the ordinary development-owner UI.
+
+## Step 3: understand authentication
+
+If `ADMIN_DEMO_API_KEY` is absent, browser mode issues an ephemeral local key and injects it only for requests without `Authorization`. The key stays in memory and is never printed. A supplied invalid credential still fails. The local listener authority constrains this fixture access.
+
+If `ADMIN_DEMO_API_KEY` is injected, strict mode requires `Authorization: ApiKey <credential>` on every request. Configure that mode through a secure client or trusted local proxy. The demo's import mapping is disposable. A deployed application persists the original issued record and manages retained pepper versions.
+
+## Step 4: inspect panels and actions
+
+Open the seeded directory and follow the record links instead of inventing references. Inspect an execution's holder/send timeline and replay state. Compare webhook queue state with attempt history. Quota usage is seeded in memory; Stripe history is demonstration data and does not dispatch real Stripe usage.
+
+Startup exercises real console CSRF, preview, confirmation and commit calls to produce audit records of actions. The demo does not fabricate those admin audit events. Keep the displayed action ID when inspecting a retry. A missing outcome does not establish rollback.
+
+The entry point wires all panels, authentication and lifecycle:
+
+```go file=site/pro-source/examples/admin-demo/main.go
+```
+
+The server owns the webhook worker and HTTP shutdown:
+
+```go file=site/pro-source/examples/admin-demo/server.go
+```
+
+## Step 5: stop and verify cleanup
+
+Press Ctrl-C. The program stops the server and worker, then closes limiter-owned work.
+It removes only the schemas and roles created by this run. It never drops the supplied database or owner role. An interrupted process can leave its exact run schemas behind; identify them through your authorized database process before cleanup. Do not delete another run's schemas.
+
+Run the local example tests for the fixture's authentication and non-database behavior:
+
+```sh file=site/pro-source/examples/site-docs/commands.sh#test-recipes
+```
+
+Those tests do not replace PostgreSQL migration, permission or restore checks. A database-backed run needs the supplied backend and reports its own limitations. The browser fixture is useful for inspecting the full UI; it is not a durability or availability benchmark.
+
+## Change for deployment
+
+Replace ephemeral credentials with validated application login. Use distinct deployment and runtime roles, exact origins and retained signing keys. Disable actions your operators do not need. Configure a durable audit sink before mutation policy. Preserve the per-package storage and restore requirements in [audit](/pro/audit/), [execution](/pro/execution/) and [webhooks](/pro/webhook/).
+
+The [admin task guide](/pro/guides/admin/) covers mounting and protocol tests. The [configuration reference](/pro/reference/admin/) lists shell defaults; each package reference lists its panel settings. Use [problem pages](/pro/problems/) to distinguish failed authorization, denied requests and uncertain mutation outcomes.

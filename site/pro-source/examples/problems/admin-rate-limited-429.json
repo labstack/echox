@@ -1,0 +1,8 @@
+{
+  "Cache-Control": "",
+  "code": "admin_rate_limited",
+  "detail": "",
+  "status": 429,
+  "title": "Too Many Requests",
+  "type": "https://echo.labstack.com/pro/problems/admin-rate-limited"
+}

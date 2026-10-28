@@ -1,0 +1,10 @@
+{
+  "Cache-Control": "",
+  "code": "idempotency_key_missing",
+  "operation_ref": "",
+  "operation_state": "",
+  "safe_new_key": false,
+  "status": 400,
+  "title": "Bad Request",
+  "type": "https://echo.labstack.com/pro/problems/idempotency-key-missing"
+}

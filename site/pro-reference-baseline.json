@@ -1,0 +1,3302 @@
+{
+  "module": "echo.labstack.com/pro",
+  "version": "v0.1.0",
+  "configs": {
+    "admin.Config": [
+      {
+        "name": "Authenticate",
+        "type": "func(*echo.Context) (Principal, error)",
+        "doc": "Authenticate is required and returns fresh customer-validated claims on every request.\nErrors and invalid principals fail closed with admin_unauthenticated.",
+        "default": "Authenticate is required and returns fresh customer-validated claims on every request."
+      },
+      {
+        "name": "Authorize",
+        "type": "func(context.Context, Principal, Access) error",
+        "doc": "Authorize optionally narrows resolved default grants. Errors hide targets with 404.\nNavigation candidates are advisory; every data request is authorized separately.\nInvalid requests also pass authorization with Navigation false. Only\nindividually valid parameters are included; required parameters may be\nmissing. Denied views remain indistinguishable from unknown views. An\nauthorized request with invalid parameters then returns 400.\nPOST lookups authorize the input scope before store access, then the resolved\nrecord target before data access. Lookup input can contain secrets; do not log it.",
+        "default": "Authorize optionally narrows resolved default grants. Only individually valid parameters are included; required parameters may be missing."
+      },
+      {
+        "name": "Middleware",
+        "type": "[]echo.MiddlewareFunc",
+        "doc": "Middleware runs inside the protected wrapper, before Authenticate.\nIts HTTP errors are sanitized and passed through ErrorHandler.\nMiddleware is optional; nil installs no additional middleware.",
+        "default": "Middleware is optional; nil installs no additional middleware."
+      },
+      {
+        "name": "Panels",
+        "type": "[]Panel",
+        "doc": "Panels contains 1–64 sealed adapters; Mount copies the slice and descriptors.\nPanels is required; configure 1 through 64 adapters.",
+        "default": "Panels is required; configure 1 through 64 adapters."
+      },
+      {
+        "name": "Origins",
+        "type": "[]string",
+        "doc": "Origins contains up to 16 exact trusted browser-visible origins. Empty derives\nthe origin from TLS and Host; forwarded headers are never trusted.",
+        "default": "Empty derives the origin from TLS and Host; forwarded headers are never trusted."
+      },
+      {
+        "name": "PublicPath",
+        "type": "string",
+        "doc": "PublicPath is the trusted external literal path; defaults to the mount prefix.",
+        "default": "PublicPath is the trusted external literal path; defaults to the mount prefix."
+      },
+      {
+        "name": "RateLimit",
+        "type": "func(context.Context, Principal, Access) (time.Duration, error)",
+        "doc": "RateLimit optionally replaces the bounded built-in principal bucket. A positive\nduration refuses with 429 and Retry-After; errors refuse with admin_busy.\nPOST lookups are charged before store access, including guesses that miss.\nShell pages also use Access{Panel: \"console\", View: \"shell\"}; authenticated\nClient shell routes and descriptor requests consume a token before navigation.",
+        "default": "RateLimit optionally replaces the bounded built-in principal bucket."
+      },
+      {
+        "name": "MaxExpensive",
+        "type": "int",
+        "doc": "MaxExpensive bounds simultaneous expensive views, including lookup work:\n1–64, default 2.",
+        "default": "MaxExpensive bounds simultaneous expensive views, including lookup work: 1–64, default 2."
+      },
+      {
+        "name": "Timeout",
+        "type": "time.Duration",
+        "doc": "Timeout bounds the full request, including middleware: 1ms–1m, default 10s.",
+        "default": "Timeout bounds the full request, including middleware: 1ms–1m, default 10s."
+      },
+      {
+        "name": "Theme",
+        "type": "Theme",
+        "doc": "Theme contains trusted application presentation; copied by value at Mount.\nTheme at zero selects the system scheme and default Echo Pro Admin title.",
+        "default": "Theme at zero selects the system scheme and default Echo Pro Admin title."
+      },
+      {
+        "name": "Instance",
+        "type": "string",
+        "doc": "Instance labels instance-local observations; required when a panel uses them.",
+        "default": "Instance labels instance-local observations; required when a panel uses them."
+      },
+      {
+        "name": "ErrorHandler",
+        "type": "func(*echo.Context, error) error",
+        "doc": "ErrorHandler optionally renders sanitized authentication and middleware problems.\nIf it leaves the response uncommitted, the shell renders the sanitized problem.",
+        "default": "ErrorHandler optionally renders sanitized authentication and middleware problems."
+      },
+      {
+        "name": "Logger",
+        "type": "*slog.Logger",
+        "doc": "Logger is optional and caller-owned; nil logs nothing. Only sanitized codes are logged.",
+        "default": "Logger is optional and caller-owned; nil logs nothing."
+      },
+      {
+        "name": "Now",
+        "type": "func() time.Time",
+        "doc": "Now is a concurrency-safe clock; nil defaults to time.Now.",
+        "default": "Now is a concurrency-safe clock; nil defaults to time.Now."
+      },
+      {
+        "name": "Keys",
+        "type": "[][]byte",
+        "doc": "Keys contains 1–8 signing/encryption keys of 32–64 bytes, copied at Mount.\nRequired for paginated or digest8 views, declared POST reads and actions.\nThe first signs and derives display digests,\nand all verify tokens. Digests are stable with the same first key, change when it\nrotates, and cannot be reversed without the key. Without Keys, unpaginated confidential reads use an ephemeral CSRF key\ncreated at mount. Tokens expire on remount and cannot be shared across\ninstances.",
+        "default": "Required for paginated or digest8 views, declared POST reads and actions."
+      },
+      {
+        "name": "CursorTTL",
+        "type": "time.Duration",
+        "doc": "CursorTTL bounds continuation lifetime: zero selects 15 minutes;\nvalid range 1s–24h.",
+        "default": "CursorTTL bounds continuation lifetime: zero selects 15 minutes; valid range 1s–24h."
+      },
+      {
+        "name": "CSRFTTL",
+        "type": "time.Duration",
+        "doc": "CSRFTTL bounds synchronizer tokens: zero selects 1 hour; valid range\n1s–24h.",
+        "default": "CSRFTTL bounds synchronizer tokens: zero selects 1 hour; valid range 1s–24h."
+      },
+      {
+        "name": "ActorBoundCSRF",
+        "type": "bool",
+        "doc": "ActorBoundCSRF permits an empty session with actor-only token lifetime.",
+        "default": "ActorBoundCSRF permits an empty session with actor-only token lifetime."
+      },
+      {
+        "name": "Audit",
+        "type": "AuditSink",
+        "doc": "Audit is a caller-owned, concurrency-safe durable sink required for enabled actions.",
+        "default": "Audit is a caller-owned, concurrency-safe durable sink required for enabled actions."
+      },
+      {
+        "name": "AllowUnauditedWrites",
+        "type": "bool",
+        "doc": "AllowUnauditedWrites explicitly opts out of durable auditing. Mount warns\nthrough Logger when actions are enabled; nil Logger remains silent.",
+        "default": "Mount warns through Logger when actions are enabled; nil Logger remains silent."
+      },
+      {
+        "name": "RedactText",
+        "type": "func(string) string",
+        "doc": "RedactText sanitizes free-text audit fields; nil retains only length and digest.",
+        "default": "RedactText sanitizes free-text audit fields; nil retains only length and digest."
+      },
+      {
+        "name": "Rand",
+        "type": "io.Reader",
+        "doc": "Rand is a concurrency-safe nonce source; nil defaults to crypto/rand.Reader.\nCustom readers must supply cryptographically secure bytes in production.",
+        "default": "Rand is a concurrency-safe nonce source; nil defaults to crypto/rand.Reader."
+      }
+    ],
+    "admin.Theme": [
+      {
+        "name": "Mode",
+        "type": "string",
+        "doc": "Mode is the initial SPA color scheme: empty (system), light or dark. Viewers may override it.",
+        "default": "Mode is the initial SPA color scheme: empty (system), light or dark."
+      },
+      {
+        "name": "Title",
+        "type": "string",
+        "doc": "Title is trusted console text; defaults to Echo Pro Admin.",
+        "default": "Title is trusted console text; defaults to Echo Pro Admin."
+      },
+      {
+        "name": "Accent",
+        "type": "string",
+        "doc": "Accent is an optional #rrggbb color. Light backgrounds require 4.5:1\ncontrast. Dark mode uses a lighter shade that reaches that contrast.",
+        "default": "Accent is an optional #rrggbb color. Light backgrounds require 4.5:1 contrast."
+      },
+      {
+        "name": "Environment",
+        "type": "string",
+        "doc": "Environment is optional trusted text shown on the SPA header.",
+        "default": "Environment is optional trusted text shown on the SPA header."
+      },
+      {
+        "name": "Tone",
+        "type": "string",
+        "doc": "Tone is empty, info, warning or danger.",
+        "default": "Tone is empty, info, warning or danger."
+      },
+      {
+        "name": "ExtraCSS",
+        "type": "string",
+        "doc": "ExtraCSS is trusted application CSS, limited to 64 KiB.\nExtraCSS is optional; empty appends no application stylesheet.",
+        "default": "ExtraCSS is optional; empty appends no application stylesheet."
+      }
+    ],
+    "audit.Capacity": [
+      {
+        "name": "Events",
+        "type": "int",
+        "doc": "Events is required and must be positive; there is no default.",
+        "default": "Events is required and must be positive; there is no default."
+      },
+      {
+        "name": "Bytes",
+        "type": "int",
+        "doc": "Bytes is required and must be positive; there is no default.",
+        "default": "Bytes is required and must be positive; there is no default."
+      }
+    ],
+    "audit.DenialConfig": [
+      {
+        "name": "Schema",
+        "type": "*Schema",
+        "doc": "Schema is required, constructed and caller-owned.",
+        "default": "Schema is required, constructed and caller-owned."
+      },
+      {
+        "name": "Recorder",
+        "type": "Recorder",
+        "doc": "Recorder is required, caller-owned and must honor its recording\ncontext.",
+        "default": "Recorder is required, caller-owned and must honor its recording context."
+      },
+      {
+        "name": "Actor",
+        "type": "func(*echo.Context) (Actor, error)",
+        "doc": "Actor is optional; nil or a failed callback uses Anonymous when no\nScope exists.",
+        "default": "Actor is optional; nil or a failed callback uses Anonymous when no Scope exists."
+      },
+      {
+        "name": "Tenant",
+        "type": "func(*echo.Context) (string, error)",
+        "doc": "Tenant is optional; nil or a failed callback uses the global tenant\nwhen no Scope exists.",
+        "default": "Tenant is optional; nil or a failed callback uses the global tenant when no Scope exists."
+      },
+      {
+        "name": "Statuses",
+        "type": "[]int",
+        "doc": "default 401, 403; copied; 1–8 distinct 4xx codes",
+        "default": "default 401, 403; copied; 1–8 distinct 4xx codes."
+      },
+      {
+        "name": "Action",
+        "type": "string",
+        "doc": "default http.request.denied",
+        "default": "default http.request.denied."
+      },
+      {
+        "name": "FailClosed",
+        "type": "bool",
+        "doc": "FailClosed returns *DenialUnrecordedError on failed recording only\nbefore response commitment; false preserves the original denial.\nFailClosed defaults to false, preserving the original denial on recording failure.",
+        "default": "FailClosed defaults to false, preserving the original denial on recording failure."
+      },
+      {
+        "name": "Timeout",
+        "type": "time.Duration",
+        "doc": "default 500ms; 50ms–5s",
+        "default": "default 500ms; 50ms–5s."
+      },
+      {
+        "name": "MaxInFlight",
+        "type": "int",
+        "doc": "default 64; 1–1024",
+        "default": "default 64; 1–1024."
+      },
+      {
+        "name": "RequestIDHeader",
+        "type": "string",
+        "doc": "default X-Request-ID",
+        "default": "default X-Request-ID."
+      },
+      {
+        "name": "Logger",
+        "type": "*slog.Logger",
+        "doc": "optional; sanitized codes only",
+        "default": "optional; sanitized codes only."
+      }
+    ],
+    "audit.MemoryStoreConfig": [
+      {
+        "name": "Capacity",
+        "type": "Capacity",
+        "doc": "Capacity requires positive event and byte bounds; there are no\ndefaults.",
+        "default": "Capacity requires positive event and byte bounds; there are no defaults."
+      },
+      {
+        "name": "Timeout",
+        "type": "time.Duration",
+        "doc": "Timeout bounds every lock wait, each test-transaction call and each short\nReadView including its callback; default 5s, valid range 100ms–60s.",
+        "default": "Timeout bounds every lock wait, each test-transaction call and each short ReadView including its callback; default 5s, valid range 100ms–60s."
+      },
+      {
+        "name": "Now",
+        "type": "func() time.Time",
+        "doc": "Now is retained and must be concurrency safe; nil uses time.Now.",
+        "default": "Now is retained and must be concurrency safe; nil uses time.Now."
+      }
+    ],
+    "audit.MiddlewareConfig": [
+      {
+        "name": "Actor",
+        "type": "func(*echo.Context) (Actor, error)",
+        "doc": "Actor is required; it resolves the verified principal and must not retain\nc.",
+        "default": "Actor is required; it resolves the verified principal and must not retain c."
+      },
+      {
+        "name": "Tenant",
+        "type": "func(*echo.Context) (string, error)",
+        "doc": "Tenant is optional; nil uses the global (empty) tenant. It must not\nretain c.",
+        "default": "Tenant is optional; nil uses the global (empty) tenant."
+      },
+      {
+        "name": "RequestIDHeader",
+        "type": "string",
+        "doc": "RequestIDHeader defaults to X-Request-ID and must be a valid HTTP\nfield name.",
+        "default": "RequestIDHeader defaults to X-Request-ID and must be a valid HTTP field name."
+      }
+    ],
+    "audit.ReaderConfig": [
+      {
+        "name": "Schema",
+        "type": "*Schema",
+        "doc": "Schema is required and retained; it must carry the recording keyring\n(non-nil Keys), including retained keys.",
+        "default": "Schema is required and retained; it must carry the recording keyring (non-nil Keys), including retained keys."
+      },
+      {
+        "name": "Access",
+        "type": "Recorder",
+        "doc": "required for Reveal/Export; must commit independently, never provisionally",
+        "default": "required for Reveal/Export; must commit independently, never provisionally."
+      },
+      {
+        "name": "TokenTTL",
+        "type": "time.Duration",
+        "doc": "default 15m; 1m–24h",
+        "default": "default 15m; 1m–24h."
+      },
+      {
+        "name": "MaxExports",
+        "type": "int",
+        "doc": "default 2; 1–16 concurrent snapshot exports per Reader",
+        "default": "default 2; 1–16 concurrent snapshot exports per Reader."
+      },
+      {
+        "name": "Now",
+        "type": "func() time.Time",
+        "doc": "default time.Now; must not block",
+        "default": "default time.Now; must not block."
+      }
+    ],
+    "audit.RelayConfig": [
+      {
+        "name": "Name",
+        "type": "string",
+        "doc": "Name is required and identifies an already registered cursor: 1–64\nASCII lowercase letters, digits, underscores or hyphens, starting\nwith a letter.",
+        "default": "Name is required and identifies an already registered cursor: 1–64 ASCII lowercase letters, digits, underscores or hyphens, starting with a letter."
+      },
+      {
+        "name": "Exporter",
+        "type": "Exporter",
+        "doc": "Exporter is required and retained; it must honor cancellation and\ndeclare the same representation as the registered cursor.",
+        "default": "Exporter is required and retained; it must honor cancellation and declare the same representation as the registered cursor."
+      },
+      {
+        "name": "Witness",
+        "type": "ProgressWitness",
+        "doc": "Witness is an optional caller-owned durable progress witness; nil\ndisables it.",
+        "default": "Witness is an optional caller-owned durable progress witness; nil disables it."
+      },
+      {
+        "name": "Batch",
+        "type": "int",
+        "doc": "Batch defaults to 256 (1–4096); MaxBytes defaults to 1 MiB\n(64 KiB–8 MiB).",
+        "default": "Batch defaults to 256 (1–4096); MaxBytes defaults to 1 MiB (64 KiB–8 MiB)."
+      },
+      {
+        "name": "MaxBytes",
+        "type": "int",
+        "doc": "Batch defaults to 256 (1–4096); MaxBytes defaults to 1 MiB\n(64 KiB–8 MiB).",
+        "default": "Batch defaults to 256 (1–4096); MaxBytes defaults to 1 MiB (64 KiB–8 MiB)."
+      },
+      {
+        "name": "Poll",
+        "type": "time.Duration",
+        "doc": "Poll defaults to 1s and must be positive. Lease defaults to 30s\n(5s–5m). Backoff defaults to 1s (1s–5m).",
+        "default": "Poll defaults to 1s and must be positive. Lease defaults to 30s (5s–5m). Backoff defaults to 1s (1s–5m)."
+      },
+      {
+        "name": "Lease",
+        "type": "time.Duration",
+        "doc": "Poll defaults to 1s and must be positive. Lease defaults to 30s\n(5s–5m). Backoff defaults to 1s (1s–5m).",
+        "default": "Poll defaults to 1s and must be positive. Lease defaults to 30s (5s–5m). Backoff defaults to 1s (1s–5m)."
+      },
+      {
+        "name": "Backoff",
+        "type": "time.Duration",
+        "doc": "Poll defaults to 1s and must be positive. Lease defaults to 30s\n(5s–5m). Backoff defaults to 1s (1s–5m).",
+        "default": "Poll defaults to 1s and must be positive. Lease defaults to 30s (5s–5m). Backoff defaults to 1s (1s–5m)."
+      },
+      {
+        "name": "Logger",
+        "type": "*slog.Logger",
+        "doc": "Logger is currently unused; Relay emits no logs.\nLogger is optional and caller-owned; nil is silent.",
+        "default": "Logger is optional and caller-owned; nil is silent."
+      }
+    ],
+    "audit.SchemaConfig": [
+      {
+        "name": "Fields",
+        "type": "map[string]redact.Class",
+        "doc": "Fields is copied; nil registers no metadata fields. At most 256 names\nmatching [a-z][a-z0-9_]{0,63} may be registered with valid classes.",
+        "default": "Fields is copied; nil registers no metadata fields."
+      },
+      {
+        "name": "Policy",
+        "type": "redact.StorePolicy",
+        "doc": "Policy selects at-rest representations; its Modes map is copied by\nconstruction. Zero selects redact defaults and requires HMAC keys.",
+        "default": "Zero selects redact defaults and requires HMAC keys."
+      },
+      {
+        "name": "Keys",
+        "type": "*redact.Keyring",
+        "doc": "Keys is an immutable caller-owned keyring retained by Schema. Keep it\nusable independently of the Schema lifetime. Nil requires\nPolicy.AllowMaskFallback when an HMAC mode is selected.",
+        "default": "Nil requires Policy.AllowMaskFallback when an HMAC mode is selected."
+      },
+      {
+        "name": "Now",
+        "type": "func() time.Time",
+        "doc": "Now is retained and must be concurrency safe; nil uses time.Now.",
+        "default": "Now is retained and must be concurrency safe; nil uses time.Now."
+      }
+    ],
+    "auditadmin.PanelConfig": [
+      {
+        "name": "ID",
+        "type": "string",
+        "doc": "ID defaults to audit; use [a-z][a-z0-9-]{0,31}, excluding api and\nassets. Use a new ID or shell Keys when rebinding a store.",
+        "default": "ID defaults to audit; use [a-z][a-z0-9-]{0,31}, excluding api and assets."
+      },
+      {
+        "name": "Reader",
+        "type": "*audit.Reader",
+        "doc": "Reader is required, concurrency safe and caller-owned; it is never closed.",
+        "default": "Reader is required, concurrency safe and caller-owned; it is never closed."
+      },
+      {
+        "name": "ActorClass",
+        "type": "redact.Class",
+        "doc": "ActorClass defaults to Identifier; SensitiveDigest8 is also accepted.",
+        "default": "ActorClass defaults to Identifier; SensitiveDigest8 is also accepted."
+      },
+      {
+        "name": "TargetClass",
+        "type": "redact.Class",
+        "doc": "TargetClass defaults to Identifier; Public, SensitiveIP and SensitiveDigest8\nare also accepted. Per-request class parameters override these probe defaults.",
+        "default": "TargetClass defaults to Identifier; Public, SensitiveIP and SensitiveDigest8 are also accepted. Per-request class parameters override these probe defaults."
+      },
+      {
+        "name": "EnableReveal",
+        "type": "bool",
+        "doc": "EnableReveal adds the privileged POST read that records audit evidence; default false.",
+        "default": "EnableReveal adds the privileged POST read that records audit evidence; default false."
+      },
+      {
+        "name": "PrincipalClass",
+        "type": "redact.Class",
+        "doc": "PrincipalClass classifies audit evidence for reveal actions; defaults to Identifier.\nSensitiveDigest8 is also accepted.",
+        "default": "PrincipalClass classifies audit evidence for reveal actions; defaults to Identifier."
+      },
+      {
+        "name": "RevealReasons",
+        "type": "[]string",
+        "doc": "RevealReasons is copied; empty selects incident_response,\ncustomer_request and legal_request. Otherwise supply 1–16 distinct\n[a-z0-9_]{1,64} codes.",
+        "default": "RevealReasons is copied; empty selects incident_response, customer_request and legal_request."
+      }
+    ],
+    "auditpg.Roles": [
+      {
+        "name": "Deployment",
+        "type": "string",
+        "doc": "Deployment defaults to audit_deployment.",
+        "default": "Deployment defaults to audit_deployment."
+      },
+      {
+        "name": "Recorder",
+        "type": "string",
+        "doc": "Recorder defaults to audit_recorder.",
+        "default": "Recorder defaults to audit_recorder."
+      },
+      {
+        "name": "Relay",
+        "type": "string",
+        "doc": "Relay defaults to audit_relay.",
+        "default": "Relay defaults to audit_relay."
+      },
+      {
+        "name": "Maintenance",
+        "type": "string",
+        "doc": "Maintenance defaults to audit_maintenance.",
+        "default": "Maintenance defaults to audit_maintenance."
+      },
+      {
+        "name": "Reader",
+        "type": "string",
+        "doc": "Reader defaults to audit_reader.",
+        "default": "Reader defaults to audit_reader."
+      }
+    ],
+    "auditpg.SchemaConfig": [
+      {
+        "name": "Schema",
+        "type": "string",
+        "doc": "Schema defaults to public; use [A-Za-z_][A-Za-z0-9_]{0,62}.",
+        "default": "Schema defaults to public; use [A-Za-z_][A-Za-z0-9_]{0,62}."
+      },
+      {
+        "name": "Roles",
+        "type": "Roles",
+        "doc": "Roles selects existing deployment and runtime roles. Empty fields use\nRoles defaults; names must be distinct.",
+        "default": "Empty fields use Roles defaults; names must be distinct."
+      },
+      {
+        "name": "Timeout",
+        "type": "time.Duration",
+        "doc": "Timeout bounds ordinary operations; zero uses 5s, valid range\n100ms–60s.",
+        "default": "Timeout bounds ordinary operations; zero uses 5s, valid range 100ms–60s."
+      },
+      {
+        "name": "MigrateTimeout",
+        "type": "time.Duration",
+        "doc": "MigrateTimeout bounds the whole migration in place of Timeout;\nzero uses 1m, valid range 1s–1h.",
+        "default": "MigrateTimeout bounds the whole migration in place of Timeout; zero uses 1m, valid range 1s–1h."
+      }
+    ],
+    "auth.APIKey": [
+      {
+        "name": "Namespace",
+        "type": "string",
+        "doc": "Namespace and Prefix are required and validated during middleware construction.",
+        "default": "Namespace and Prefix are required and validated during middleware construction."
+      },
+      {
+        "name": "Prefix",
+        "type": "string",
+        "doc": "Namespace and Prefix are required and validated during middleware construction.",
+        "default": "Namespace and Prefix are required and validated during middleware construction."
+      },
+      {
+        "name": "Header",
+        "type": "string",
+        "doc": "Header empty selects Authorization: ApiKey; a configured header is also accepted.",
+        "default": "Header empty selects Authorization: ApiKey; a configured header is also accepted."
+      },
+      {
+        "name": "Peppers",
+        "type": "PepperRing",
+        "doc": "Peppers is required; construction copies its versions and key bytes.",
+        "default": "Peppers is required; construction copies its versions and key bytes."
+      },
+      {
+        "name": "Store",
+        "type": "KeyStore",
+        "doc": "Store is required, caller-owned and must return current revocation state.",
+        "default": "Store is required, caller-owned and must return current revocation state."
+      },
+      {
+        "name": "LookupTimeout",
+        "type": "time.Duration",
+        "doc": "LookupTimeout defaults to 2s; valid range 1ms through 30s.",
+        "default": "LookupTimeout defaults to 2s; valid range 1ms through 30s."
+      }
+    ],
+    "auth.BearerConfig": [
+      {
+        "name": "Namespace",
+        "type": "string",
+        "doc": "Namespace names principal IDs using [a-z][a-z0-9-]{0,31};\nrequired. Issuer is the exact trusted issuer string, required and at\nmost 2048 bytes.",
+        "default": "Namespace names principal IDs using [a-z][a-z0-9-]{0,31}; required. Issuer is the exact trusted issuer string, required and at most 2048 bytes."
+      },
+      {
+        "name": "Issuer",
+        "type": "string",
+        "doc": "Namespace names principal IDs using [a-z][a-z0-9-]{0,31};\nrequired. Issuer is the exact trusted issuer string, required and at\nmost 2048 bytes.",
+        "default": "Namespace names principal IDs using [a-z][a-z0-9-]{0,31}; required. Issuer is the exact trusted issuer string, required and at most 2048 bytes."
+      },
+      {
+        "name": "Audiences",
+        "type": "[]string",
+        "doc": "Audiences is copied; require 1–32 accepted values, each 1–512 bytes.",
+        "default": "Audiences is copied; require 1–32 accepted values, each 1–512 bytes."
+      },
+      {
+        "name": "JWKSURL",
+        "type": "string",
+        "doc": "JWKSURL and DiscoveryURL are HTTPS sources; set exactly one.",
+        "default": "JWKSURL and DiscoveryURL are HTTPS sources; set exactly one."
+      },
+      {
+        "name": "DiscoveryURL",
+        "type": "string",
+        "doc": "JWKSURL and DiscoveryURL are HTTPS sources; set exactly one.",
+        "default": "JWKSURL and DiscoveryURL are HTTPS sources; set exactly one."
+      },
+      {
+        "name": "AllowedJWKSHosts",
+        "type": "[]string",
+        "doc": "AllowedJWKSHosts is copied, with at most 32 exact jwks_uri hosts,\nincluding a port only when the URL has one. Empty permits only the\ndiscovery host for the discovered JWKS URL.",
+        "default": "Empty permits only the discovery host for the discovered JWKS URL."
+      },
+      {
+        "name": "Algorithms",
+        "type": "[]jose.SignatureAlgorithm",
+        "doc": "Algorithms is copied; empty selects RS256, PS256, ES256 and EdDSA.\nAt most ten RSA, RSA-PSS, ECDSA or EdDSA algorithms are accepted.",
+        "default": "Algorithms is copied; empty selects RS256, PS256, ES256 and EdDSA."
+      },
+      {
+        "name": "Profile",
+        "type": "TokenProfile",
+        "doc": "Profile defaults to ProfileAccessToken; ProfileJWT is the other valid\nvalue.",
+        "default": "Profile defaults to ProfileAccessToken; ProfileJWT is the other valid value."
+      },
+      {
+        "name": "ClockSkew",
+        "type": "time.Duration",
+        "doc": "ClockSkew defaults to 30s; nonzero values must be positive and at\nmost 2m.",
+        "default": "ClockSkew defaults to 30s; nonzero values must be positive and at most 2m."
+      },
+      {
+        "name": "SubjectClaim",
+        "type": "string",
+        "doc": "SubjectClaim defaults to sub; ScopeClaim defaults to scope, then scp\nif absent. KindClaim empty selects User. TenantClaim is used only\nwith TrustTenantClaim.",
+        "default": "SubjectClaim defaults to sub; ScopeClaim defaults to scope, then scp if absent. KindClaim empty selects User."
+      },
+      {
+        "name": "ScopeClaim",
+        "type": "string",
+        "doc": "SubjectClaim defaults to sub; ScopeClaim defaults to scope, then scp\nif absent. KindClaim empty selects User. TenantClaim is used only\nwith TrustTenantClaim.",
+        "default": "SubjectClaim defaults to sub; ScopeClaim defaults to scope, then scp if absent. KindClaim empty selects User."
+      },
+      {
+        "name": "KindClaim",
+        "type": "string",
+        "doc": "SubjectClaim defaults to sub; ScopeClaim defaults to scope, then scp\nif absent. KindClaim empty selects User. TenantClaim is used only\nwith TrustTenantClaim.",
+        "default": "SubjectClaim defaults to sub; ScopeClaim defaults to scope, then scp if absent. KindClaim empty selects User."
+      },
+      {
+        "name": "TenantClaim",
+        "type": "string",
+        "doc": "SubjectClaim defaults to sub; ScopeClaim defaults to scope, then scp\nif absent. KindClaim empty selects User. TenantClaim is used only\nwith TrustTenantClaim.",
+        "default": "SubjectClaim defaults to sub; ScopeClaim defaults to scope, then scp if absent. KindClaim empty selects User."
+      },
+      {
+        "name": "TrustTenantClaim",
+        "type": "bool",
+        "doc": "TrustTenantClaim explicitly permits TenantClaim to restrict the\nprincipal; default false.",
+        "default": "TrustTenantClaim explicitly permits TenantClaim to restrict the principal; default false."
+      },
+      {
+        "name": "ClaimAllowlist",
+        "type": "[]string",
+        "doc": "ClaimAllowlist is copied; empty retains no extra claims. At most 32\nnames of 1–128 bytes are accepted; retained values must satisfy\nPrincipalConfig.",
+        "default": "ClaimAllowlist is copied; empty retains no extra claims."
+      },
+      {
+        "name": "Client",
+        "type": "*http.Client",
+        "doc": "Client is optional; nil uses a zero http.Client. A private shallow\ncopy shares its transport, disables cookies and restricts redirects.",
+        "default": "Client is optional; nil uses a zero http.Client."
+      },
+      {
+        "name": "Timeout",
+        "type": "time.Duration",
+        "doc": "Timeout bounds each fetch independently: zero selects 5s; valid range\n1ms–30s.",
+        "default": "Timeout bounds each fetch independently: zero selects 5s; valid range 1ms–30s."
+      },
+      {
+        "name": "Now",
+        "type": "func() time.Time",
+        "doc": "Now is retained and must be concurrency safe; nil uses time.Now.",
+        "default": "Now is retained and must be concurrency safe; nil uses time.Now."
+      },
+      {
+        "name": "Logger",
+        "type": "*slog.Logger",
+        "doc": "Logger is caller-owned; nil is silent. Only sanitized categories for\nskipped JWKS entries are logged.",
+        "default": "Logger is caller-owned; nil is silent."
+      }
+    ],
+    "auth.Config": [
+      {
+        "name": "Schemes",
+        "type": "map[string]Scheme",
+        "doc": "Schemes requires 1–32 named schemes with distinct namespaces.\nConstruction compiles a private map and retains constructed Bearers\nand APIKey stores.",
+        "default": "Schemes requires 1–32 named schemes with distinct namespaces."
+      },
+      {
+        "name": "Fallback",
+        "type": "Requirement",
+        "doc": "Fallback is required; choose Deny, Anonymous or Require. Its zero\nvalue is invalid.",
+        "default": "Fallback is required; choose Deny, Anonymous or Require. Its zero value is invalid."
+      },
+      {
+        "name": "Report",
+        "type": "*openapi.Report",
+        "doc": "Report optionally validates every effective operation's scheme/scopes\nat startup. Its operation policies are copied during construction; do\nnot mutate it during that call.",
+        "default": "Report optionally validates every effective operation's scheme/scopes at startup."
+      },
+      {
+        "name": "Logger",
+        "type": "*slog.Logger",
+        "doc": "Logger is retained and caller-owned; nil is silent.",
+        "default": "Logger is retained and caller-owned; nil is silent."
+      },
+      {
+        "name": "Now",
+        "type": "func() time.Time",
+        "doc": "Now is retained and must be concurrency safe; nil uses each scheme's\nclock (time.Now unless a BearerConfig.Now was supplied).",
+        "default": "Now is retained and must be concurrency safe; nil uses each scheme's clock (time.Now unless a BearerConfig.Now was supplied)."
+      }
+    ],
+    "auth.KeyOptions": [
+      {
+        "name": "Kind",
+        "type": "Kind",
+        "doc": "Kind defaults to Service; User is the other accepted value.",
+        "default": "Kind defaults to Service; User is the other accepted value."
+      },
+      {
+        "name": "Scopes",
+        "type": "[]string",
+        "doc": "Scopes is optional; empty grants none. IssueKey copies the slice.",
+        "default": "Scopes is optional; empty grants none."
+      },
+      {
+        "name": "TenantRestriction",
+        "type": "string",
+        "doc": "TenantRestriction is optional; empty leaves membership resolution to the application.",
+        "default": "TenantRestriction is optional; empty leaves membership resolution to the application."
+      },
+      {
+        "name": "ExpiresAt",
+        "type": "time.Time",
+        "doc": "ExpiresAt at zero permits a nonexpiring credential.",
+        "default": "ExpiresAt at zero permits a nonexpiring credential."
+      }
+    ],
+    "auth.PrincipalConfig": [
+      {
+        "name": "Namespace",
+        "type": "string",
+        "doc": "Namespace is required and matches [a-z][a-z0-9-]{0,31}. Subject is\nrequired, valid UTF-8 and at most 16 KiB. Scheme is required and at\nmost 64 bytes.",
+        "default": "Namespace is required and matches [a-z][a-z0-9-]{0,31}. Subject is required, valid UTF-8 and at most 16 KiB. Scheme is required and at most 64 bytes."
+      },
+      {
+        "name": "Subject",
+        "type": "string",
+        "doc": "Namespace is required and matches [a-z][a-z0-9-]{0,31}. Subject is\nrequired, valid UTF-8 and at most 16 KiB. Scheme is required and at\nmost 64 bytes.",
+        "default": "Namespace is required and matches [a-z][a-z0-9-]{0,31}. Subject is required, valid UTF-8 and at most 16 KiB. Scheme is required and at most 64 bytes."
+      },
+      {
+        "name": "Scheme",
+        "type": "string",
+        "doc": "Namespace is required and matches [a-z][a-z0-9-]{0,31}. Subject is\nrequired, valid UTF-8 and at most 16 KiB. Scheme is required and at\nmost 64 bytes.",
+        "default": "Namespace is required and matches [a-z][a-z0-9-]{0,31}. Subject is required, valid UTF-8 and at most 16 KiB. Scheme is required and at most 64 bytes."
+      },
+      {
+        "name": "Kind",
+        "type": "Kind",
+        "doc": "Kind must be User or Service; the zero value is invalid.",
+        "default": "Kind must be User or Service; the zero value is invalid."
+      },
+      {
+        "name": "Scopes",
+        "type": "[]string",
+        "doc": "Scopes is copied; empty grants none. At most 64 visible ASCII\n(0x21–0x7E) scopes of 1–128 bytes are accepted.",
+        "default": "Scopes is copied; empty grants none."
+      },
+      {
+        "name": "TenantRestriction",
+        "type": "string",
+        "doc": "TenantRestriction is optional and matches [A-Za-z0-9._:-]{1,128} when\nset. KeyID is optional and at most 256 bytes.",
+        "default": "TenantRestriction is optional and matches [A-Za-z0-9._:-]{1,128} when set. KeyID is optional and at most 256 bytes."
+      },
+      {
+        "name": "KeyID",
+        "type": "string",
+        "doc": "TenantRestriction is optional and matches [A-Za-z0-9._:-]{1,128} when\nset. KeyID is optional and at most 256 bytes.",
+        "default": "TenantRestriction is optional and matches [A-Za-z0-9._:-]{1,128} when set. KeyID is optional and at most 256 bytes."
+      },
+      {
+        "name": "ExpiresAt",
+        "type": "time.Time",
+        "doc": "ExpiresAt is the verified expiry; zero represents a nonexpiring API\nkey. NewPrincipal stores it without checking whether it is in the\nfuture.",
+        "default": "ExpiresAt is the verified expiry; zero represents a nonexpiring API key."
+      },
+      {
+        "name": "Claims",
+        "type": "map[string]string",
+        "doc": "Claims is copied; nil retains none. At most 32 UTF-8 entries fit,\nwith names of 1–128 bytes and values of at most 1024 bytes.",
+        "default": "Claims is copied; nil retains none."
+      }
+    ],
+    "authbind.QuotaConfig": [
+      {
+        "name": "IP",
+        "type": "func(*echo.Context) string",
+        "doc": "IP is a retained, concurrency-safe trusted extractor. Nil uses\nc.RealIP only when Echo.IPExtractor is configured.",
+        "default": "Nil uses c.RealIP only when Echo.IPExtractor is configured."
+      },
+      {
+        "name": "AnonymousByIP",
+        "type": "bool",
+        "doc": "AnonymousByIP permits anonymous metering by a valid trusted IP;\ndefault false.",
+        "default": "AnonymousByIP permits anonymous metering by a valid trusted IP; default false."
+      }
+    ],
+    "execution.Effect": [
+      {
+        "name": "Name",
+        "type": "string",
+        "doc": "Name and Provider are required; they identify the effect and provider replay rules.",
+        "default": "Name and Provider are required; they identify the effect and provider replay rules."
+      },
+      {
+        "name": "Provider",
+        "type": "string",
+        "doc": "Name and Provider are required; they identify the effect and provider replay rules.",
+        "default": "Name and Provider are required; they identify the effect and provider replay rules."
+      },
+      {
+        "name": "ReplayWindow",
+        "type": "time.Duration",
+        "doc": "ReplayWindow at zero declares no provider replay window; nonzero must exceed RequestTimeout plus 5m.",
+        "default": "ReplayWindow at zero declares no provider replay window; nonzero must exceed RequestTimeout plus 5m."
+      },
+      {
+        "name": "RequestTimeout",
+        "type": "time.Duration",
+        "doc": "RequestTimeout is required, positive and at most 5m, in whole microseconds.",
+        "default": "RequestTimeout is required, positive and at most 5m, in whole microseconds."
+      }
+    ],
+    "execution.FingerprintSpec": [
+      {
+        "name": "Profile",
+        "type": "string",
+        "doc": "Profile empty selects http/v1 during policy construction.",
+        "default": "Profile empty selects http/v1 during policy construction."
+      },
+      {
+        "name": "Version",
+        "type": "string",
+        "doc": "Version defaults to v1 when Profile is defaulted; custom profiles require it explicitly.",
+        "default": "Version defaults to v1 when Profile is defaulted; custom profiles require it explicitly."
+      },
+      {
+        "name": "Headers",
+        "type": "[]string",
+        "doc": "Headers nil selects the six standard headers; an explicit empty slice selects none.",
+        "default": "Headers nil selects the six standard headers; an explicit empty slice selects none."
+      },
+      {
+        "name": "CustomVersion",
+        "type": "string",
+        "doc": "CustomVersion is required for custom profiles and empty for built-in profiles.",
+        "default": "CustomVersion is required for custom profiles and empty for built-in profiles."
+      },
+      {
+        "name": "ConfigDigest",
+        "type": "[32]byte",
+        "doc": "ConfigDigest at zero contributes a zero configuration digest; set it when application configuration changes behavior.",
+        "default": "ConfigDigest at zero contributes a zero configuration digest; set it when application configuration changes behavior."
+      }
+    ],
+    "execution.JournalConfig": [
+      {
+        "name": "Namespace",
+        "type": "string",
+        "doc": "Namespace is required: 1–64 UTF-8 bytes without control characters.",
+        "default": "Namespace is required: 1–64 UTF-8 bytes without control characters."
+      },
+      {
+        "name": "Store",
+        "type": "Store",
+        "doc": "Store is required, retained and caller-owned; it must satisfy Store\ncancellation, copying and concurrency requirements.",
+        "default": "Store is required, retained and caller-owned; it must satisfy Store cancellation, copying and concurrency requirements."
+      },
+      {
+        "name": "Policies",
+        "type": "map[string]Policy",
+        "doc": "Policies requires 1–1024 named policies; New copies the map and\nnested slices.",
+        "default": "Policies requires 1–1024 named policies; New copies the map and nested slices."
+      },
+      {
+        "name": "OpTimeout",
+        "type": "time.Duration",
+        "doc": "OpTimeout defaults to 5s (1–30s); CompleteTimeout to 10s (1–30s);\nReconcileTimeout to 30s (1s–5m); ReconcileLease to 1m (2s–10m) and\nmust exceed ReconcileTimeout + OpTimeout.",
+        "default": "OpTimeout defaults to 5s (1–30s); CompleteTimeout to 10s (1–30s); ReconcileTimeout to 30s (1s–5m); ReconcileLease to 1m (2s–10m) and must exceed ReconcileTimeout + OpTimeout."
+      },
+      {
+        "name": "CompleteTimeout",
+        "type": "time.Duration",
+        "doc": "OpTimeout defaults to 5s (1–30s); CompleteTimeout to 10s (1–30s);\nReconcileTimeout to 30s (1s–5m); ReconcileLease to 1m (2s–10m) and\nmust exceed ReconcileTimeout + OpTimeout.",
+        "default": "OpTimeout defaults to 5s (1–30s); CompleteTimeout to 10s (1–30s); ReconcileTimeout to 30s (1s–5m); ReconcileLease to 1m (2s–10m) and must exceed ReconcileTimeout + OpTimeout."
+      },
+      {
+        "name": "ReconcileTimeout",
+        "type": "time.Duration",
+        "doc": "OpTimeout defaults to 5s (1–30s); CompleteTimeout to 10s (1–30s);\nReconcileTimeout to 30s (1s–5m); ReconcileLease to 1m (2s–10m) and\nmust exceed ReconcileTimeout + OpTimeout.",
+        "default": "OpTimeout defaults to 5s (1–30s); CompleteTimeout to 10s (1–30s); ReconcileTimeout to 30s (1s–5m); ReconcileLease to 1m (2s–10m) and must exceed ReconcileTimeout + OpTimeout."
+      },
+      {
+        "name": "ReconcileLease",
+        "type": "time.Duration",
+        "doc": "OpTimeout defaults to 5s (1–30s); CompleteTimeout to 10s (1–30s);\nReconcileTimeout to 30s (1s–5m); ReconcileLease to 1m (2s–10m) and\nmust exceed ReconcileTimeout + OpTimeout.",
+        "default": "OpTimeout defaults to 5s (1–30s); CompleteTimeout to 10s (1–30s); ReconcileTimeout to 30s (1s–5m); ReconcileLease to 1m (2s–10m) and must exceed ReconcileTimeout + OpTimeout."
+      },
+      {
+        "name": "MaxResultBytes",
+        "type": "int",
+        "doc": "MaxResultBytes defaults to 64 KiB (1 byte–1 MiB); MaxUnresolvedPerTenant\ndefaults to 1000 and must be positive.",
+        "default": "MaxResultBytes defaults to 64 KiB (1 byte–1 MiB); MaxUnresolvedPerTenant defaults to 1000 and must be positive."
+      },
+      {
+        "name": "MaxUnresolvedPerTenant",
+        "type": "int",
+        "doc": "MaxResultBytes defaults to 64 KiB (1 byte–1 MiB); MaxUnresolvedPerTenant\ndefaults to 1000 and must be positive.",
+        "default": "MaxResultBytes defaults to 64 KiB (1 byte–1 MiB); MaxUnresolvedPerTenant defaults to 1000 and must be positive."
+      },
+      {
+        "name": "MaxNamespaceRecords",
+        "type": "int64",
+        "doc": "MaxNamespaceRecords defaults to 5,000,000 and MaxNamespaceBytes to 20\nGiB; both must be positive after defaults.",
+        "default": "MaxNamespaceRecords defaults to 5,000,000 and MaxNamespaceBytes to 20 GiB; both must be positive after defaults."
+      },
+      {
+        "name": "MaxNamespaceBytes",
+        "type": "int64",
+        "doc": "MaxNamespaceRecords defaults to 5,000,000 and MaxNamespaceBytes to 20\nGiB; both must be positive after defaults.",
+        "default": "MaxNamespaceRecords defaults to 5,000,000 and MaxNamespaceBytes to 20 GiB; both must be positive after defaults."
+      },
+      {
+        "name": "BudgetShards",
+        "type": "int",
+        "doc": "BudgetShards defaults to 16; valid range 1–256.",
+        "default": "BudgetShards defaults to 16; valid range 1–256."
+      },
+      {
+        "name": "Redact",
+        "type": "func(context.Context, Key, Result) (Result, error)",
+        "doc": "Redact optionally transforms copied results before storage; nil\npreserves them.",
+        "default": "Redact optionally transforms copied results before storage; nil preserves them."
+      },
+      {
+        "name": "RedactEvidence",
+        "type": "func(context.Context, Evidence) (Evidence, error)",
+        "doc": "RedactEvidence optionally transforms recorded diagnostics before storage; nil\npreserves it.",
+        "default": "RedactEvidence optionally transforms recorded diagnostics before storage; nil preserves it."
+      },
+      {
+        "name": "OnTransition",
+        "type": "func(context.Context, Transition)",
+        "doc": "OnTransition optionally observes owned committed records; nil is\nsilent.",
+        "default": "OnTransition optionally observes owned committed records; nil is silent."
+      },
+      {
+        "name": "OnError",
+        "type": "func(context.Context, error)",
+        "doc": "OnError optionally observes errors; nil is silent.",
+        "default": "OnError optionally observes errors; nil is silent."
+      }
+    ],
+    "execution.Limits": [
+      {
+        "name": "MaxResultBytes",
+        "type": "int",
+        "doc": "MaxResultBytes defaults to 64 KiB; valid range 1 byte through 1 MiB.",
+        "default": "MaxResultBytes defaults to 64 KiB; valid range 1 byte through 1 MiB."
+      },
+      {
+        "name": "MaxUnresolvedPerTenant",
+        "type": "int",
+        "doc": "MaxUnresolvedPerTenant defaults to 1000 and must be positive.",
+        "default": "MaxUnresolvedPerTenant defaults to 1000 and must be positive."
+      },
+      {
+        "name": "MaxNamespaceRecords",
+        "type": "int64",
+        "doc": "MaxNamespaceRecords defaults to 5000000 and must be positive.",
+        "default": "MaxNamespaceRecords defaults to 5000000 and must be positive."
+      },
+      {
+        "name": "MaxNamespaceBytes",
+        "type": "int64",
+        "doc": "MaxNamespaceBytes defaults to 20 GiB of logical charges and must be positive.",
+        "default": "MaxNamespaceBytes defaults to 20 GiB of logical charges and must be positive."
+      },
+      {
+        "name": "BudgetShards",
+        "type": "int",
+        "doc": "BudgetShards defaults to 16; valid range 1 through 256.",
+        "default": "BudgetShards defaults to 16; valid range 1 through 256."
+      }
+    ],
+    "execution.MiddlewareConfig": [
+      {
+        "name": "Journal",
+        "type": "*Journal",
+        "doc": "Journal is required, retained and caller-owned.",
+        "default": "Journal is required, retained and caller-owned."
+      },
+      {
+        "name": "Identity",
+        "type": "func(*echo.Context) (tenant, subject string, err error)",
+        "doc": "Identity is required and resolves trusted tenant and subject per\nrequest.",
+        "default": "Identity is required and resolves trusted tenant and subject per request."
+      },
+      {
+        "name": "Operation",
+        "type": "string",
+        "doc": "Operation must name a configured ExternalMode policy; empty is\ninvalid.",
+        "default": "Operation must name a configured ExternalMode policy; empty is invalid."
+      },
+      {
+        "name": "ReplayCheck",
+        "type": "func(*echo.Context) error",
+        "doc": "ReplayCheck is required and authorizes current access on every\ninvocation.",
+        "default": "ReplayCheck is required and authorizes current access on every invocation."
+      },
+      {
+        "name": "ClassifyStatus",
+        "type": "func(int) State",
+        "doc": "ClassifyStatus optionally maps status to Completed or Failed; nil\nleaves classification explicit through Classify. It may also return\nan empty state.",
+        "default": "ClassifyStatus optionally maps status to Completed or Failed; nil leaves classification explicit through Classify. It may also return an empty state."
+      },
+      {
+        "name": "Header",
+        "type": "string",
+        "doc": "Header defaults to Idempotency-Key and must be a valid HTTP field\nname.",
+        "default": "Header defaults to Idempotency-Key and must be a valid HTTP field name."
+      },
+      {
+        "name": "Fingerprint",
+        "type": "func(context.Context, *http.Request, string, map[string]string, FingerprintSpec, int64) ([32]byte, error)",
+        "doc": "Fingerprint defaults to FingerprintHTTP for built-in HTTP profiles;\ncustom profiles require a callback with FingerprintHTTP's bounds and\ncancellation requirements.",
+        "default": "Fingerprint defaults to FingerprintHTTP for built-in HTTP profiles; custom profiles require a callback with FingerprintHTTP's bounds and cancellation requirements."
+      },
+      {
+        "name": "MaxFingerprintBytes",
+        "type": "int64",
+        "doc": "MaxFingerprintBytes defaults to 1 MiB; valid range 1 byte–8 MiB.",
+        "default": "MaxFingerprintBytes defaults to 1 MiB; valid range 1 byte–8 MiB."
+      },
+      {
+        "name": "MaxResponseBytes",
+        "type": "int",
+        "doc": "MaxResponseBytes defaults to 1 MiB; valid range 1 byte–8 MiB.",
+        "default": "MaxResponseBytes defaults to 1 MiB; valid range 1 byte–8 MiB."
+      },
+      {
+        "name": "ReplayHeaders",
+        "type": "[]string",
+        "doc": "ReplayHeaders is copied; nil selects Content-Type, nonnil empty\nselects none. At most 64 distinct allowed HTTP field names fit;\nhop-by-hop, framing, Set-Cookie and Idempotent-Replayed fields are\nforbidden.",
+        "default": "ReplayHeaders is copied; nil selects Content-Type, nonnil empty selects none."
+      },
+      {
+        "name": "NotExecuted",
+        "type": "func(*echo.Context)",
+        "doc": "NotExecuted runs once on every no-work path, including\nvalidation/refusal; nil is silent.",
+        "default": "NotExecuted runs once on every no-work path, including validation/refusal; nil is silent."
+      },
+      {
+        "name": "ProblemHandler",
+        "type": "func(*echo.Context, Problem) error",
+        "doc": "ProblemHandler optionally renders execution problems; nil uses RFC\n9457.",
+        "default": "ProblemHandler optionally renders execution problems; nil uses RFC 9457."
+      },
+      {
+        "name": "OnError",
+        "type": "func(context.Context, error)",
+        "doc": "OnError optionally observes storage/finalization and transport\nfailures without changing the answer; nil is silent.",
+        "default": "OnError optionally observes storage/finalization and transport failures without changing the answer; nil is silent."
+      }
+    ],
+    "execution.Policy": [
+      {
+        "name": "SafetyVersion",
+        "type": "string",
+        "doc": "SafetyVersion is required and versions the operation's safety rules.",
+        "default": "SafetyVersion is required and versions the operation's safety rules."
+      },
+      {
+        "name": "Scope",
+        "type": "string",
+        "doc": "Scope empty defaults to the configured operation name in Journal.New.",
+        "default": "Scope empty defaults to the configured operation name in Journal.New."
+      },
+      {
+        "name": "ReconcilerVersion",
+        "type": "string",
+        "doc": "ReconcilerVersion is required for external mode and empty for transactional mode.",
+        "default": "ReconcilerVersion is required for external mode and empty for transactional mode."
+      },
+      {
+        "name": "Effects",
+        "type": "[]Effect",
+        "doc": "Effects requires 1 through 8 entries in external mode; transactional mode requires none.",
+        "default": "Effects requires 1 through 8 entries in external mode; transactional mode requires none."
+      },
+      {
+        "name": "Fingerprint",
+        "type": "FingerprintSpec",
+        "doc": "Fingerprint at zero selects http/v1 with its default header set.",
+        "default": "Fingerprint at zero selects http/v1 with its default header set."
+      },
+      {
+        "name": "Lease",
+        "type": "time.Duration",
+        "doc": "Lease defaults to 1m in external mode; transactional mode requires zero.",
+        "default": "Lease defaults to 1m in external mode; transactional mode requires zero."
+      },
+      {
+        "name": "ResultRetention",
+        "type": "time.Duration",
+        "doc": "ResultRetention defaults to 24h and must be positive.",
+        "default": "ResultRetention defaults to 24h and must be positive."
+      },
+      {
+        "name": "KeyRetention",
+        "type": "time.Duration",
+        "doc": "KeyRetention defaults to 7 days and must be at least ResultRetention.",
+        "default": "KeyRetention defaults to 7 days and must be at least ResultRetention."
+      },
+      {
+        "name": "Mode",
+        "type": "ExecutionMode",
+        "doc": "Mode empty selects ExternalMode; TransactionalMode is explicit.",
+        "default": "Mode empty selects ExternalMode; TransactionalMode is explicit."
+      }
+    ],
+    "execution.ReconcileSchedulerConfig": [
+      {
+        "name": "Operator",
+        "type": "*Operator",
+        "doc": "Operator is required and retained; its journal's Store must implement\nScheduledReconcileStore.",
+        "default": "Operator is required and retained; its journal's Store must implement ScheduledReconcileStore."
+      },
+      {
+        "name": "Scopes",
+        "type": "map[string]ScheduledReconciler",
+        "doc": "Scopes is copied and requires 1–1024 registered policy scopes, not\noperation aliases. Reconciler and Completion callbacks are retained.",
+        "default": "Scopes is copied and requires 1–1024 registered policy scopes, not operation aliases."
+      },
+      {
+        "name": "PollInterval",
+        "type": "time.Duration",
+        "doc": "PollInterval defaults to 30s; valid range 1s–1h, measured after each\npass. It is not a recovery-latency guarantee.",
+        "default": "PollInterval defaults to 30s; valid range 1s–1h, measured after each pass."
+      },
+      {
+        "name": "PageSize",
+        "type": "int",
+        "doc": "PageSize defaults to 25; valid range 1–100 examined records per pass.",
+        "default": "PageSize defaults to 25; valid range 1–100 examined records per pass."
+      },
+      {
+        "name": "AuthorizeNamespace",
+        "type": "func(context.Context, string) error",
+        "doc": "AuthorizeNamespace is required and retained; it runs before each\nListUncertain. Errors stop Run.",
+        "default": "AuthorizeNamespace is required and retained; it runs before each ListUncertain."
+      },
+      {
+        "name": "AuthorizeTarget",
+        "type": "func(context.Context, ReconcileTarget) (bool, error)",
+        "doc": "AuthorizeTarget is required and retained; it runs before preparing\neach candidate. False skips the target; errors stop Run.",
+        "default": "AuthorizeTarget is required and retained; it runs before preparing each candidate."
+      },
+      {
+        "name": "Logger",
+        "type": "*slog.Logger",
+        "doc": "Logger is retained and caller-owned; nil is silent. It receives only\nbounded categories, never refs, principal data or error text.",
+        "default": "Logger is retained and caller-owned; nil is silent."
+      }
+    ],
+    "executionadmin.Config": [
+      {
+        "name": "Operator",
+        "type": "*execution.Operator",
+        "doc": "Operator is required, retained and must come from Journal.Operator.",
+        "default": "Operator is required, retained and must come from Journal.Operator."
+      },
+      {
+        "name": "Reconciler",
+        "type": "execution.Reconciler",
+        "doc": "Reconciler is optional and retained; nil disables reconciliation.\nSending requires the library claim's Resend permit.",
+        "default": "Reconciler is optional and retained; nil disables reconciliation. Sending requires the library claim's Resend permit."
+      },
+      {
+        "name": "Completion",
+        "type": "execution.Completion",
+        "doc": "Completion is optional and retained; nonnil requires Reconciler.",
+        "default": "Completion is optional and retained; nonnil requires Reconciler."
+      },
+      {
+        "name": "EnableResolve",
+        "type": "bool",
+        "doc": "EnableResolve opts into destructive resolution; default false.",
+        "default": "EnableResolve opts into destructive resolution; default false."
+      },
+      {
+        "name": "MaxPending",
+        "type": "int",
+        "doc": "MaxPending defaults to 128 (1–1000); at the cap new reconciles are\nrefused and ambiguous handles are never evicted.",
+        "default": "MaxPending defaults to 128 (1–1000); at the cap new reconciles are refused and ambiguous handles are never evicted."
+      }
+    ],
+    "pgstore.StoreConfig": [
+      {
+        "name": "Schema",
+        "type": "string",
+        "doc": "Schema defaults to public; valid identifiers are 1–63 UTF-8 bytes\nwithout NUL or \"$$\". Namespace is optional; when set it is 1–64 UTF-8\nbytes without controls and binds New to the namespace caps.",
+        "default": "Schema defaults to public; valid identifiers are 1–63 UTF-8 bytes without NUL or \"$$\". Namespace is optional; when set it is 1–64 UTF-8 bytes without controls and binds New to the namespace caps."
+      },
+      {
+        "name": "Namespace",
+        "type": "string",
+        "doc": "Schema defaults to public; valid identifiers are 1–63 UTF-8 bytes\nwithout NUL or \"$$\". Namespace is optional; when set it is 1–64 UTF-8\nbytes without controls and binds New to the namespace caps.",
+        "default": "Schema defaults to public; valid identifiers are 1–63 UTF-8 bytes without NUL or \"$$\". Namespace is optional; when set it is 1–64 UTF-8 bytes without controls and binds New to the namespace caps."
+      },
+      {
+        "name": "Limits",
+        "type": "execution.Limits",
+        "doc": "Limits selects namespace caps; zero fields select execution.Limits\ndefaults.",
+        "default": "Limits selects namespace caps; zero fields select execution.Limits defaults."
+      },
+      {
+        "name": "MigrateTimeout",
+        "type": "time.Duration",
+        "doc": "MigrateTimeout bounds all of Migrate: pool acquisition, DDL, catalog\nvalidation and COMMIT. It defaults to 1m; valid range 1s–1h.",
+        "default": "It defaults to 1m; valid range 1s–1h."
+      }
+    ],
+    "pgstore.TxRunnerConfig": [
+      {
+        "name": "Namespace",
+        "type": "string",
+        "doc": "Namespace is required: 1–64 UTF-8 bytes without control characters.",
+        "default": "Namespace is required: 1–64 UTF-8 bytes without control characters."
+      },
+      {
+        "name": "Policies",
+        "type": "map[string]execution.Policy",
+        "doc": "Policies requires 1–1024 TransactionalMode policies; the map and\nslices are copied.",
+        "default": "Policies requires 1–1024 TransactionalMode policies; the map and slices are copied."
+      },
+      {
+        "name": "Limits",
+        "type": "execution.Limits",
+        "doc": "Limits zero fields select execution.Limits defaults; caps must match\na namespace-bound Store.",
+        "default": "Limits zero fields select execution.Limits defaults; caps must match a namespace-bound Store."
+      },
+      {
+        "name": "OpTimeout",
+        "type": "time.Duration",
+        "doc": "OpTimeout defaults to 5s; valid range 1–30s, for starting or\nfinishing an operation, including COMMIT.",
+        "default": "OpTimeout defaults to 5s; valid range 1–30s, for starting or finishing an operation, including COMMIT."
+      },
+      {
+        "name": "TxTimeout",
+        "type": "time.Duration",
+        "doc": "TxTimeout bounds the total call; defaults to 30s, valid range 1–60s,\nshortened by the caller deadline.",
+        "default": "TxTimeout bounds the total call; defaults to 30s, valid range 1–60s, shortened by the caller deadline."
+      },
+      {
+        "name": "CleanupTimeout",
+        "type": "time.Duration",
+        "doc": "CleanupTimeout defaults to 5s; valid range 1–30s, for detached\nrollback.",
+        "default": "CleanupTimeout defaults to 5s; valid range 1–30s, for detached rollback."
+      },
+      {
+        "name": "Redact",
+        "type": "func(context.Context, execution.Key, execution.Result) (execution.Result, error)",
+        "doc": "Redact is retained and must be concurrency safe and honor ctx; nil\npreserves the copied result. It runs once per first commit with the\ntrusted key tenant and subject and an empty Value.",
+        "default": "Redact is retained and must be concurrency safe and honor ctx; nil preserves the copied result. It runs once per first commit with the trusted key tenant and subject and an empty Value."
+      }
+    ],
+    "quota.AdminConfig": [
+      {
+        "name": "Limiter",
+        "type": "*Limiter",
+        "doc": "Limiter is required, retained and caller-owned.",
+        "default": "Limiter is required, retained and caller-owned."
+      },
+      {
+        "name": "Authorize",
+        "type": "func(*echo.Context) error",
+        "doc": "Authorize is required and runs before parsing or store access on\nevery route. It must not retain c.",
+        "default": "Authorize is required and runs before parsing or store access on every route."
+      },
+      {
+        "name": "Overrides",
+        "type": "func(*echo.Context, Identity, string) ([]Override, error)",
+        "doc": "Overrides optionally changes limit numbers for /usage; nil uses plan\nvalues.",
+        "default": "Overrides optionally changes limit numbers for /usage; nil uses plan values."
+      },
+      {
+        "name": "TopK",
+        "type": "*TopK",
+        "doc": "TopK is optional and caller-owned; nil makes /top return not found.",
+        "default": "TopK is optional and caller-owned; nil makes /top return not found."
+      },
+      {
+        "name": "ErrorHandler",
+        "type": "func(*echo.Context, error) error",
+        "doc": "ErrorHandler optionally handles authorization errors; nil returns\nthem to Echo.",
+        "default": "ErrorHandler optionally handles authorization errors; nil returns them to Echo."
+      }
+    ],
+    "quota.Breaker": [
+      {
+        "name": "Window",
+        "type": "time.Duration",
+        "doc": "Window defaults to 10s; valid range 1ms–24h.",
+        "default": "Window defaults to 10s; valid range 1ms–24h."
+      },
+      {
+        "name": "MinCalls",
+        "type": "int",
+        "doc": "MinCalls defaults to 20; nonzero values must be positive.",
+        "default": "MinCalls defaults to 20; nonzero values must be positive."
+      },
+      {
+        "name": "FailureRatio",
+        "type": "float64",
+        "doc": "FailureRatio defaults to 0.5; nonzero values must be in (0,1],\nexcluding NaN.",
+        "default": "FailureRatio defaults to 0.5; nonzero values must be in (0,1], excluding NaN."
+      },
+      {
+        "name": "Cooldown",
+        "type": "time.Duration",
+        "doc": "Cooldown defaults to 1s; nonzero values must be positive.",
+        "default": "Cooldown defaults to 1s; nonzero values must be positive."
+      }
+    ],
+    "quota.Config": [
+      {
+        "name": "Store",
+        "type": "Store",
+        "doc": "Store is required, retained and caller-owned; Limiter.Close never\ncloses it.",
+        "default": "Store is required, retained and caller-owned; Limiter.Close never closes it."
+      },
+      {
+        "name": "Plans",
+        "type": "[]Plan",
+        "doc": "Plans requires at least one valid plan; New copies all maps and\nslices.",
+        "default": "Plans requires at least one valid plan; New copies all maps and slices."
+      },
+      {
+        "name": "StoreTimeout",
+        "type": "time.Duration",
+        "doc": "StoreTimeout bounds each remote store call; zero uses 25ms, negative is\ninvalid, and caller deadlines always win. Local stores, such as memory,\nrun without it.",
+        "default": "StoreTimeout bounds each remote store call; zero uses 25ms, negative is invalid, and caller deadlines always win."
+      },
+      {
+        "name": "DenyCache",
+        "type": "time.Duration",
+        "doc": "DenyCache is off at zero; positive durations at most 10s cache store denials.",
+        "default": "DenyCache is off at zero; positive durations at most 10s cache store denials."
+      },
+      {
+        "name": "DenyCacheSize",
+        "type": "int",
+        "doc": "DenyCacheSize bounds the LRU; zero defaults to 10000, otherwise it\nmust be positive.",
+        "default": "DenyCacheSize bounds the LRU; zero defaults to 10000, otherwise it must be positive."
+      },
+      {
+        "name": "ReservationTTL",
+        "type": "time.Duration",
+        "doc": "ReservationTTL defaults to 1h and must be at least 1ms; size it above\nthe longest work plus settlement.",
+        "default": "ReservationTTL defaults to 1h and must be at least 1ms; size it above the longest work plus settlement."
+      },
+      {
+        "name": "SettledRetention",
+        "type": "time.Duration",
+        "doc": "SettledRetention defaults to 5m, must be at least 1ms, and bounds the\nidempotent retry window.",
+        "default": "SettledRetention defaults to 5m, must be at least 1ms, and bounds the idempotent retry window."
+      },
+      {
+        "name": "SettleWorkers",
+        "type": "int",
+        "doc": "SettleWorkers defaults to 4 (1..1024); the queue holds 1024 jobs.",
+        "default": "SettleWorkers defaults to 4 (1..1024); the queue holds 1024 jobs."
+      },
+      {
+        "name": "Expired",
+        "type": "SettlePolicy",
+        "doc": "Expired settles reservations past ReservationTTL: Keep (default) commits\nreserved amounts, Refund returns them. It runs on the next Reserve or Settle\nin the partition and, with an Outbox, in the periodic sweep.",
+        "default": "Expired settles reservations past ReservationTTL: Keep (default) commits reserved amounts, Refund returns them."
+      },
+      {
+        "name": "Outbox",
+        "type": "*Outbox",
+        "doc": "Outbox makes consumption and threshold events durable and is copied when\nnonnil; with it, Hooks.OnConsumption and Hooks.OnThreshold must be nil.\nNew then starts background delivery goroutines, with partition concurrency\nbounded by Outbox.Workers; Close stops them. Nil disables durable delivery;\nHooks then receive events at most once.",
+        "default": "Outbox makes consumption and threshold events durable and is copied when nonnil; with it, Hooks.OnConsumption and Hooks.OnThreshold must be nil. Nil disables durable delivery; Hooks then receive events at most once."
+      },
+      {
+        "name": "Fallback",
+        "type": "Fallback",
+        "doc": "Fallback applies only to remote buckets; remote counters fail open unless strict.\nFallback at zero enables local remote-bucket fallback with one instance and 100000 keys.",
+        "default": "Fallback at zero enables local remote-bucket fallback with one instance and 100000 keys."
+      },
+      {
+        "name": "Breaker",
+        "type": "Breaker",
+        "doc": "Breaker selects bounded remote-store failure tracking; zero uses\nBreaker defaults.",
+        "default": "Breaker selects bounded remote-store failure tracking; zero uses Breaker defaults."
+      },
+      {
+        "name": "Hooks",
+        "type": "Hooks",
+        "doc": "Hooks contains optional retained synchronous callbacks; see Hooks for\nconcurrency.",
+        "default": "Hooks contains optional retained synchronous callbacks; see Hooks for concurrency."
+      },
+      {
+        "name": "Logger",
+        "type": "*slog.Logger",
+        "doc": "Logger is retained and caller-owned; nil is silent.",
+        "default": "Logger is retained and caller-owned; nil is silent."
+      }
+    ],
+    "quota.Fallback": [
+      {
+        "name": "Disabled",
+        "type": "bool",
+        "doc": "Disabled turns off local fallback; default false.",
+        "default": "Disabled turns off local fallback; default false."
+      },
+      {
+        "name": "Instances",
+        "type": "int",
+        "doc": "Instances defaults to 1 and MaxKeys to 100000; both must be positive\nafter defaults.",
+        "default": "Instances defaults to 1 and MaxKeys to 100000; both must be positive after defaults."
+      },
+      {
+        "name": "MaxKeys",
+        "type": "int",
+        "doc": "Instances defaults to 1 and MaxKeys to 100000; both must be positive\nafter defaults.",
+        "default": "Instances defaults to 1 and MaxKeys to 100000; both must be positive after defaults."
+      }
+    ],
+    "quota.Hooks": [
+      {
+        "name": "OnDecision",
+        "type": "func(context.Context, Request, Decision)",
+        "doc": "OnDecision is optional; nil disables this callback.",
+        "default": "OnDecision is optional; nil disables this callback."
+      },
+      {
+        "name": "OnStoreError",
+        "type": "func(context.Context, string, error)",
+        "doc": "OnStoreError is optional; nil disables this callback.",
+        "default": "OnStoreError is optional; nil disables this callback."
+      },
+      {
+        "name": "OnConsumption",
+        "type": "func(context.Context, ConsumptionEvent)",
+        "doc": "OnConsumption is optional; nil disables this callback.",
+        "default": "OnConsumption is optional; nil disables this callback."
+      },
+      {
+        "name": "OnThreshold",
+        "type": "func(context.Context, ThresholdEvent)",
+        "doc": "OnThreshold is optional; nil disables this callback.",
+        "default": "OnThreshold is optional; nil disables this callback."
+      },
+      {
+        "name": "OnSettlement",
+        "type": "func(context.Context, SettlementObservation)",
+        "doc": "Lifecycle observations run once per normally returning call or worker job,\nafter existing hooks and cache invalidation. OnOperation runs last. These\ncallbacks count attempts, never consumption; application panics propagate.\nOnSettlement is optional; nil disables this callback.",
+        "default": "OnSettlement is optional; nil disables this callback."
+      },
+      {
+        "name": "OnCredit",
+        "type": "func(context.Context, CreditObservation)",
+        "doc": "OnCredit is optional; nil disables this callback.",
+        "default": "OnCredit is optional; nil disables this callback."
+      },
+      {
+        "name": "OnRelease",
+        "type": "func(context.Context, ReleaseObservation)",
+        "doc": "OnRelease is optional; nil disables this callback.",
+        "default": "OnRelease is optional; nil disables this callback."
+      },
+      {
+        "name": "OnReset",
+        "type": "func(context.Context, ResetObservation)",
+        "doc": "OnReset is optional; nil disables this callback.",
+        "default": "OnReset is optional; nil disables this callback."
+      },
+      {
+        "name": "ObserveOperation",
+        "type": "func(context.Context) bool",
+        "doc": "ObserveOperation gates only OnOperation and its aggregate construction.\nNil observes every operation. It runs once per public operation or worker\njob with that operation's context; a panic is recovered and means true.\nLifecycle callbacks are unaffected. It must be safe for concurrent calls\nand should return promptly without retaining the context.",
+        "default": "Nil observes every operation."
+      },
+      {
+        "name": "OnOperation",
+        "type": "func(context.Context, OperationObservation)",
+        "doc": "OnOperation is optional; nil disables this callback.",
+        "default": "OnOperation is optional; nil disables this callback."
+      }
+    ],
+    "quota.MemoryConfig": [
+      {
+        "name": "MaxKeys",
+        "type": "int",
+        "doc": "MaxKeys defaults to 500000; positive values bound each state\ncategory. Negative values fail Validate and quota.New.",
+        "default": "MaxKeys defaults to 500000; positive values bound each state category."
+      },
+      {
+        "name": "Clock",
+        "type": "func() time.Time",
+        "doc": "Clock is retained and must be concurrency safe; nil uses time.Now.",
+        "default": "Clock is retained and must be concurrency safe; nil uses time.Now."
+      }
+    ],
+    "quota.MiddlewareConfig": [
+      {
+        "name": "Exclusive",
+        "type": "bool",
+        "doc": "Exclusive rejects a request after quota middleware has already checked the\nsame Limiter. It prevents later quota middleware from checking that Limiter.\nIt cannot undo earlier usage. Skips and callback failures do not\nparticipate; all Allow/Reserve outcomes do. State resets with Echo's request\nstate and tracks at most eight distinct Limiters per request. Conflicts\nreturn ErrDuplicateAdmission; an Exclusive stage on a ninth Limiter returns\nErrParticipationLimit. Non-Exclusive stages beyond eight are admitted\nuntracked, as before.\nExclusive defaults to false.",
+        "default": "Exclusive defaults to false."
+      },
+      {
+        "name": "Settle",
+        "type": "bool",
+        "doc": "Settle reserves before the handler and asynchronously settles final costs afterward.\nSettle defaults to false, charging usage without reserving and settling.",
+        "default": "Settle defaults to false, charging usage without reserving and settling."
+      },
+      {
+        "name": "Unsettled",
+        "type": "func(status int) SettlePolicy",
+        "doc": "Unsettled defaults to Keep; it selects a policy only when Charge was not called.",
+        "default": "Unsettled defaults to Keep; it selects a policy only when Charge was not called."
+      },
+      {
+        "name": "Limiter",
+        "type": "*Limiter",
+        "doc": "Limiter is required, retained and caller-owned.",
+        "default": "Limiter is required, retained and caller-owned."
+      },
+      {
+        "name": "Identity",
+        "type": "func(*echo.Context) (Identity, error)",
+        "doc": "Identity is required and resolves a trusted paying subject.",
+        "default": "Identity is required and resolves a trusted paying subject."
+      },
+      {
+        "name": "Plan",
+        "type": "func(*echo.Context, Identity) (string, error)",
+        "doc": "Plan is optional only with one configured plan; nil selects that\nplan.",
+        "default": "Plan is optional only with one configured plan; nil selects that plan."
+      },
+      {
+        "name": "Period",
+        "type": "func(*echo.Context, Identity) (Period, error)",
+        "doc": "Period is required for selected billing-period limits; nil supplies\nno period.",
+        "default": "Period is required for selected billing-period limits; nil supplies no period."
+      },
+      {
+        "name": "Overrides",
+        "type": "func(*echo.Context, Identity, string) ([]Override, error)",
+        "doc": "Overrides runs for middleware and UsageHandler; the app caches its source.\nOverrides is optional; nil applies no numeric overrides.",
+        "default": "Overrides is optional; nil applies no numeric overrides."
+      },
+      {
+        "name": "Shadow",
+        "type": "func(*echo.Context, Identity, string) (string, error)",
+        "doc": "Shadow selects a candidate plan for limit checks only; nil disables it.",
+        "default": "Shadow selects a candidate plan for limit checks only; nil disables it."
+      },
+      {
+        "name": "Dimensions",
+        "type": "func(*echo.Context) (map[string]string, error)",
+        "doc": "Dimensions selects trusted subjects in middleware; UsageHandler uses query values.\nDimensions is optional; nil supplies no dimension values during limit checks.",
+        "default": "Dimensions is optional; nil supplies no dimension values during limit checks."
+      },
+      {
+        "name": "Cost",
+        "type": "func(*echo.Context) (Cost, error)",
+        "doc": "Cost is optional; nil charges requests:1. Returned maps are borrowed\nfor the request and must not be mutated concurrently.",
+        "default": "Cost is optional; nil charges requests:1."
+      },
+      {
+        "name": "Operation",
+        "type": "func(*echo.Context) string",
+        "doc": "Operation defaults to the registered method/path, with automatic HEAD\nusing GET and unmatched requests sharing one operation.",
+        "default": "Operation defaults to the registered method/path, with automatic HEAD using GET and unmatched requests sharing one operation."
+      },
+      {
+        "name": "Skipper",
+        "type": "middleware.Skipper",
+        "doc": "Skipper defaults to never skipping; true bypasses quota\nparticipation.",
+        "default": "Skipper defaults to never skipping; true bypasses quota participation."
+      },
+      {
+        "name": "Headers",
+        "type": "HeaderMode",
+        "doc": "Headers defaults to Draft11; Legacy, Draft11AndLegacy and NoHeaders\nselect other modes.",
+        "default": "Headers defaults to Draft11; Legacy, Draft11AndLegacy and NoHeaders select other modes."
+      },
+      {
+        "name": "DenyHandler",
+        "type": "func(*echo.Context, Decision) error",
+        "doc": "DenyHandler defaults to the package RFC 9457 denial renderer.",
+        "default": "DenyHandler defaults to the package RFC 9457 denial renderer."
+      },
+      {
+        "name": "UnavailableHandler",
+        "type": "func(*echo.Context, Decision) error",
+        "doc": "UnavailableHandler defaults to the package RFC 9457 unavailable\nrenderer.",
+        "default": "UnavailableHandler defaults to the package RFC 9457 unavailable renderer."
+      },
+      {
+        "name": "ErrorHandler",
+        "type": "func(*echo.Context, error) error",
+        "doc": "ErrorHandler defaults to returning input errors unchanged to Echo.",
+        "default": "ErrorHandler defaults to returning input errors unchanged to Echo."
+      }
+    ],
+    "quota.Outbox": [
+      {
+        "name": "Deliver",
+        "type": "func(context.Context, Event) error",
+        "doc": "Deliver receives every event at least once, possibly concurrently and out of\norder. Return nil after durably handling it; an error retries with backoff.\nDeduplicate by Event.ID. It must support concurrent calls.",
+        "default": "Return nil after durably handling it; an error retries with backoff."
+      },
+      {
+        "name": "Workers",
+        "type": "int",
+        "doc": "Workers defaults to 2; partitions delivered concurrently, 1..64.",
+        "default": "Workers defaults to 2; partitions delivered concurrently, 1..64."
+      },
+      {
+        "name": "Batch",
+        "type": "int",
+        "doc": "Batch defaults to 100; entries read per store call, 1..1000.",
+        "default": "Batch defaults to 100; entries read per store call, 1..1000."
+      },
+      {
+        "name": "PollInterval",
+        "type": "time.Duration",
+        "doc": "PollInterval defaults to 1s; index poll interval and the first retry delay.",
+        "default": "PollInterval defaults to 1s; index poll interval and the first retry delay."
+      },
+      {
+        "name": "SweepInterval",
+        "type": "time.Duration",
+        "doc": "SweepInterval defaults to 1m; re-index and expiry sweep interval.",
+        "default": "SweepInterval defaults to 1m; re-index and expiry sweep interval."
+      }
+    ],
+    "quotaadmin.Config": [
+      {
+        "name": "EnableCredits",
+        "type": "bool",
+        "doc": "EnableCredits exposes credit-topup and credit-correct. Mount then requires\nKeys and a durable Audit sink or explicit AllowUnauditedWrites.",
+        "default": "Mount then requires Keys and a durable Audit sink or explicit AllowUnauditedWrites."
+      },
+      {
+        "name": "EnableReset",
+        "type": "bool",
+        "doc": "EnableReset exposes destructive partition-wide generation resets. Mount\nrequires Keys and an Audit sink or explicit AllowUnauditedWrites.",
+        "default": "Mount requires Keys and an Audit sink or explicit AllowUnauditedWrites."
+      },
+      {
+        "name": "TopK",
+        "type": "*quota.TopK",
+        "doc": "TopK optionally enables the top-consumption view; nil omits it.\nIt remains caller-owned.",
+        "default": "TopK optionally enables the top-consumption view; nil omits it."
+      },
+      {
+        "name": "Denials",
+        "type": "*DenialRecorder",
+        "doc": "Denials optionally supplies instance-local denials; nil omits that\nview. It remains caller-owned.",
+        "default": "Denials optionally supplies instance-local denials; nil omits that view."
+      },
+      {
+        "name": "Backlog",
+        "type": "Backlog",
+        "doc": "Backlog optionally supplies outbox observations; nil omits that view.\nIt remains caller-owned.",
+        "default": "Backlog optionally supplies outbox observations; nil omits that view."
+      },
+      {
+        "name": "ID",
+        "type": "string",
+        "doc": "ID defaults to quota; use 1–32 lowercase ASCII letters, digits or\nhyphens, starting with a letter, excluding api and assets.",
+        "default": "ID defaults to quota; use 1–32 lowercase ASCII letters, digits or hyphens, starting with a letter, excluding api and assets."
+      },
+      {
+        "name": "Limiter",
+        "type": "*quota.Limiter",
+        "doc": "Limiter is required, constructed and caller-owned; keep it open while\nserving.",
+        "default": "Limiter is required, constructed and caller-owned; keep it open while serving."
+      },
+      {
+        "name": "Overrides",
+        "type": "func(context.Context, quota.Identity, string) ([]quota.Override, error)",
+        "doc": "Overrides optionally supplies read-only limit adjustments after\nauthorization; nil uses plan values. The callback is retained, must\nbe concurrency safe and must honor ctx.",
+        "default": "Overrides optionally supplies read-only limit adjustments after authorization; nil uses plan values."
+      }
+    ],
+    "quotamcp.MiddlewareConfig": [
+      {
+        "name": "Limiter",
+        "type": "*quota.Limiter",
+        "doc": "Limiter is required and caller-owned; quotamcp never closes it.",
+        "default": "Limiter is required and caller-owned; quotamcp never closes it."
+      },
+      {
+        "name": "Identity",
+        "type": "func(ctx context.Context, c Caller) (quota.Identity, error)",
+        "doc": "Identity is required and returns the paying subject. It sees\nauthenticated data only: ctx, Caller.TokenInfo and Caller.Header,\nnever tool arguments.",
+        "default": "Identity is required and returns the paying subject."
+      },
+      {
+        "name": "Plan",
+        "type": "func(ctx context.Context, id quota.Identity) (string, error)",
+        "doc": "Plan selects a plan ID; nil uses the sole plan.",
+        "default": "Plan selects a plan ID; nil uses the sole plan."
+      },
+      {
+        "name": "Period",
+        "type": "func(ctx context.Context, id quota.Identity) (quota.Period, error)",
+        "doc": "Period returns the billing period; it is required and runs only for\nplans with billing-period limits.",
+        "default": "Period returns the billing period; it is required and runs only for plans with billing-period limits."
+      },
+      {
+        "name": "Overrides",
+        "type": "func(ctx context.Context, id quota.Identity, plan string) ([]quota.Override, error)",
+        "doc": "Overrides changes limit numbers for one call; optional.",
+        "default": "Overrides changes limit numbers for one call; optional."
+      },
+      {
+        "name": "Shadow",
+        "type": "func(ctx context.Context, id quota.Identity, plan string) (string, error)",
+        "doc": "Shadow selects a candidate plan for limit checks only; optional.",
+        "default": "Shadow selects a candidate plan for limit checks only; optional."
+      },
+      {
+        "name": "Dimensions",
+        "type": "func(ctx context.Context, call Call) (map[string]string, error)",
+        "doc": "Dimensions selects dimension values, for example the model a tool will\ncall. It may read arguments; values select subjects, never the authenticated caller.\nDimensions is optional; nil supplies no dimension values.",
+        "default": "Dimensions is optional; nil supplies no dimension values."
+      },
+      {
+        "name": "Policies",
+        "type": "map[string]Policy",
+        "doc": "Policies maps tool names to metering policies; unlisted tools use Default\nwith the operation Unlisted.",
+        "default": "Policies maps tool names to metering policies; unlisted tools use Default with the operation Unlisted."
+      },
+      {
+        "name": "Default",
+        "type": "Policy",
+        "doc": "Default meters unlisted tools; zero charges one requests attempt with\nno billable Cost.",
+        "default": "Default meters unlisted tools; zero charges one requests attempt with no billable Cost."
+      },
+      {
+        "name": "Unsettled",
+        "type": "func(Outcome) quota.SettlePolicy",
+        "doc": "Unsettled decides a settled call that recorded no Charge, except a\nChargeFirst call that never started. Nil keeps the reservation, except\nfor input-required rounds, whose Cost meters are refunded. No refund\nreturns Attempt meters.",
+        "default": "Nil keeps the reservation, except for input-required rounds, whose Cost meters are refunded."
+      },
+      {
+        "name": "Disclose",
+        "type": "bool",
+        "doc": "Disclose adds plan and limit names, quotas and balances to denials.\nDisclose defaults to false.",
+        "default": "Disclose defaults to false."
+      },
+      {
+        "name": "ReportUsage",
+        "type": "bool",
+        "doc": "ReportUsage adds the smallest remaining requests limit to the _meta of\nsuccessful results.\nReportUsage defaults to false.",
+        "default": "ReportUsage defaults to false."
+      },
+      {
+        "name": "LoopBreaker",
+        "type": "bool",
+        "doc": "LoopBreaker adds the attempt meter LoopMeter and the dimension\nLoopDimension to every metered call, so a plan can limit identical calls.\nLoopBreaker defaults to false.",
+        "default": "LoopBreaker defaults to false."
+      },
+      {
+        "name": "OnCall",
+        "type": "func(ctx context.Context, info CallInfo)",
+        "doc": "OnCall observes each metered call after it ends; optional. It never sees\narguments or results.",
+        "default": "OnCall observes each metered call after it ends; optional."
+      },
+      {
+        "name": "OnMeteringError",
+        "type": "func(ctx context.Context, failure MeteringFailure)",
+        "doc": "OnMeteringError observes each eligible metered tools/call that obtains no\nallow/deny decision, independently of OnError's once-per-plan-set reports.\nOther methods, malformed pass-through requests and exempt tools are excluded.\nIt runs synchronously and must support concurrent calls; no context is retained.\nOnMeteringError is optional; nil disables the callback.",
+        "default": "OnMeteringError is optional; nil disables the callback."
+      },
+      {
+        "name": "OnError",
+        "type": "func(ctx context.Context, c Caller, err error)",
+        "doc": "OnError receives callback errors, *quota.RequestError, settlement\nfailures and plan sets that break a policy; optional. Store failures also\nreach quota.Hooks.OnStoreError.",
+        "default": "OnError receives callback errors, *quota.RequestError, settlement failures and plan sets that break a policy; optional."
+      }
+    ],
+    "quotamcp.Policy": [
+      {
+        "name": "Attempt",
+        "type": "quota.Cost",
+        "doc": "Attempt is charged on every admitted call and never refunded by\nquotamcp, so rate limits and the loop breaker see every attempt. Nil\nmeans {\"requests\": 1}; an empty non-nil Attempt charges no attempt meter.",
+        "default": "Nil means {\"requests\": 1}; an empty non-nil Attempt charges no attempt meter."
+      },
+      {
+        "name": "Cost",
+        "type": "quota.Cost",
+        "doc": "Cost holds the billable meters, disjoint from Attempt. Attempt-counted\ntools charge it when the request is allowed. Settled tools reserve it as an upper bound\nand settle it with Charge; it is the only part quotamcp ever refunds.\nCost is optional; nil has no billable work meters.",
+        "default": "Cost is optional; nil has no billable work meters."
+      },
+      {
+        "name": "Settle",
+        "type": "bool",
+        "doc": "Settle reserves Attempt plus Cost and settles Cost with the actual.\nSettle defaults to false, charging Cost when the request is allowed.",
+        "default": "Settle defaults to false, charging Cost when the request is allowed."
+      },
+      {
+        "name": "ChargeFirst",
+        "type": "bool",
+        "doc": "ChargeFirst declares that the settled tool's handler calls Charge,\nCharge(ctx, nil) at least, before any billable work. Without Charge, the call never reached the handler because arguments were\ninvalid or the tool was unknown. Its Cost meters are refunded. A successful result\nwithout Charge breaks the declaration: it keeps the reservation and is\nreported to OnError.",
+        "default": "ChargeFirst declares that the settled tool's handler calls Charge, Charge(ctx, nil) at least, before any billable work."
+      },
+      {
+        "name": "Exempt",
+        "type": "bool",
+        "doc": "Exempt tools are never metered; they take no Attempt or Cost.\nExempt defaults to false.",
+        "default": "Exempt defaults to false."
+      }
+    ],
+    "quotaotel.LifecycleConfig": [
+      {
+        "name": "Names",
+        "type": "NameAllowlist",
+        "doc": "Names at zero maps all plan, limit and meter names to _other.",
+        "default": "Names at zero maps all plan, limit and meter names to _other."
+      }
+    ],
+    "quotaotel.TraceConfig": [
+      {
+        "name": "Names",
+        "type": "NameAllowlist",
+        "doc": "Names is validated and copied; zero normalizes names to _other.",
+        "default": "Names is validated and copied; zero normalizes names to _other."
+      },
+      {
+        "name": "Identity",
+        "type": "func(quota.Identity) []attribute.KeyValue",
+        "doc": "Identity is trace-only opt-in. At most four returned candidates are examined;\nonly namespaced scalars outside quota.*, error.*, gen_ai.* and mcp.* survive.\nKeys are at most 64 bytes, strings at most 128; duplicates are dropped.\nPrefer a keyed digest, which remains linkable personal data, not anonymization.\nIdentity is optional; nil discloses no caller attributes.",
+        "default": "Identity is optional; nil discloses no caller attributes."
+      },
+      {
+        "name": "Remaining",
+        "type": "bool",
+        "doc": "Remaining discloses coarse usage per subject, even without caller attributes.\nRemaining defaults to false.",
+        "default": "Remaining defaults to false."
+      },
+      {
+        "name": "MarkErrors",
+        "type": "bool",
+        "doc": "MarkErrors sets Error status only when an unavailable store causes a request to be rejected.\nMarkErrors defaults to false.",
+        "default": "MarkErrors defaults to false."
+      },
+      {
+        "name": "MaxEventAttrs",
+        "type": "int",
+        "doc": "MaxEventAttrs includes the dropped marker: zero selects 16; otherwise 1..32.",
+        "default": "MaxEventAttrs includes the dropped marker: zero selects 16; otherwise 1..32."
+      },
+      {
+        "name": "Failures",
+        "type": "FailureSink",
+        "doc": "Failures optionally counts recovered panics; nil does not count failures.",
+        "default": "Failures optionally counts recovered panics; nil does not count failures."
+      },
+      {
+        "name": "Logger",
+        "type": "*slog.Logger",
+        "doc": "Logger optionally receives fixed diagnostics, at most once per minute per\nconstructed hook. Recovered values, caller data and error text are never logged.",
+        "default": "Logger optionally receives fixed diagnostics, at most once per minute per constructed hook."
+      }
+    ],
+    "quotaprom.LifecycleConfig": [
+      {
+        "name": "Names",
+        "type": "NameAllowlist",
+        "doc": "Names at zero maps all plan, limit and meter names to _other.",
+        "default": "Names at zero maps all plan, limit and meter names to _other."
+      }
+    ],
+    "quotastripe.Config": [
+      {
+        "name": "Namespace",
+        "type": "string",
+        "doc": "Namespace is required and identifies one account's immutable state history.",
+        "default": "Namespace is required and identifies one account's immutable state history."
+      },
+      {
+        "name": "Store",
+        "type": "Store",
+        "doc": "Store is required, concurrency safe, and caller-owned.",
+        "default": "Store is required, concurrency safe, and caller-owned."
+      },
+      {
+        "name": "Client",
+        "type": "*http.Client",
+        "doc": "Client is required and caller-owned. Redirects are refused on an owned client.",
+        "default": "Client is required and caller-owned."
+      },
+      {
+        "name": "APIKey",
+        "type": "func(context.Context) (string, error)",
+        "doc": "APIKey is required; it supplies a key under a request deadline. One callback\nruns at a time; concurrent callers wait within their own bounded contexts.\nDispatch resolves or reuses a validated key before claiming work.\nFailure before claiming writes nothing,\nreports OnError (op \"dispatch\") and pauses dispatch with escalating backoff.",
+        "default": "APIKey is required; it supplies a key under a request deadline."
+      },
+      {
+        "name": "APIKeyTTL",
+        "type": "time.Duration",
+        "doc": "APIKeyTTL defaults to one minute; require 1 second..15 minutes.\nA validated key is shared by workers and reads for this duration after\nresolution. Expiry, 401/403, validation failure and Run start clear it.\nShorter TTLs reduce key memory residency and rotation delay but increase\ncallback traffic. In-flight requests may finish with their admitted key.",
+        "default": "APIKeyTTL defaults to one minute; require 1 second..15 minutes."
+      },
+      {
+        "name": "Meters",
+        "type": "map[string]Meter",
+        "doc": "Meters contains 1..256 source-meter mappings; New takes a private copy.\nMeters is required; configure 1 through 256 mappings.",
+        "default": "Meters is required; configure 1 through 256 mappings."
+      },
+      {
+        "name": "Ignore",
+        "type": "[]string",
+        "doc": "Ignore contains at most 256 pure ignored source meters; default empty.",
+        "default": "Ignore contains at most 256 pure ignored source meters; default empty."
+      },
+      {
+        "name": "Customer",
+        "type": "func(context.Context, quota.ConsumptionEvent) (string, error)",
+        "doc": "Customer is required; the first event-specific result is durably indexed.\nReturn ErrSkip for a terminal skip; other errors backpressure quota.",
+        "default": "Customer is required; the first event-specific result is durably indexed."
+      },
+      {
+        "name": "Drained",
+        "type": "func(context.Context) (bool, error)",
+        "doc": "Drained reports whether final source usage through the chosen cutoff has arrived.\nNil leaves source completeness unknown.",
+        "default": "Nil leaves source completeness unknown."
+      },
+      {
+        "name": "Window",
+        "type": "time.Duration",
+        "doc": "Window defaults to one minute; other nonzero grids are rejected.",
+        "default": "Window defaults to one minute; other nonzero grids are rejected."
+      },
+      {
+        "name": "Lateness",
+        "type": "time.Duration",
+        "doc": "Lateness defaults to two minutes before automatic sealing.",
+        "default": "Lateness defaults to two minutes before automatic sealing."
+      },
+      {
+        "name": "ResendWithin",
+        "type": "time.Duration",
+        "doc": "ResendWithin defaults to 12 hours from the persisted first send\nintent; require RequestTimeout + 5m < ResendWithin < 23h55m.",
+        "default": "ResendWithin defaults to 12 hours from the persisted first send intent; require RequestTimeout + 5m < ResendWithin < 23h55m."
+      },
+      {
+        "name": "DedupeRetention",
+        "type": "time.Duration",
+        "doc": "DedupeRetention defaults to 72 hours after window end; unresolved work pins it.",
+        "default": "DedupeRetention defaults to 72 hours after window end; unresolved work pins it."
+      },
+      {
+        "name": "DecisionRetention",
+        "type": "time.Duration",
+        "doc": "DecisionRetention defaults to 35 days and cannot exceed 35 days.",
+        "default": "DecisionRetention defaults to 35 days and cannot exceed 35 days."
+      },
+      {
+        "name": "ReceiptRetention",
+        "type": "time.Duration",
+        "doc": "ReceiptRetention defaults to 400 days; MaxHistory can shorten actual coverage.",
+        "default": "ReceiptRetention defaults to 400 days; MaxHistory can shorten actual coverage."
+      },
+      {
+        "name": "LeaseTTL",
+        "type": "time.Duration",
+        "doc": "LeaseTTL defaults to two minutes; require >=3*RequestTimeout and <=24 hours.",
+        "default": "LeaseTTL defaults to two minutes; require >=3*RequestTimeout and <=24 hours."
+      },
+      {
+        "name": "BacklogAlarm",
+        "type": "time.Duration",
+        "doc": "BacklogAlarm defaults to 30 minutes for OnBacklog.",
+        "default": "BacklogAlarm defaults to 30 minutes for OnBacklog."
+      },
+      {
+        "name": "SummaryLag",
+        "type": "time.Duration",
+        "doc": "SummaryLag defaults to 15 minutes; this is a heuristic, not a processing SLA.",
+        "default": "SummaryLag defaults to 15 minutes; this is a heuristic, not a processing SLA."
+      },
+      {
+        "name": "RequestTimeout",
+        "type": "time.Duration",
+        "doc": "RequestTimeout defaults to 30 seconds; require 0 < timeout <=5 minutes.",
+        "default": "RequestTimeout defaults to 30 seconds; require 0 < timeout <=5 minutes."
+      },
+      {
+        "name": "RatePerSecond",
+        "type": "int",
+        "doc": "RatePerSecond defaults to 20 for each shared POST/read budget; maximum 1000.",
+        "default": "RatePerSecond defaults to 20 for each shared POST/read budget; maximum 1000."
+      },
+      {
+        "name": "Burst",
+        "type": "int",
+        "doc": "Burst defaults to one; maximum 1000 per budget.",
+        "default": "Burst defaults to one; maximum 1000 per budget."
+      },
+      {
+        "name": "Workers",
+        "type": "int",
+        "doc": "Workers defaults to eight concurrent group workers; require 1..64.\nEach group has at most one local request in flight. All workers share rate\nbudgets and the account authentication pause. Run cancels and joins them.",
+        "default": "Workers defaults to eight concurrent group workers; require 1..64."
+      },
+      {
+        "name": "MaxAttempts",
+        "type": "int",
+        "doc": "MaxAttempts defaults to 50; require 1..1000. Auth responses do not count.",
+        "default": "MaxAttempts defaults to 50; require 1..1000."
+      },
+      {
+        "name": "MaxDedupeEvents",
+        "type": "int",
+        "doc": "MaxDedupeEvents defaults to 100000 per billed group, matching StoreConfig.",
+        "default": "MaxDedupeEvents defaults to 100000 per billed group, matching StoreConfig."
+      },
+      {
+        "name": "MaxDecisions",
+        "type": "int",
+        "doc": "MaxDecisions defaults to 100000 per terminal/counter shard, matching StoreConfig.",
+        "default": "MaxDecisions defaults to 100000 per terminal/counter shard, matching StoreConfig."
+      },
+      {
+        "name": "MaxOpenGroups",
+        "type": "int",
+        "doc": "MaxOpenGroups defaults to 10000 retained groups, including internal shards.\nRedis group counting is approximate across slots; matching StoreConfig is required.",
+        "default": "MaxOpenGroups defaults to 10000 retained groups, including internal shards. Redis group counting is approximate across slots; matching StoreConfig is required."
+      },
+      {
+        "name": "MaxUnsentBatches",
+        "type": "int",
+        "doc": "MaxUnsentBatches defaults to 10000 open/sealed/sending/uncertain/quarantined\nrecords per group, matching StoreConfig.MaxBatches. Sent receipts are excluded.",
+        "default": "MaxUnsentBatches defaults to 10000 open/sealed/sending/uncertain/quarantined records per group, matching StoreConfig.MaxBatches."
+      },
+      {
+        "name": "MaxQuarantined",
+        "type": "int",
+        "doc": "MaxQuarantined defaults to 10000 per group, matching StoreConfig.",
+        "default": "MaxQuarantined defaults to 10000 per group, matching StoreConfig."
+      },
+      {
+        "name": "Logger",
+        "type": "*slog.Logger",
+        "doc": "Logger is optional and caller-owned; default silence. Logs use fixed fields,\nbounded response classifications and only the last four customer characters.",
+        "default": "Logger is optional and caller-owned; default silence."
+      },
+      {
+        "name": "OnError",
+        "type": "func(context.Context, string, error)",
+        "doc": "OnError is optional and may run concurrently; it must be concurrency safe,\nhonor its bounded context and not block.",
+        "default": "OnError is optional and may run concurrently; it must be concurrency safe, honor its bounded context and not block."
+      },
+      {
+        "name": "OnBacklog",
+        "type": "func(context.Context, time.Duration)",
+        "doc": "OnBacklog is optional; it must honor its bounded context and not block.",
+        "default": "OnBacklog is optional; it must honor its bounded context and not block."
+      }
+    ],
+    "quotastripe.StoreConfig": [
+      {
+        "name": "Prefix",
+        "type": "string",
+        "doc": "Prefix defaults to quotastripe; use <=32 lowercase letters, digits or underscores.\nAn optional namespace: prefix accepts a namespace of up to 32 lowercase\nletters, digits, underscores or hyphens (for example echo-pro:tests).",
+        "default": "Prefix defaults to quotastripe; use <=32 lowercase letters, digits or underscores. An optional namespace: prefix accepts a namespace of up to 32 lowercase letters, digits, underscores or hyphens (for example echo-pro:tests)."
+      },
+      {
+        "name": "Clock",
+        "type": "func() time.Time",
+        "doc": "Clock is an optional concurrency-safe clock for isolated tests; default store time.",
+        "default": "Clock is an optional concurrency-safe clock for isolated tests; default store time."
+      },
+      {
+        "name": "DedupeRetention",
+        "type": "time.Duration",
+        "doc": "DedupeRetention defaults to 72 hours, measured strictly after window end.",
+        "default": "DedupeRetention defaults to 72 hours, measured strictly after window end."
+      },
+      {
+        "name": "DecisionRetention",
+        "type": "time.Duration",
+        "doc": "DecisionRetention defaults to 35 days; require one minute through 35 days.",
+        "default": "DecisionRetention defaults to 35 days; require one minute through 35 days."
+      },
+      {
+        "name": "ReceiptRetention",
+        "type": "time.Duration",
+        "doc": "ReceiptRetention defaults to 400 days; history capacity may evict sooner.",
+        "default": "ReceiptRetention defaults to 400 days; history capacity may evict sooner."
+      },
+      {
+        "name": "MaxDedupeEvents",
+        "type": "int",
+        "doc": "MaxDedupeEvents defaults to 100000 per billed group. Index shards allow\nMaxDedupeEvents+MaxDecisions entries, additionally limited by MaxBytes.",
+        "default": "MaxDedupeEvents defaults to 100000 per billed group."
+      },
+      {
+        "name": "MaxDecisions",
+        "type": "int",
+        "doc": "MaxDecisions defaults to 100000 per terminal shard or daily-counter shard.",
+        "default": "MaxDecisions defaults to 100000 per terminal shard or daily-counter shard."
+      },
+      {
+        "name": "MaxGroups",
+        "type": "int",
+        "doc": "MaxGroups defaults to 10000, including internal shards and permanent tombstones.\nIt is exact per MemoryStore and approximate per namespace across Redis slots.",
+        "default": "MaxGroups defaults to 10000, including internal shards and permanent tombstones."
+      },
+      {
+        "name": "MaxOpenWindows",
+        "type": "int",
+        "doc": "MaxOpenWindows defaults to 1000 per group.",
+        "default": "MaxOpenWindows defaults to 1000 per group."
+      },
+      {
+        "name": "MaxBatches",
+        "type": "int",
+        "doc": "MaxBatches defaults to 10000 unresolved records per group, including open work.",
+        "default": "MaxBatches defaults to 10000 unresolved records per group, including open work."
+      },
+      {
+        "name": "MaxQuarantined",
+        "type": "int",
+        "doc": "MaxQuarantined defaults to 10000 per group; quarantined input never expires.",
+        "default": "MaxQuarantined defaults to 10000 per group; quarantined input never expires."
+      },
+      {
+        "name": "MaxHistory",
+        "type": "int",
+        "doc": "MaxHistory defaults to 10000 sent receipts per group in companion storage.\nOldest-first eviction advances CoverageLostBefore and never removes unresolved work.",
+        "default": "MaxHistory defaults to 10000 sent receipts per group in companion storage."
+      },
+      {
+        "name": "MaxReservations",
+        "type": "int",
+        "doc": "MaxReservations defaults to 1000 compact Capture replies per group, retained\nfor at most one minute, plus persistent FlushOnce captures. Also bounds\npersistent FlushOnce requests in the namespace slot. Persistent records\nnever evict; exhaustion rejects new request IDs. MaxBytes also applies.\nSeal never creates a reply receipt.",
+        "default": "MaxReservations defaults to 1000 compact Capture replies per group, retained for at most one minute, plus persistent FlushOnce captures."
+      },
+      {
+        "name": "MaxBytes",
+        "type": "int",
+        "doc": "MaxBytes defaults to 32 MiB for the hot group record, excluding sent and\ndurable flush receipts in companion storage. Each flush receipt is bounded\nby 32 * MaxBytes * (registered groups + 1); MaxReservations bounds their count.\nNamespace scheduling leases have a separate fixed 2 KiB allowance so a full\nflush registry remains restartable at capacity.",
+        "default": "MaxBytes defaults to 32 MiB for the hot group record, excluding sent and durable flush receipts in companion storage."
+      }
+    ],
+    "redisstore.Config": [
+      {
+        "name": "Prefix",
+        "type": "string",
+        "doc": "Prefix defaults to quota; the unqualified prefix must match\n[a-z0-9][a-z0-9_]{0,15}. See Config for the optional namespace.",
+        "default": "Prefix defaults to quota; the unqualified prefix must match [a-z0-9][a-z0-9_]{0,15}. See Config for the optional namespace."
+      },
+      {
+        "name": "Clock",
+        "type": "func() time.Time",
+        "doc": "Clock is retained for isolated tests only and must be concurrency safe.\nIt replaces server time, including virtual expiry; nil uses Redis TIME.",
+        "default": "It replaces server time, including virtual expiry; nil uses Redis TIME."
+      }
+    ],
+    "stripeadmin.Config": [
+      {
+        "name": "Status",
+        "type": "StatusReader",
+        "doc": "Status is required, retained and caller-owned; it must honor ctx and\nbe concurrency safe.",
+        "default": "Status is required, retained and caller-owned; it must honor ctx and be concurrency safe."
+      },
+      {
+        "name": "Inspection",
+        "type": "InspectionReader",
+        "doc": "Inspection enables bounded shared-store diagnostic views. Nil omits them.",
+        "default": "Nil omits them."
+      },
+      {
+        "name": "Reconcile",
+        "type": "ReconcileReader",
+        "doc": "Reconcile enables the aggregate Probe action. Nil omits it.",
+        "default": "Nil omits it."
+      },
+      {
+        "name": "Flush",
+        "type": "FlushRunner",
+        "doc": "Flush enables the durable local-dispatcher Write. Nil omits it.",
+        "default": "Nil omits it."
+      },
+      {
+        "name": "Budget",
+        "type": "quotastripe.InspectionBudget",
+        "doc": "Budget bounds inspection; zero uses quotastripe defaults.",
+        "default": "Budget bounds inspection; zero uses quotastripe defaults."
+      },
+      {
+        "name": "StripePages",
+        "type": "int",
+        "doc": "StripePages defaults to 10 and must be 1–100. Shared across Probe retries.",
+        "default": "StripePages defaults to 10 and must be 1–100."
+      },
+      {
+        "name": "ID",
+        "type": "string",
+        "doc": "ID defaults to stripe; use 1–32 lowercase ASCII letters, digits or\nhyphens, starting with a letter, excluding api and assets.",
+        "default": "ID defaults to stripe; use 1–32 lowercase ASCII letters, digits or hyphens, starting with a letter, excluding api and assets."
+      },
+      {
+        "name": "BacklogAlarm",
+        "type": "time.Duration",
+        "doc": "BacklogAlarm is a display threshold; defaults to 30m, nonzero values\nmust be positive.",
+        "default": "BacklogAlarm is a display threshold; defaults to 30m, nonzero values must be positive."
+      },
+      {
+        "name": "Now",
+        "type": "func() time.Time",
+        "doc": "Now is retained and must be concurrency safe; nil uses time.Now.",
+        "default": "Now is retained and must be concurrency safe; nil uses time.Now."
+      }
+    ],
+    "tenant.AuthorizeConfig": [
+      {
+        "name": "Authorizer",
+        "type": "Authorizer",
+        "doc": "Authorizer is required, caller-owned and must be concurrency safe and\nhonor ctx.",
+        "default": "Authorizer is required, caller-owned and must be concurrency safe and honor ctx."
+      },
+      {
+        "name": "Action",
+        "type": "string",
+        "doc": "Action is required and contains 1–128 bytes.",
+        "default": "Action is required and contains 1–128 bytes."
+      },
+      {
+        "name": "Resource",
+        "type": "func(*echo.Context) (Resource, error)",
+        "doc": "Resource is a required, concurrency-safe resolver. It borrows the\nEcho context for the call and must honor its request deadline.",
+        "default": "Resource is a required, concurrency-safe resolver."
+      },
+      {
+        "name": "Timeout",
+        "type": "time.Duration",
+        "doc": "Timeout bounds resource resolution and authorization; defaults to 2s,\nvalid range 1ms–30s.",
+        "default": "Timeout bounds resource resolution and authorization; defaults to 2s, valid range 1ms–30s."
+      }
+    ],
+    "tenant.CerbosConfig": [
+      {
+        "name": "HTTP",
+        "type": "HTTPConfig",
+        "doc": "HTTP supplies the required client, origin and bounded request\nsettings.",
+        "default": "HTTP supplies the required client, origin and bounded request settings."
+      },
+      {
+        "name": "Principal",
+        "type": "func(Check) (CerbosPrincipal, error)",
+        "doc": "Principal is a required retained mapping and must be concurrency\nsafe. Returned roles and attributes are borrowed only during the\nauthorization call.",
+        "default": "Principal is a required retained mapping and must be concurrency safe."
+      }
+    ],
+    "tenant.Config": [
+      {
+        "name": "Selectors",
+        "type": "[]Selector",
+        "doc": "Selectors is copied; nil selects only a credential restriction.\nAt most 16 non-nil, concurrency-safe callbacks are accepted.",
+        "default": "Selectors is copied; nil selects only a credential restriction. At most 16 non-nil, concurrency-safe callbacks are accepted."
+      },
+      {
+        "name": "Member",
+        "type": "func(context.Context, auth.Principal, ID) (bool, error)",
+        "doc": "Member checks authenticated principals only; nil refuses\nrequest-selected tenants unless the credential restricts the tenant.\nIt is retained, must be concurrency safe and honor ctx; even (true,\nerror) refuses.",
+        "default": "Member checks authenticated principals only; nil refuses request-selected tenants unless the credential restricts the tenant."
+      },
+      {
+        "name": "Required",
+        "type": "bool",
+        "doc": "Required refuses an absent tenant except on public operations;\ndefault false.",
+        "default": "Required refuses an absent tenant except on public operations; default false."
+      },
+      {
+        "name": "AnonymousSelector",
+        "type": "Selector",
+        "doc": "AnonymousSelector is an optional retained selector for anonymous\ntraffic; nil disables anonymous tenant selection.",
+        "default": "AnonymousSelector is an optional retained selector for anonymous traffic; nil disables anonymous tenant selection."
+      }
+    ],
+    "tenant.HTTPConfig": [
+      {
+        "name": "Client",
+        "type": "*http.Client",
+        "doc": "Client is required and caller-owned. A shallow private copy shares\nits transport and disables its cookie jar; configure it before\ncalling Cerbos or OpenFGA. Later field changes are not observed.",
+        "default": "Client is required and caller-owned."
+      },
+      {
+        "name": "URL",
+        "type": "string",
+        "doc": "URL is a required http(s) origin without credentials, query or\nfragment. HTTP supports private service meshes.",
+        "default": "URL is a required http(s) origin without credentials, query or fragment."
+      },
+      {
+        "name": "Timeout",
+        "type": "time.Duration",
+        "doc": "Timeout defaults to 2s; valid range 1ms–30s, bounded by caller\ncancellation.",
+        "default": "Timeout defaults to 2s; valid range 1ms–30s, bounded by caller cancellation."
+      },
+      {
+        "name": "MaxConcurrent",
+        "type": "int",
+        "doc": "MaxConcurrent defaults to 16; valid range 1–256. Excess calls deny\nimmediately.",
+        "default": "MaxConcurrent defaults to 16; valid range 1–256."
+      },
+      {
+        "name": "AuthHeader",
+        "type": "string",
+        "doc": "AuthHeader and AuthValue are both empty or both set. Header is 1–64 ASCII\nletters, digits or hyphens; Value is at most 8192 bytes without CR or LF.",
+        "default": "AuthHeader and AuthValue are both empty or both set."
+      },
+      {
+        "name": "AuthValue",
+        "type": "string",
+        "doc": "AuthHeader and AuthValue are both empty or both set. Header is 1–64 ASCII\nletters, digits or hyphens; Value is at most 8192 bytes without CR or LF.",
+        "default": "AuthHeader and AuthValue are both empty or both set."
+      },
+      {
+        "name": "AllowInsecure",
+        "type": "bool",
+        "doc": "AllowInsecure permits credentials over HTTP for local tests; default\nfalse.",
+        "default": "AllowInsecure permits credentials over HTTP for local tests; default false."
+      }
+    ],
+    "tenant.OpenFGAConfig": [
+      {
+        "name": "HTTP",
+        "type": "HTTPConfig",
+        "doc": "HTTP supplies the required client, origin and bounded request\nsettings.",
+        "default": "HTTP supplies the required client, origin and bounded request settings."
+      },
+      {
+        "name": "StoreID",
+        "type": "string",
+        "doc": "StoreID and AuthorizationModelID are required, each 1–64 ASCII\nletters, digits, underscores or hyphens.",
+        "default": "StoreID and AuthorizationModelID are required, each 1–64 ASCII letters, digits, underscores or hyphens."
+      },
+      {
+        "name": "AuthorizationModelID",
+        "type": "string",
+        "doc": "StoreID and AuthorizationModelID are required, each 1–64 ASCII\nletters, digits, underscores or hyphens.",
+        "default": "StoreID and AuthorizationModelID are required, each 1–64 ASCII letters, digits, underscores or hyphens."
+      },
+      {
+        "name": "ActionRelations",
+        "type": "map[string]string",
+        "doc": "ActionRelations is copied; require 1–256 entries. Actions are 1–128\nbytes; relations start with an ASCII letter or underscore followed by\nup to 49 ASCII letters, digits or underscores. Missing actions deny.",
+        "default": "ActionRelations is copied; require 1–256 entries."
+      },
+      {
+        "name": "User",
+        "type": "func(Check) (string, error)",
+        "doc": "User is a retained, concurrency-safe mapping; nil selects the\ndefault principal mapping described above. Its result must be a\nvalid OpenFGA user.",
+        "default": "User is a retained, concurrency-safe mapping; nil selects the default principal mapping described above."
+      }
+    ],
+    "webhook.Endpoint": [
+      {
+        "name": "URL",
+        "type": "string",
+        "doc": "URL is required and has no default.",
+        "default": "URL is required and has no default."
+      },
+      {
+        "name": "Secrets",
+        "type": "[]string",
+        "doc": "Secrets is required; configure 1 through 8 signing secrets.",
+        "default": "Secrets is required; configure 1 through 8 signing secrets."
+      }
+    ],
+    "webhook.HTTPSenderConfig": [
+      {
+        "name": "Endpoints",
+        "type": "map[string]Endpoint",
+        "doc": "Endpoints registers 1–64 destinations, keyed by Delivery.Destination.\nKeep these keys in sync with the store Routing destinations.\nEndpoints is required; configure 1 through 64 destinations.",
+        "default": "Endpoints is required; configure 1 through 64 destinations."
+      },
+      {
+        "name": "Client",
+        "type": "*http.Client",
+        "doc": "Client is optional and caller-owned. Its settings are copied; Transport\nmust be nil or *http.Transport (arbitrary transports may retry). The\ntransport is cloned, restricted to HTTP/1, and uses no persistent\nconnections, compression, redirects, cookie jar or automatic retries.\nA zero Timeout uses 15s. A positive Timeout is preserved. The client and\ntransport must not be mutated during construction; neither is modified.",
+        "default": "Client is optional and caller-owned. Its settings are copied; Transport must be nil or *http.Transport (arbitrary transports may retry). A zero Timeout uses 15s."
+      },
+      {
+        "name": "Now",
+        "type": "func() time.Time",
+        "doc": "Now defaults to time.Now; a supplied clock must be concurrency safe.",
+        "default": "Now defaults to time.Now; a supplied clock must be concurrency safe."
+      },
+      {
+        "name": "Logger",
+        "type": "*slog.Logger",
+        "doc": "Logger is optional, caller-owned and defaults to silence. Logs contain\nonly outcome and machine code, never endpoint or delivery IDs.",
+        "default": "Logger is optional, caller-owned and defaults to silence."
+      }
+    ],
+    "webhook.ReceiveConfig": [
+      {
+        "name": "Inbox",
+        "type": "Acceptor",
+        "doc": "Inbox is required, caller-owned and must be concurrency safe and\nhonor ctx.",
+        "default": "Inbox is required, caller-owned and must be concurrency safe and honor ctx."
+      },
+      {
+        "name": "Source",
+        "type": "string",
+        "doc": "Source is the required registered source name, 1–64 printable ASCII\nbytes. It must equal every Verify result's Source.",
+        "default": "Source is the required registered source name, 1–64 printable ASCII bytes."
+      },
+      {
+        "name": "Verify",
+        "type": "VerifyFunc",
+        "doc": "Verify is required, retained and must be concurrency safe and honor\nctx.",
+        "default": "Verify is required, retained and must be concurrency safe and honor ctx."
+      },
+      {
+        "name": "MaxBodyBytes",
+        "type": "int64",
+        "doc": "MaxBodyBytes defaults to 256 KiB; valid range 1 byte–1 MiB.",
+        "default": "MaxBodyBytes defaults to 256 KiB; valid range 1 byte–1 MiB."
+      },
+      {
+        "name": "Timeout",
+        "type": "time.Duration",
+        "doc": "Timeout bounds body reads, verification and acceptance from adapter\nentry; zero uses 5s, valid range 1–8s. See ReceiveConfig for\nbody-read deadline requirements.",
+        "default": "Timeout bounds body reads, verification and acceptance from adapter entry; zero uses 5s, valid range 1–8s."
+      },
+      {
+        "name": "Logger",
+        "type": "*slog.Logger",
+        "doc": "Logger is optional and caller-owned; nil is silent.",
+        "default": "Logger is optional and caller-owned; nil is silent."
+      }
+    ],
+    "webhook.StandardVerifierConfig": [
+      {
+        "name": "Secrets",
+        "type": "[]string",
+        "doc": "Secrets uses Endpoint's whsec_ form and bounds; any matching key verifies.\nSecrets is required; configure 1 through 8 verification secrets.",
+        "default": "Secrets is required; configure 1 through 8 verification secrets."
+      },
+      {
+        "name": "Tenant",
+        "type": "string",
+        "doc": "Source, Type and Format are required preparation names. Tenant and\nAccount are trusted route bindings and may be empty.",
+        "default": "Source, Type and Format are required preparation names. Tenant and Account are trusted route bindings and may be empty."
+      },
+      {
+        "name": "Source",
+        "type": "string",
+        "doc": "Source, Type and Format are required preparation names. Tenant and\nAccount are trusted route bindings and may be empty.",
+        "default": "Source, Type and Format are required preparation names. Tenant and Account are trusted route bindings and may be empty."
+      },
+      {
+        "name": "Account",
+        "type": "string",
+        "doc": "Source, Type and Format are required preparation names. Tenant and\nAccount are trusted route bindings and may be empty.",
+        "default": "Source, Type and Format are required preparation names. Tenant and Account are trusted route bindings and may be empty."
+      },
+      {
+        "name": "Type",
+        "type": "string",
+        "doc": "Source, Type and Format are required preparation names. Tenant and\nAccount are trusted route bindings and may be empty.",
+        "default": "Source, Type and Format are required preparation names. Tenant and Account are trusted route bindings and may be empty."
+      },
+      {
+        "name": "Format",
+        "type": "string",
+        "doc": "Source, Type and Format are required preparation names. Tenant and\nAccount are trusted route bindings and may be empty.",
+        "default": "Source, Type and Format are required preparation names. Tenant and Account are trusted route bindings and may be empty."
+      },
+      {
+        "name": "Tolerance",
+        "type": "time.Duration",
+        "doc": "Tolerance defaults to 5m; valid range 1s–5m, on either side of Now.\nTimestamp checking limits replay age; the inbox must deduplicate IDs.",
+        "default": "Tolerance defaults to 5m; valid range 1s–5m, on either side of Now."
+      },
+      {
+        "name": "Now",
+        "type": "func() time.Time",
+        "doc": "Now defaults to time.Now; a supplied clock must be concurrency safe.",
+        "default": "Now defaults to time.Now; a supplied clock must be concurrency safe."
+      }
+    ],
+    "webhookadmin.Config": [
+      {
+        "name": "ID",
+        "type": "string",
+        "doc": "ID is the panel ID: 1–32 bytes of [a-z0-9-] starting with a letter, not\n\"api\" or \"assets\". It defaults to \"webhook\". Use a distinct ID for each namespace. Change the ID or console Keys when\nswitching that location to another namespace. Cursors bind the panel ID\nrather than the store.",
+        "default": "It defaults to \"webhook\"."
+      },
+      {
+        "name": "Store",
+        "type": "*webhookpg.Store",
+        "doc": "Store is an already constructed, caller-owned store from webhookpg.New\non the runtime-role pool. The panel never migrates, closes or\nreconfigures it. Keep the store and its pool open while any console using the panel serves\nrequests.\nRequired.",
+        "default": "Required."
+      },
+      {
+        "name": "EnableReplay",
+        "type": "bool",
+        "doc": "EnableReplay explicitly enables audited replay, unknown-outcome decisions\nand payload reveal. The default\npanel exposes reads only. Mounting an enabled panel requires console Keys\nand an Audit sink (or the explicit AllowUnauditedWrites opt-out).",
+        "default": "The default panel exposes reads only. Mounting an enabled panel requires console Keys and an Audit sink (or the explicit AllowUnauditedWrites opt-out)."
+      }
+    ],
+    "webhookmem.DestinationConfig": [
+      {
+        "name": "Version",
+        "type": "string",
+        "doc": "Version is required; configure the immutable routing version.",
+        "default": "Version is required; configure the immutable routing version."
+      },
+      {
+        "name": "Send",
+        "type": "webhook.SendFunc",
+        "doc": "Send is required, retained and caller-owned.",
+        "default": "Send is required, retained and caller-owned."
+      },
+      {
+        "name": "ReplayWindow",
+        "type": "time.Duration",
+        "doc": "ReplayWindow is required and has no default.",
+        "default": "ReplayWindow is required and has no default."
+      },
+      {
+        "name": "RequestTimeout",
+        "type": "time.Duration",
+        "default": "RequestTimeout defaults to 15s, valid range 1–30s."
+      }
+    ],
+    "webhookmem.RoutingConfig": [
+      {
+        "name": "Destinations",
+        "type": "map[string]DestinationConfig",
+        "doc": "Destinations is optional; nil registers none, with at most 64 entries.",
+        "default": "Destinations is optional; nil registers none, with at most 64 entries."
+      },
+      {
+        "name": "MaxAttempts",
+        "type": "int",
+        "default": "MaxAttempts defaults to 8, range 1–32."
+      },
+      {
+        "name": "MaxAge",
+        "type": "time.Duration",
+        "default": "MaxAge defaults to 72h, range 1m–7 days."
+      },
+      {
+        "name": "Logger",
+        "type": "*slog.Logger",
+        "default": "Logger is optional, caller-owned and silent when nil."
+      }
+    ],
+    "webhookmem.StoreConfig": [
+      {
+        "name": "Namespace",
+        "type": "string",
+        "default": "Namespace defaults to \"default\"; each Store is independent."
+      },
+      {
+        "name": "MaxMessages",
+        "type": "int64",
+        "default": "MaxMessages defaults to 1,000 (range 1–100,000); MaxBytes defaults to 16 MiB (range 1 KiB– 1 GiB)."
+      },
+      {
+        "name": "MaxBytes",
+        "type": "int64",
+        "default": "MaxMessages defaults to 1,000 (range 1–100,000); MaxBytes defaults to 16 MiB (range 1 KiB– 1 GiB)."
+      },
+      {
+        "name": "Routing",
+        "type": "RoutingConfig",
+        "doc": "Routing at zero registers no destinations and uses the RoutingConfig retry defaults.",
+        "default": "Routing at zero registers no destinations and uses the RoutingConfig retry defaults."
+      }
+    ],
+    "webhookmem.WorkerConfig": [
+      {
+        "name": "Concurrency",
+        "type": "int",
+        "default": "Concurrency defaults to 16 (1–64); PollInterval defaults to 250ms (50ms–5s); ShutdownTimeout defaults to 30s (1–60s)."
+      },
+      {
+        "name": "PollInterval",
+        "type": "time.Duration",
+        "default": "Concurrency defaults to 16 (1–64); PollInterval defaults to 250ms (50ms–5s); ShutdownTimeout defaults to 30s (1–60s)."
+      },
+      {
+        "name": "ShutdownTimeout",
+        "type": "time.Duration",
+        "default": "Concurrency defaults to 16 (1–64); PollInterval defaults to 250ms (50ms–5s); ShutdownTimeout defaults to 30s (1–60s)."
+      }
+    ],
+    "webhookpg.DestinationConfig": [
+      {
+        "name": "Version",
+        "type": "string",
+        "doc": "Version is required, immutable and 1–64 printable ASCII bytes. It\ndefines the payload and routing rules and must equal every enqueued\nmessage's Version.",
+        "default": "Version is required, immutable and 1–64 printable ASCII bytes."
+      },
+      {
+        "name": "Send",
+        "type": "webhook.SendFunc",
+        "doc": "Send is required, retained and must be concurrency safe and honor\nctx.",
+        "default": "Send is required, retained and must be concurrency safe and honor ctx."
+      },
+      {
+        "name": "ReplayWindow",
+        "type": "time.Duration",
+        "doc": "ReplayWindow is the receiver's documented deduplication horizon;\nrequired, greater than RequestTimeout + 5m and at most 30 days.",
+        "default": "ReplayWindow is the receiver's documented deduplication horizon; required, greater than RequestTimeout + 5m and at most 30 days."
+      },
+      {
+        "name": "RequestTimeout",
+        "type": "time.Duration",
+        "doc": "RequestTimeout defaults to 15s; valid range 1–30s, stored to\nmillisecond precision.",
+        "default": "RequestTimeout defaults to 15s; valid range 1–30s, stored to millisecond precision."
+      }
+    ],
+    "webhookpg.RoutingConfig": [
+      {
+        "name": "Sources",
+        "type": "map[string]ProcessFunc",
+        "doc": "Sources is copied; nil registers none. At most 64 named processors\nare accepted; callbacks are retained for the Store's lifetime and\nmust be concurrency safe.",
+        "default": "Sources is copied; nil registers none."
+      },
+      {
+        "name": "Destinations",
+        "type": "map[string]DestinationConfig",
+        "doc": "Destinations is copied; nil registers none. At most 64 named\ndestinations are accepted. Names in both maps are 1–64 printable\nASCII bytes.",
+        "default": "Destinations is copied; nil registers none."
+      },
+      {
+        "name": "MaxAttempts",
+        "type": "int",
+        "doc": "MaxAttempts defaults to 8 per cycle; valid range 1–32.\nAt most 32 attempts are permitted in total.",
+        "default": "MaxAttempts defaults to 8 per cycle; valid range 1–32."
+      },
+      {
+        "name": "MaxAge",
+        "type": "time.Duration",
+        "doc": "MaxAge defaults to 72h per cycle; valid range 1m–7 days.",
+        "default": "MaxAge defaults to 72h per cycle; valid range 1m–7 days."
+      },
+      {
+        "name": "ProcessTimeout",
+        "type": "time.Duration",
+        "doc": "ProcessTimeout defaults to 5s; valid range 1–15s.",
+        "default": "ProcessTimeout defaults to 5s; valid range 1–15s."
+      },
+      {
+        "name": "Logger",
+        "type": "*slog.Logger",
+        "doc": "Logger is retained for the Store's lifetime and caller-owned; nil is\nsilent. It must be concurrency safe.",
+        "default": "Logger is retained for the Store's lifetime and caller-owned; nil is silent."
+      }
+    ],
+    "webhookpg.StoreConfig": [
+      {
+        "name": "Schema",
+        "type": "string",
+        "doc": "Schema defaults to public (1–63 UTF-8 bytes without NUL); Namespace\ndefaults to \"default\" (1–64 printable ASCII bytes).",
+        "default": "Schema defaults to public (1–63 UTF-8 bytes without NUL); Namespace defaults to \"default\" (1–64 printable ASCII bytes)."
+      },
+      {
+        "name": "Namespace",
+        "type": "string",
+        "doc": "Schema defaults to public (1–63 UTF-8 bytes without NUL); Namespace\ndefaults to \"default\" (1–64 printable ASCII bytes).",
+        "default": "Schema defaults to public (1–63 UTF-8 bytes without NUL); Namespace defaults to \"default\" (1–64 printable ASCII bytes)."
+      },
+      {
+        "name": "Timeout",
+        "type": "time.Duration",
+        "doc": "Timeout bounds New and each Store operation; defaults to 5s, valid\nrange 1–30s.",
+        "default": "Timeout bounds New and each Store operation; defaults to 5s, valid range 1–30s."
+      },
+      {
+        "name": "MigrateTimeout",
+        "type": "time.Duration",
+        "doc": "MigrateTimeout bounds the whole migration in place of Timeout;\ndefaults to 1m, valid range 1s–1h.",
+        "default": "MigrateTimeout bounds the whole migration in place of Timeout; defaults to 1m, valid range 1s–1h."
+      },
+      {
+        "name": "MaxMessages",
+        "type": "int64",
+        "doc": "MaxMessages defaults to 100,000; valid range 1–10,000,000.",
+        "default": "MaxMessages defaults to 100,000; valid range 1–10,000,000."
+      },
+      {
+        "name": "MaxBytes",
+        "type": "int64",
+        "doc": "MaxBytes defaults to 512 MiB; valid range 1 MiB–1 TiB.",
+        "default": "MaxBytes defaults to 512 MiB; valid range 1 MiB–1 TiB."
+      },
+      {
+        "name": "PayloadRetention",
+        "type": "time.Duration",
+        "doc": "PayloadRetention defaults to 7 days; must be positive and at most\nDedupeRetention.",
+        "default": "PayloadRetention defaults to 7 days; must be positive and at most DedupeRetention."
+      },
+      {
+        "name": "DedupeRetention",
+        "type": "time.Duration",
+        "doc": "DedupeRetention defaults to 30 days; valid range 30–365 days.",
+        "default": "DedupeRetention defaults to 30 days; valid range 30–365 days."
+      },
+      {
+        "name": "Routing",
+        "type": "RoutingConfig",
+        "doc": "Routing is validated and copied by New; Migrate ignores it.\nRouting at zero registers no routes and uses the RoutingConfig retry defaults in New; Migrate ignores it.",
+        "default": "Routing at zero registers no routes and uses the RoutingConfig retry defaults in New; Migrate ignores it."
+      }
+    ],
+    "webhookpg.WorkerConfig": [
+      {
+        "name": "Concurrency",
+        "type": "int",
+        "doc": "Concurrency fixes the worker count and caps claimed or in-flight\nrecords; defaults to 16, valid range 1–64.",
+        "default": "Concurrency fixes the worker count and caps claimed or in-flight records; defaults to 16, valid range 1–64."
+      },
+      {
+        "name": "BatchSize",
+        "type": "int",
+        "doc": "BatchSize caps one claim; defaults to min(8, Concurrency),\nvalid range 1–min(16, Concurrency).",
+        "default": "BatchSize caps one claim; defaults to min(8, Concurrency), valid range 1–min(16, Concurrency)."
+      },
+      {
+        "name": "PollInterval",
+        "type": "time.Duration",
+        "doc": "PollInterval is the base idle wait; defaults to 250ms, valid range\n50ms–5s.",
+        "default": "PollInterval is the base idle wait; defaults to 250ms, valid range 50ms–5s."
+      },
+      {
+        "name": "ShutdownTimeout",
+        "type": "time.Duration",
+        "doc": "ShutdownTimeout bounds the drain after cancellation; defaults to 30s,\nvalid range 1–60s. See Worker.Run for shutdown behavior.",
+        "default": "ShutdownTimeout bounds the drain after cancellation; defaults to 30s, valid range 1–60s."
+      }
+    ]
+  },
+  "functions": {
+    "audit.DenialConfig.ToMiddleware": "func (cfg DenialConfig) ToMiddleware() (echo.MiddlewareFunc, error)",
+    "audit.MiddlewareConfig.ToMiddleware": "func (cfg MiddlewareConfig) ToMiddleware() (echo.MiddlewareFunc, error)",
+    "audit.NewIdentity": "func NewIdentity() string",
+    "audit.NewMemoryStore": "func NewMemoryStore(c MemoryStoreConfig) (*MemoryStore, error)",
+    "audit.NewReader": "func NewReader(b ReadBackend, c ReaderConfig) (*Reader, error)",
+    "audit.NewRelay": "func NewRelay(b RelayBackend, c RelayConfig) (*Relay, error)",
+    "audit.NewSchema": "func NewSchema(c SchemaConfig) (*Schema, error)",
+    "auditadmin.New": "func New(store *auditpg.Store) (*Sink, error)",
+    "auditadmin.NewPanel": "func NewPanel(c PanelConfig) (*Panel, error)",
+    "auditpg.New": "func New(ctx context.Context, pool *pgxpool.Pool, c SchemaConfig) (*Store, error)",
+    "auth.Config.ToMiddleware": "func (c Config) ToMiddleware() (echo.MiddlewareFunc, error)",
+    "auth.NewBearer": "func NewBearer(ctx context.Context, c BearerConfig) (*Bearer, error)",
+    "auth.NewPrincipal": "func NewPrincipal(c PrincipalConfig) (Principal, error)",
+    "execution.MiddlewareConfig.ToMiddleware": "func (cfg MiddlewareConfig) ToMiddleware() (echo.MiddlewareFunc, error)",
+    "execution.New": "func New(cfg JournalConfig) (*Journal, error)",
+    "execution.NewMemoryStore": "func NewMemoryStore(clock func() time.Time) *MemoryStore",
+    "execution.NewReconcileScheduler": "func NewReconcileScheduler(cfg ReconcileSchedulerConfig) (*ReconcileScheduler, error)",
+    "executionadmin.New": "func New(cfg Config) (*Panel, error)",
+    "pgstore.New": "func New(ctx context.Context, pool *pgxpool.Pool, cfg StoreConfig) (*Store, error)",
+    "pgstore.NewTxRunner": "func NewTxRunner(store *Store, cfg TxRunnerConfig) (*TxRunner, error)",
+    "quota.MiddlewareConfig.ToMiddleware": "func (cfg MiddlewareConfig) ToMiddleware() (echo.MiddlewareFunc, error)",
+    "quota.New": "func New(cfg Config) (*Limiter, error)",
+    "quota.NewMemoryStore": "func NewMemoryStore(cfg MemoryConfig) *MemoryStore",
+    "quota.NewTopK": "func NewTopK(k int) *TopK",
+    "quotaadmin.New": "func New(cfg Config) (*Panel, error)",
+    "quotaadmin.NewDenialRecorder": "func NewDenialRecorder(size int) (*DenialRecorder, error)",
+    "quotamcp.MiddlewareConfig.ToMiddleware": "func (c MiddlewareConfig) ToMiddleware() (mcp.Middleware, error)",
+    "quotaotel.New": "func New(mp metric.MeterProvider) (*Metrics, error)",
+    "quotaotel.NewFailureCounter": "func NewFailureCounter(mp metric.MeterProvider) (FailureSink, error)",
+    "quotaotel.NewLifecycle": "func NewLifecycle(mp metric.MeterProvider, cfg LifecycleConfig) (*Lifecycle, error)",
+    "quotaprom.New": "func New(reg prometheus.Registerer) (*Metrics, error)",
+    "quotaprom.NewFailureCounter": "func NewFailureCounter(reg prometheus.Registerer) (FailureSink, error)",
+    "quotaprom.NewLifecycle": "func NewLifecycle(reg prometheus.Registerer, cfg LifecycleConfig) (*Lifecycle, error)",
+    "quotastripe.New": "func New(cfg Config) (*Exporter, error)",
+    "quotastripe.NewMemoryStore": "func NewMemoryStore(cfg StoreConfig) (*MemoryStore, error)",
+    "quotastripe.NewRedisStore": "func NewRedisStore(client redis.UniversalClient, cfg StoreConfig) (*RedisStore, error)",
+    "redisstore.New": "func New(client redis.UniversalClient, cfg Config) (*Store, error)",
+    "stripeadmin.New": "func New(cfg Config) (*Panel, error)",
+    "tenant.AuthorizeConfig.ToMiddleware": "func (c AuthorizeConfig) ToMiddleware() (echo.MiddlewareFunc, error)",
+    "tenant.Config.ToMiddleware": "func (c Config) ToMiddleware() (echo.MiddlewareFunc, error)",
+    "webhook.ReceiveConfig.ToMiddleware": "func (c ReceiveConfig) ToMiddleware() (echo.MiddlewareFunc, error)",
+    "webhookadmin.New": "func New(cfg Config) (*Panel, error)",
+    "webhookmem.New": "func New(cfg StoreConfig) (*Store, error)",
+    "webhookmem.NewWorker": "func NewWorker(s *Store, cfg WorkerConfig) (*Worker, error)",
+    "webhookpg.New": "func New(ctx context.Context, pool *pgxpool.Pool, cfg StoreConfig) (*Store, error)",
+    "webhookpg.NewWorker": "func NewWorker(s *Store, cfg WorkerConfig) (*Worker, error)"
+  },
+  "problems": [
+    {
+      "Code": "admin_action_id_reused",
+      "Type": "https://echo.labstack.com/pro/problems/admin-action-id-reused",
+      "Messages": [
+        {
+          "Status": 409,
+          "TitleEN": "Conflict",
+          "TitleJA": "競合が発生しました"
+        }
+      ]
+    },
+    {
+      "Code": "admin_audit_unavailable",
+      "Type": "https://echo.labstack.com/pro/problems/admin-audit-unavailable",
+      "Messages": [
+        {
+          "Status": 503,
+          "TitleEN": "Service Unavailable",
+          "TitleJA": "サービスを利用できません"
+        }
+      ]
+    },
+    {
+      "Code": "admin_backend_unavailable",
+      "Type": "https://echo.labstack.com/pro/problems/admin-backend-unavailable",
+      "Messages": [
+        {
+          "Status": 503,
+          "TitleEN": "Service Unavailable",
+          "TitleJA": "サービスを利用できません"
+        }
+      ]
+    },
+    {
+      "Code": "admin_busy",
+      "Type": "https://echo.labstack.com/pro/problems/admin-busy",
+      "Messages": [
+        {
+          "Status": 503,
+          "TitleEN": "Service Unavailable",
+          "TitleJA": "サービスを利用できません"
+        }
+      ]
+    },
+    {
+      "Code": "admin_confirmation_required",
+      "Type": "https://echo.labstack.com/pro/problems/admin-confirmation-required",
+      "Messages": [
+        {
+          "Status": 422,
+          "TitleEN": "Unprocessable Entity",
+          "TitleJA": "リクエストを処理できません"
+        }
+      ]
+    },
+    {
+      "Code": "admin_cross_origin",
+      "Type": "https://echo.labstack.com/pro/problems/admin-cross-origin",
+      "Messages": [
+        {
+          "Status": 403,
+          "TitleEN": "Forbidden",
+          "TitleJA": "アクセスが許可されていません"
+        }
+      ]
+    },
+    {
+      "Code": "admin_csrf_invalid",
+      "Type": "https://echo.labstack.com/pro/problems/admin-csrf-invalid",
+      "Messages": [
+        {
+          "Status": 403,
+          "TitleEN": "Forbidden",
+          "TitleJA": "アクセスが許可されていません"
+        }
+      ]
+    },
+    {
+      "Code": "admin_forbidden",
+      "Type": "https://echo.labstack.com/pro/problems/admin-forbidden",
+      "Messages": [
+        {
+          "Status": 403,
+          "TitleEN": "Forbidden",
+          "TitleJA": "アクセスが許可されていません"
+        }
+      ]
+    },
+    {
+      "Code": "admin_in_progress",
+      "Type": "https://echo.labstack.com/pro/problems/admin-in-progress",
+      "Messages": [
+        {
+          "Status": 409,
+          "TitleEN": "Conflict",
+          "TitleJA": "競合が発生しました"
+        }
+      ]
+    },
+    {
+      "Code": "admin_internal",
+      "Type": "https://echo.labstack.com/pro/problems/admin-internal",
+      "Messages": [
+        {
+          "Status": 500,
+          "TitleEN": "Internal Server Error",
+          "TitleJA": "サーバー内部エラー"
+        }
+      ]
+    },
+    {
+      "Code": "admin_invalid_request",
+      "Type": "https://echo.labstack.com/pro/problems/admin-invalid-request",
+      "Messages": [
+        {
+          "Status": 400,
+          "TitleEN": "Bad Request",
+          "TitleJA": "不正なリクエスト"
+        }
+      ]
+    },
+    {
+      "Code": "admin_method_not_allowed",
+      "Type": "https://echo.labstack.com/pro/problems/admin-method-not-allowed",
+      "Messages": [
+        {
+          "Status": 405,
+          "TitleEN": "Method Not Allowed",
+          "TitleJA": "このHTTPメソッドは許可されていません"
+        }
+      ]
+    },
+    {
+      "Code": "admin_not_found",
+      "Type": "https://echo.labstack.com/pro/problems/admin-not-found",
+      "Messages": [
+        {
+          "Status": 404,
+          "TitleEN": "Not Found",
+          "TitleJA": "見つかりません"
+        }
+      ]
+    },
+    {
+      "Code": "admin_not_ready",
+      "Type": "https://echo.labstack.com/pro/problems/admin-not-ready",
+      "Messages": [
+        {
+          "Status": 503,
+          "TitleEN": "Service Unavailable",
+          "TitleJA": "サービスを利用できません"
+        }
+      ]
+    },
+    {
+      "Code": "admin_rate_limited",
+      "Type": "https://echo.labstack.com/pro/problems/admin-rate-limited",
+      "Messages": [
+        {
+          "Status": 429,
+          "TitleEN": "Too Many Requests",
+          "TitleJA": "リクエストが多すぎます"
+        }
+      ]
+    },
+    {
+      "Code": "admin_reason_required",
+      "Type": "https://echo.labstack.com/pro/problems/admin-reason-required",
+      "Messages": [
+        {
+          "Status": 422,
+          "TitleEN": "Unprocessable Entity",
+          "TitleJA": "リクエストを処理できません"
+        }
+      ]
+    },
+    {
+      "Code": "admin_timeout",
+      "Type": "https://echo.labstack.com/pro/problems/admin-timeout",
+      "Messages": [
+        {
+          "Status": 504,
+          "TitleEN": "Gateway Timeout",
+          "TitleJA": "ゲートウェイのタイムアウト"
+        }
+      ]
+    },
+    {
+      "Code": "admin_unauthenticated",
+      "Type": "https://echo.labstack.com/pro/problems/admin-unauthenticated",
+      "Messages": [
+        {
+          "Status": 401,
+          "TitleEN": "Unauthorized",
+          "TitleJA": "認証が必要です"
+        }
+      ]
+    },
+    {
+      "Code": "binding_failed",
+      "Type": "https://echo.labstack.com/pro/problems/binding-failed",
+      "Messages": [
+        {
+          "Status": 400,
+          "TitleEN": "Bad Request",
+          "TitleJA": "不正なリクエスト"
+        }
+      ]
+    },
+    {
+      "Code": "body_too_large",
+      "Type": "https://echo.labstack.com/pro/problems/body-too-large",
+      "Messages": [
+        {
+          "Status": 413,
+          "TitleEN": "Request Entity Too Large",
+          "TitleJA": "リクエスト本文が大きすぎます"
+        }
+      ]
+    },
+    {
+      "Code": "cost_exceeds_limit",
+      "Type": "https://echo.labstack.com/pro/problems/cost-exceeds-limit",
+      "Messages": [
+        {
+          "Status": 403,
+          "TitleEN": "Request cost exceeds the plan's limit",
+          "TitleJA": "リクエストのコストがプランの上限を超えています"
+        }
+      ]
+    },
+    {
+      "Code": "credit_conflict",
+      "Type": "https://echo.labstack.com/pro/problems/credit-conflict",
+      "Messages": [
+        {
+          "Status": 409,
+          "TitleEN": "Credit ID was already used with a different amount",
+          "TitleJA": "クレジットIDは異なる金額ですでに使用されています"
+        }
+      ]
+    },
+    {
+      "Code": "execution_capacity",
+      "Type": "https://echo.labstack.com/pro/problems/execution-capacity",
+      "Messages": [
+        {
+          "Status": 503,
+          "TitleEN": "Service Unavailable",
+          "TitleJA": "サービスを利用できません"
+        }
+      ]
+    },
+    {
+      "Code": "execution_unavailable",
+      "Type": "https://echo.labstack.com/pro/problems/execution-unavailable",
+      "Messages": [
+        {
+          "Status": 503,
+          "TitleEN": "Service Unavailable",
+          "TitleJA": "サービスを利用できません"
+        }
+      ]
+    },
+    {
+      "Code": "forbidden",
+      "Type": "https://echo.labstack.com/pro/problems/forbidden",
+      "Messages": [
+        {
+          "Status": 403,
+          "TitleEN": "Forbidden",
+          "TitleJA": "アクセスが許可されていません"
+        }
+      ]
+    },
+    {
+      "Code": "idempotency_key_invalid",
+      "Type": "https://echo.labstack.com/pro/problems/idempotency-key-invalid",
+      "Messages": [
+        {
+          "Status": 400,
+          "TitleEN": "Bad Request",
+          "TitleJA": "不正なリクエスト"
+        }
+      ]
+    },
+    {
+      "Code": "idempotency_key_missing",
+      "Type": "https://echo.labstack.com/pro/problems/idempotency-key-missing",
+      "Messages": [
+        {
+          "Status": 400,
+          "TitleEN": "Bad Request",
+          "TitleJA": "不正なリクエスト"
+        }
+      ]
+    },
+    {
+      "Code": "idempotency_key_reused",
+      "Type": "https://echo.labstack.com/pro/problems/idempotency-key-reused",
+      "Messages": [
+        {
+          "Status": 422,
+          "TitleEN": "Unprocessable Entity",
+          "TitleJA": "リクエストを処理できません"
+        }
+      ]
+    },
+    {
+      "Code": "idempotency_request_invalid",
+      "Type": "https://echo.labstack.com/pro/problems/idempotency-request-invalid",
+      "Messages": [
+        {
+          "Status": 400,
+          "TitleEN": "Bad Request",
+          "TitleJA": "不正なリクエスト"
+        },
+        {
+          "Status": 413,
+          "TitleEN": "Request Entity Too Large",
+          "TitleJA": "リクエスト本文が大きすぎます"
+        }
+      ]
+    },
+    {
+      "Code": "insufficient_credits",
+      "Type": "https://echo.labstack.com/pro/problems/insufficient-credits",
+      "Messages": [
+        {
+          "Status": 402,
+          "TitleEN": "Request cannot be satisfied as prepaid credits are insufficient",
+          "TitleJA": "前払いクレジットが不足しているため、リクエストを処理できません"
+        }
+      ]
+    },
+    {
+      "Code": "invalid_request",
+      "Type": "https://echo.labstack.com/pro/problems/invalid-request",
+      "Messages": [
+        {
+          "Status": 400,
+          "TitleEN": "Invalid quota administration request",
+          "TitleJA": "クォータ管理リクエストが無効です"
+        }
+      ]
+    },
+    {
+      "Code": "operation_abandoned",
+      "Type": "https://echo.labstack.com/pro/problems/operation-abandoned",
+      "Messages": [
+        {
+          "Status": 409,
+          "TitleEN": "Conflict",
+          "TitleJA": "競合が発生しました"
+        }
+      ]
+    },
+    {
+      "Code": "operation_disputed",
+      "Type": "https://echo.labstack.com/pro/problems/operation-disputed",
+      "Messages": [
+        {
+          "Status": 409,
+          "TitleEN": "Conflict",
+          "TitleJA": "競合が発生しました"
+        }
+      ]
+    },
+    {
+      "Code": "operation_in_progress",
+      "Type": "https://echo.labstack.com/pro/problems/operation-in-progress",
+      "Messages": [
+        {
+          "Status": 409,
+          "TitleEN": "Conflict",
+          "TitleJA": "競合が発生しました"
+        }
+      ]
+    },
+    {
+      "Code": "operation_not_applied",
+      "Type": "https://echo.labstack.com/pro/problems/operation-not-applied",
+      "Messages": [
+        {
+          "Status": 409,
+          "TitleEN": "Conflict",
+          "TitleJA": "競合が発生しました"
+        }
+      ]
+    },
+    {
+      "Code": "operation_policy_changed",
+      "Type": "https://echo.labstack.com/pro/problems/operation-policy-changed",
+      "Messages": [
+        {
+          "Status": 409,
+          "TitleEN": "Conflict",
+          "TitleJA": "競合が発生しました"
+        }
+      ]
+    },
+    {
+      "Code": "operation_response_too_large",
+      "Type": "https://echo.labstack.com/pro/problems/operation-response-too-large",
+      "Messages": [
+        {
+          "Status": 500,
+          "TitleEN": "Internal Server Error",
+          "TitleJA": "サーバー内部エラー"
+        }
+      ]
+    },
+    {
+      "Code": "operation_result_expired",
+      "Type": "https://echo.labstack.com/pro/problems/operation-result-expired",
+      "Messages": [
+        {
+          "Status": 409,
+          "TitleEN": "Conflict",
+          "TitleJA": "競合が発生しました"
+        }
+      ]
+    },
+    {
+      "Code": "operation_result_unavailable",
+      "Type": "https://echo.labstack.com/pro/problems/operation-result-unavailable",
+      "Messages": [
+        {
+          "Status": 409,
+          "TitleEN": "Conflict",
+          "TitleJA": "競合が発生しました"
+        }
+      ]
+    },
+    {
+      "Code": "operation_uncertain",
+      "Type": "https://echo.labstack.com/pro/problems/operation-uncertain",
+      "Messages": [
+        {
+          "Status": 409,
+          "TitleEN": "Conflict",
+          "TitleJA": "競合が発生しました"
+        }
+      ]
+    },
+    {
+      "Code": "quota_exceeded",
+      "Type": "https://iana.org/assignments/http-problem-types#quota-exceeded",
+      "Messages": [
+        {
+          "Status": 429,
+          "TitleEN": "Request cannot be satisfied as assigned quota has been exceeded",
+          "TitleJA": "割り当てられたクォータを超過したため、リクエストを処理できません"
+        }
+      ]
+    },
+    {
+      "Code": "temporary_reduced_capacity",
+      "Type": "https://iana.org/assignments/http-problem-types#temporary-reduced-capacity",
+      "Messages": [
+        {
+          "Status": 503,
+          "TitleEN": "Request cannot be satisfied due to temporary server capacity constraints",
+          "TitleJA": "一時的なサーバー容量の制約により、リクエストを処理できません"
+        }
+      ]
+    },
+    {
+      "Code": "unauthenticated",
+      "Type": "https://echo.labstack.com/pro/problems/unauthenticated",
+      "Messages": [
+        {
+          "Status": 401,
+          "TitleEN": "Unauthorized",
+          "TitleJA": "認証が必要です"
+        }
+      ]
+    },
+    {
+      "Code": "unsupported_media_type",
+      "Type": "https://echo.labstack.com/pro/problems/unsupported-media-type",
+      "Messages": [
+        {
+          "Status": 415,
+          "TitleEN": "Unsupported Media Type",
+          "TitleJA": "未対応のメディアタイプ"
+        }
+      ]
+    },
+    {
+      "Code": "validation_failed",
+      "Type": "https://echo.labstack.com/pro/problems/validation-failed",
+      "Messages": [
+        {
+          "Status": 400,
+          "TitleEN": "Bad Request",
+          "TitleJA": "不正なリクエスト"
+        }
+      ]
+    }
+  ]
+}
