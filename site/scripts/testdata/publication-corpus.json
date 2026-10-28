@@ -5,6 +5,20 @@
   },
   "cases": [
     {
+      "id": "frontmatter-double-quoted-toml-marker",
+      "name": "pages/reference/auth.mdx",
+      "content": "---\ntitle: x\ndescription: \"a\n+++ {import.meta.env}\"\n---\n",
+      "allowed": false,
+      "reason": "invalid frontmatter"
+    },
+    {
+      "id": "frontmatter-single-quoted-yaml-marker",
+      "name": "pages/reference/auth.mdx",
+      "content": "---\ntitle: x\ndescription: 'a\n---x {import.meta.env}'\n---\n",
+      "allowed": false,
+      "reason": "invalid frontmatter"
+    },
+    {
       "id": "frontmatter-leading-blank",
       "name": "pages/reference/auth.mdx",
       "content": "\n---\nhead:\n  - tag: script\n    content: alert(1)\n---\nText",

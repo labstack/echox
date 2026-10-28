@@ -108,7 +108,10 @@ export function checkFrontmatter(name, content) {
   const end = content.indexOf('\n---\n', 4);
   const invalid = () => { throw new Error(`${name}: invalid frontmatter`); };
   if (end < 0) invalid();
-  const doc = parseDocument(content.slice(4, end), { schema: 'core', customTags: ['timestamp'], uniqueKeys: true });
+  const header = content.slice(4, end);
+  // YAML parsers disagree on delimiter prefixes inside quoted continuations.
+  if (header.split('\n').some((line) => line.startsWith('---') || line.startsWith('+++'))) invalid();
+  const doc = parseDocument(header, { schema: 'core', customTags: ['timestamp'], uniqueKeys: true });
   if (doc.errors.length || doc.warnings.length) invalid();
   function validate(node, sidebar = false) {
     if (!isMap(node) || node.anchor || node.tag) invalid();

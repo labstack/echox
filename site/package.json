@@ -38,5 +38,8 @@
     "sharp": "^0.35.5",
     "unified": "^11.0.5",
     "yaml": "2.9.1"
+  },
+  "devDependencies": {
+    "@astrojs/internal-helpers": "0.13.0"
   }
 }
