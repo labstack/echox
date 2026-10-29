@@ -42,7 +42,9 @@ import "github.com/labstack/echo/v5"
 | Version | Import path                     | Status |
 | ------- | ------------------------------- | ------ |
 | **v5**  | `github.com/labstack/echo/v5`   | Current |
-| v4      | `github.com/labstack/echo/v4`   | LTS (maintenance) |
+| v4      | `github.com/labstack/echo/v4`   | Bug fixes until 2026-12-31; security fixes until 2027-12-31 |
+
+Dates and scope: [Echo security policy](https://github.com/labstack/echo/blob/master/SECURITY.md).
 
 :::note
 Echo follows [semantic import versioning](https://go.dev/blog/v2-go-modules) — the

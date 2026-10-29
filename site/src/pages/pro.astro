@@ -102,7 +102,7 @@ const plans = [
   },
   {
     name: 'Team', was: '$1,500', price: '$990', unit: '/ year', note: 'Up to 20 developers',
-    items: ['Everything in Echo', 'Every Echo Pro package', 'Every release while subscribed', 'Access tokens for go.labstack.io'],
+    items: ['Everything in Echo', 'Every Echo Pro package', 'Every release while subscribed', 'Access tokens for go.labstack.io', 'Email support, two-business-day target'],
     cta: { label: 'Buy Team', href: checkout.Team, primary: true },
   },
   {
@@ -129,7 +129,8 @@ const comparison: Array<[string, Array<[string, ...Array<boolean | string>]>]> =
   ]],
   ['Support', [
     ['Community support on GitHub', true, true, true],
-    ['Support plan ($4,900 / year)', false, 'Separate', 'Separate'],
+    ['Email support, two-business-day target', false, true, true],
+    ['Echo Support ($4,900 / year)', 'Sold separately', 'Sold separately', 'Sold separately'],
   ]],
   ['Billing', [
     ['Price', 'Free', '$1,500 / year', '$4,500 / year'],
@@ -147,7 +148,8 @@ const faq = [
   ['Does Echo Pro send telemetry or check a license at run time?', 'No. The library does not send telemetry or perform runtime license checks. Configure metrics and tracing through hooks into your own systems.'],
   ['What happens when the subscription ends?', 'You keep the versions you already have. You also keep access to security fixes for the release lines you owned. New versions need an active subscription.'],
   ['Can we evaluate before buying, or get a refund?', 'There is no free trial. Review the package documentation and code samples before buying. If Echo Pro is not right for you, you get a full refund within 30 days of purchase.'],
-  ['Invoices and purchase orders?', 'Team and Business are billed annually per organisation. Support and Enterprise are invoiced annually. Email support@labstack.com for billing details your company needs.'],
+  ['What does Echo Support include?', 'A yearly contract with the maintainer for teams running Echo v4 or v5, with or without Echo Pro: a named contact, four incidents a year, a two-business-day response target on US business days and an annual letter listing your Echo versions, the advisories that apply and their support dates. It has no fixed repair time and no 24/7 cover. Security fixes stay public for everyone; Echo Support does not buy earlier or private fixes.'],
+  ['Invoices and purchase orders?', 'Team and Business are billed annually per organisation. Echo Support and Enterprise are invoiced annually. Email support@labstack.com for billing details your company needs.'],
 ];
 
 const structuredData = {
@@ -351,10 +353,10 @@ const head = [
       <p class="pro-pending">Secure checkout by Stripe; enter code <code>FOUNDING</code> for the founding price. Invoices, payment method and cancellation: <a class="pro-link" href={billingPortal}>billing portal</a>.</p>
 
       <div class="pro-extra">
-        <div>
-          <h3>Support</h3>
-          <p><b>$4,900</b> / year · Support plan, invoiced annually.</p>
-          <a class="pro-link" href="mailto:support@labstack.com?subject=Echo%20Pro%20Support" data-ga-event="generate_lead" data-ga-plan="Support">Contact us</a>
+        <div id="support">
+          <h3>Echo Support</h3>
+          <p><b>$4,900</b> / year, invoiced annually. Maintainer help for Echo v4 or v5, with or without Echo Pro: a named contact, four incidents a year, a two-business-day response target and an annual maintenance-status letter. Best effort; no SLA. <a class="pro-link" href="https://github.com/labstack/echo/blob/master/.github/SUPPORT.md">Terms</a>.</p>
+          <a class="pro-link" href="mailto:support@labstack.com?subject=Echo%20Support" data-ga-event="generate_lead" data-ga-plan="Support">Contact us</a>
         </div>
         <div>
           <h3>Enterprise</h3>
@@ -385,8 +387,10 @@ const head = [
         </table>
       </div>
 
+      <p class="pro-terms-title">Team and Business terms</p>
       <ul class="pro-terms">
         <li>Annual billing only; no monthly plan.</li>
+        <li>Email support is best effort: a two-business-day target, not an SLA.</li>
         <li>Full refund within 30 days of purchase.</li>
         <li>Prices exclude tax. Sold to businesses: checkout asks for your company name, and a tax ID where supported.</li>
         <li>After your subscription ends, you keep received versions. You also receive security fixes on the release lines you owned.</li>
@@ -612,7 +616,8 @@ const head = [
   .pro-compare .grp th { text-align: start; padding: 22px 0 8px; font-family: var(--sl-font); font-size: 0.8125rem; font-weight: 600; color: var(--sl-color-gray-3); }
   .pro-compare .yes { color: var(--sl-color-white); }
   .pro-compare .no { color: var(--sl-color-gray-4); }
-  .pro-terms { margin: 1.75rem 0 0; padding-inline-start: 1.1rem; columns: 2 20rem; column-gap: 2rem; font-size: 0.875rem; color: var(--sl-color-gray-3); }
+  .pro .pro-terms-title { margin: 1.75rem 0 0.5rem; font-size: 0.875rem; font-weight: 600; color: var(--sl-color-white); }
+  .pro-terms { margin: 0; padding-inline-start: 1.1rem; columns: 2 20rem; column-gap: 2rem; font-size: 0.875rem; color: var(--sl-color-gray-3); }
   .pro-terms li { break-inside: avoid; margin-bottom: 0.4rem; }
 
   /* Install */
