@@ -306,8 +306,10 @@ const head = [
             </div>
             {item.console && (
               <figure class="pro-shot">
-                <Image class="shot-dark" src={consoleDark} alt="Echo Pro admin console overview: a pipeline from requests through executions, outbox and webhooks to receivers, with event counts for the selected window." width={1600} height={570} loading="lazy" decoding="async" />
-                <Image class="shot-light" src={consoleLight} alt="Echo Pro admin console overview: a pipeline from requests through executions, outbox and webhooks to receivers, with event counts for the selected window." width={1600} height={570} loading="lazy" decoding="async" />
+                <div class="pro-shot-crop">
+                <Image class="shot-dark" src={consoleDark} alt="Echo Pro admin console pipeline panel: the first stages, requests, executions and outbox, with event counts for the selected window." width={1600} height={570} loading="lazy" decoding="async" />
+                <Image class="shot-light" src={consoleLight} alt="Echo Pro admin console pipeline panel: the first stages, requests, executions and outbox, with event counts for the selected window." width={1600} height={570} loading="lazy" decoding="async" />
+                </div>
                 <figcaption>The admin console overview, from the demo catalog.</figcaption>
               </figure>
             )}
@@ -408,13 +410,16 @@ const head = [
       <aside class="pro-install-docs" aria-labelledby="docs">
       <h3 id="docs">Read the docs</h3>
       <p class="pro-muted">Start with installation and a local app, then choose the packages your application needs. These pages cover Echo Pro v0.1.0.</p>
-      <ul>
-        <li><a href="/pro/install/">Install Echo Pro</a> · <a href="/pro/getting-started/">Getting started</a></li>
-        <li><a href="/pro/auth/">Authentication</a> · <a href="/pro/tenant/">Tenant resolution and authorization</a></li>
-        <li><a href="/pro/quota/">Quotas</a> · <a href="/pro/webhook/">Signed webhooks</a> · <a href="/pro/audit/">Audit</a> · <a href="/pro/execution/">Execution</a> · <a href="/pro/admin/">Admin console</a></li>
-        <li>Examples: <a href="/pro/examples/quota-otel/">Quota telemetry</a> · <a href="/pro/examples/stripe/">Stripe usage export</a> · <a href="/pro/examples/admin/">Local admin</a> · <a href="/pro/examples/admin-demo/">Full console demo</a></li>
-        <li><a href="/pro/guides/">Task guides</a> · <a href="/pro/reference/">Configuration reference</a> · <a href="/pro/examples/">Examples</a> · <a href="/pro/problems/">Problem types</a></li>
-      </ul>
+      <dl class="pro-docmap">
+        <dt>Start</dt>
+        <dd><a href="/pro/install/">Install</a><a href="/pro/getting-started/">Getting started</a></dd>
+        <dt>Packages</dt>
+        <dd><a href="/pro/auth/">Authentication</a><a href="/pro/tenant/">Tenants</a><a href="/pro/quota/">Quotas</a><a href="/pro/webhook/">Webhooks</a><a href="/pro/audit/">Audit</a><a href="/pro/execution/">Execution</a><a href="/pro/admin/">Admin console</a></dd>
+        <dt>Examples</dt>
+        <dd><a href="/pro/examples/quota-otel/">Quota telemetry</a><a href="/pro/examples/stripe/">Stripe usage export</a><a href="/pro/examples/admin/">Local admin</a><a href="/pro/examples/admin-demo/">Full console demo</a></dd>
+        <dt>Reference</dt>
+        <dd><a href="/pro/guides/">Task guides</a><a href="/pro/reference/">Configuration</a><a href="/pro/problems/">Problem types</a></dd>
+      </dl>
       </aside>
       </div>
     </section>
@@ -553,7 +558,10 @@ const head = [
   .pro-flagship-copy p:last-child { margin-bottom: 0; }
   .pro-pkg { font-family: var(--sl-font-mono); font-size: 0.78rem !important; color: var(--sl-color-gray-4) !important; }
   .pro-shot { margin: 0; }
-  .pro-shot :global(img) { display: block; width: 100%; height: auto; aspect-ratio: 1600 / 570; border: 1px solid var(--sl-color-hairline-light); border-radius: 8px; }
+  /* Show the pipeline panel (first three stages) at a readable size: the
+     frame keeps the source region x 60-930, y 255-560 of the 1600x570 shot. */
+  .pro-shot-crop { position: relative; overflow: hidden; aspect-ratio: 870 / 305; border: 1px solid var(--sl-color-hairline-light); border-radius: 8px; }
+  .pro-shot-crop :global(img) { position: absolute; display: block; width: 183.9%; max-width: none; height: auto; left: -6.9%; top: -83.6%; }
   .pro-shot figcaption { margin-top: 8px; font-size: 0.8rem; color: var(--sl-color-gray-4); }
   :global([data-theme='dark']) .pro-shot :global(.shot-light), :global([data-theme='light']) .pro-shot :global(.shot-dark) { display: none; }
 
@@ -613,8 +621,12 @@ const head = [
   @media (min-width: 64rem) { .pro-install-grid { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); } }
   .pro-install-docs { border: 1px solid var(--sl-color-hairline); border-radius: 10px; padding: 1.25rem 1.5rem; }
   .pro .pro-install-docs h3 { margin-top: 0; }
-  .pro-install-docs ul { padding-inline-start: 1.1rem; margin: 0; }
-  .pro-install-docs li { margin-bottom: 0.6rem; font-size: 0.9rem; }
+  /* Docs map: short labels, links as a wrapped row, underline on hover only. */
+  .pro-docmap { margin: 0.75rem 0 0; display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 0.55rem 1rem; font-size: 0.9rem; }
+  .pro-docmap dt { margin: 0; color: var(--sl-color-gray-4); font-size: 0.8125rem; padding-top: 1px; }
+  .pro-docmap dd { margin: 0; display: flex; flex-wrap: wrap; gap: 0.4rem 0.9rem; }
+  .pro-docmap a { color: var(--echo-cyan-text); text-decoration: none; }
+  .pro-docmap a:hover { color: var(--echo-cyan-text); text-decoration: underline; text-underline-offset: 3px; }
   .pro-install ol { padding-inline-start: 2rem; margin: 0 0 1.5rem; }
   .pro-install li { margin-bottom: 1.1rem; color: var(--sl-color-gray-2); }
   .pro-install li::marker { color: var(--sl-color-gray-4); font-family: var(--sl-font-mono); }

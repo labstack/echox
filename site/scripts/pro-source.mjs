@@ -92,8 +92,11 @@ export function preparePro() {
   const bundle = readPro();
   const target = join(siteDir, 'src/content/docs/pro');
   if (existsSync(target) && lstatSync(target).isSymbolicLink()) throw new Error('Pro content target must not be a symlink');
-  rmSync(target, { recursive: true, force: true });
+  // The next channel never publishes Pro pages (includeDocsRoute in
+  // src/pro-page.mjs filters their routes; llms.txt lists Pro only at base /),
+  // so leave the generated pages alone for the stable dev server.
   if (process.env.DOCS_CHANNEL === 'next') return;
+  rmSync(target, { recursive: true, force: true });
   for (const [name, content] of bundle.files) {
     if (!name.startsWith('pages/')) continue;
     const file = join(target, name.slice(6));
