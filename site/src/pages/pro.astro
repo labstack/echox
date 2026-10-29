@@ -412,8 +412,8 @@ const head = [
         <li><a href="/pro/install/">Install Echo Pro</a> · <a href="/pro/getting-started/">Getting started</a></li>
         <li><a href="/pro/auth/">Authentication</a> · <a href="/pro/tenant/">Tenant resolution and authorization</a></li>
         <li><a href="/pro/quota/">Quotas</a> · <a href="/pro/webhook/">Signed webhooks</a> · <a href="/pro/audit/">Audit</a> · <a href="/pro/execution/">Execution</a> · <a href="/pro/admin/">Admin console</a></li>
-        <li>Recipes: <a href="/pro/recipes/quota-otel/">Quota telemetry</a> · <a href="/pro/recipes/stripe/">Stripe usage export</a> · <a href="/pro/recipes/admin/">Local admin</a> · <a href="/pro/recipes/admin-demo/">Full console demo</a></li>
-        <li><a href="/pro/guides/">Task guides</a> · <a href="/pro/reference/">Configuration reference</a> · <a href="/pro/recipes/">Recipes</a> · <a href="/pro/problems/">Problem types</a></li>
+        <li>Examples: <a href="/pro/examples/quota-otel/">Quota telemetry</a> · <a href="/pro/examples/stripe/">Stripe usage export</a> · <a href="/pro/examples/admin/">Local admin</a> · <a href="/pro/examples/admin-demo/">Full console demo</a></li>
+        <li><a href="/pro/guides/">Task guides</a> · <a href="/pro/reference/">Configuration reference</a> · <a href="/pro/examples/">Examples</a> · <a href="/pro/problems/">Problem types</a></li>
       </ul>
     </section>
 
@@ -536,6 +536,11 @@ const head = [
   .pro-diagram :global(.d-flow path) { fill: none; stroke: var(--sl-color-gray-4); stroke-width: 1.25; }
   .pro-diagram :global(.d-read) { fill: none; stroke: var(--sl-color-gray-4); stroke-width: 1.25; stroke-dasharray: 4 4; }
   .pro-diagram :global(.d-head) { fill: var(--sl-color-gray-4); }
+  /* Request flow: dashes move along the arrows. Off when the reader asks for reduced motion. */
+  @media (prefers-reduced-motion: no-preference) {
+    .pro-diagram :global(.d-flow path) { stroke: var(--echo-cyan-text); stroke-dasharray: 5 5; animation: d-flow 1.4s linear infinite; }
+    @keyframes d-flow { to { stroke-dashoffset: -20; } }
+  }
 
   /* Packages */
   .pro-flagships { display: grid; gap: 12px; margin-bottom: 2rem; }

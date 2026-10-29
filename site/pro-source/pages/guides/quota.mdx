@@ -124,6 +124,6 @@ Attach hooks for decisions and lifecycle events to your own telemetry providers.
 ```go file=site/pro-source/examples/source/quota/observations_example_test.go#ExampleHooks
 ```
 
-Use [quota telemetry](/pro/recipes/quota-otel/) for provider setup and shutdown. Use [Stripe export](/pro/recipes/stripe/) for durable event delivery. Add `quotaadmin` for operator inspection; enable credit/reset actions only with explicit operator and audit policy.
+Use [quota telemetry](/pro/examples/quota-otel/) for provider setup and shutdown. Use [Stripe export](/pro/examples/stripe/) for durable event delivery. Add `quotaadmin` for operator inspection; enable credit/reset actions only with explicit operator and audit policy.
 
 On 429, retain `Retry-After` and show the violated budget. On [402 insufficient credits](/pro/problems/insufficient-credits/), fund the balance or reduce work. On [403 cost exceeds limit](/pro/problems/cost-exceeds-limit/), split or reduce the request; waiting cannot make it fit. Show a strict-store 503 as an outage, not as the customer running out of quota.

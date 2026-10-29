@@ -93,8 +93,16 @@ html { scroll-padding-top: calc(var(--sl-nav-height, 4rem) + 1rem); }
 :is(p, li, dd, figcaption) { text-wrap: pretty; }
 
 /* ---------- Type ---------- */
-.sl-markdown-content :is(h1, h2, h3, h4) { font-family: var(--sl-font); font-weight: 600; letter-spacing: -0.015em; }
-.sl-markdown-content h1, .content-panel h1 { font-weight: 600; letter-spacing: -0.025em; }
+/* DM Sans's optical-size axis already tightens large text; keep tracking light. */
+.sl-markdown-content :is(h1, h2, h3, h4) { font-family: var(--sl-font); font-weight: 600; letter-spacing: -0.005em; }
+.sl-markdown-content h1, .content-panel h1 { font-weight: 600; letter-spacing: -0.01em; }
+/* Section headings sit well below the page title (Starlight's default h2 is
+   83% of h1); sizes match common docs scales. Prose lines stay near 72
+   characters; code blocks and tables keep the full column. */
+.sl-markdown-content h2 { font-size: 1.625rem; line-height: 1.25; }
+.sl-markdown-content h3 { font-size: 1.25rem; line-height: 1.3; }
+.sl-markdown-content h4 { font-size: 1.0625rem; line-height: 1.35; }
+.sl-markdown-content :is(p, ul, ol, blockquote) { max-width: 72ch; }
 .sl-markdown-content { font-size: 0.96rem; }
 
 /* UI chrome stays in DM Sans; small, sentence-case group captions. */
@@ -214,7 +222,7 @@ site-search button { border-radius: 8px !important; }
    hero is a two-column, left-anchored layout (Linear changelog rhythm), so
    centred section heads would break the reading line on wide screens. */
 .hero { padding-block: 3rem 1rem; }
-.hero h1 { font-weight: 600; letter-spacing: -0.03em; }
+.hero h1 { font-weight: 600; letter-spacing: -0.015em; }
 
 .echo-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 32px; padding: 24px 0; margin: 32px 0 8px; border-block: 1px solid var(--sl-color-hairline); }
 @media (min-width: 48rem) { .echo-stats { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
@@ -229,7 +237,7 @@ site-search button { border-radius: 8px !important; }
 
 /* section heading: no eyebrow, left-aligned */
 .echo-h { text-align: start; margin: 72px 0 24px; }
-.echo-h h2 { font-family: var(--sl-font); font-weight: 600; font-size: clamp(1.4rem, 2.4vw, 1.75rem); letter-spacing: -0.025em; line-height: 1.25; color: var(--sl-color-white); margin: 0; border: 0; padding: 0; max-width: 32ch; }
+.echo-h h2 { font-family: var(--sl-font); font-weight: 600; font-size: clamp(1.4rem, 2.4vw, 1.75rem); letter-spacing: -0.01em; line-height: 1.25; color: var(--sl-color-white); margin: 0; border: 0; padding: 0; max-width: 32ch; }
 
 /* Semantic Starlight steps, presented as compact homepage cards. */
 .echo-steps .sl-steps { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
@@ -262,8 +270,6 @@ site-search button { border-radius: 8px !important; }
 /* 32px hit areas around 20px glyphs (WCAG 2.5.8 target size). */
 .echo-social a { display: inline-flex; align-items: center; justify-content: center; min-width: 32px; min-height: 32px; border-radius: 6px; color: var(--sl-color-gray-3); font-size: 1.2rem; line-height: 1; text-decoration: none; transition: color var(--echo-ease); }
 .echo-social a:hover { color: var(--sl-color-white); }
-.echo-social .echo-docfoot-pro { font-size: 0.8125rem; padding: 0 8px; }
-.echo-social .echo-docfoot-pro:hover { color: var(--echo-cyan-text); }
 
 /* site-wide footer on docs pages (homepage uses its own .echo-foot) */
 .echo-docfoot { margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--sl-color-hairline); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; font-size: 0.8125rem; color: var(--sl-color-gray-4); }
@@ -307,10 +313,14 @@ site-search button { border-radius: 8px !important; }
 /* ===================== Prev / next pager ===================== */
 /* Starlight's default title is ~h4; in mono it reads oversized. Tone down,
    tighten padding, step the border on hover like other interactive cards. */
-.pagination-links a { padding: 14px 18px; border-radius: 10px; box-shadow: none; transition: border-color var(--echo-ease); }
-.pagination-links a:hover { border-color: var(--sl-color-gray-4); }
-.pagination-links a > span { font-size: 0.68rem; color: var(--sl-color-gray-4); }
-.pagination-links a .link-title { font-size: 1.02rem; font-weight: 600; margin-top: 2px; }
+/* Previous/next: compact cards that sit below the 26px section headings;
+   hover matches the sidebar (soft tint, cyan text). */
+.pagination-links a { padding: 8px 14px; border-color: var(--sl-color-hairline); border-radius: 8px; box-shadow: none; transition: border-color var(--echo-ease), background-color var(--echo-ease); }
+.pagination-links a:hover { border-color: var(--sl-color-hairline-light); background: var(--echo-soft); }
+.pagination-links a svg { --sl-icon-size: 1rem !important; color: var(--sl-color-gray-4); }
+.pagination-links a > span { font-size: 0.75rem; line-height: 1.3; color: var(--sl-color-gray-4); }
+.pagination-links a .link-title { font-size: 0.95rem; font-weight: 600; line-height: 1.35; margin-top: 0; color: var(--sl-color-white); transition: color var(--echo-ease); }
+.pagination-links a:hover .link-title { color: var(--echo-cyan-text); }
 
 /* ===================== Theme polish ===================== */
 
@@ -364,7 +374,7 @@ starlight-toc a[aria-current='true'] { color: var(--echo-cyan-text); border-inli
 .hh { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 48px; align-items: start; padding: 28px 0 8px; }
 @media (max-width: 900px) { .hh { grid-template-columns: minmax(0, 1fr); gap: 28px; } }
 .hh-left { min-width: 0; }
-.hh h1 { font-family: var(--sl-font); font-weight: 600; font-size: clamp(2.2rem, 4.4vw, 3.2rem); line-height: 1.08; letter-spacing: -0.03em; color: var(--sl-color-white); margin: 0 0 18px; }
+.hh h1 { font-family: var(--sl-font); font-weight: 600; font-size: clamp(2.2rem, 4.4vw, 3.2rem); line-height: 1.08; letter-spacing: -0.015em; color: var(--sl-color-white); margin: 0 0 18px; }
 .hh-sub { font-family: var(--sl-font); font-size: 1.0625rem; line-height: 1.65; color: var(--sl-color-gray-2); max-width: 46ch; margin-bottom: 26px; }
 .hh-cta { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 20px; }
 .hh-btn { display: inline-flex; align-items: center; gap: 8px; font-family: var(--sl-font); font-weight: 600; font-size: 0.92rem; border: 1px solid transparent; border-radius: 8px; padding: 11px 18px; cursor: pointer; text-decoration: none; transition: background-color var(--echo-ease), border-color var(--echo-ease), color var(--echo-ease); margin: 0; min-height: 44px; }

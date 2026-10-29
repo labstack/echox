@@ -78,4 +78,4 @@ Choose `Concurrency` for available database and receiver capacity. Schedule `Mai
 
 Inspect attempt and replay history before deciding another business effect is safe. HTTP 2xx records receiver acceptance. HTTP timeouts and network failures can leave an outgoing delivery uncertain. A different webhook ID would defeat receiver deduplication. Preserve the key and payload.
 
-The [admin console](/pro/admin/) can expose authorized dead-record replay and explicit uncertain-delivery decisions through `webhookadmin`. It requires PostgreSQL. The [full demo](/pro/recipes/admin-demo/) exercises those panels with disposable data. Keep operator scope, confirmations and durable audit enabled for recovery actions.
+The [admin console](/pro/admin/) can expose authorized dead-record replay and explicit uncertain-delivery decisions through `webhookadmin`. It requires PostgreSQL. The [full demo](/pro/examples/admin-demo/) exercises those panels with disposable data. Keep operator scope, confirmations and durable audit enabled for recovery actions.

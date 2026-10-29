@@ -7,7 +7,7 @@ import { checkMDX, checkJSONReferences } from './pro-publication.mjs';
 import { sourceReference, sourceSnippet } from '../plugins/remark-source-code.mjs';
 
 export const siteDir = fileURLToPath(new URL('..', import.meta.url));
-const page = /^(?:install|getting-started|auth|tenant|quota|webhook|audit|execution|admin|recipes\/(?:index|quota-otel|stripe|admin|admin-demo)|(?:guides|reference)\/(?:index|auth|tenant|quota|webhook|audit|execution|admin)|problems\/(?:index|[a-z]+(?:-[a-z]+)*))\.mdx$/;
+const page = /^(?:install|getting-started|auth|tenant|quota|webhook|audit|execution|admin|examples\/(?:index|quota-otel|stripe|admin|admin-demo)|(?:guides|reference)\/(?:index|auth|tenant|quota|webhook|audit|execution|admin)|problems\/(?:index|[a-z]+(?:-[a-z]+)*))\.mdx$/;
 const example = /^(?:getting-started\/main|quota-otel\/main|stripe\/main|admin\/main|admin-demo\/(?:main|auth|server|quota|audit|execution|webhook|reports|throughput))\.go$/;
 
 const problemExample = /^examples\/problems\/[a-z]+(?:-[a-z]+)*-[45]\d\d\.(?:json|http)$/;

@@ -43,7 +43,7 @@ After you register all routes, call `VerifyRoutes`. It reports any route registe
 `PublicPath` can name the public console path when a reverse proxy rewrites the URL.
 
 `Config.Middleware` runs inside the console's security and timeout checks.
-If you use CORS middleware, skip it for the console prefix. The [local tutorial](/pro/recipes/admin/) shows that setup.
+If you use CORS middleware, skip it for the console prefix. The [local tutorial](/pro/examples/admin/) shows that setup.
 The console checks origins and CSRF tokens for its requests.
 `Origins` lists allowed deployment origins. For cookie sessions, write actions need CSRF tokens tied to `Principal.Session`.
 
@@ -89,5 +89,5 @@ Reread backend state when the mutation result is unknown. Neither a timeout nor 
 Use `admintest` with your application's principals, targets and enabled actions.
 Test tenant changes, expired sessions, pagination and cached receipts.
 Test that preview performs no mutation and a failed audit intent prevents mutation.
-The [full demo](/pro/recipes/admin-demo/) seeds operator panels and states its database privilege limits.
+The [full demo](/pro/examples/admin-demo/) seeds operator panels and states its database privilege limits.
 The [problem catalog](/pro/problems/) distinguishes failed authorization, unavailable backends and uncertain mutations.

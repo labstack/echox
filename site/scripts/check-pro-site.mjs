@@ -15,7 +15,7 @@ for (const name of files.keys()) {
   assert.match(html, /<h1\b/);
   assert.match(html, /<title>[^<]+ · Echo Pro<\/title>/);
   assert.match(html, /data-pagefind-filter="product\[content\]" content="Echo Pro"/);
-  assert.match(html, /Echo Pro is commercial software/);
+  assert.doesNotMatch(html, /Released under the MIT License/, `${route} footer claims MIT`);
   assert.doesNotMatch(html, /hreflang=|widget\.kapa\.ai|github\.com\/labstack\/echo-pro|Edit page/);
   assert.ok(sitemap.includes(`https://echo.labstack.com${route}`), `${route} absent from release sitemap`);
   assert.ok(!existsSync(join(dist, 'next', route, 'index.html')), `${route} has next copy`);
@@ -32,7 +32,18 @@ for (const pkg of ['auth', 'tenant', 'quota', 'webhook', 'audit', 'execution', '
   assert.match(html, /Defaults \/ requirements/);
   assert.match(html, /\.go:\d+/);
 }
+const pager = (route) => {
+  const html = readFileSync(join(dist, route, 'index.html'), 'utf8');
+  return {
+    prev: html.match(/href="([^"]+)"[^>]*rel="prev"/)?.[1],
+    next: html.match(/href="([^"]+)"[^>]*rel="next"/)?.[1],
+  };
+};
+assert.deepEqual(pager('pro/install'), { prev: undefined, next: '/pro/getting-started/' });
+assert.deepEqual(pager('pro/quota'), { prev: '/pro/tenant/', next: '/pro/webhook/' });
+assert.deepEqual(pager('pro/problems'), { prev: '/pro/reference/admin/', next: undefined });
+assert.equal(pager('pro/problems/insufficient-credits').prev, '/pro/problems/');
 assert.match(readFileSync(join(dist, 'next/pro/index.html'), 'utf8'), /http-equiv="refresh"/);
 const oss = readFileSync(join(dist, 'guide/installation/index.html'), 'utf8');
 assert.ok(!oss.includes('href="/pro/install/"'), 'Pro sidebar leaked into OSS');
-console.log(`Verified ${count} rendered Pro docs, release sitemap coverage, package tables and English/release-only routes`);
+console.log(`Verified ${count} rendered Pro docs, release sitemap coverage, package tables, previous/next links and English/release-only routes`);
