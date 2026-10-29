@@ -29,11 +29,15 @@ export function sourceReferenceAt(node, path) {
   }
 }
 
+// Readers copy snippets: drop tooling noise that is not part of the example.
+// Lint directives (//nolint:...) and SPDX licence header lines never render.
+const toolingLine = /^\s*(?:\/\/nolint\b|(?:\/\/|#)\s*SPDX-(?:License-Identifier|FileCopyrightText):)/;
+
 function withoutMarkers(lines) {
   const result = [];
   let removed = false;
   for (const line of lines) {
-    if (regionMarker.test(line)) { removed = true; continue; }
+    if (regionMarker.test(line) || toolingLine.test(line)) { removed = true; continue; }
     if (!line.trim() && removed && !result.at(-1)?.trim()) continue;
     result.push(line);
     if (line.trim()) removed = false;

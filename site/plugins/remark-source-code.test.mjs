@@ -241,3 +241,23 @@ test('raw component imports and Markdown includes share source excerpts; Casbin 
     assert.ok(!fences.some((fence) => /^package main\b/m.test(fence.value)), 'the full server is linked rather than duplicated');
   }
 });
+
+test('snippets drop SPDX licence headers and nolint directives', () => {
+  const source = [
+    '# SPDX-License-Identifier: LicenseRef-Example',
+    '# SPDX-FileCopyrightText: © 2026 Example',
+    'name: ci',
+    '',
+    'jobs: {}',
+  ].join('\n');
+  assert.equal(sourceSnippet(source), 'name: ci\n\njobs: {}');
+  const go = [
+    'func main() {',
+    '\t// docs:start hero',
+    '\t//nolint:contextcheck // reason',
+    '\tguard, err := build()',
+    '\t// docs:end hero',
+    '}',
+  ].join('\n');
+  assert.equal(sourceSnippet(go, 'hero'), 'guard, err := build()');
+});
