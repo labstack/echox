@@ -6,7 +6,7 @@ const groups = [
   ['Start here', [['install', 'Install Echo Pro'], ['getting-started', 'Getting started']]],
   ['Packages', [['auth', 'Authentication'], ['tenant', 'Tenant resolution'], ['quota', 'Quotas'], ['webhook', 'Webhooks'], ['audit', 'Audit'], ['execution', 'Execution'], ['admin', 'Admin console']]],
   ['Tasks', [['guides/auth', 'Configure authentication'], ['guides/tenant', 'Authorize resources'], ['guides/quota', 'Configure quotas'], ['guides/webhook', 'Receive and deliver events'], ['guides/audit', 'Record audit events'], ['guides/execution', 'Bind retries and recover'], ['guides/admin', 'Mount operator panels']]],
-  ['Recipes', [['recipes/quota-otel', 'Quota telemetry'], ['recipes/stripe', 'Stripe usage export'], ['recipes/admin', 'Local admin'], ['recipes/admin-demo', 'Full console demo']]],
+  ['Examples', [['examples/quota-otel', 'Quota telemetry'], ['examples/stripe', 'Stripe usage export'], ['examples/admin', 'Local admin'], ['examples/admin-demo', 'Full console demo']]],
   ['Reference', [['reference/auth', 'Auth configuration'], ['reference/tenant', 'Tenant configuration'], ['reference/quota', 'Quota configuration'], ['reference/webhook', 'Webhook configuration'], ['reference/audit', 'Audit configuration'], ['reference/execution', 'Execution configuration'], ['reference/admin', 'Admin configuration'], ['problems', 'Problem types']]],
 ] as const;
 

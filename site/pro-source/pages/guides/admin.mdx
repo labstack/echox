@@ -33,13 +33,13 @@ It mounts the panel and closes the limiter at shutdown:
 ```go file=site/pro-source/examples/admin/main.go
 ```
 
-Run it through the [local admin tutorial](/pro/recipes/admin/). Keep its fixed local reader on a loopback listener. A deployed application needs validated authentication, per-session binding and a reviewed origin list.
+Run it through the [local admin tutorial](/pro/examples/admin/). Keep its fixed local reader on a loopback listener. A deployed application needs validated authentication, per-session binding and a reviewed origin list.
 
 ## Add execution, audit or webhook panels
 
 Pass a journal operator to `executionadmin`. Pass an authorized `audit.Reader` to `auditadmin.NewPanel`. A webhook panel needs `*webhookpg.Store` and global scope. The memory webhook store cannot back that panel.
 
-The [full console tutorial](/pro/recipes/admin-demo/) shows the complete wiring and the PostgreSQL prerequisites. Close pools only after workers and in-flight console reads stop. Durable audit needs its separate PostgreSQL roles. Without them, the demo falls back to memory audit.
+The [full console tutorial](/pro/examples/admin-demo/) shows the complete wiring and the PostgreSQL prerequisites. Close pools only after workers and in-flight console reads stop. Durable audit needs its separate PostgreSQL roles. Without them, the demo falls back to memory audit.
 
 ## Enable mutations deliberately
 

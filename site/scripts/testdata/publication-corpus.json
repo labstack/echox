@@ -908,36 +908,36 @@
       "reason": ""
     },
     {
-      "id": "current-recipes/admin-demo.mdx",
-      "name": "pages/recipes/admin-demo.mdx",
+      "id": "current-examples/admin-demo.mdx",
+      "name": "pages/examples/admin-demo.mdx",
       "currentPage": true,
       "allowed": true,
       "reason": ""
     },
     {
-      "id": "current-recipes/admin.mdx",
-      "name": "pages/recipes/admin.mdx",
+      "id": "current-examples/admin.mdx",
+      "name": "pages/examples/admin.mdx",
       "currentPage": true,
       "allowed": true,
       "reason": ""
     },
     {
-      "id": "current-recipes/index.mdx",
-      "name": "pages/recipes/index.mdx",
+      "id": "current-examples/index.mdx",
+      "name": "pages/examples/index.mdx",
       "currentPage": true,
       "allowed": true,
       "reason": ""
     },
     {
-      "id": "current-recipes/quota-otel.mdx",
-      "name": "pages/recipes/quota-otel.mdx",
+      "id": "current-examples/quota-otel.mdx",
+      "name": "pages/examples/quota-otel.mdx",
       "currentPage": true,
       "allowed": true,
       "reason": ""
     },
     {
-      "id": "current-recipes/stripe.mdx",
-      "name": "pages/recipes/stripe.mdx",
+      "id": "current-examples/stripe.mdx",
+      "name": "pages/examples/stripe.mdx",
       "currentPage": true,
       "allowed": true,
       "reason": ""

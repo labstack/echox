@@ -69,7 +69,7 @@ Replace the schema and role names with your provisioned names. Keep separate poo
 Use READ COMMITTED for recorder transactions. Keep projection keys for the retained events you need to search. Run retention and relay work through bounded application-owned loops. After a restore, stop writes and follow the database restore procedure before `Rebind` or `Fork`.
 Reconnecting to the restored database does not make lost records safe to ignore.
 
-The [full console demo](/pro/recipes/admin-demo/) reports when these role requirements are unavailable and uses memory audit instead. Memory audit is fine for UI tests. It loses all records when the process exits. It does not test PostgreSQL recording or restore behavior.
+The [full console demo](/pro/examples/admin-demo/) reports when these role requirements are unavailable and uses memory audit instead. Memory audit is fine for UI tests. It loses all records when the process exits. It does not test PostgreSQL recording or restore behavior.
 
 ## Expose a reader in the console
 

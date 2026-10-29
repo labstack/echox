@@ -98,7 +98,7 @@ An `Outbox` stores consumption and threshold events atomically with usage change
 Delivery is at least once and may arrive concurrently or out of order. Deduplicate by `Event.ID`.
 A permanently failing delivery blocks its partition. A full memory outbox makes writes needing events fail with 503.
 An outbox cannot be combined with synchronous consumption/threshold hooks or TopK.
-[Stripe export](/pro/recipes/stripe/) consumes these final usage events.
+[Stripe export](/pro/examples/stripe/) consumes these final usage events.
 
 Protect `UsageHandler` with the same authentication and plan callbacks as quota checks.
 Reads do not consume usage. `quotaadmin` adds usage and plan views, and optional write actions, to the [console](/pro/admin/).
