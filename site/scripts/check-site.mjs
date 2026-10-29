@@ -97,6 +97,9 @@ for (const locale of ['es', 'ja', 'pt-br', 'zh-cn']) {
 for (const path of ['sitemap-index.xml', 'pagefind/pagefind.js']) {
   if (!existsSync(join(distDir, path))) problems.push(`Missing ${path}`);
 }
+const robots = join(distDir, 'robots.txt');
+if (!existsSync(robots)) problems.push('Missing robots.txt');
+else if (!readFileSync(robots, 'utf8').includes('Sitemap: https://echo.labstack.com/sitemap-index.xml\n')) problems.push('robots.txt: missing sitemap');
 for (const path of ['llms.txt', 'next/llms.txt']) {
   const file = join(distDir, path);
   if (!existsSync(file)) { problems.push(`Missing ${path}`); continue; }

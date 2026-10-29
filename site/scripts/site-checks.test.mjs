@@ -32,6 +32,7 @@ test('new routes pass without accepting a baseline; removals and new-page broken
   for (const locale of ['es', 'ja', 'pt-br', 'zh-cn']) file(site, `dist/${locale}/middleware/index.html`, `<html lang="${locale}"></html>`);
   for (const path of ['sitemap-index.xml', 'pagefind/pagefind.js']) file(site, `dist/${path}`, '');
   for (const path of ['llms.txt', 'next/llms.txt']) file(site, `dist/${path}`, '# Echo\n');
+  file(site, 'dist/robots.txt', 'Sitemap: https://echo.labstack.com/sitemap-index.xml\n');
   file(site, 'dist/new-page/index.html', '<html lang="en"><a href="/">Home</a></html>');
   const accepted = check(site, 'check-site.mjs');
   assert.equal(accepted.status, 0, accepted.stderr);
