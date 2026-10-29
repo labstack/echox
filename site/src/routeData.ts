@@ -22,15 +22,21 @@ export const onRequest = defineRouteMiddleware((context) => {
   route.siteTitleHref = '/pro';
   route.editUrl = undefined;
   route.lastUpdated = undefined;
-  route.pagination = { prev: undefined, next: undefined };
+  const path = context.url.pathname.replace(/\/$/, '');
+  const link = (slug: string, label: string) => ({
+    type: 'link' as const, label, href: `/pro/${slug}/`, isCurrent: path === `/pro/${slug}`, badge: undefined, attrs: {},
+  });
   route.sidebar = groups.map(([label, items]) => ({
     type: 'group', label, collapsed: false, badge: undefined,
-    entries: items.map(([slug, label]) => ({
-      type: 'link', label, href: `/pro/${slug}/`,
-      isCurrent: context.url.pathname.replace(/\/$/, '') === `/pro/${slug}`,
-      badge: undefined, attrs: {},
-    })),
+    entries: items.map(([slug, label]) => link(slug, label)),
   }));
+  // Previous/next follow the Pro sidebar order; a problem page links back to
+  // the problem index.
+  const flat = groups.flatMap(([, items]) => items.map(([slug, label]) => link(slug, label)));
+  const at = flat.findIndex((entry) => entry.isCurrent);
+  route.pagination = at >= 0
+    ? { prev: flat[at - 1], next: flat[at + 1] }
+    : { prev: path.startsWith('/pro/problems/') ? link('problems', 'Problem types') : undefined, next: undefined };
   const title = `${route.entry.data.title} · Echo Pro`;
   for (const head of route.head) {
     if (head.tag === 'title') head.content = title;

@@ -4,6 +4,7 @@ import stable from '../generated/echo-source.json';
 import manifest from '../generated/config-fields.json';
 import { formatRevision } from '../data/source.mjs';
 import { isProPage } from '../pro-page.mjs';
+import { Icon } from '@astrojs/starlight/components';
 
 const isNext = process.env.DOCS_CHANNEL === 'next';
 const revision = manifest.revision;
@@ -29,7 +30,7 @@ const counterpart = /\/(?:404|404\.html)\/?$/.test(path)
 
 {isLaunchHome && <aside class="echo-version-banner launch" aria-label="Announcement" data-pagefind-ignore>
   <span><strong>New: Echo Pro</strong> — multi-tenant auth, quotas and signed webhooks for Echo&nbsp;v5.<span class="detail"> Founding pricing for the first 25 organisations.</span></span>
-  <a class="switch" href="/pro" data-ga-event="pro_click" data-ga-placement="launch_banner">See Echo Pro <span aria-hidden="true">→</span></a>
+  <a class="switch" href="/pro" data-ga-event="pro_click" data-ga-placement="launch_banner">See Echo Pro <Icon name="right-arrow" class="arrow" /></a>
 </aside>}
 
 {isProduct && path.replace(/\/$/, '') !== '/pro' && <aside class="echo-version-banner" aria-label="Echo Pro version" data-pagefind-ignore>
@@ -48,6 +49,8 @@ const counterpart = /\/(?:404|404\.html)\/?$/.test(path)
   .echo-version-banner strong { color: var(--sl-color-white); font-weight: 600; }
   .echo-version-banner a { color: var(--echo-cyan-text); text-decoration: underline; text-underline-offset: .15em; }
   .echo-version-banner .switch { margin-inline-start: .7rem; font-weight: 600; }
+  /* DM Sans has no arrow glyph; the icon keeps it from falling back to a system font. */
+  .echo-version-banner .arrow { display: inline-block; vertical-align: -0.125em; font-size: 1em; }
   .echo-version-banner.launch span { text-align: center; text-wrap: balance; }
   .echo-version-banner a:focus-visible { outline: 2px solid var(--echo-cyan-text); outline-offset: 2px; }
   @media (max-width: 40rem) {

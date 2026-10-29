@@ -6,8 +6,8 @@ import { isProPage } from '../pro-page.mjs';
 import { Font } from 'astro:assets';
 ---
 <Default />
-<Font cssVariable="--font-dm-sans" preload />
-<Font cssVariable="--font-fragment-mono" preload />
+<Font cssVariable="--font-dm-sans" preload={[{ style: 'normal' }]} />
+<Font cssVariable="--font-fragment-mono" preload={[{ style: 'normal' }]} />
 
 <meta data-pagefind-filter="product[content]" content={isProPage(Astro.url.pathname) ? 'Echo Pro' : 'Echo'} />
 {isProPage(Astro.url.pathname) && Astro.url.pathname.replace(/\/$/, '') !== '/pro' && <meta data-pagefind-meta="title[content]" content={`${Astro.locals.starlightRoute.entry.data.title} · Echo Pro`} />}

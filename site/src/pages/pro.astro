@@ -536,6 +536,11 @@ const head = [
   .pro-diagram :global(.d-flow path) { fill: none; stroke: var(--sl-color-gray-4); stroke-width: 1.25; }
   .pro-diagram :global(.d-read) { fill: none; stroke: var(--sl-color-gray-4); stroke-width: 1.25; stroke-dasharray: 4 4; }
   .pro-diagram :global(.d-head) { fill: var(--sl-color-gray-4); }
+  /* Request flow: dashes move along the arrows. Off when the reader asks for reduced motion. */
+  @media (prefers-reduced-motion: no-preference) {
+    .pro-diagram :global(.d-flow path) { stroke: var(--echo-cyan-text); stroke-dasharray: 5 5; animation: d-flow 1.4s linear infinite; }
+    @keyframes d-flow { to { stroke-dashoffset: -20; } }
+  }
 
   /* Packages */
   .pro-flagships { display: grid; gap: 12px; margin-bottom: 2rem; }

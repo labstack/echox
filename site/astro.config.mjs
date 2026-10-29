@@ -30,7 +30,13 @@ export default defineConfig({
       fallbacks: ['ui-sans-serif', 'system-ui', 'sans-serif'],
       display: 'swap',
       options: {
-        variants: [{ src: ['@fontsource-variable/dm-sans/files/dm-sans-latin-wght-normal.woff2'], weight: '400 700', style: 'normal' }],
+        // The opsz files carry DM Sans's optical-size axis, so headings use its
+        // display shapes instead of the 9pt text master. Italics load only when
+        // a page uses them (they are not preloaded, see Head.astro).
+        variants: [
+          { src: ['@fontsource-variable/dm-sans/files/dm-sans-latin-opsz-normal.woff2'], weight: '400 700', style: 'normal' },
+          { src: ['@fontsource-variable/dm-sans/files/dm-sans-latin-opsz-italic.woff2'], weight: '400 700', style: 'italic' },
+        ],
       },
     },
     {
@@ -40,7 +46,10 @@ export default defineConfig({
       fallbacks: ['ui-monospace', 'monospace'],
       display: 'swap',
       options: {
-        variants: [{ src: ['@fontsource/fragment-mono/files/fragment-mono-latin-400-normal.woff2'], weight: '400', style: 'normal' }],
+        variants: [
+          { src: ['@fontsource/fragment-mono/files/fragment-mono-latin-400-normal.woff2'], weight: '400', style: 'normal' },
+          { src: ['@fontsource/fragment-mono/files/fragment-mono-latin-400-italic.woff2'], weight: '400', style: 'italic' },
+        ],
       },
     },
   ],
