@@ -42,7 +42,9 @@ import "github.com/labstack/echo/v5"
 | バージョン | インポートパス                | ステータス |
 | ---------- | ----------------------------- | ---------- |
 | **v5**     | `github.com/labstack/echo/v5` | 現行 |
-| v4         | `github.com/labstack/echo/v4` | LTS（保守） |
+| v4         | `github.com/labstack/echo/v4` | バグ修正は 2026-12-31 まで、セキュリティ修正は 2027-12-31 まで |
+
+日付と対象範囲は [Echo のセキュリティポリシー](https://github.com/labstack/echo/blob/master/SECURITY.md) を参照してください。
 
 :::note
 Echo は[セマンティックインポートバージョニング](https://go.dev/blog/v2-go-modules)に従います。

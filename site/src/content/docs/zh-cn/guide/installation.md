@@ -42,7 +42,9 @@ import "github.com/labstack/echo/v5"
 | 版本 | 导入路径                      | 状态 |
 | ---- | ----------------------------- | ---- |
 | **v5** | `github.com/labstack/echo/v5` | 当前 |
-| v4   | `github.com/labstack/echo/v4` | LTS（维护） |
+| v4   | `github.com/labstack/echo/v4` | 错误修复至 2026-12-31，安全修复至 2027-12-31 |
+
+日期和范围见 [Echo 安全策略](https://github.com/labstack/echo/blob/master/SECURITY.md)。
 
 :::note
 Echo 遵循[语义化导入版本](https://go.dev/blog/v2-go-modules)：
