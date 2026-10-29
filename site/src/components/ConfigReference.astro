@@ -79,10 +79,10 @@ const sourceUrl = (file: string, line: number) => `${repository}/blob/${manifest
   thead th { color: var(--sl-color-gray-2); }
   tbody th { font-weight: 500; }
   code { overflow-wrap: anywhere; white-space: pre-wrap; }
-  .field-description { min-width: 16rem; white-space: pre-line; overflow-wrap: anywhere; }
-  .pro-reference tbody th { text-transform: none; letter-spacing: normal; min-width: 8rem; }
+  .field-description { min-width: 16rem; white-space: normal; overflow-wrap: anywhere; }
+  tbody th { text-transform: none; letter-spacing: normal; min-width: 8rem; }
   .pro-reference td:nth-child(2) { min-width: 7rem; }
   .pro-reference td:last-child { white-space: nowrap; }
-  .pro-reference tbody th code, .pro-reference td:nth-child(2) code, .pro-reference td:last-child code { overflow-wrap: normal; }
+  tbody th code, .pro-reference td:nth-child(2) code, .pro-reference td:last-child code { overflow-wrap: normal; }
   .deprecated { margin-inline-start: .5rem; }
 </style>

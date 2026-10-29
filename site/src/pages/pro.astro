@@ -26,7 +26,6 @@ const billingPortal = 'https://billing.stripe.com/p/login/5kQ14o5UU9WM3Gt0DU4sE0
 import gettingStartedSource from '../../pro-source/examples/getting-started/main.go?raw';
 import installCommands from '../../pro-source/examples/site-docs/commands.sh?raw';
 import netrcExample from '../../pro-source/examples/site-docs/netrc.example?raw';
-import ciSource from '../../pro-source/examples/site-docs/github-actions.yml?raw';
 import { sourceSnippet } from '../../plugins/remark-source-code.mjs';
 const authSnippet = sourceSnippet(gettingStartedSource, 'site-auth');
 const quotaSnippet = sourceSnippet(gettingStartedSource, 'site-quota');
@@ -139,7 +138,6 @@ const comparison: Array<[string, Array<[string, ...Array<boolean | string>]>]> =
   ]],
 ];
 
-const ciSnippet = ciSource;
 
 const faq = [
   ['What stays free?', 'Echo, its built-in middleware and the official packages (echo-jwt, echo-otel, echo-prometheus and echo-contrib) are open source under the MIT license. Echo Pro is a separate module that builds on them.'],
@@ -218,7 +216,7 @@ const head = [
         </div>
         {tabs.map((tab) => (
           <div class="pro-panel" id={`panel-${tab.id}`} role="tabpanel" aria-labelledby={`tab-${tab.id}`} aria-label={tab.label} tabindex="0">
-            <Code code={tab.code} lang="go" frame="code" />
+            <Code code={tab.code} lang="go" frame="code" wrap />
           </div>
         ))}
       </div>
@@ -396,16 +394,18 @@ const head = [
     <section id="install" aria-labelledby="install-title" class="pro-install">
       <h2 id="install-title">Install</h2>
       <p class="pro-intro">After purchase you create your organisation's access token once. Then, on each machine:</p>
+      <div class="pro-install-grid">
+      <div>
       <ol>
         <li><span>Mark the module private. If you already set <code>GOPRIVATE</code>, append <code>,echo.labstack.com</code> to your existing value instead.</span><Code code={privatePatternSnippet} lang="sh" frame="none" wrap /></li>
         <li><span>Add this line to <code>~/.netrc</code> (Windows: <code>%USERPROFILE%\_netrc</code>), mode 600.</span><Code code={netrcExample.trim()} lang="text" frame="none" wrap /></li>
         <li><span>Add Echo Pro to your module.</span><Code code={getVersionSnippet} lang="sh" frame="none" wrap /></li>
       </ol>
       <h3>In CI</h3>
-      <p class="pro-muted">GitHub Actions: store the token as a repository secret and create a job-scoped credential file before <code>go</code> runs.</p>
-      <Code code={ciSnippet} lang="yaml" title=".github/workflows/ci.yml" frame="code" />
-      <p class="pro-muted">See <a href="/pro/install/">installation</a> for corporate mirrors, <code>GOPROXY</code> chains, Docker and offline builds.</p>
+      <p class="pro-muted">Store the token as a CI secret and write a job-scoped credential file before <code>go</code> runs. <a href="/pro/install/">Installation</a> has a complete GitHub Actions workflow, plus corporate mirrors, <code>GOPROXY</code> chains, Docker and offline builds.</p>
+      </div>
 
+      <aside class="pro-install-docs" aria-labelledby="docs">
       <h3 id="docs">Read the docs</h3>
       <p class="pro-muted">Start with installation and a local app, then choose the packages your application needs. These pages cover Echo Pro v0.1.0.</p>
       <ul>
@@ -415,6 +415,8 @@ const head = [
         <li>Examples: <a href="/pro/examples/quota-otel/">Quota telemetry</a> · <a href="/pro/examples/stripe/">Stripe usage export</a> · <a href="/pro/examples/admin/">Local admin</a> · <a href="/pro/examples/admin-demo/">Full console demo</a></li>
         <li><a href="/pro/guides/">Task guides</a> · <a href="/pro/reference/">Configuration reference</a> · <a href="/pro/examples/">Examples</a> · <a href="/pro/problems/">Problem types</a></li>
       </ul>
+      </aside>
+      </div>
     </section>
 
     <section id="faq" aria-labelledby="faq-title" class="pro-faq">
@@ -513,7 +515,7 @@ const head = [
   .pro-panel :global(.expressive-code) { --ec-brdRad: 0; --ec-brdCol: transparent; --ec-codeFontSize: 0.78rem; margin: 0; }
 
   /* Trust row */
-  .pro-trust { list-style: none; margin: 3.5rem 0 0; padding: 1.25rem 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px 28px; border-block: 1px solid var(--sl-color-hairline); }
+  .pro-trust { width: 100%; max-width: none; list-style: none; margin: 3.5rem 0 0; padding: 1.25rem 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px 28px; border-block: 1px solid var(--sl-color-hairline); }
   @media (min-width: 40rem) { .pro-trust { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   @media (min-width: 64rem) { .pro-trust { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
   .pro-trust li { display: flex; gap: 10px; margin: 0; font-size: 0.875rem; line-height: 1.5; color: var(--sl-color-gray-3); }
@@ -591,7 +593,9 @@ const head = [
 
   /* position: relative keeps the absolutely positioned sr-only labels inside the scroller. */
   .pro-compare-wrap { position: relative; margin-top: 2.5rem; overflow-x: auto; }
-  .pro-compare { min-width: 34rem; }
+  /* Fixed columns so the three plan columns are equal width. */
+  .pro-compare { min-width: 34rem; table-layout: fixed; }
+  .pro-compare tr > :first-child { width: 52%; }
   .pro-compare caption { text-align: start; font-weight: 600; font-size: 1.02rem; color: var(--sl-color-white); padding-bottom: 10px; }
   .pro-compare th, .pro-compare td { padding: 9px 10px; border-bottom: 1px solid var(--sl-color-hairline); text-align: center; }
   .pro-compare thead th { font-weight: 600; color: var(--sl-color-white); }
@@ -604,8 +608,14 @@ const head = [
   .pro-terms li { break-inside: avoid; margin-bottom: 0.4rem; }
 
   /* Install */
-  .pro-install { max-width: 48rem; }
-  .pro-install ol { padding-inline-start: 1.3rem; margin: 0 0 1.5rem; }
+  /* Install: steps on the left, docs map on the right; one column below 64rem. */
+  .pro-install-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2rem 3rem; align-items: start; }
+  @media (min-width: 64rem) { .pro-install-grid { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); } }
+  .pro-install-docs { border: 1px solid var(--sl-color-hairline); border-radius: 10px; padding: 1.25rem 1.5rem; }
+  .pro .pro-install-docs h3 { margin-top: 0; }
+  .pro-install-docs ul { padding-inline-start: 1.1rem; margin: 0; }
+  .pro-install-docs li { margin-bottom: 0.6rem; font-size: 0.9rem; }
+  .pro-install ol { padding-inline-start: 2rem; margin: 0 0 1.5rem; }
   .pro-install li { margin-bottom: 1.1rem; color: var(--sl-color-gray-2); }
   .pro-install li::marker { color: var(--sl-color-gray-4); font-family: var(--sl-font-mono); }
   .pro-install li :global(.expressive-code) { margin-top: 0.5rem; }
@@ -613,7 +623,9 @@ const head = [
   .pro-install :global(.expressive-code) { margin-bottom: 0.9rem; }
 
   /* FAQ */
-  .pro-faq { max-width: 48rem; }
+  /* Questions: two columns of disclosures on wide screens. */
+  .pro-faq-list { display: grid; grid-template-columns: minmax(0, 1fr); column-gap: 3rem; align-items: start; }
+  @media (min-width: 64rem) { .pro-faq-list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   .pro-faq-list { border-top: 1px solid var(--sl-color-hairline); margin-bottom: 1.25rem; }
   .pro-faq details { border-bottom: 1px solid var(--sl-color-hairline); }
   .pro-faq summary { display: flex; justify-content: space-between; align-items: center; gap: 1rem; min-height: 48px; padding: 10px 0; cursor: pointer; font-weight: 600; color: var(--sl-color-white); list-style: none; }

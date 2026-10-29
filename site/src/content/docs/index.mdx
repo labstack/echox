@@ -50,20 +50,20 @@ import { CardGrid, Code, LinkCard, Steps } from '@astrojs/starlight/components';
   <div><b>MIT</b><span>open source license</span></div>
 </div>
 
-<div class="echo-h"><h2>Everything you need. Nothing you don't.</h2></div>
+<div class="echo-h"><h2>Features</h2></div>
 
 <div class="echo-features not-content">
   <CardGrid>
-    <FeatureCard title="Optimized Router" icon="rocket">Radix-tree routing with zero dynamic allocation and smart route prioritization.</FeatureCard>
-    <FeatureCard title="Batteries-included Middleware" icon="setting">CORS, JWT, rate-limit, gzip, recover, request logging — 25+ built in.</FeatureCard>
-    <FeatureCard title="Data Binding" icon="document">Bind JSON, XML, form, query &amp; path params into typed structs.<Code code={'var u User\nif err := c.Bind(&u); err != nil {\n\treturn err\n}'} lang="go" frame="none" /></FeatureCard>
-    <FeatureCard title="Automatic TLS" icon="padlock">HTTPS out of the box via Let's Encrypt, plus HTTP/2 support.</FeatureCard>
-    <FeatureCard title="Extensible" icon="puzzle">Composable middleware and a clean, minimal interface for total control.</FeatureCard>
-    <FeatureCard title="Templates" icon="window">Plug in any Go template engine for fast, flexible HTML rendering.</FeatureCard>
+    <FeatureCard title="Optimized router" icon="rocket">Radix-tree router; matching a route allocates no memory with default settings. Static paths match before parameters, parameters before wildcards.</FeatureCard>
+    <FeatureCard title="Middleware" icon="setting">CORS, CSRF, rate limiting, gzip, recover and request logging ship in Echo's <code>middleware</code> package. JWT, sessions and metrics are official add-ons.</FeatureCard>
+    <FeatureCard title="Data binding" icon="document">Bind JSON, XML or form bodies and path parameters into a struct with one call to <code>c.Bind</code>. The <a href="/guide/binding/">binding guide</a> covers query parameters.</FeatureCard>
+    <FeatureCard title="TLS and HTTP/2" icon="padlock"><code>StartConfig.StartTLS</code> serves HTTPS from certificate files, or set <code>StartConfig.TLSConfig</code> and call <code>Start</code>. HTTP/2 works over TLS by default.</FeatureCard>
+    <FeatureCard title="Extensible" icon="puzzle">Write middleware as a plain function. Replace the binder, validator, renderer, IP extractor or error handler.</FeatureCard>
+    <FeatureCard title="Templates" icon="window">Use <code>echo.TemplateRenderer</code> for <code>html/template</code>, or set <code>e.Renderer</code> to any engine that implements <code>echo.Renderer</code>.</FeatureCard>
   </CardGrid>
 </div>
 
-<div class="echo-h"><h2>A running server in three steps.</h2></div>
+<div class="echo-h"><h2>Quickstart</h2></div>
 
 <div class="echo-steps">
   <Steps>
@@ -75,9 +75,9 @@ import { CardGrid, Code, LinkCard, Steps } from '@astrojs/starlight/components';
       </li>
       <li>
         <h3>Write</h3>
-        <p>The core of <code>server.go</code>. Copy the <a href="/cookbook/hello-world/">full Hello World example</a> for the imports and <code>main</code>.</p>
+        <p>Create <code>server.go</code> with one route. The <a href="/cookbook/hello-world/">full example</a> adds imports and <code>main</code>.</p>
 
-        ```go file=cookbook/hello-world/server.go#hero frame="none" wrap
+        ```go file=cookbook/hello-world/server.go#route frame="none" wrap
         ```
 
       </li>
@@ -90,7 +90,7 @@ import { CardGrid, Code, LinkCard, Steps } from '@astrojs/starlight/components';
   </Steps>
 </div>
 
-<div class="echo-h"><h2>Official packages, ready to plug in.</h2></div>
+<div class="echo-h"><h2>Official packages</h2></div>
 
 <div class="echo-eco not-content">
   <CardGrid>
@@ -101,7 +101,7 @@ import { CardGrid, Code, LinkCard, Steps } from '@astrojs/starlight/components';
   </CardGrid>
 </div>
 
-<div class="echo-h"><h2>Backed by teams who build on Echo.</h2></div>
+<div class="echo-h"><h2>Sponsors</h2></div>
 
 <div class="sp not-content">
   <div class="sp-featured-row">

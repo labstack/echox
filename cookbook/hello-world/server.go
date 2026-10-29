@@ -18,9 +18,11 @@ func main() {
 	e.Use(middleware.Recover())
 
 	// Route => handler
+	// docs:start route
 	e.GET("/", func(c *echo.Context) error {
 		return c.String(http.StatusOK, "Hello, World!\n")
 	})
+	// docs:end route
 	// docs:end hero
 
 	// Start server
