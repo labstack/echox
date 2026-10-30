@@ -57,6 +57,8 @@ Use `Reserve` for work whose final cost is unknown before work starts. Retain th
 
 For HTTP handlers, set `Settle: true` and call `quota.Charge` with final amounts. An explicit zero refunds work. Omitted meters retain their reservations. Call `Close` during shutdown to drain asynchronous settlement. The [execution task](/pro/guides/execution/) demonstrates keeping two request attempts charged while charging actual token work once.
 
+For MCP tools, the default settled policy keeps the billable reservation when SDK argument validation fails before the handler runs. Use `quotamcp.Policy{Settle: true, ChargeFirst: true}` and call `quotamcp.Charge(ctx, nil)` before billable work to refund such failures. Attempt meters remain charged. See the [MCP accounting example](/pro/examples/quota-otel/#step-3-follow-tool-accounting).
+
 ## Bound dimensions and adjust customer quotas
 
 Use a controlled dimension vocabulary such as `small`, `large` and `other`. Set `ByDimension` on the limit and provide every configured dimension. The example also applies a numeric override without changing the subject's stored usage:

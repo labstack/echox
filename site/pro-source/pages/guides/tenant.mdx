@@ -23,7 +23,14 @@ The complete example issues a restricted key, resolves a path tenant and authori
 ```go file=site/pro-source/examples/source/tenant/site_example_test.go#ExampleAuthorizeConfig_ToMiddleware
 ```
 
-Replace the map with a repository lookup using `c.Request().Context()`. Return the resource tenant from that lookup, not from `c.Param("tenant")`. Return an error for an absent resource according to your application's disclosure policy. The middleware applies the shared timeout and refuses a mismatched owner before policy.
+Replace the map with a repository lookup using `c.Request().Context()`. Return the resource tenant from that lookup, not from `c.Param("tenant")`. Any error from `Resource`, including not found, returns 403. The middleware applies the shared timeout and refuses a mismatched owner before policy.
+
+If your application wants 404 for missing resources, check existence after authentication and tenant selection, before resource authorization. This example checks within the selected tenant and passes existing resources on to the authorization middleware. The resolver must still check ownership; account for deletion between the lookup and authorization.
+
+```go file=site/pro-source/examples/source/tenant/site_example_test.go#missing-resource
+```
+
+Alternatively, authorize a collection-level resource and check item existence in the handler, returning 404 there. Returning `echo.ErrNotFound` from `Resource` still produces 403.
 
 ## Select headers, subdomains or anonymous tenant pages
 

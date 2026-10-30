@@ -36,7 +36,9 @@ If the reset day is the 31st, shorter months reset on their last day.
 `Concurrent` holds one slot until release or lease expiry. `Credits` debits a funded balance.
 Middleware returns 402 `insufficient_credits` for an unfunded request.
 It returns 403 `cost_exceeds_limit` when a request can never fit a limit.
-It returns 429 `quota_exceeded` with `Retry-After` when a time budget is exhausted.
+It returns 429 `quota_exceeded` when a budget is exhausted.
+`Retry-After` is sent when the binding (deciding) limit is an exceeded bucket or concurrency limit.
+Day, month and billing-period denials omit that header; `reset_at` gives the reset time instead.
 
 Limits default to tenant scope. All limits in a plan use one partition, tenant or IP. That lets the store check them in one atomic step.
 User, API-key and operation scopes divide usage within that partition.

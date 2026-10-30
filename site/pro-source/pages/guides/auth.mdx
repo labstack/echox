@@ -47,6 +47,15 @@ Set the exact issuer, accepted API audiences and a configured JWKS URL. The comp
 Replace the fixture issuer and client with your trusted issuer origin and application client. Keep certificate verification enabled. Use `DiscoveryURL` instead of `JWKSURL` to discover the key location.
 A nonempty `AllowedJWKSHosts` must list every permitted discovered host, including the discovery host when needed. Set `Algorithms` only to the asymmetric algorithms your issuer uses. Retain only claims the application needs in `ClaimAllowlist`. Enable `TrustTenantClaim` only for an issuer authorized to restrict your application's tenants.
 
+## Accept either an API key or a JWT on one route
+
+Pass two single-scheme maps to `auth.Require` for OR. This route accepts either the configured API key or the verified bearer token, with `invoice:read` scope. Supply the API key and constructed bearer verifier from the preceding tasks, with distinct namespaces and credential headers. Send one credential mechanism per request.
+
+```go file=site/pro-source/examples/source/auth/example_test.go#either-credential
+```
+
+One map containing both schemes means AND and is rejected by `ToMiddleware` with a configuration error.
+
 ## Authenticate and select tenants before quota
 
 Build `authbind.Middleware(authCfg, tenantCfg)` first. Construct `authbind.Quota()` for the quota callback. Register the guard before quota on the same Echo group. The combined program's `run` function also installs the problem error handler and closes limiter-owned work during shutdown.

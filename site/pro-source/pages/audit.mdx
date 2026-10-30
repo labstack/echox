@@ -23,7 +23,8 @@ Recording an event also needs a schema and store, as shown in the [task guide](/
 `NewSchema` copies registered fields and their storage rules, such as masking or HMAC hashing.
 Register metadata names with their `redact.Class` before calling `Prepare`.
 The default storage policy requires HMAC keys. Keep the immutable `redact.Keyring` available while using the schema.
-If you enable the mask fallback, the schema works without HMAC keys. You then cannot search by exact value.
+If you enable the mask fallback, the schema can prepare and record events without HMAC keys.
+Without those keys, `NewReader` also fails with a configuration error; you cannot use the reader to get, query, search or export events.
 `Schema.MaskFallback()` reports whether that fallback is enabled.
 
 Map the actor from the verified principal. Classify user and service IDs as identifiers.

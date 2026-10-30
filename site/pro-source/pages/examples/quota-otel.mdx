@@ -39,6 +39,13 @@ The HTTP callback returns fixed tenant `demo`.  Replace it with [authbind callba
 
 The program registers `search` on an MCP server and connects an in-process client. `quotamcp` applies an explicit tool policy and the same limiter. MCP telemetry uses a bounded allowlist for plan, tool and meter names. It never takes the tenant from tool arguments, which the model writes.
 
+By default, a settled MCP call that records no `Charge` keeps its full billable reservation. This includes calls whose arguments fail SDK validation before the handler runs. The policy in this example therefore bills those failed calls.
+
+To refund billable `Cost` for validation failures, set both `Settle: true` and `ChargeFirst: true`. The handler must call `quotamcp.Charge(ctx, nil)` before billable work and report actual usage afterward. Attempt meters remain charged. A successful result without any `Charge` keeps the reservation and reports a configuration error.
+
+```go file=site/pro-source/examples/source/quota/quotamcp/example_test.go#charge-first
+```
+
 The full source owns both providers, creates the failure counter and joins the HTTP server and MCP sessions:
 
 ```go file=site/pro-source/examples/quota-otel/main.go
@@ -61,5 +68,12 @@ For a smaller tracing-only fixture, this executable example prints `true quota.d
 ## Change for deployment
 
 Replace stdout exporters with your own provider/export path. Keep the providers caller-owned and drain them at shutdown after work stops. Define allowlists from controlled plan, limit, tool and meter names. Do not label metrics with raw tenant IDs, credentials or arbitrary tool arguments.
+
+When combining this program with the [Stripe outbox example](/pro/examples/stripe/), replace `metrics.Hooks()` with `metrics.OutboxHooks()` in `quota.JoinHooks`. Keep tracing and lifecycle hooks. An outbox cannot be combined with synchronous consumption or threshold hooks. Count events after the exporter accepts them:
+
+```go file=site/pro-source/examples/source/quota/quotaotel/tracing_example_test.go#outbox-metrics
+```
+
+`Count` counts redeliveries again; these counters are delivery observations, not a deduplicated billing ledger. Stripe delivery still deduplicates by event ID.
 
 Use Redis or Valkey for budgets shared across processes. Record allow/deny decisions and final usage as separate metrics. Tracing a denied attempt does not mean it consumed work. See [quota accounting tasks](/pro/guides/quota/) for reserve/settle examples and [the configuration reference](/pro/reference/quota/) for telemetry bounds.
