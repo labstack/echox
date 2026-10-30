@@ -64,6 +64,8 @@ The online command cancels and joins the dispatcher before returning. Ctrl-C can
 
 The offline example verifies event acceptance only. It does not certify a live Stripe account, invoice correctness or reconciliation coverage. Test online dispatch with your sandbox and the package's pinned Stripe API version before enabling billed traffic.
 
+If you add the [quota telemetry example](/pro/examples/quota-otel/), replace `metrics.Hooks()` with `metrics.OutboxHooks()` and call `metrics.Count(ctx, ev)` after `exporter.Deliver(ctx, ev)` succeeds. `Count` counts redeliveries again; use the exporter’s event-ID deduplication for billing.
+
 ## Change for deployment
 
 Replace both memory stores with persistent stores. Use a fixed namespace for each export history within a Stripe account. Configure store capacity, retention and exporter settings consistently. Keep final usage strict so an unavailable store cannot admit unrecorded billed work. Deduplicate quota events by `Event.ID` because the outbox can deliver them more than once and out of order.

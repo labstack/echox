@@ -13,8 +13,8 @@ import ConfigReference from '../../../../components/ConfigReference.astro';
 
 - `Config.Panels`: 1–64 panel adapters.
 - `Config.Authenticate`: your per-request login check.
-- Write actions: enable each panel action and configure its role, scope, confirmations and `Audit` sink.
-- `Config.Keys`: required for pagination, digest views, POST reads and actions.
+- Write actions: enable each panel action and configure signing keys and an `Audit` sink. The shell requires Operator and the resolved scope; panel adapters fix reason and confirmation requirements. `Config.Authorize` can narrow these permissions.
+- `Config.Keys`: required for pagination, digest views, declared POST views and actions. Unpaginated confidential-filter reads can use POST without Keys on one instance: Mount creates an ephemeral CSRF key. Its tokens expire on remount and cannot be verified by another instance. Supply shared Keys for multi-instance deployments.
 
 Viewer is the default role; `PublicPath` defaults to the mount prefix and an empty `Theme.Mode` follows the system scheme.
 

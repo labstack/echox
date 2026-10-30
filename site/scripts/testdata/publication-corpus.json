@@ -698,6 +698,13 @@
       "reason": ""
     },
     {
+      "id": "current-problems/admin-selection-required.mdx",
+      "name": "pages/problems/admin-selection-required.mdx",
+      "currentPage": true,
+      "allowed": true,
+      "reason": ""
+    },
+    {
       "id": "current-problems/admin-timeout.mdx",
       "name": "pages/problems/admin-timeout.mdx",
       "currentPage": true,

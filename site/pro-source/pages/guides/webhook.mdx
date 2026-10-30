@@ -37,6 +37,8 @@ The POST handler prepares and enqueues this event with the request context:
 ```go file=site/pro-source/examples/getting-started/main.go#site-webhook
 ```
 
+With `HTTPSenderConfig`, the outgoing `Key` is the Standard Webhooks message ID: 1–128 printable ASCII bytes, without spaces or dots (`.`). `PrepareOutgoing` accepts any 1–128-byte UTF-8 key without control characters, because custom `SendFunc` senders may allow more. Check the key with `webhook.StandardID` before you enqueue; otherwise the HTTP sender rejects the delivery with `invalid_id` and never sends it.
+
 ## Exercise a memory queue and worker
 
 The example prepares a fixed business key and inspects ready state.

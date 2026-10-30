@@ -470,3 +470,82 @@ func TestSiteTenantIsolation(t *testing.T) {
 }
 
 // docs:end isolation-test
+
+// docs:start missing-resource
+// MountInvoice checks existence within the selected tenant before authorization.
+func MountInvoice(e *echo.Echo, exists func(context.Context, tenant.ID, string) (bool, error), authorize echo.MiddlewareFunc, handler echo.HandlerFunc) {
+	checkExists := func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c *echo.Context) error {
+			ctx := c.Request().Context()
+			id, ok := tenant.From(ctx)
+			if !ok {
+				return echo.ErrForbidden
+			}
+			found, err := exists(ctx, id, c.Param("id"))
+			if err != nil {
+				return err
+			}
+			if !found {
+				return echo.ErrNotFound
+			}
+			return next(c)
+		}
+	}
+	// Install authentication and tenant selection before this route.
+	e.GET("/invoices/:id", handler, checkExists, authorize)
+}
+
+// docs:end missing-resource
+
+func TestMountInvoice(t *testing.T) {
+	for _, tc := range []struct {
+		name  string
+		found bool
+		want  int
+	}{
+		{"missing", false, http.StatusNotFound},
+		{"existing", true, http.StatusNoContent},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			authenticate, token := identity(t, "acme")
+			selectTenant, err := (tenant.Config{
+				Selectors: []tenant.Selector{tenant.FromCredential()}, Required: true,
+			}).ToMiddleware()
+			if err != nil {
+				t.Fatal(err)
+			}
+			e := echo.New()
+			e.Use(authenticate, selectTenant)
+			existsCalls, authorizeCalls, handlerCalls := 0, 0, 0
+			exists := func(ctx context.Context, id tenant.ID, invoice string) (bool, error) {
+				existsCalls++
+				if _, ok := auth.From(ctx); !ok || id != "acme" || invoice != "inv-1" {
+					t.Fatalf("lookup without authenticated tenant/invoice: tenant=%q invoice=%q", id, invoice)
+				}
+				return tc.found, nil
+			}
+			authorize := func(next echo.HandlerFunc) echo.HandlerFunc {
+				return func(c *echo.Context) error {
+					authorizeCalls++
+					return next(c)
+				}
+			}
+			MountInvoice(e, exists, authorize, func(c *echo.Context) error {
+				handlerCalls++
+				return c.NoContent(http.StatusNoContent)
+			})
+			r := httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/invoices/inv-1", nil)
+			r.Header.Set("Authorization", "ApiKey "+token)
+			w := httptest.NewRecorder()
+			e.ServeHTTP(w, r)
+			if w.Code != tc.want || existsCalls != 1 {
+				t.Fatalf("status=%d lookups=%d; want %d and one lookup", w.Code, existsCalls, tc.want)
+			}
+			if !tc.found {
+				tenanttest.Refused(t, w.Code, authorizeCalls, handlerCalls)
+			} else if authorizeCalls != 1 || handlerCalls != 1 {
+				t.Fatalf("authorize=%d handler=%d; want one each", authorizeCalls, handlerCalls)
+			}
+		})
+	}
+}

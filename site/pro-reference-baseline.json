@@ -2985,6 +2985,17 @@
       ]
     },
     {
+      "Code": "admin_selection_required",
+      "Type": "https://echo.labstack.com/pro/problems/admin-selection-required",
+      "Messages": [
+        {
+          "Status": 400,
+          "TitleEN": "Bad Request",
+          "TitleJA": "不正なリクエスト"
+        }
+      ]
+    },
+    {
       "Code": "admin_timeout",
       "Type": "https://echo.labstack.com/pro/problems/admin-timeout",
       "Messages": [

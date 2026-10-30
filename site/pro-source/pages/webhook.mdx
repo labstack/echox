@@ -18,6 +18,8 @@ The verifier checks original bytes before the inbox accepts them.
 ```go file=site/pro-source/examples/source/webhook/example_test.go#site-anchor
 ```
 
+With `HTTPSenderConfig`, the outgoing `Key` is the Standard Webhooks message ID: 1–128 printable ASCII bytes, without spaces or dots (`.`). `PrepareOutgoing` accepts any 1–128-byte UTF-8 key without control characters, because custom `SendFunc` senders may allow more. Check the key with `webhook.StandardID` before you enqueue; otherwise the HTTP sender rejects the delivery with `invalid_id` and never sends it.
+
 ## Verify original bytes
 
 The Standard Webhooks sender signs `id + "." + timestamp + "." + payload` with HMAC-SHA256.

@@ -8,6 +8,8 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"sync/atomic"
+	"testing"
 
 	"github.com/labstack/echo/v5"
 	"github.com/modelcontextprotocol/go-sdk/mcp"
@@ -162,3 +164,66 @@ func ExampleMiddlewareConfig_Validate() {
 }
 
 // docs:end ExampleMiddlewareConfig_Validate
+
+// docs:start charge-first
+// RegisterChargeFirstSearch registers a tool and returns its metering policy.
+func RegisterChargeFirstSearch(srv *mcp.Server, search func(context.Context, string) (string, int64, error)) quotamcp.Policy {
+	mcp.AddTool(srv, &mcp.Tool{Name: "search"}, func(ctx context.Context, _ *mcp.CallToolRequest, args struct {
+		Query string `json:"query"`
+	}) (*mcp.CallToolResult, any, error) {
+		quotamcp.Charge(ctx, nil) // Mark started before calling the provider.
+		text, tokens, err := search(ctx, args.Query)
+		if err != nil {
+			return nil, nil, err
+		} // Keep the reservation if usage is unknown.
+		quotamcp.Charge(ctx, quota.Cost{"tokens": tokens})
+		return &mcp.CallToolResult{Content: []mcp.Content{&mcp.TextContent{Text: text}}}, nil, nil
+	})
+	// Assign this policy to MiddlewareConfig.Policies["search"].
+	return quotamcp.Policy{
+		Cost: quota.Cost{"tokens": 100}, Settle: true, ChargeFirst: true,
+	}
+}
+
+// docs:end charge-first
+
+func TestRegisterChargeFirstSearch(t *testing.T) {
+	rec := &recorder{}
+	l := newLimiter(t, rec, quota.Plan{ID: "team", Limits: []quota.Limit{
+		quota.PerDay("tool_calls", 10),
+		quota.PerMonth("tokens", 1000).Meter("tokens"),
+	}})
+	srv := mcp.NewServer(&mcp.Implementation{Name: "test", Version: "v1"}, nil)
+	var calls atomic.Int64
+	policy := RegisterChargeFirstSearch(srv, func(_ context.Context, query string) (string, int64, error) {
+		calls.Add(1)
+		return "results for " + query, 37, nil
+	})
+	cfg := config(l, rec)
+	cfg.Policies = map[string]quotamcp.Policy{"search": policy}
+	mw, err := cfg.ToMiddleware()
+	if err != nil {
+		t.Fatal(err)
+	}
+	srv.AddReceivingMiddleware(mw)
+	cs := connect(t, srv, nil, "")
+	res := call(t, cs, "search", map[string]any{"query": "invoices"})
+	if res.IsError || text(res) != "results for invoices" || calls.Load() != 1 {
+		t.Fatalf("successful search: result=%+v calls=%d", res, calls.Load())
+	}
+	if got := usage(t, l, "acme", "tokens"); got != 37 {
+		t.Fatalf("tokens = %d, want reported usage 37 instead of reservation 100", got)
+	}
+	if res := call(t, cs, "search", map[string]any{"query": 123}); !res.IsError {
+		t.Fatal("invalid arguments accepted")
+	}
+	if calls.Load() != 1 {
+		t.Fatalf("search calls = %d, want invalid arguments rejected before handler", calls.Load())
+	}
+	if got := usage(t, l, "acme", "tokens"); got != 37 {
+		t.Fatalf("tokens = %d, want invalid call's reservation refunded, leaving 37", got)
+	}
+	if got := usage(t, l, "acme", "tool_calls"); got != 2 {
+		t.Fatalf("attempts = %d, want both calls admitted", got)
+	}
+}
