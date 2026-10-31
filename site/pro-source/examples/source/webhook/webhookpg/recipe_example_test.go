@@ -269,7 +269,7 @@ VALUES ($1, $2, 'grant', $3) ON CONFLICT DO NOTHING`,
 		}
 		if tag.RowsAffected() == 0 {
 			var recorded int64
-			if err = tx.QueryRow(
+			if err := tx.QueryRow(
 				ctx,
 				"SELECT amount FROM app.entitlements WHERE tenant = $1 AND "+
 					"invoice = $2 AND action = 'grant'",
@@ -473,7 +473,7 @@ func runHTTPOutbox(
 			},
 		},
 	}
-	if err = webhookpg.Migrate(ctx, ownerPool, cfg); err != nil {
+	if err := webhookpg.Migrate(ctx, ownerPool, cfg); err != nil {
 		return err
 	}
 	store, err := webhookpg.New(ctx, runtimePool, cfg)
@@ -494,7 +494,7 @@ func runHTTPOutbox(
 	if err != nil {
 		return err
 	}
-	if err = enqueueHTTPGrant(ctx, runtimePool, store, p); err != nil {
+	if err := enqueueHTTPGrant(ctx, runtimePool, store, p); err != nil {
 		return err
 	}
 	worker, err := webhookpg.NewWorker(store, webhookpg.WorkerConfig{Concurrency: 8})
@@ -548,7 +548,7 @@ VALUES ($1, $2, 'grant', $3) ON CONFLICT DO NOTHING`,
 	}
 	if tag.RowsAffected() == 0 {
 		var amount int64
-		if err = tx.QueryRow(
+		if err := tx.QueryRow(
 			ctx,
 			`SELECT amount FROM app.entitlements
 WHERE tenant=$1 AND invoice=$2 AND action='grant'`,

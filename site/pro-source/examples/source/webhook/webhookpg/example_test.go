@@ -232,7 +232,7 @@ VALUES ($1, $2, 'grant', $3) ON CONFLICT DO NOTHING`,
 	}
 	if tag.RowsAffected() == 0 {
 		var recorded int64
-		if err = tx.QueryRow(
+		if err := tx.QueryRow(
 			ctx,
 			"SELECT amount FROM app.entitlements WHERE tenant = $1 AND "+
 				"invoice = $2 AND action = 'grant'",

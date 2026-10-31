@@ -7,7 +7,7 @@ description: Fields, defaults and constructors for quota.
 
 import ConfigReference from '../../../../components/ConfigReference.astro';
 
-`echo.labstack.com/pro` v0.1.0. See the [task guide](/pro/guides/quota/) for setup examples.
+`echo.labstack.com/pro` v0.2.0. See the [task guide](/pro/guides/quota/) for setup examples.
 
 ## Required fields
 
@@ -139,6 +139,12 @@ Import `echo.labstack.com/pro/quota/quotastripe/stripeadmin`.
 | `Config.DenyCache` | Off by default; at most ten seconds and never longer than the retry delay |
 
 Call `Limiter.Close` before closing its store or Redis client.
+
+## Top-K tracker
+
+`quota.NewTopK(k)` returns `(*quota.TopK, error)` and rejects k outside
+1..1000 with a `*quota.ConfigError`. `quota.MustNewTopK(k)` panics instead, for
+fixed configuration.
 
 ## Related pages
 

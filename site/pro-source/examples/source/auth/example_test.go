@@ -54,8 +54,8 @@ func ExampleNewPrincipal() {
 	if err != nil {
 		panic(err)
 	}
-	copy := p.Scopes()
-	copy[0] = "invoice:write"
+	cloned := p.Scopes()
+	cloned[0] = "invoice:write"
 	fmt.Println(p.ID(), p.Scopes()[0])
 	// Output: employees:alice invoice:read
 }

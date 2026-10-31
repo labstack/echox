@@ -44,7 +44,7 @@ func ExampleJournal_Do_transfer() {
 			// request, with SDK retries/redirects disabled. The example omits network I/O.
 			deadline := start.Add(permit.ValidFor)
 			if !time.Now().Before(deadline) {
-				return execution.Result{}, &execution.Ambiguity{}
+				return execution.Result{}, &execution.AmbiguityError{}
 			}
 			fmt.Println(name, permit.SendID == sendID)
 		}

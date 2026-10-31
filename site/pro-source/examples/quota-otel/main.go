@@ -29,7 +29,7 @@ import (
 	"echo.labstack.com/pro/quota/quotaotel"
 )
 
-func run(ctx context.Context, output io.Writer) (result error) {
+func runWithContext(ctx context.Context, output io.Writer) (result error) {
 	spanExporter, err := stdouttrace.New(stdouttrace.WithWriter(output))
 	if err != nil {
 		return err
@@ -150,12 +150,7 @@ func run(ctx context.Context, output io.Writer) (result error) {
 			result = errors.Join(result, err)
 		}
 	}()
-	request, err := http.NewRequestWithContext(
-		ctx,
-		http.MethodGet,
-		"http://"+listener.Addr().String()+"/",
-		nil,
-	)
+	request, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://"+listener.Addr().String()+"/", http.NoBody)
 	if err != nil {
 		return err
 	}
@@ -273,10 +268,18 @@ func toolCall(
 }
 
 func main() {
-	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
-	defer cancel()
-	if err := run(ctx, os.Stdout); err != nil {
+	if err := run(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
+}
+
+func run() error {
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+	if err := runWithContext(ctx, os.Stdout); err != nil {
+		return err
+	}
+
+	return nil
 }

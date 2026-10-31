@@ -31,6 +31,13 @@ import (
 )
 
 func main() {
+	if err := run(); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+}
+
+func run() error {
 	// Do not put the URL in flag defaults: -help must never disclose credentials.
 	var databaseURL string
 	flag.StringVar(
@@ -46,13 +53,13 @@ func main() {
 	}
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
-	if err := run(ctx, databaseURL, *addr); err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+	if err := runWithContext(ctx, databaseURL, *addr); err != nil {
+		return err
 	}
+	return nil
 }
 
-func run(ctx context.Context, databaseURL, addr string) error {
+func runWithContext(ctx context.Context, databaseURL, addr string) error {
 	if databaseURL == "" {
 		return errors.New(
 			"provide -postgres-url or ADMIN_DEMO_POSTGRES_URL; use the " +
@@ -121,7 +128,7 @@ func run(ctx context.Context, databaseURL, addr string) error {
 			Maintenance: prefix + "_maintenance",
 			Reader:      prefix + "_reader",
 		}
-		if err = createRoles(ctx, pool, roles); err != nil {
+		if err := createRoles(ctx, pool, roles); err != nil {
 			return err
 		}
 	}
@@ -247,20 +254,20 @@ func run(ctx context.Context, databaseURL, addr string) error {
 		Origins:        []string{"http://" + demoBrowserAuthority(authority)},
 	}
 	//nolint:contextcheck // Mount registers routes; request contexts originate in Echo.
-	if err = cfg.Mount(e, "/admin"); err != nil {
+	if err := cfg.Mount(e, "/admin"); err != nil {
 		return err
 	}
 	// executionadmin binds one namespace. A second console exposes the other.
 	cfg.Panels = []admin.Panel{qp, sp, op, fp, wp, ap}
 	//nolint:contextcheck // Mount registers routes; request contexts originate in Echo.
-	if err = cfg.Mount(e, "/admin-fulfillment"); err != nil {
+	if err := cfg.Mount(e, "/admin-fulfillment"); err != nil {
 		return err
 	}
-	if err = mountSamples(ctx, e, lim, op, append(records, fulfillment...)); err != nil {
+	if err := mountSamples(ctx, e, lim, op, append(records, fulfillment...)); err != nil {
 		return err
 	}
 	for _, mount := range []string{"/admin", "/admin-fulfillment"} {
-		if err = admin.VerifyRoutes(e, mount); err != nil {
+		if err := admin.VerifyRoutes(e, mount); err != nil {
 			return err
 		}
 	}

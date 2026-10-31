@@ -1,6 +1,6 @@
 {
   "module": "echo.labstack.com/pro",
-  "revision": "v0.1.0",
+  "revision": "v0.2.0",
   "configs": [
     {
       "name": "admin.Config",
@@ -669,7 +669,7 @@
       "name": "auth.APIKey",
       "file": "auth/apikey.go",
       "line": 205,
-      "doc": "APIKey configures a key-store scheme. Header sets an optional alternative to\nAuthorization: ApiKey. Supplying credentials in both headers is rejected.\nLookupTimeout defaults to 2s (1ms–30s). The store stays caller-owned and must honor\ncancellation. No goroutines start. Construction copies the pepper ring and key bytes.\nCancellation and lookup failures return a sanitized *Failure without exposing store or\ncontext errors.",
+      "doc": "APIKey configures a key-store scheme. Header sets an optional alternative to\nAuthorization: ApiKey. Supplying credentials in both headers is rejected.\nLookupTimeout defaults to 2s (1ms–30s). The store stays caller-owned and must honor\ncancellation. No goroutines start. Construction copies the pepper ring and key bytes.\nCancellation and lookup failures return a sanitized *FailureError without exposing store or\ncontext errors.",
       "fields": [
         {
           "name": "Namespace",
@@ -1230,7 +1230,7 @@
     {
       "name": "execution.Limits",
       "file": "execution/types.go",
-      "line": 87,
+      "line": 88,
       "doc": "Limits are immutable per namespace; zero values select documented defaults.",
       "fields": [
         {
@@ -1238,35 +1238,35 @@
           "type": "int",
           "doc": "MaxResultBytes defaults to 64 KiB; valid range 1 byte–1 MiB.",
           "default": "MaxResultBytes defaults to 64 KiB; valid range 1 byte–1 MiB.",
-          "line": 87
+          "line": 88
         },
         {
           "name": "MaxUnresolvedPerTenant",
           "type": "int",
           "doc": "MaxUnresolvedPerTenant defaults to 1000 and must be positive.",
           "default": "MaxUnresolvedPerTenant defaults to 1000 and must be positive.",
-          "line": 87
+          "line": 88
         },
         {
           "name": "MaxNamespaceRecords",
           "type": "int64",
           "doc": "MaxNamespaceRecords defaults to 5000000 and must be positive.",
           "default": "MaxNamespaceRecords defaults to 5000000 and must be positive.",
-          "line": 87
+          "line": 88
         },
         {
           "name": "MaxNamespaceBytes",
           "type": "int64",
           "doc": "MaxNamespaceBytes defaults to 20 GiB of logical charges and must be positive.",
           "default": "MaxNamespaceBytes defaults to 20 GiB of logical charges and must be positive.",
-          "line": 87
+          "line": 88
         },
         {
           "name": "BudgetShards",
           "type": "int",
           "doc": "BudgetShards defaults to 16; valid range 1–256.",
           "default": "BudgetShards defaults to 16; valid range 1–256.",
-          "line": 87
+          "line": 88
         }
       ]
     },
@@ -1372,7 +1372,7 @@
     {
       "name": "execution.Policy",
       "file": "execution/types.go",
-      "line": 77,
+      "line": 78,
       "doc": "Policy declares effects and their safety rules. New owns copied slices. Zero tunables\nselect Lease=1 minute, ResultRetention=24 hours, KeyRetention=7 days. Effects require\nexplicit timeouts. Backend selection comes only from the injected Store; a policy\ncarries no storage selector. An empty fingerprint selects http/v1; nil Headers selects\nIf-Match, If-None-Match, If-Modified-Since, If-Unmodified-Since, Content-Encoding and\nContent-Language, while an explicit empty slice selects none. An empty Mode selects\nExternalMode; TransactionalMode requires no effects, a zero Lease and an empty\nReconcilerVersion.",
       "fields": [
         {
@@ -1380,63 +1380,63 @@
           "type": "string",
           "doc": "SafetyVersion is required and versions the operation's safety rules.",
           "default": "SafetyVersion is required and versions the operation's safety rules.",
-          "line": 77
+          "line": 78
         },
         {
           "name": "Scope",
           "type": "string",
           "doc": "Scope empty defaults to the configured operation name in Journal.New.",
           "default": "Scope empty defaults to the configured operation name in Journal.New.",
-          "line": 77
+          "line": 78
         },
         {
           "name": "ReconcilerVersion",
           "type": "string",
           "doc": "ReconcilerVersion is required for external mode and empty for transactional mode.",
           "default": "ReconcilerVersion is required for external mode and empty for transactional mode.",
-          "line": 77
+          "line": 78
         },
         {
           "name": "Effects",
           "type": "[]Effect",
           "doc": "Effects requires 1–8 entries in external mode; transactional mode requires none.",
           "default": "Effects requires 1–8 entries in external mode; transactional mode requires none.",
-          "line": 77
+          "line": 78
         },
         {
           "name": "Fingerprint",
           "type": "FingerprintSpec",
           "doc": "Fingerprint at zero selects http/v1 with its default header set.",
           "default": "Fingerprint at zero selects http/v1 with its default header set.",
-          "line": 77
+          "line": 78
         },
         {
           "name": "Lease",
           "type": "time.Duration",
           "doc": "Lease defaults to 1m in external mode; transactional mode requires zero.",
           "default": "Lease defaults to 1m in external mode; transactional mode requires zero.",
-          "line": 77
+          "line": 78
         },
         {
           "name": "ResultRetention",
           "type": "time.Duration",
           "doc": "ResultRetention defaults to 24h and must be positive.",
           "default": "ResultRetention defaults to 24h and must be positive.",
-          "line": 77
+          "line": 78
         },
         {
           "name": "KeyRetention",
           "type": "time.Duration",
           "doc": "KeyRetention defaults to 7 days and must be at least ResultRetention.",
           "default": "KeyRetention defaults to 7 days and must be at least ResultRetention.",
-          "line": 77
+          "line": 78
         },
         {
           "name": "Mode",
-          "type": "ExecutionMode",
+          "type": "Mode",
           "doc": "Mode empty selects ExternalMode; TransactionalMode is explicit.",
           "default": "Mode empty selects ExternalMode; TransactionalMode is explicit.",
-          "line": 77
+          "line": 78
         }
       ]
     },
@@ -2787,7 +2787,7 @@
     {
       "name": "stripeadmin.Config",
       "file": "quota/quotastripe/stripeadmin/panel.go",
-      "line": 37,
+      "line": 36,
       "doc": "Config selects the caller-owned status reader. Status and optional readers\nare retained for the panel lifetime, never closed; all must be concurrency\nsafe and honor cancellation.",
       "fields": [
         {
@@ -2795,63 +2795,63 @@
           "type": "StatusReader",
           "doc": "Status is required, retained and caller-owned; it must honor ctx and\nbe concurrency safe.",
           "default": "Status is required, retained and caller-owned; it must honor ctx and be concurrency safe.",
-          "line": 40
+          "line": 39
         },
         {
           "name": "Inspection",
           "type": "InspectionReader",
           "doc": "Inspection enables bounded shared-store diagnostic views. Nil omits them.",
           "default": "Nil omits them.",
-          "line": 42
+          "line": 41
         },
         {
           "name": "Reconcile",
           "type": "ReconcileReader",
           "doc": "Reconcile enables a probe that compares exported totals with Stripe usage. Nil omits\nthe action.",
           "default": "Nil omits the action.",
-          "line": 45
+          "line": 44
         },
         {
           "name": "Flush",
           "type": "FlushRunner",
           "doc": "Flush enables an action that seals and dispatches eligible usage through the local\ndispatcher. The request is saved durably for retries. Nil omits the action.",
           "default": "Nil omits the action.",
-          "line": 48
+          "line": 47
         },
         {
           "name": "Budget",
           "type": "quotastripe.InspectionBudget",
           "doc": "Budget bounds inspection; zero uses quotastripe defaults.",
           "default": "Budget bounds inspection; zero uses quotastripe defaults.",
-          "line": 50
+          "line": 49
         },
         {
           "name": "StripePages",
           "type": "int",
           "doc": "StripePages defaults to 10 and must be 1–100. Shared across Probe retries.",
           "default": "StripePages defaults to 10 and must be 1–100.",
-          "line": 52
+          "line": 51
         },
         {
           "name": "ID",
           "type": "string",
           "doc": "ID defaults to stripe; use 1–32 lowercase ASCII letters, digits or\nhyphens, starting with a letter, excluding api and assets.",
           "default": "ID defaults to stripe; use 1–32 lowercase ASCII letters, digits or hyphens, starting with a letter, excluding api and assets.",
-          "line": 55
+          "line": 54
         },
         {
           "name": "BacklogAlarm",
           "type": "time.Duration",
           "doc": "BacklogAlarm is a display threshold; defaults to 30m, nonzero values\nmust be positive.",
           "default": "BacklogAlarm is a display threshold; defaults to 30m, nonzero values must be positive.",
-          "line": 58
+          "line": 57
         },
         {
           "name": "Now",
           "type": "func() time.Time",
           "doc": "Now is retained and must be concurrency safe; nil uses time.Now.",
           "default": "Now is retained and must be concurrency safe; nil uses time.Now.",
-          "line": 60
+          "line": 59
         }
       ]
     },
@@ -3722,9 +3722,9 @@
     },
     {
       "name": "quota.NewTopK",
-      "signature": "func NewTopK(k int) *TopK",
+      "signature": "func NewTopK(k int) (*TopK, error)",
       "file": "quota/topk.go",
-      "line": 62
+      "line": 63
     },
     {
       "name": "quotaadmin.New",
@@ -3808,7 +3808,7 @@
       "name": "stripeadmin.New",
       "signature": "func New(cfg Config) (*Panel, error)",
       "file": "quota/quotastripe/stripeadmin/panel.go",
-      "line": 68
+      "line": 67
     },
     {
       "name": "tenant.AuthorizeConfig.ToMiddleware",

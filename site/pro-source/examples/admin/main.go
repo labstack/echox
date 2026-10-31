@@ -23,7 +23,7 @@ import (
 	"echo.labstack.com/pro/quota/quotaadmin"
 )
 
-func run(ctx context.Context) error {
+func runWithContext(ctx context.Context) error {
 	//nolint:contextcheck // Construction has no context API; no Outbox is configured.
 	l, err := quota.New(quota.Config{Store: quota.NewMemoryStore(
 		quota.MemoryConfig{},
@@ -75,10 +75,10 @@ func run(ctx context.Context) error {
 		}, nil
 	}}
 	//nolint:contextcheck // Mount only registers routes; Echo supplies request contexts.
-	if err = cfg.Mount(e, prefix); err != nil {
+	if err := cfg.Mount(e, prefix); err != nil {
 		return err
 	}
-	if err = admin.VerifyRoutes(e, prefix); err != nil {
+	if err := admin.VerifyRoutes(e, prefix); err != nil {
 		return err
 	}
 	server := &http.Server{
@@ -108,10 +108,18 @@ func run(ctx context.Context) error {
 	}
 }
 func main() {
-	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
-	defer cancel()
-	if err := run(ctx); err != nil {
+	if err := run(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
+}
+
+func run() error {
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
+	defer cancel()
+	if err := runWithContext(ctx); err != nil {
+		return err
+	}
+
+	return nil
 }

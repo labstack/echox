@@ -12,7 +12,7 @@ install_pro() {
   go env -w GOPRIVATE=echo.labstack.com
   # docs:end private-pattern
   # docs:start get-version
-  go get echo.labstack.com/pro@v0.1.0
+  go get echo.labstack.com/pro@v0.2.0
   # docs:end get-version
   go mod verify
   # docs:end install
@@ -21,7 +21,7 @@ install_pro() {
 probe_registry() {
   # docs:start proxy-probe
   curl --silent --show-error --netrc-file "$HOME/.netrc" --output /dev/null --write-out '%{http_code}\n' \
-    https://go.labstack.io/echo.labstack.com/pro/@v/v0.1.0.info
+    https://go.labstack.io/echo.labstack.com/pro/@v/v0.2.0.info
   # docs:end proxy-probe
 }
 
@@ -125,7 +125,7 @@ test_packages() {
 
 build_application() {
   # docs:start docker-build
-  docker build --secret id=netrc,src="$HOME/.netrc" -t invoice-api:v0.1.0 .
+  docker build --secret id=netrc,src="$HOME/.netrc" -t invoice-api:v0.2.0 .
   # docs:end docker-build
   # docs:start vendor
   go mod vendor

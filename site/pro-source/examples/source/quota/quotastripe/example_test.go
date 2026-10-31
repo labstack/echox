@@ -100,7 +100,7 @@ func exampleExporter() (*quotastripe.Exporter, error) {
 type exampleTransport struct{}
 
 func (exampleTransport) RoundTrip(r *http.Request) (*http.Response, error) {
-	return &http.Response{StatusCode: 200, Header: make(http.Header), Body: io.NopCloser(strings.NewReader(`{"object":"list","has_more":false,"data":[]}`)), Request: r}, nil
+	return &http.Response{StatusCode: http.StatusOK, Header: make(http.Header), Body: io.NopCloser(strings.NewReader(`{"object":"list","has_more":false,"data":[]}`)), Request: r}, nil
 }
 
 // docs:start ExampleExporter_Status

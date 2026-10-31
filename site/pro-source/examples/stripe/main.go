@@ -22,6 +22,13 @@ import (
 )
 
 func main() {
+	if err := run(); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+}
+
+func run() error {
 	online := flag.Bool(
 		"online",
 		false,
@@ -31,9 +38,10 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer stop()
 	if err := demo(ctx, *online); err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+		return err
 	}
+
+	return nil
 }
 
 func demo(ctx context.Context, online bool) (resultErr error) {
@@ -125,7 +133,7 @@ func demo(ctx context.Context, online bool) (resultErr error) {
 	}
 	// Stop all source admissions. This example has no reservations or future
 	// settlements; Close joins outbox processing before affirming catch-up.
-	if err = lim.Close(ctx); err != nil {
+	if err := lim.Close(ctx); err != nil {
 		return err
 	}
 	closed = true

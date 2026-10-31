@@ -25,14 +25,14 @@ func ExampleHTTPSenderConfig_ToSendFunc() {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		body, err := io.ReadAll(io.LimitReader(r.Body, webhook.MaxPayloadBytes+1))
 		if err != nil {
-			w.WriteHeader(400)
+			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
 		if _, err = verify(r.Context(), r, body); err != nil {
-			w.WriteHeader(400)
+			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
-		w.WriteHeader(204)
+		w.WriteHeader(http.StatusNoContent)
 	}))
 	defer server.Close()
 	send, err := (webhook.HTTPSenderConfig{Endpoints: map[string]webhook.Endpoint{

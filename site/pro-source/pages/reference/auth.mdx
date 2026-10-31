@@ -7,7 +7,7 @@ description: Fields, defaults and constructors for auth.
 
 import ConfigReference from '../../../../components/ConfigReference.astro';
 
-`echo.labstack.com/pro` v0.1.0. See the [task guide](/pro/guides/auth/) for setup examples.
+`echo.labstack.com/pro` v0.2.0. See the [task guide](/pro/guides/auth/) for setup examples.
 
 ## Required fields
 
@@ -86,6 +86,10 @@ Lookups must support concurrent calls and return current revocation data.
 See the [compiled SQL sketch](/pro/guides/auth/#replace-the-memory-key-store).
 
 Stores, clients, clocks and loggers must support concurrent calls.
+
+## Error types
+
+Authentication and scope refusals use `*auth.FailureError`.
 
 ## Related pages
 
