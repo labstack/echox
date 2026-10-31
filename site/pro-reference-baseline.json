@@ -1,6 +1,6 @@
 {
   "module": "echo.labstack.com/pro",
-  "version": "v0.1.0",
+  "version": "v0.2.0",
   "configs": {
     "admin.Config": [
       {
@@ -1113,7 +1113,7 @@
       },
       {
         "name": "Mode",
-        "type": "ExecutionMode",
+        "type": "Mode",
         "doc": "Mode empty selects ExternalMode; TransactionalMode is explicit.",
         "default": "Mode empty selects ExternalMode; TransactionalMode is explicit."
       }
@@ -2783,7 +2783,7 @@
     "quota.MiddlewareConfig.ToMiddleware": "func (cfg MiddlewareConfig) ToMiddleware() (echo.MiddlewareFunc, error)",
     "quota.New": "func New(cfg Config) (*Limiter, error)",
     "quota.NewMemoryStore": "func NewMemoryStore(cfg MemoryConfig) *MemoryStore",
-    "quota.NewTopK": "func NewTopK(k int) *TopK",
+    "quota.NewTopK": "func NewTopK(k int) (*TopK, error)",
     "quotaadmin.New": "func New(cfg Config) (*Panel, error)",
     "quotaadmin.NewDenialRecorder": "func NewDenialRecorder(size int) (*DenialRecorder, error)",
     "quotamcp.MiddlewareConfig.ToMiddleware": "func (c MiddlewareConfig) ToMiddleware() (mcp.Middleware, error)",

@@ -8,7 +8,7 @@ import { readPro, apiSnapshot, siteDir } from './pro-source.mjs';
 
 test('Pro snapshot has complete catalog coverage and source-owned programs', () => {
   const bundle = readPro();
-  assert.equal(bundle.provenance.version, 'v0.1.0');
+  assert.match(bundle.provenance.version, /^v\d+\.\d+\.\d+$/);
   for (const [name, content] of bundle.files) {
     if (name.startsWith('pages/') && content.toString().includes('package main')) assert.fail(`${name} pasted a program`);
   }

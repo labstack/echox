@@ -7,7 +7,7 @@ description: Fields, defaults and constructors for tenant.
 
 import ConfigReference from '../../../../components/ConfigReference.astro';
 
-`echo.labstack.com/pro` v0.1.0. See the [task guide](/pro/guides/tenant/) for setup examples.
+`echo.labstack.com/pro` v0.2.0. See the [task guide](/pro/guides/tenant/) for setup examples.
 
 ## Required fields
 
@@ -61,6 +61,10 @@ Import `echo.labstack.com/pro/tenant`.
 | HTTP adapter work | None |
 
 Keep the authorization client open while requests are using it.
+
+## Error types
+
+Tenant selection refusals use `*tenant.FailureError`.
 
 ## Related pages
 

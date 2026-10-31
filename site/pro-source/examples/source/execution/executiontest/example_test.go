@@ -21,12 +21,16 @@ import (
 // docs:start ExampleCheckStore
 func ExampleCheckStore() {
 	newStore := func(t *testing.T, now func() time.Time) execution.Store {
+		t.Helper()
+
 		store := executiontest.NewModel(now)
 		t.Cleanup(func() {}) // Release per-case fixtures here.
 		return store
 	}
 	// Call from func TestStoreConformance(t *testing.T).
 	conformance := func(t *testing.T) {
+		t.Helper()
+
 		executiontest.CheckStore(t, newStore)
 		executiontest.CheckScheduler(t, newStore)
 	}

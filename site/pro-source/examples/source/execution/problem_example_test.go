@@ -17,11 +17,11 @@ import (
 	"echo.labstack.com/pro/problem/echoadapter"
 )
 
-// orderRejected is an application error; any type with Problem() qualifies.
-type orderRejected struct{}
+// orderRejectedError is an application error; any type with Problem() qualifies.
+type orderRejectedError struct{}
 
-func (orderRejected) Error() string { return "order rejected" }
-func (orderRejected) Problem() problem.Details {
+func (orderRejectedError) Error() string { return "order rejected" }
+func (orderRejectedError) Problem() problem.Details {
 	return problem.Details{
 		Type:    "https://shop.example/problems/order-rejected",
 		Title:   "Order rejected",
@@ -62,7 +62,7 @@ func ExampleMiddlewareConfig_ToMiddleware_problemAdapter() {
 		if err := execution.Classify(c, execution.Failed); err != nil {
 			return err
 		}
-		return orderRejected{}
+		return orderRejectedError{}
 	}, mw)
 	show := func(w *httptest.ResponseRecorder) {
 		h := w.Header()

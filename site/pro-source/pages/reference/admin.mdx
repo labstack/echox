@@ -7,7 +7,7 @@ description: Fields, defaults and constructors for admin.
 
 import ConfigReference from '../../../../components/ConfigReference.astro';
 
-`echo.labstack.com/pro` v0.1.0. See the [task guide](/pro/guides/admin/) for setup examples.
+`echo.labstack.com/pro` v0.2.0. See the [task guide](/pro/guides/admin/) for setup examples.
 
 ## Required fields
 
@@ -43,6 +43,11 @@ Import `echo.labstack.com/pro/admin`.
 When every expensive-view slot is busy, the console returns 503 with code `admin_busy`.
 
 The console never closes panel backends, authentication resources or the audit sink.
+
+## Error types
+
+Console errors use `*admin.ProblemError`. OpenAPI chain errors use
+`*openapi.ProblemError`.
 
 ## Related pages
 

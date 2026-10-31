@@ -107,7 +107,8 @@ func ExampleNewReconcileScheduler() {
 		}},
 		PollInterval: time.Second,
 		AuthorizeNamespace: func(context.Context, string) error {
-			if passes++; passes > 1 {
+			passes++
+			if passes > 1 {
 				cancel() // Stop after one pass, as an application shutdown would.
 			}
 			return nil

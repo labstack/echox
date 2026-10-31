@@ -41,7 +41,7 @@ func ExampleLimiter_ShadowReport() {
 // docs:start ExampleTopK
 func ExampleTopK() {
 	ctx := context.Background()
-	top := quota.NewTopK(5)
+	top := quota.MustNewTopK(5)
 	l := quota.MustNew(quota.Config{Store: quota.NewMemoryStore(quota.MemoryConfig{}), Plans: []quota.Plan{{ID: "team", Limits: []quota.Limit{quota.PerDay("requests", 100)}}}, Hooks: quota.JoinHooks(top.Hooks())})
 	defer func() {
 		if err := l.Close(ctx); err != nil {

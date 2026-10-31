@@ -7,7 +7,7 @@ description: Fields, defaults and constructors for execution.
 
 import ConfigReference from '../../../../components/ConfigReference.astro';
 
-`echo.labstack.com/pro` v0.1.0. See the [task guide](/pro/guides/execution/) for setup examples.
+`echo.labstack.com/pro` v0.2.0. See the [task guide](/pro/guides/execution/) for setup examples.
 
 ## Required fields
 
@@ -76,6 +76,11 @@ Import `echo.labstack.com/pro/execution/pgstore`.
 | `Policy.KeyRetention` | Seven days by default; unresolved records do not expire automatically |
 
 Keep the store open until requests, recovery calls and the scheduler have stopped.
+
+## Error types
+
+Business failures use `*execution.FailureError`; uncertain external effects
+use `*execution.AmbiguityError`. The execution mode type is `execution.Mode`.
 
 ## Related pages
 

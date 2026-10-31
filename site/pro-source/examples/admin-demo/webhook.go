@@ -124,7 +124,7 @@ func seedWebhooks(ctx context.Context, pool *pgxpool.Pool, schema string) (resul
 				if admitErr != nil {
 					return nil, admitErr
 				}
-				if err = webhookSnapshot(ctx, pool, schema, receipt.Ref, direction, state); err != nil {
+				if err := webhookSnapshot(ctx, pool, schema, receipt.Ref, direction, state); err != nil {
 					return nil, err
 				}
 			}

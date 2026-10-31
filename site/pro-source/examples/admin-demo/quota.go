@@ -17,7 +17,10 @@ func seedQuota(ctx context.Context) (*quota.Limiter, *quotaadmin.Panel, error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	top := quota.NewTopK(10)
+	top, err := quota.NewTopK(10)
+	if err != nil {
+		return nil, nil, err
+	}
 	//nolint:contextcheck // Construction has no context API; no Outbox is configured.
 	lim, err := quota.New(quota.Config{Store: quota.NewMemoryStore(quota.MemoryConfig{}), Hooks: quota.JoinHooks(top.Hooks(), denials.Hooks()), Plans: []quota.Plan{
 		{ID: "team", Limits: []quota.Limit{quota.PerDay("daily", 100).Meter("requests"), quota.Credits("credits").Meter("tokens")}},

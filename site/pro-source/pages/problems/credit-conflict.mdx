@@ -71,7 +71,7 @@ Notes:
 
 - Fields are written in alphabetical order.
 - The console rewrites every 404 response to `admin_not_found` with an empty `detail`.
-- The console renders this problem in its own format when a panel returns it as an `admin.Problem` outside an action commit. Its title is `Conflict` unless the panel supplies one.
+- The console renders this problem in its own format when a panel returns it as an `admin.ProblemError` outside an action commit. Its title is `Conflict` unless the panel supplies one.
 - When a credit action conflicts at commit, the console does not return a problem. It returns an `application/json` action result with `audit.code` set to `credit_conflict` and outcome `refused`.
 
 ## Related behavior

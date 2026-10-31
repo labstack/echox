@@ -203,7 +203,7 @@ func ExampleAttemptFrom() {
 		} // A refusal never authorizes a send.
 		deadline := start.Add(permit.ValidFor)
 		if !time.Now().Before(deadline) {
-			return &execution.Ambiguity{}
+			return &execution.AmbiguityError{}
 		}
 		// One identical provider request uses permit.Key and this deadline, with
 		// SDK retries/redirects disabled. Here the provider succeeds, then the

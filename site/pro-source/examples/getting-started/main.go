@@ -32,6 +32,13 @@ import (
 )
 
 func main() {
+	if err := run(); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+}
+
+func run() error {
 	browser := flag.Bool(
 		"browser",
 		false,
@@ -45,14 +52,15 @@ func main() {
 	flag.Parse()
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer cancel()
-	if err := run(ctx, runConfig{
+	if err := runWithContext(ctx, runConfig{
 		keyFile: *keyFile,
 		browser: *browser,
 		address: "127.0.0.1:8080",
 	}); err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+		return err
 	}
+
+	return nil
 }
 
 type runConfig struct {
@@ -63,7 +71,7 @@ type runConfig struct {
 	verified func()
 }
 
-func run(ctx context.Context, cfg runConfig) (result error) {
+func runWithContext(ctx context.Context, cfg runConfig) (result error) {
 	keyFile := cfg.keyFile
 	if keyFile == "" {
 		return errors.New(

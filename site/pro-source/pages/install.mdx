@@ -11,7 +11,7 @@ sidebar:
 
 Use this page before your first `go get`, and when you set up CI, Docker or an offline build.
 
-Install `echo.labstack.com/pro v0.1.0` through `go.labstack.io`. You need Go 1.26 or later, an application module and an organisation download token. The module requires Echo v5.4.2. You do not need access to a private Git repository. The token only authenticates module downloads. Your application never checks it at run time.
+Install `echo.labstack.com/pro v0.2.0` through `go.labstack.io`. You need Go 1.26 or later, an application module and an organisation download token. The module requires Echo v5.4.2. You do not need access to a private Git repository. The token only authenticates module downloads. Your application never checks it at run time.
 
 ## Set up local development
 
@@ -56,7 +56,7 @@ An always-run step removes the credential. The workflow pins each Action to a fu
 ```yaml file=site/pro-source/examples/site-docs/github-actions.yml
 ```
 
-Save the workflow in your application's workflow directory. Before you enable the job, commit `go.mod` (pinned to v0.1.0) and `go.sum`. Run this job only for trusted code. Any step in the job can read the secret. Fork pull requests do not receive repository secrets by default.
+Save the workflow in your application's workflow directory. Before you enable the job, commit `go.mod` (pinned to v0.2.0) and `go.sum`. Run this job only for trusted code. Any step in the job can read the secret. Fork pull requests do not receive repository secrets by default.
 Run checks for fork pull requests in a separate workflow that has no secret. If you turn on module caching later, restrict the cache to licensed users.
 
 `NETRC` points Go at the temporary credential file. The token appears only in the credential-setup step's environment. That step turns off shell tracing before it writes the file. The cleanup step runs even when the download fails. When you copy the workflow, update the Action pins under your own update policy.
@@ -93,7 +93,7 @@ Probe the exact pinned metadata URL without printing the credential or response 
 ```sh file=site/pro-source/examples/site-docs/commands.sh#proxy-probe
 ```
 
-A 200 confirms that this credential can read v0.1.0 metadata. A 401 means missing or invalid credentials. Check four things: the machine name is `go.labstack.io`; `password` holds the token; Go reads the netrc you expect (`NETRC` or your home directory); the token is not revoked. The registry ignores `login` and checks only `password`. A wrong slug does not cause 401. Do not put the token in a URL or paste it into diagnostics.
+A 200 confirms that this credential can read v0.2.0 metadata. A 401 means missing or invalid credentials. Check four things: the machine name is `go.labstack.io`; `password` holds the token; Go reads the netrc you expect (`NETRC` or your home directory); the token is not revoked. The registry ignores `login` and checks only `password`. A wrong slug does not cause 401. Do not put the token in a URL or paste it into diagnostics.
 
 A 403 means the token is valid, but your organisation is not entitled to that version. Check the version you requested. Then ask support to check your organisation's status. After a subscription lapses, the token can still download versions you were entitled to. A revoked organisation gets 403. Clearing the module cache or turning off checksums does not fix a 403.
 

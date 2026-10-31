@@ -83,7 +83,7 @@ func seedStripe(ctx context.Context) (*stripeadmin.Panel, error) {
 	}
 	for i := range 24 {
 		event := quota.ConsumptionEvent{ID: fmt.Sprintf("offline-usage-%03d", i), Identity: quota.Identity{Tenant: demoTenants[i%4]}, Plan: "team", Meter: "tokens", Amount: int64(80 + i*19), At: time.Now().UTC().Add(-time.Duration(i*11+1) * time.Minute).Truncate(time.Millisecond)}
-		if err = exporter.Deliver(ctx, quota.Event{ID: event.ID, Consumption: &event}); err != nil {
+		if err := exporter.Deliver(ctx, quota.Event{ID: event.ID, Consumption: &event}); err != nil {
 			return nil, err
 		}
 	}
