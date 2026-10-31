@@ -98,8 +98,8 @@ func(c *echo.Context) error {
 
 ```json
 {
-  "email": "jon@labstack.com",
-  "name": "Jon"
+  "name": "Jon",
+  "email": "jon@labstack.com"
 }
 ```
 
@@ -178,19 +178,10 @@ func(c *echo.Context) error {
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <User>
-  <Name>Jon</Name>
-  <Email>jon@labstack.com</Email>
+  <name>Jon</name>
+  <email>jon@labstack.com</email>
 </User>
 ```
-
-:::tip
-リクエスト URL のクエリ文字列に `pretty` を追加すると、`Context#XML()` でも
-整形済み XML を出力できます。
-
-```sh
-curl http://localhost:1323/users/1?pretty
-```
-:::
 
 ### XML blob
 
@@ -295,7 +286,6 @@ func(c *echo.Context) error {
 ### レスポンス後
 
 `Response#After(func())` は、レスポンスが書き込まれた直後に実行される関数を登録します。
-`Content-Length` が不明な場合、after 関数は実行されません。
 
 ```go
 e.GET("/hooks", func(c *echo.Context) error {

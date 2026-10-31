@@ -78,7 +78,7 @@ if err := c.Bind(&f); err != nil {
 各ステップが前の値を上書きします。
 
 1. パスパラメーター
-2. クエリパラメーター（GET / DELETE のみ）
+2. クエリパラメーター（GET / DELETE / HEAD / QUERY のみ）
 3. リクエストボディ
 
 ```go
