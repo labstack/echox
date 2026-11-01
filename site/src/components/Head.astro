@@ -9,5 +9,9 @@ import { Font } from 'astro:assets';
 <Font cssVariable="--font-dm-sans" preload={[{ style: 'normal' }]} />
 <Font cssVariable="--font-fragment-mono" preload={[{ style: 'normal' }]} />
 
+{/* Go module discovery for `go get echo.labstack.com/pro/...`: Go fetches
+   any /pro page with ?go-get=1 and reads this tag, so installs work from the
+   static site alone. The proxy at go.labstack.io checks the customer token. */}
+{isProPage(Astro.url.pathname) && <meta name="go-import" content="echo.labstack.com/pro mod https://go.labstack.io" />}
 <meta data-pagefind-filter="product[content]" content={isProPage(Astro.url.pathname) ? 'Echo Pro' : 'Echo'} />
 {isProPage(Astro.url.pathname) && Astro.url.pathname.replace(/\/$/, '') !== '/pro' && <meta data-pagefind-meta="title[content]" content={`${Astro.locals.starlightRoute.entry.data.title} · Echo Pro`} />}
