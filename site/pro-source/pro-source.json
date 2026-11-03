@@ -1,7 +1,7 @@
 {
   "module": "echo.labstack.com/pro",
   "version": "v0.2.0",
-  "commit": "cff49e6f4e402d78d5e54a0b17a42ce58ccd5b84",
+  "commit": "739488b482e43de26862020fee64fd7742e60383",
   "hashes": {
     "config-fields.json": "0b54cb3291832384f3f9cd5c269151b2c6a0a96acd734ed42feba6324bc76e99",
     "examples/admin-demo/audit.go": "e332591665875ea7a9d36e756089cf34c8eca947ded969bac6014472c0d206a3",
@@ -163,7 +163,7 @@
     "examples/source/webhook/webhookpg/recipe_example_test.go": "c8913d7f1fa8855da4111f94bcedd53f4b41290c8c661eef46fdac613ee6615d",
     "examples/stripe/main.go": "9a276a754e25ce92c5ac9aa7b56bf99a7bdaaa9e9e5aa720dbd96a8172cabb4b",
     "go.mod": "a15972f4fabcb3e4bb557961a5871308b5716a0d84c0520daeb7d093e5a06c22",
-    "pages/admin.mdx": "4d54be230046665206d032d6f8b8b5e52dd2f7383880c788559ac9292bf58302",
+    "pages/admin.mdx": "188b9eb152b20df32d6912918fecfd1ee12c08166b3714062fd41636dbd6c792",
     "pages/audit.mdx": "b4c0ea5522c0f15e2e54d4940d0441d2a8e8085b1c6d1fab0d06f8be3bdb7c95",
     "pages/auth.mdx": "8a7e7da5255e3dcd6e86236eb236474a0b9334bb1e6bc82edf03c34cecf5dc6e",
     "pages/examples/admin-demo.mdx": "1adb231b07a6d09d39bdca05d83621005f598d201b2943ee1a0fe7e461b23497",
