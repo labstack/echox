@@ -1,6 +1,6 @@
 ---
 title: Admin console
-description: An operator console served by your Echo application. It checks access on every request, and writes are opt-in and audited.
+description: "An operator console inside your Echo v5 app: quota usage and credits, execution records, audit evidence, webhook inbox and outbox, Stripe export status and OpenAPI coverage, with opt-in writes."
 sidebar:
   order: 9
 ---
@@ -12,6 +12,28 @@ The [task guide](/pro/guides/admin/) shows mounting; the [reference](/pro/refere
 Use it when operators need to inspect usage, stuck operations or failed deliveries without database access.
 Register panels for your quota, execution, audit, webhook, OpenAPI and Stripe data.
 You do not need a frontend build or a separate console service.
+
+## What operators can do
+
+The overview shows summary tiles, items that need attention and, when execution or webhook panels are mounted, a pipeline; missing data shows as unknown.
+Each package below adds one panel; mount only the ones your application uses.
+
+- **Quotas** (`quota/quotaadmin`): plans and usage with credit balances and debt, plus optional top-consumer, denial and outbox views. Opt-in actions top up or correct credits and reset a partition's usage.
+- **Stripe** (`quota/quotastripe/stripeadmin`): export backlog status; batches, unresolved items and decisions when inspection is enabled. Opt-in actions compare local exports with Stripe's aggregates and flush the exporter.
+- **Executions** (`execution/executionadmin`): the uncertain queue, records, capacity, lookup by key and JSON export. Opt-in reconcile and resolve actions recover uncertain operations.
+- **Audit** (`audit/auditadmin`): search audit evidence by tenant, actor, target, action, outcome, IP and time, with an optional, reasoned reveal of masked values.
+- **Webhooks** (`webhook/webhookadmin`): inbox and outbox by state, including dead and uncertain deliveries, with each record's attempt and replay history. An opt-in action replays a delivery.
+- **OpenAPI** (`openapi/openapiadmin`): the startup coverage report: each operation's policy, quota costs and security scopes, routes outside the spec, and advisories.
+
+With PostgreSQL stores, the execution, webhook and audit panels also chart counts of retained records for any window up to 30 days (the last 24 hours by default).
+
+## How it behaves
+
+- Every request runs your authentication, and every record read checks tenant or global access. Links and bookmarks grant nothing.
+- Writes are off until you enable them per panel. Each shows a preview and needs confirmation; most also need a reason, and destructive ones need typed confirmation. With an audit sink configured, the intent is recorded before the write runs, then its outcome.
+- IP addresses, API-key identifiers and Stripe customer IDs are masked unless the operator has reveal access. Secrets, raw API keys and payloads are never shown. Sensitive filters stay out of URLs and browser history.
+- Operators can switch between light and dark themes, use a narrow-screen layout, share deep links, and copy or download a view's data as JSON. You can set the accent color.
+- It ships inside your binary under a strict Content Security Policy with Trusted Types, with no CDN or login page of its own.
 
 This mounts a read-only quota panel. `operatorKey` is a disposable fixture credential; `panel` uses the application's limiter.
 
