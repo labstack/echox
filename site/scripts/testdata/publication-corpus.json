@@ -1,7 +1,8 @@
 {
   "files": {
     "pages/auth.mdx": "",
-    "examples/getting-started/main.go": "// docs:start demo\npackage main\n// docs:end demo\n"
+    "examples/getting-started/main.go": "// docs:start demo\npackage main\n// docs:end demo\n",
+    "examples/demo.sh": "echo demo\n"
   },
   "cases": [
     {
@@ -299,11 +300,144 @@
       "reason": "unsupported source fence"
     },
     {
-      "id": "nested-fence-  ",
+      "id": "indented-source-fence",
       "name": "pages/reference/auth.mdx",
       "content": "  ```go file=site/pro-source/examples/getting-started/main.go\n  ```",
       "allowed": true,
       "reason": ""
+    },
+    {
+      "id": "source-fence-joined-language",
+      "name": "pages/reference/auth.mdx",
+      "content": "```g title=\"x\"o file=site/pro-source/examples/demo.sh\n```",
+      "allowed": false,
+      "reason": "every code fence must be an empty source include"
+    },
+    {
+      "id": "source-fence-joined-path",
+      "name": "pages/reference/auth.mdx",
+      "content": "```sh file=site/pro-source/examples/de title=\"x\"mo.sh\n```",
+      "allowed": false,
+      "reason": "every code fence must be an empty source include"
+    },
+    {
+      "id": "source-fence-title-before-language",
+      "name": "pages/reference/auth.mdx",
+      "content": "``` title=\"x\" sh file=site/pro-source/examples/demo.sh\n```",
+      "allowed": false,
+      "reason": "every code fence must be an empty source include"
+    },
+    {
+      "id": "source-fence-two-titles",
+      "name": "pages/reference/auth.mdx",
+      "content": "```sh title=\"x\" title=\"y\" file=site/pro-source/examples/demo.sh\n```",
+      "allowed": false,
+      "reason": "every code fence must be an empty source include"
+    },
+    {
+      "id": "source-fence-title-after-file",
+      "name": "pages/reference/auth.mdx",
+      "content": "```sh file=site/pro-source/examples/demo.sh title=\"x\"\n```",
+      "allowed": false,
+      "reason": "every code fence must be an empty source include"
+    },
+    {
+      "id": "source-fence-tab-indent",
+      "name": "pages/reference/auth.mdx",
+      "content": "\t```sh file=site/pro-source/examples/demo.sh\n\t```",
+      "allowed": false,
+      "reason": "unsupported source fence"
+    },
+    {
+      "id": "source-fence-closing-trailing-space",
+      "name": "pages/reference/auth.mdx",
+      "content": "```sh file=site/pro-source/examples/demo.sh\n``` ",
+      "allowed": false,
+      "reason": "source fences must be empty"
+    },
+    {
+      "id": "source-fence-closing-four-backticks",
+      "name": "pages/reference/auth.mdx",
+      "content": "```sh file=site/pro-source/examples/demo.sh\n````",
+      "allowed": false,
+      "reason": "source fences must be empty"
+    },
+    {
+      "id": "source-fence-single-quoted-title",
+      "name": "pages/reference/auth.mdx",
+      "content": "```sh title='x' file=site/pro-source/examples/demo.sh\n```",
+      "allowed": false,
+      "reason": "every code fence must be an empty source include"
+    },
+    {
+      "id": "source-fence-title-open-brace",
+      "name": "pages/reference/auth.mdx",
+      "content": "```sh title=\"x{y\" file=site/pro-source/examples/demo.sh\n```",
+      "allowed": false,
+      "reason": "every code fence must be an empty source include"
+    },
+    {
+      "id": "source-fence-title-close-brace",
+      "name": "pages/reference/auth.mdx",
+      "content": "```sh title=\"x}y\" file=site/pro-source/examples/demo.sh\n```",
+      "allowed": false,
+      "reason": "every code fence must be an empty source include"
+    },
+    {
+      "id": "source-fence-title-double-quote",
+      "name": "pages/reference/auth.mdx",
+      "content": "```sh title=\"x\"y\" file=site/pro-source/examples/demo.sh\n```",
+      "allowed": false,
+      "reason": "every code fence must be an empty source include"
+    },
+    {
+      "id": "source-fence-title-backtick",
+      "name": "pages/reference/auth.mdx",
+      "content": "```sh title=\"x`y\" file=site/pro-source/examples/demo.sh\n```",
+      "allowed": false,
+      "reason": "backtick in fence info"
+    },
+    {
+      "id": "indented-source-fence-with-title",
+      "name": "pages/reference/auth.mdx",
+      "content": "   ```sh title=\"~/.demo file-1_2\" file=site/pro-source/examples/demo.sh\n   ```",
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "source-fence-with-title",
+      "name": "pages/reference/auth.mdx",
+      "content": "```sh title=\"~/.demo file-1_2\" file=site/pro-source/examples/demo.sh\n```",
+      "allowed": true,
+      "reason": ""
+    },
+    {
+      "id": "source-fence-leading-space",
+      "name": "pages/reference/auth.mdx",
+      "content": "``` sh file=site/pro-source/examples/demo.sh\n```",
+      "allowed": false,
+      "reason": "every code fence must be an empty source include"
+    },
+    {
+      "id": "source-fence-double-space",
+      "name": "pages/reference/auth.mdx",
+      "content": "```sh  file=site/pro-source/examples/demo.sh\n```",
+      "allowed": false,
+      "reason": "every code fence must be an empty source include"
+    },
+    {
+      "id": "source-fence-tab-separator",
+      "name": "pages/reference/auth.mdx",
+      "content": "```sh\tfile=site/pro-source/examples/demo.sh\n```",
+      "allowed": false,
+      "reason": "every code fence must be an empty source include"
+    },
+    {
+      "id": "source-fence-trailing-space",
+      "name": "pages/reference/auth.mdx",
+      "content": "```sh file=site/pro-source/examples/demo.sh \n```",
+      "allowed": false,
+      "reason": "every code fence must be an empty source include"
     },
     {
       "id": "source-fence",
