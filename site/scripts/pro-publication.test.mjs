@@ -12,6 +12,30 @@ const reviewedImport = "import ConfigReference from '../../../../components/Conf
 const api = { configs: [{ name: 'auth.Config' }] };
 const files = new Map();
 
+test('source fences accept up to three spaces and one restricted literal title', () => {
+  const source = new Map([['examples/demo.sh', '# docs:start install\ngo mod verify\n# docs:end install\n']]);
+  const file = 'file=site/pro-source/examples/demo.sh#install';
+  const check = (content) => checkMDX('pages/install.mdx', content, source, api);
+  for (const indent of ['', ' ', '  ', '   ']) {
+    for (const attrs of [file, `title="~/.netrc" ${file}`, `title="A-Z_a-z/0.9 ~" ${file}`]) {
+      assert.doesNotThrow(() => check(`${indent}\x60\x60\x60sh ${attrs}\n${indent}\x60\x60\x60`));
+    }
+  }
+  assert.doesNotThrow(() => check(`1. Install:\n\n   \x60\x60\x60sh title="~/.netrc" ${file}\n   \x60\x60\x60`));
+  for (const indent of ['    ', '     ', '\t', ' \t']) {
+    assert.throws(() => check(`${indent}\x60\x60\x60sh ${file}\n${indent}\x60\x60\x60`), /unsupported source fence/);
+  }
+  for (const close of ['```', '  ```', '    ```', '   ``` ', '   ````']) {
+    assert.throws(() => check(`   \x60\x60\x60sh ${file}\n${close}`), /source fences must be empty/);
+  }
+  for (const attrs of [
+    `title="" ${file}`, `title='demo' ${file}`, `title={demo} ${file}`,
+    `title="a" title="b" ${file}`, `title="a" extra ${file}`,
+    `${file} title="A-Z_a-z/0.9 ~"`,
+    ...['{x}', '<x>', 'a:b', 'a#b', 'a=b', 'a\\b', 'a\tb', 'café', 'a"b', 'a`b'].map((title) => `title="${title}" ${file}`),
+  ]) assert.throws(() => check(`\x60\x60\x60sh ${attrs}\n\x60\x60\x60`), undefined, attrs);
+});
+
 test('only reviewed MDX imports, components and literal attributes are accepted', () => {
   for (const content of [
     "import fs from 'node:fs';", "> import fs from 'node:fs';", "- import fs from 'node:fs';", "import secret from '/private/source.go?raw';",
@@ -105,12 +129,15 @@ test('synthetic corpus traverses readPro and its source include validation', asy
   for (const c of corpus.cases.filter((c) => !c.currentPage)) await t.test(c.id, (t) => {
     const root = mkdtempSync(join(tmpdir(), 'pro-publication-corpus-'));
     t.after(() => rmSync(root, { recursive: true, force: true }));
+    // The shared grammar fixture uses a generic filename; materialize it at
+    // an already reviewed bundle path without widening the export allowlist.
+    const bundlePath = (value) => value.replaceAll('examples/demo.sh', 'examples/site-docs/commands.sh');
     const payloads = {
-      ...corpus.files,
+      ...Object.fromEntries(Object.entries(corpus.files).map(([name, content]) => [bundlePath(name), content])),
       'go.mod': 'module echo.labstack.com/pro-site-snapshot\n\ngo 1.26.0\n',
       'config-fields.json': JSON.stringify({ ...api, module: 'echo.labstack.com/pro', revision: 'v0.1.0' }),
       'problems.json': '[]',
-      [c.name]: c.content,
+      [c.name]: bundlePath(c.content),
     };
     const provenance = { module: 'echo.labstack.com/pro', version: 'v0.1.0', commit: 'a'.repeat(40), hashes: {} };
     for (const [name, content] of Object.entries(payloads)) {
