@@ -12,6 +12,29 @@ const reviewedImport = "import ConfigReference from '../../../../components/Conf
 const api = { configs: [{ name: 'auth.Config' }] };
 const files = new Map();
 
+test('source fences accept up to three spaces and one restricted literal title', () => {
+  const source = new Map([['examples/demo.sh', '# docs:start install\ngo mod verify\n# docs:end install\n']]);
+  const file = 'file=site/pro-source/examples/demo.sh#install';
+  const check = (content) => checkMDX('pages/install.mdx', content, source, api);
+  for (const indent of ['', ' ', '  ', '   ']) {
+    for (const attrs of [file, `title="~/.netrc" ${file}`, `${file} title="A-Z_a-z/0.9 ~"`]) {
+      assert.doesNotThrow(() => check(`${indent}\x60\x60\x60sh ${attrs}\n${indent}\x60\x60\x60`));
+    }
+  }
+  assert.doesNotThrow(() => check(`1. Install:\n\n   \x60\x60\x60sh title="~/.netrc" ${file}\n   \x60\x60\x60`));
+  for (const indent of ['    ', '     ', '\t', ' \t']) {
+    assert.throws(() => check(`${indent}\x60\x60\x60sh ${file}\n${indent}\x60\x60\x60`), /unsupported source fence/);
+  }
+  for (const close of ['```', '  ```', '    ```', '   ``` ', '   ````']) {
+    assert.throws(() => check(`   \x60\x60\x60sh ${file}\n${close}`), /source fences must be empty/);
+  }
+  for (const attrs of [
+    `title="" ${file}`, `title='demo' ${file}`, `title={demo} ${file}`,
+    `title="a" title="b" ${file}`, `title="a" extra ${file}`,
+    ...['{x}', '<x>', 'a:b', 'a#b', 'a=b', 'a\\b', 'a\tb', 'café', 'a"b', 'a`b'].map((title) => `title="${title}" ${file}`),
+  ]) assert.throws(() => check(`\x60\x60\x60sh ${attrs}\n\x60\x60\x60`), undefined, attrs);
+});
+
 test('only reviewed MDX imports, components and literal attributes are accepted', () => {
   for (const content of [
     "import fs from 'node:fs';", "> import fs from 'node:fs';", "- import fs from 'node:fs';", "import secret from '/private/source.go?raw';",

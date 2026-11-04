@@ -53,6 +53,24 @@ test('includes a named region inside a nested fence', (t) => {
   assert.equal(quote.children[0].meta, null);
 });
 
+test('MDX ordered-list includes keep their list item and display title', (t) => {
+  const { root } = fixture(t);
+  const markdown = '1. Configure the file:\n\n   ```go title="~/.netrc" file=server.go#handler\n   ```';
+  const [list] = render(markdown, root, 'install.mdx').children;
+  assert.equal(list.type, 'list');
+  assert.equal(list.ordered, true);
+  const [item] = list.children;
+  assert.equal(item.type, 'listItem');
+  const code = item.children.find((node) => node.type === 'code');
+  assert.equal(code.value, 'func handler() {}');
+  assert.equal(code.meta, 'title="~/.netrc"');
+  const loader = withSourceCode({ name: 'test', load: (ctx) => ctx.generateDigest(markdown) }, { root });
+  const context = { generateDigest: JSON.stringify };
+  const before = loader.load(context);
+  writeFileSync(join(root, 'server.go'), '// docs:start handler\nfunc changed() {}\n// docs:end handler\n');
+  assert.notEqual(loader.load(context), before);
+});
+
 test('includes hash-comment regions from shell and workflow sources', (t) => {
   const { root } = fixture(t);
   writeFileSync(join(root, 'commands.sh'), '# docs:start install\n  go mod verify\n# docs:end install\n');

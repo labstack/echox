@@ -150,11 +150,17 @@ function checkPublicationSyntax(name, body, files) {
       const end = trimmed.indexOf(']');
       if (end < 0 || /[\[\\]/.test(trimmed.slice(1, end))) fail('unsupported reference label');
     }
-    if (trimmed.startsWith('~~~') || trimmed.startsWith('```') && !line.startsWith('```')) fail('unsupported source fence');
-    if (line.startsWith('```')) {
-      if (line.slice(3).includes('`')) fail('backtick in fence info');
-      if (lines[++i] !== '```') fail('source fences must be empty');
-      const attrs = line.slice(3).trim().split(/\s+/);
+    const fence = line.replace(/^ +/, '');
+    const indent = line.slice(0, line.length - fence.length);
+    if (trimmed.startsWith('~~~') || trimmed.startsWith('```') && (!fence.startsWith('```') || indent.length > 3)) fail('unsupported source fence');
+    if (trimmed.startsWith('```')) {
+      if (fence.slice(3).includes('`')) fail('backtick in fence info');
+      if (lines[++i] !== `${indent}\x60\x60\x60`) fail('source fences must be empty');
+      // Match the exporter's optional literal title and retain every other
+      // attribute for the existing language/source allowlist below.
+      const titles = [...fence.matchAll(/ title="[a-zA-Z0-9_./~ -]+"/g)];
+      const info = titles.length === 1 ? fence.slice(0, titles[0].index) + fence.slice(titles[0].index + titles[0][0].length) : fence;
+      const attrs = info.slice(3).trim().split(/\s+/);
       if (attrs.length !== 2 || !/^[a-zA-Z][a-zA-Z0-9_-]*$/.test(attrs[0]) || !attrs[1].startsWith('file=site/pro-source/')) fail('every code fence must be an empty source include');
       const [path, region, extra] = attrs[1].slice('file=site/pro-source/'.length).split('#');
       if (!path.startsWith('examples/') || !files.has(path)) fail('unexported snippet');

@@ -302,8 +302,8 @@
       "id": "nested-fence-  ",
       "name": "pages/reference/auth.mdx",
       "content": "  ```go file=site/pro-source/examples/getting-started/main.go\n  ```",
-      "allowed": false,
-      "reason": "unsupported source fence"
+      "allowed": true,
+      "reason": ""
     },
     {
       "id": "source-fence",
