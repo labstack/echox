@@ -307,6 +307,13 @@
       "reason": ""
     },
     {
+      "id": "unicode-space-in-path",
+      "name": "pages/reference/auth.mdx",
+      "content": "```sh file=site/pro-source/examples/demo.sh#a b\n```",
+      "allowed": false,
+      "reason": "every code fence must be an empty source include"
+    },
+    {
       "id": "source-fence-joined-language",
       "name": "pages/reference/auth.mdx",
       "content": "```g title=\"x\"o file=site/pro-source/examples/demo.sh\n```",

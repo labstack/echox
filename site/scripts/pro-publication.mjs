@@ -10,7 +10,7 @@ const comments = /^\/\* Diataxis: (tutorial|how-to|reference|explanation)(; gene
 const declarationPackages = new Set(['admin', 'audit', 'audit/auditpg', 'audit/auditadmin', 'auth', 'auth/authbind', 'execution', 'execution/pgstore', 'execution/executionadmin', 'quota', 'quota/redisstore', 'quota/quotaadmin', 'quota/quotaotel', 'quota/quotaprom', 'quota/quotamcp', 'quota/quotastripe', 'quota/quotastripe/stripeadmin', 'tenant', 'webhook', 'webhook/webhookmem', 'webhook/webhookpg', 'webhook/webhookadmin']);
 const markdownNodes = new Set(['root', 'yaml', 'paragraph', 'text', 'heading', 'thematicBreak', 'blockquote', 'list', 'listItem', 'emphasis', 'strong', 'delete', 'break', 'inlineCode', 'code', 'link', 'image', 'definition', 'linkReference', 'imageReference']);
 // Match the complete line, exactly as the Go exporter's sourceFence does.
-const sourceFence = /^ {0,3}```[a-zA-Z][a-zA-Z0-9_-]*(?: title="[a-zA-Z0-9_./~ -]+")? file=site\/pro-source\/([^\s`]+)$/;
+const sourceFence = /^ {0,3}```[a-zA-Z][a-zA-Z0-9_-]*(?: title="[a-zA-Z0-9_./~ -]+")? file=site\/pro-source\/([a-zA-Z0-9_.\/#-]+)$/;
 
 export function checkDestination(name, input, files) {
   let destination = input.replace(/&(#x[0-9a-f]+|#\d+|[a-z][a-z0-9]+);/gi, (whole, entity) => {
