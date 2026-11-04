@@ -17,18 +17,18 @@ Install `echo.labstack.com/pro v0.2.0` through `go.labstack.io`. You need Go 1.2
 
 1. Open your `.netrc` file in an editor. On Unix it is `~/.netrc`; Windows uses `%USERPROFILE%\_netrc`. Add the entry below. Replace the organisation slug and token with your own. Keep the value in your credential manager and out of source control, shell history and logs.
 
-```text file=site/pro-source/examples/site-docs/netrc.example
-```
+   ```text title="~/.netrc" file=site/pro-source/examples/site-docs/netrc.example
+   ```
 
 2. Restrict the Unix file to its owner:
 
-```sh file=site/pro-source/examples/site-docs/commands.sh#protect-netrc
-```
+   ```sh file=site/pro-source/examples/site-docs/commands.sh#protect-netrc
+   ```
 
 3. Configure the private module pattern, then install and verify the pinned version from your application module:
 
-```sh file=site/pro-source/examples/site-docs/commands.sh#install
-```
+   ```sh file=site/pro-source/examples/site-docs/commands.sh#install
+   ```
 
 If you already have `GOPRIVATE` patterns, append `echo.labstack.com` to that comma-separated list instead of replacing it. The pattern must include the bare host. If you set `GONOSUMDB` or `GONOPROXY` yourself, append to those lists too.
 

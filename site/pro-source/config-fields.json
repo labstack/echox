@@ -1543,7 +1543,7 @@
     {
       "name": "pgstore.StoreConfig",
       "file": "execution/pgstore/store.go",
-      "line": 53,
+      "line": 55,
       "doc": "StoreConfig selects a schema and optionally binds an instance to one namespace.\nNamespace, when supplied, makes New check its persisted shard count and caps\nagainst Limits; Begin must use those same caps.\nWith no Namespace, Begin checks its own Limits against the persisted namespace.\nThe caller's pgx query mode is never changed.\n\nAn earlier caller deadline or cancellation still ends migration first, and\nstatements keep the one-second lock timeout. New validates MigrateTimeout and rejects out-of-range values. New and Store\noperations do not use it as their deadline.",
       "fields": [
         {
@@ -1551,28 +1551,28 @@
           "type": "string",
           "doc": "Schema defaults to public; valid identifiers are 1–63 UTF-8 bytes\nwithout NUL or \"$$\". Namespace is optional; when set it is 1–64 UTF-8\nbytes without controls and binds New to the namespace caps.",
           "default": "Schema defaults to public; valid identifiers are 1–63 UTF-8 bytes without NUL or \"$$\". Namespace is optional; when set it is 1–64 UTF-8 bytes without controls and binds New to the namespace caps.",
-          "line": 57
+          "line": 59
         },
         {
           "name": "Namespace",
           "type": "string",
           "doc": "Schema defaults to public; valid identifiers are 1–63 UTF-8 bytes\nwithout NUL or \"$$\". Namespace is optional; when set it is 1–64 UTF-8\nbytes without controls and binds New to the namespace caps.",
           "default": "Schema defaults to public; valid identifiers are 1–63 UTF-8 bytes without NUL or \"$$\". Namespace is optional; when set it is 1–64 UTF-8 bytes without controls and binds New to the namespace caps.",
-          "line": 57
+          "line": 59
         },
         {
           "name": "Limits",
           "type": "execution.Limits",
           "doc": "Limits selects namespace caps; zero fields select execution.Limits\ndefaults.",
           "default": "Limits selects namespace caps; zero fields select execution.Limits defaults.",
-          "line": 60
+          "line": 62
         },
         {
           "name": "MigrateTimeout",
           "type": "time.Duration",
           "doc": "MigrateTimeout bounds all of Migrate: pool acquisition, DDL, catalog\nvalidation and COMMIT. It defaults to 1m; valid range 1s–1h.",
           "default": "It defaults to 1m; valid range 1s–1h.",
-          "line": 63
+          "line": 65
         }
       ]
     },
@@ -3694,7 +3694,7 @@
       "name": "pgstore.New",
       "signature": "func New(ctx context.Context, pool *pgxpool.Pool, cfg StoreConfig) (*Store, error)",
       "file": "execution/pgstore/store.go",
-      "line": 542
+      "line": 568
     },
     {
       "name": "pgstore.NewTxRunner",
