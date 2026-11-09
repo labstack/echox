@@ -1,6 +1,6 @@
 {
   "module": "echo.labstack.com/pro",
-  "revision": "v0.2.0",
+  "revision": "v0.2.1",
   "configs": [
     {
       "name": "admin.Config",
