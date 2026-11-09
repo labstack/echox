@@ -76,7 +76,7 @@ Um campo pode declarar várias fontes. Os dados fazem binding nesta ordem, cada 
 sobrescrevendo a anterior:
 
 1. Parâmetros de caminho
-2. Parâmetros de query (somente GET / DELETE)
+2. Parâmetros de query (somente GET / DELETE / HEAD / QUERY)
 3. Body do request
 
 ```go

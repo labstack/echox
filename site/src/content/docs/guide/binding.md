@@ -76,7 +76,7 @@ A field can declare several sources. Data is bound in this order, each step
 overwriting the previous:
 
 1. Path parameters
-2. Query parameters (GET / DELETE only)
+2. Query parameters (GET / DELETE / HEAD / QUERY only)
 3. Request body
 
 ```go

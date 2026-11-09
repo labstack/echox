@@ -76,7 +76,7 @@ Un campo puede declarar varios orígenes. Los datos se vinculan en este orden, y
 sobrescribe el anterior:
 
 1. Parámetros de path
-2. Parámetros de query (solo GET / DELETE)
+2. Parámetros de query (solo GET / DELETE / HEAD / QUERY)
 3. Body del request
 
 ```go

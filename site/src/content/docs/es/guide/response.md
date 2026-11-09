@@ -98,8 +98,8 @@ func(c *echo.Context) error {
 
 ```json
 {
-  "email": "jon@labstack.com",
-  "name": "Jon"
+  "name": "Jon",
+  "email": "jon@labstack.com"
 }
 ```
 
@@ -178,19 +178,10 @@ func(c *echo.Context) error {
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <User>
-  <Name>Jon</Name>
-  <Email>jon@labstack.com</Email>
+  <name>Jon</name>
+  <email>jon@labstack.com</email>
 </User>
 ```
-
-:::tip
-También puedes hacer que `Context#XML()` produzca XML con formato bonito agregando `pretty`
-al query string de la URL del request.
-
-```sh
-curl http://localhost:1323/users/1?pretty
-```
-:::
 
 ### Blob XML
 
@@ -295,7 +286,6 @@ func(c *echo.Context) error {
 ### Después de la response
 
 `Response#After(func())` registra una función que se ejecuta justo después de escribir la response.
-Si `Content-Length` es desconocido, no se ejecuta ninguna función after.
 
 ```go
 e.GET("/hooks", func(c *echo.Context) error {
