@@ -10,12 +10,12 @@ require (
 	github.com/gorilla/websocket v1.5.3
 	github.com/labstack/echo-contrib/v5 v5.0.1
 	github.com/labstack/echo-jwt/v5 v5.0.2
-	github.com/labstack/echo/v5 v5.4.4
+	github.com/labstack/echo/v5 v5.4.7
 	github.com/lestrrat-go/jwx/v3 v3.4.0
 	github.com/prometheus/client_golang v1.25.0
 	github.com/r3labs/sse/v2 v2.10.0
-	golang.org/x/crypto v0.58.0
-	golang.org/x/net v0.60.0
+	golang.org/x/crypto v0.59.0
+	golang.org/x/net v0.62.0
 )
 
 require (
@@ -36,8 +36,8 @@ require (
 	github.com/prometheus/procfs v0.22.0 // indirect
 	github.com/segmentio/asm v1.2.1 // indirect
 	github.com/valyala/fastjson v1.6.10 // indirect
-	golang.org/x/sys v0.49.0 // indirect
-	golang.org/x/text v0.43.0 // indirect
+	golang.org/x/sys v0.50.0 // indirect
+	golang.org/x/text v0.44.0 // indirect
 	golang.org/x/time v0.15.0 // indirect
 	google.golang.org/protobuf v1.36.12 // indirect
 	gopkg.in/cenkalti/backoff.v1 v1.1.0 // indirect
