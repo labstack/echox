@@ -1,0 +1,2364 @@
+{
+  "version": 1,
+  "name": "echo",
+  "documents": [
+    {
+      "id": "index.md",
+      "kind": "page",
+      "title": "Echo — High performance, minimalist Go web framework",
+      "description": "Fast, extensible, minimalist Go web framework built on net/http. Radix-tree router, request binding, centralized error handling, and a concrete Context struct in v5.",
+      "tab": "",
+      "url": "https://echo.labstack.com/sourcey/",
+      "markdown": "https://echo.labstack.com/sourcey/index.md",
+      "file": "index.md",
+      "searchText": "# echo {#echo} is a **high performance, extensible, minimalist go web framework** built on go's standard `net/http`. it interoperates with the library through `echo.wraphandler` and `echo.wrapmiddleware`, adds parts leaves to you: fast radix-tree router, request binding pluggable validation, official third-party middleware, centralized error handling. actively maintained, `v5` current release line. requires **go 1.25 or higher** (module `go 1.25.0` at documented commit). ## what you get {#what-you-get} - **radix-tree routing** — static, parameter wildcard routes; static routes match first see [routing context](/sourcey/guides/routing-context.html). **middleware, before after `e.pre` runs routing, `e.use` [middleware](/sourcey/guides/middleware.html). **data binding** json, xml, form, query path parameters, validation [binding handling](/sourcey/guides/binding-error-handling.html). **centralized handling** one `httperrorhandler` for every handler middleware returns **a concrete `context`** in v5 `context` struct, not an interface, handlers take `*echo.context` [context responses](/sourcey/guides/context-responses.html). **migration from v4** breaking changes, v4 support dates [migration → v5](/sourcey/guides/migration-v4-v5.html). where start {#where-to-start} new echo? read [quickstart](/sourcey/quickstart.html) install, your \"hello, world!\" server, core concepts. already routing? context](/sourcey/guides/routing-context.html) [middleware](/sourcey/guides/middleware.html) cover daily api. shipping production? handling](/sourcey/guides/binding-error-handling.html) responses](/sourcey/guides/context-responses.html) sharp edges (binding failures, responses, response helpers). api reference {#api-reference} [go api](/sourcey/api.html) tab full `github.com/labstack/echo/v5` package, generated package source: 38 types, 55 package-level functions, 232 methods, 78 constants, 21 variables including `echo`, `context`, `config`, `router`, `group`, `routeinfo`, `defaultbinder`, `httperror`, helpers. version {#documented-version} this site documents **labstack/echo @ 59aacdd** (commit `59aacddc4a13904b8a80a76f1ec838c495b5feca`, 20 nov 2026, v5.4.7), mit licensed. source links point that exact commit github.",
+      "documentId": "index",
+      "locale": "en",
+      "contentLocale": "en",
+      "contentVersion": "current",
+      "versionScope": "site",
+      "alternates": [
+        {
+          "locale": "en",
+          "contentVersion": "current",
+          "url": "https://echo.labstack.com/sourcey/",
+          "markdown": "https://echo.labstack.com/sourcey/index.md"
+        }
+      ]
+    },
+    {
+      "id": "quickstart.md",
+      "kind": "page",
+      "title": "Quickstart",
+      "description": "Install Echo v5, run your first Hello World server, and learn the core concepts — Echo instance, routes, handlers, Start.",
+      "tab": "",
+      "url": "https://echo.labstack.com/sourcey/quickstart.html",
+      "markdown": "https://echo.labstack.com/sourcey/quickstart.md",
+      "file": "quickstart.md",
+      "searchText": "# quickstart {#quickstart} echo v5 requires **go 1.25 or higher**. if you need to install upgrade go, visit the [official go download page](https://go.dev/dl/). ## {#install} create a new directory for your project, initialize modules, then echo: ```bash mod init myapp get github.com/labstack/echo/v5 ``` hello, world! {#hello-world} ```go package main import ( \"log/slog\" \"net/http\" \"github.com/labstack/echo/v5\" \"github.com/labstack/echo/v5/middleware\" ) func main() { e := echo.new() e.use(middleware.requestlogger()) // log requests with log/slog e.use(middleware.recover()) recover from panics and return an error e.get(\"/\", hello) err e.start(\":8080\"); != nil slog.error(\"failed start server\", \"error\", err) } hello(c *echo.context) c.string(http.statusok, \"hello, world!\") run it send request: ```console $ . curl http://localhost:8080/ `e.start` shuts server down gracefully on <kbd>ctrl</kbd>+<kbd>c</kbd>. core concepts {#core-concepts} this simple introduces of - **echo instance** — `echo.new()` creates application. `echo.newwithconfig` takes `config` tune (see in [go api](/sourcey/api.html)). **routes** `e.get`, `e.post`, `e.put`, `e.delete`, friends register handlers method + path. paths support parameters (`:id`) wildcards (`*`) see [routing context](/sourcey/guides/routing-context.html). **handlers** handler `*echo.context` (a pointer concrete `context` struct) returns `error`. `c.string`, `c.json`, `c.html`, `c.file` write response [context responses](/sourcey/guides/context-responses.html). **middleware** `e.use` registers that after routing; `e.pre` before routing [middleware](/sourcey/guides/middleware.html). **start** `e.start(\":8080\")` starts server. only errors are not `http.errserverclosed`, so graceful shutdown ctrl+c is error. next steps {#next-steps} context](/sourcey/guides/routing-context.html) parameters, wildcards, groups, route info. [middleware](/sourcey/guides/middleware.html) `pre`/`use` split, requestlogger, recover. [binding handling](/sourcey/guides/binding-error-handling.html) binding request data, custom responses.",
+      "documentId": "quickstart",
+      "locale": "en",
+      "contentLocale": "en",
+      "contentVersion": "current",
+      "versionScope": "site",
+      "alternates": [
+        {
+          "locale": "en",
+          "contentVersion": "current",
+          "url": "https://echo.labstack.com/sourcey/quickstart.html",
+          "markdown": "https://echo.labstack.com/sourcey/quickstart.md"
+        }
+      ]
+    },
+    {
+      "id": "guides/routing-context.md",
+      "kind": "page",
+      "title": "Routing and context",
+      "description": "Route parameters, wildcards, route groups, the v5 Router interface, and reading route info from the context.",
+      "tab": "",
+      "url": "https://echo.labstack.com/sourcey/guides/routing-context.html",
+      "markdown": "https://echo.labstack.com/sourcey/guides/routing-context.md",
+      "file": "guides/routing-context.md",
+      "searchText": "# routing and context {#routing-and-context} echo's router is a radix tree. static routes match first, then parameter wildcard routes. ## basic {#basic-routing} ```go e := echo.new() e.get(\"/\", func(c *echo.context) error { return c.string(http.statusok, \"hello, world!\") }) e.post(\"/users\", createuser) e.put(\"/users/:id\", updateuser) e.delete(\"/users/:id\", deleteuser) ``` every http method has helper: `get`, `post`, `put`, `delete`, `patch`, `head`, `options`, `connect`, `trace`, plus `any` (all methods) `match` (an explicit list). `add` registers route for any string, `addroute` pre-built `route`. parameters wildcards {#parameters-and-wildcards} // get /users/42 — c.param(\"id\") == \"42\" e.get(\"/users/:id\", \"user \"+c.param(\"id\")) /files/docs/guide.pdf c.param(\"*\") \"docs/guide.pdf\" e.get(\"/files/*\", \"file \"+c.param(\"*\")) `c.param` reads captured value by name (`\"*\"` the wildcard). `c.paramor(\"id\", \"default\")` returns fallback when absent, `c.path()` registered pattern (for example `/users/:id`), not concrete request path. `c.pathvalues()` all values at once. groups {#groups} share prefix middleware: api e.group(\"/api\") api.use(middleware.jwtwithconfig(jwtconfig)) runs in group api.get(\"/users\", listusers) /api/users api.post(\"/users\", post admin api.group(\"/admin\") /api/admin/... admin.get(\"/stats\", stats) `group` supports same helpers as `echo` (`get`, nesting, `static`, `file`, `use`). middleware on only that group's files {#static-files} e.static(\"/assets\", \"public\") serves ./public /assets/* e.staticfs(\"/assets\", fs) an fs.fs e.file(\"/favicon.ico\", \"favicon.ico\") since v5.4.7, `static` with without trailing slash `prefix/*` `prefix` redirect to `prefix/` so `/assetsadmin/private.txt` can no longer escape guard `/assets/admin` (ghsa-76qj-xf66-r429). prefer `group.static` over `middleware.static` attached `group.use` sit behind guards: variant protected guards inside (ghsa-5hp7-4fcm-57f9). interface (v5) {#the-router-interface-v5} v5 adds `router` implementations be swapped. `e.router` current router, `routerconfig` configures it. default `defaultrouter`, created `newdefaultrouter` or `newconcurrentrouter`. `e.routenotfound` handler requests route; it, unmatched 404 from `errnotfound`. `c.routeinfo()` matched route's info (`routeinfo`): method, path pattern, name. it reliable way log meter instead of pool {#context-pool} reuses `context` through pool: `acquirecontext` takes one, `releasecontext` handlers never need call these framework does per but custom servers built `servehttp` must hold `*context` after returns.",
+      "documentId": "guides/routing-context",
+      "locale": "en",
+      "contentLocale": "en",
+      "contentVersion": "current",
+      "versionScope": "site",
+      "alternates": [
+        {
+          "locale": "en",
+          "contentVersion": "current",
+          "url": "https://echo.labstack.com/sourcey/guides/routing-context.html",
+          "markdown": "https://echo.labstack.com/sourcey/guides/routing-context.md"
+        }
+      ]
+    },
+    {
+      "id": "guides/middleware.md",
+      "kind": "page",
+      "title": "Middleware",
+      "description": "The Pre/Use split, RequestLogger with log/slog, Recover, and the official middleware packages.",
+      "tab": "",
+      "url": "https://echo.labstack.com/sourcey/guides/middleware.html",
+      "markdown": "https://echo.labstack.com/sourcey/guides/middleware.md",
+      "file": "guides/middleware.md",
+      "searchText": "# middleware {#middleware} is a function wrapping handler. echo splits it in two places: - **`e.pre`** runs **before routing**, so can rewrite the path or method. use for rewrites, trailing-slash handling, and method overrides. **`e.use`** **after around matched logging, recovery, auth, cors, everything else. ```go e := echo.new() e.pre(middleware.removetrailingslash()) e.use(middleware.requestlogger()) // log requests with log/slog e.use(middleware.recover()) recover from panics return an error e.use(middleware.cors()) cors headers ``` `e.middlewares()` returns registered `use` middleware; `e.premiddlewares()` `pre` middleware. both run registration order. ## requestlogger (v5 logging) {#requestlogger-v5-logging} v5 drops old logging interface uses standard library's `log/slog` instead. there no `middleware.logger` anymore — logger `middleware.requestlogger`: e.use(middleware.requestloggerwithconfig(middleware.requestloggerconfig{ logmethod: true, loguri: logstatus: loglatency: logremoteip: logerror: logvaluesfunc: func(c *echo.context, v middleware.requestloggervalues) { c.logger().info(\"request\", \"method\", v.method, \"uri\", v.uri, \"status\", v.status) nil }, })) `requestloggerwithconfig` takes `requestloggerconfig`; no-arg `requestlogger()` defaults. handlers reach same `*slog.logger` through `c.logger()`, `c.setlogger` replaces per request. {#recover} `recover` catches converts them into passed to `httperrorhandler` (a 500 by default). register early before cannot be recovered it. official {#official-middleware} maintained team, `middleware` package of this module: | what does --- `requestlogger` / structured request `recoverwithconfig` panic recovery `cors` `corswithconfig` cross-origin resource sharing `csrf` `csrfwithconfig` csrf token protection `gzip` `gzipwithconfig` response compression (honors `accept-encoding` quality values since v5.4.7) `bodylimit` `bodylimitwithconfig` body size limit `basicauth` `basicauthwithconfig` http basic authentication `bodydump` `bodydumpwithconfig` request/response `compress` (alternative gzip) `decompress` decompression `contexttimeout` per-request context timeout jwt authentication, casbin/sessions/pprof, opentelemetry, prometheus live separate repositories: [labstack/echo-jwt](https://github.com/labstack/echo-jwt), [labstack/echo-contrib](https://github.com/labstack/echo-contrib), [labstack/echo-otel](https://github.com/labstack/echo-otel), [labstack/echo-prometheus](https://github.com/labstack/echo-prometheus). check each one version (`v4` `v5`) supports adopting writing {#writing-middleware} next handler handler: func onlyjson(next echo.handlerfunc) echo.handlerfunc *echo.context) if c.request().header.get(\"accept\") != \"application/json\" echo.newhttperror(http.statusnotacceptable) } next(c) e.use(onlyjson) `echo.handlerfunc` type v5: `func(c error`. returning sends see [binding handling](/sourcey/guides/binding-error-handling.html).",
+      "documentId": "guides/middleware",
+      "locale": "en",
+      "contentLocale": "en",
+      "contentVersion": "current",
+      "versionScope": "site",
+      "alternates": [
+        {
+          "locale": "en",
+          "contentVersion": "current",
+          "url": "https://echo.labstack.com/sourcey/guides/middleware.html",
+          "markdown": "https://echo.labstack.com/sourcey/guides/middleware.md"
+        }
+      ]
+    },
+    {
+      "id": "guides/binding-error-handling.md",
+      "kind": "page",
+      "title": "Binding and error handling",
+      "description": "Binding JSON, XML, form, query and path data into structs; validation; the HTTPError type and custom error handlers.",
+      "tab": "",
+      "url": "https://echo.labstack.com/sourcey/guides/binding-error-handling.html",
+      "markdown": "https://echo.labstack.com/sourcey/guides/binding-error-handling.md",
+      "file": "guides/binding-error-handling.md",
+      "searchText": "# binding and error handling {#binding-and-error-handling} ## request data {#binding-request-data} `c.bind` decodes the body (json, xml, or form, by `content-type`) plus query path parameters into a struct: ```go type user struct { name string `json:\"name\" form:\"name\" query:\"name\"` email `json:\"email\" form:\"email\" query:\"email\"` } func createuser(c *echo.context) u := new(user) if err c.bind(u); != nil return echo.newhttperror(http.statusbadrequest, err.error()) // use ... c.json(http.statuscreated, u) ``` reads, in order: parameters, then body. failure returns `bindingerror` — since v5.4.7, map whose value is not `string`, `[]string`, `any` an instead of silently skipping values, named types no longer panic. fine-grained helpers bind one source each: `echo.bindbody`, `echo.bindqueryparams`, `echo.bindpathvalues`, `echo.bindheaders`. `binder` interface (implemented `defaultbinder`, default on `e.binder`) lets you replace whole step; `e.binder` field to set. validation {#validation} customvalidator validator *validator.validate (cv *customvalidator) validate(i any) cv.validator.struct(i) e.validator = &customvalidator{validator: validator.new()} set `e.validator` any implementing `validate(any) error`. `c.validate(i)` runs it; `c.validatectx(ctx, i)` it with context. without registered, `validate` `errvalidatornotregistered`. errors: httperror {#errors-httperror} handlers signal failures returning error. `httperror` carries code message: echo.errnotfound 404, predefined \"name required\") required\", map[string]string{\"field\": \"name\"}) errors cover common codes: `errbadrequest`, `errunauthorized`, `errforbidden`, `errnotfound`, `errmethodnotallowed`, `errrequesttimeout`, `errstatusrequestentitytoolarge`, `errunsupportedmediatype`, `errtoomanyrequests`, `errinternalservererror`, `errbadgateway`, `errserviceunavailable`, `errvalidatornotregistered`, `errrenderernotregistered`, `errcookienotfound`. has `code` `message` fields; `newbindingerror` wraps failures. handler {#the-error-handler} every middleware goes place: `e.httperrorhandler`. `defaulthttperrorhandler`, which writes json (or html, `accept`) message. control format: e.httperrorhandler func(err error, c http.statusinternalservererror he, ok err.(*echo.httperror); he.code log it, write your own c.logger().error(\"request failed\", \"error\", err) !c.response().committed c.json(code, map[string]any{\"error\": err.error()}) `problemdetailshttperrorhandler` built-in alternative that rfc 9457 problem-details responses. two details matter when writing custom handler: check `c.response().committed` before (the response may already be partially sent), remember strip `content-encoding`, `content-length`, `content-disposition` (since v5.4.7) skips step can send stale `content-length`",
+      "documentId": "guides/binding-error-handling",
+      "locale": "en",
+      "contentLocale": "en",
+      "contentVersion": "current",
+      "versionScope": "site",
+      "alternates": [
+        {
+          "locale": "en",
+          "contentVersion": "current",
+          "url": "https://echo.labstack.com/sourcey/guides/binding-error-handling.html",
+          "markdown": "https://echo.labstack.com/sourcey/guides/binding-error-handling.md"
+        }
+      ]
+    },
+    {
+      "id": "guides/context-responses.md",
+      "kind": "page",
+      "title": "Context and responses",
+      "description": "The v5 Context struct, request accessors, response helpers, and the generic ContextGet helpers.",
+      "tab": "",
+      "url": "https://echo.labstack.com/sourcey/guides/context-responses.html",
+      "markdown": "https://echo.labstack.com/sourcey/guides/context-responses.md",
+      "file": "guides/context-responses.md",
+      "searchText": "# context and responses {#context-and-responses} ## is a struct in v5 {#context-is-a-struct-in-v5} v4 `context` was an interface; it concrete struct, handlers take pointer to it: ```go // — no longer valid func handler(c echo.context) error { ... } *echo.context) ``` because new methods can be added minor versions without breaking existing code. the framework hands each request pooled `*context` (`acquirecontext` / `releasecontext`); do not hold onto after handler returns. reading {#reading-the-request} c.request() *http.request c.param(\"id\") path parameter c.paramor(\"id\", \"none\") with fallback c.queryparam(\"q\") query value c.queryparamor(\"q\", \"\") c.queryparams() url.values all parameters c.querystring() raw string c.formvalue(\"name\") form c.formvalueor(\"name\", \"\")// c.formvalues() values c.cookie(\"session\") *http.cookie, or errcookienotfound c.cookies() cookies c.realip() client ip (uses e.ipextractor) c.scheme() http https e.schemeextractor) c.istls() whether tls c.iswebsocket() websocket upgrade c.path() registered route pattern, e.g. /users/:id c.routeinfo() matched info (method, path, name) `c.get(key)` `c.set(key, value)` store request-scoped values. generic helpers read them type-safely: user, ok := echo.contextget[user](c, \"user\") tenant echo.contextgetor(c, \"tenant\", \"default\") writing {#writing-responses} c.string(http.statusok, \"hello, world!\") c.json(http.statusok, map[string]string{\"hello\": \"world\"}) c.jsonpretty(http.statusok, data, \" \") c.jsonp(http.statusok, \"callback\", data) c.xml(http.statusok, c.xmlpretty(http.statusok, c.html(http.statusok, \"<b>hi</b>\") c.htmlblob(http.statusok, []byte(\"<b>hi</b>\")) c.blob(http.statusok, \"application/octet-stream\", c.stream(http.statusok, \"text/plain\", reader) c.file(\"/path/to/file.pdf\") c.filefs(\"file.pdf\", fs) c.attachment(\"/path/to/report.pdf\", \"report.pdf\") content-disposition: attachment c.inline(\"/path/to/report.pdf\", inline c.nocontent(http.statusnocontent) c.redirect(http.statusseeother, \"/login\") c.render(http.statusok, \"hello.html\", needs e.renderer set, else errrenderernotregistered `c.response()` returns `*response` (a wrapper around `http.responsewriter` `committed` state byte counting). since v5.4.7, `response.flush` commits uncommitted response, `writeheader` passes 1xx informational codes (such as `103 early hints`) through committing. templates {#templates} type template *template.template (t *template) render(w io.writer, name string, data any, c return t.templates.executetemplate(w, name, = &template{templates: template.must(template.parseglob(\"views/*.html\"))} set `e.renderer` any implementing `render(io.writer, *context) error`. calling `c.render` renderer `errrenderernotregistered`.",
+      "documentId": "guides/context-responses",
+      "locale": "en",
+      "contentLocale": "en",
+      "contentVersion": "current",
+      "versionScope": "site",
+      "alternates": [
+        {
+          "locale": "en",
+          "contentVersion": "current",
+          "url": "https://echo.labstack.com/sourcey/guides/context-responses.html",
+          "markdown": "https://echo.labstack.com/sourcey/guides/context-responses.md"
+        }
+      ]
+    },
+    {
+      "id": "guides/migration-v4-v5.md",
+      "kind": "page",
+      "title": "Migration v4 → v5",
+      "description": "The breaking changes from Echo v4 to v5 — Context as a struct, slog logging, the Router interface — and the v4 support dates.",
+      "tab": "",
+      "url": "https://echo.labstack.com/sourcey/guides/migration-v4-v5.html",
+      "markdown": "https://echo.labstack.com/sourcey/guides/migration-v4-v5.md",
+      "file": "guides/migration-v4-v5.md",
+      "searchText": "# migration v4 → v5 {#migration-v4--v5} echo `v5` (current release line, first released 2026-01-18; this site documents v5.4.7) is a maintenance with major breaking changes. the full list in [api_changes_v5.md](https://github.com/labstack/echo/blob/master/api_changes_v5.md) repository. changes that touch nearly every application are below. ## context: interface concrete struct {#context-interface--concrete-struct} single biggest change. `context` was an interface; it struct, and **every handler must take pointer**: ```go // func handler(c echo.context) error { return c.json(200, map[string]string{\"hello\": \"world\"}) } *echo.context) ``` middleware signatures change same way: `echo.handlerfunc` now `func(c error`, `echo.middlewarefunc` wraps that. custom types implemented no longer compile against — use directly, or wrap it. payoff: because maintainers can add methods minor versions without your code. logging: old gone, slog {#logging-the-old-interface-is-gone-slog-is-in} drops logging uses standard library's `log/slog`. `middleware.logger` gone; `middleware.requestlogger` (or `requestloggerwithconfig`) instead, reach logger from handlers `c.logger()`. see [middleware](/sourcey/guides/middleware.html). routing: router {#routing-a-router-interface} adds `router` (`e.router`, `routerconfig`, `defaultrouter`) so routing implementations be swapped. default radix-tree behavior unchanged: static routes match first, then parameters wildcards. `c.routeinfo()` new returns matched route's method, path pattern, name. generic helpers *context {#generic-helpers-take-context} (`contextget`, `contextgetor`) `*context`, form were renamed to `formvalue*` family (`formvalue`, `formvalueor`, `formvalues`). update call sites used names. test helpers: echotest {#new-test-helpers-echotest} `echotest` package for middleware. separate module, not covered by reference (root only). version support {#version-support} | bug fixes security --- 5.x yes 4.x, latest until 2026-12-31 2027-12-31 older releases upgrade 4.x routine end on 2026-12-31. free, public, security-only continue 2027-12-31, patch of version. requires go 1.26 later. start projects v5, plan upgrades `api_changes_v5.md`. checklist {#checklist} 1. signature `echo.context` `*echo.context`. 2. replace `middleware.requestlogger`; move configuration `requestloggerconfig` / 3. module path: `go get github.com/labstack/echo/v5`. 4. removed/renamed (form `formvalue*`; check `api_changes_v5.md` list). 5. re-run tests hand-rolled harnesses.",
+      "documentId": "guides/migration-v4-v5",
+      "locale": "en",
+      "contentLocale": "en",
+      "contentVersion": "current",
+      "versionScope": "site",
+      "alternates": [
+        {
+          "locale": "en",
+          "contentVersion": "current",
+          "url": "https://echo.labstack.com/sourcey/guides/migration-v4-v5.html",
+          "markdown": "https://echo.labstack.com/sourcey/guides/migration-v4-v5.md"
+        }
+      ]
+    },
+    {
+      "id": "api/package-root.md",
+      "kind": "page",
+      "title": "github.com/labstack/echo/v5",
+      "description": "Package echo implements high performance, minimalist Go web framework.",
+      "tab": "api",
+      "url": "https://echo.labstack.com/sourcey/api/package-root.html",
+      "markdown": "https://echo.labstack.com/sourcey/api/package-root.md",
+      "file": "api/package-root.md",
+      "searchText": "package echo implements high performance, minimalist go web framework. example: main import ( \"log/slog\" \"net/http\" \"github.com/labstack/echo/v5\" \"github.com/labstack/echo/v5/middleware\" ) // handler func hello(c *echo.context) error { return c.string(http.statusok, \"hello, world!\") } main() instance e := echo.new() middleware e.use(middleware.requestlogger()) e.use(middleware.recover()) routes e.get(\"/\", hello) start server if err e.start(\":8080\"); != nil slog.error(\"failed to server\", \"error\", err) learn more at [https://echo.labstack.com](https://echo.labstack.com) ## timelayoutunixtime ```go const = timelayout(\"unixtime\") unix timestamp in seconds timelayoutunixtimemilli timelayout(\"unixtimemilli\") milliseconds timelayoutunixtimenano timelayout(\"unixtimenano\") nanoseconds ``` timelayout constants for parsing timestamps different precisions. mimeapplicationjson javascript object notation (json) https://www.rfc-editor.org/rfc/rfc8259 \"application/json\" deprecated: please use instead. json should be encoded using utf-8 by default. no \"charset\" parameter is defined this registration. adding one really has effect on compliant recipients. see rfc 8259, section 8.1. https://datatracker.ietf.org/doc/html/rfc8259#section-8.1n\" mimeapplicationjsoncharsetutf8 + \"; \" charsetutf8 mimeapplicationjavascript \"application/javascript\" mimeapplicationjavascriptcharsetutf8 mimeapplicationxml \"application/xml\" mimeapplicationxmlcharsetutf8 mimetextxml \"text/xml\" mimetextxmlcharsetutf8 mimeapplicationform \"application/x-www-form-urlencoded\" mimeapplicationprotobuf \"application/protobuf\" mimeapplicationmsgpack \"application/msgpack\" mimeapplicationproblemjson the content type 9457 problem details responses. https://www.rfc-editor.org/rfc/rfc9457 \"application/problem+json\" mimetexthtml \"text/html\" mimetexthtmlcharsetutf8 mimetextplain \"text/plain\" mimetextplaincharsetutf8 mimemultipartform \"multipart/form-data\" mimeoctetstream \"application/octet-stream\" mime types propfind method can used collection and property resources. \"propfind\" report get information about a resource, 3253 \"report\" query safe, idempotent request carrying (a query) its body, 10008. it not (yet) part of `net/http` standard library, so defines here. \"query\" routenotfound special handling \"route found\" (404) cases \"echo_route_not_found\" routeany that matches any http request. lower priority other methods have been registered with router path. \"echo_route_any\" headeraccept \"accept\" headeracceptencoding \"accept-encoding\" headerallow name \"allow\" header field list set advertised as supported target resource. returning an allow mandatory status 405 (method found) useful options 7231: https://datatracker.ietf.org/doc/html/rfc7231#section-7.4.1 headerauthorization \"authorization\" headercontentdisposition \"content-disposition\" headercontentencoding \"content-encoding\" headercontentlength \"content-length\" headercontenttype \"content-type\" headercookie \"cookie\" headersetcookie \"set-cookie\" headerifmodifiedsince \"if-modified-since\" headerlastmodified \"last-modified\" headerlocation \"location\" headerretryafter \"retry-after\" headerupgrade \"upgrade\" headervary \"vary\" headerwwwauthenticate \"www-authenticate\" headerxforwardedfor \"x-forwarded-for\" headerxforwardedproto \"x-forwarded-proto\" headerxforwardedprotocol \"x-forwarded-protocol\" headerxforwardedssl \"x-forwarded-ssl\" headerxurlscheme \"x-url-scheme\" headerxhttpmethodoverride \"x-http-method-override\" headerxrealip \"x-real-ip\" headerxrequestid \"x-request-id\" headerxcorrelationid \"x-correlation-id\" headerxrequestedwith \"x-requested-with\" headerserver \"server\" headerorigin indicates origin (scheme, hostname, port) caused see: https://developer.mozilla.org/en-us/docs/web/http/headers/origin \"origin\" headercachecontrol \"cache-control\" headerconnection \"connection\" access control headeraccesscontrolrequestmethod \"access-control-request-method\" headeraccesscontrolrequestheaders \"access-control-request-headers\" headeraccesscontrolalloworigin \"access-control-allow-origin\" headeraccesscontrolallowmethods \"access-control-allow-methods\" headeraccesscontrolallowheaders \"access-control-allow-headers\" headeraccesscontrolallowcredentials \"access-control-allow-credentials\" headeraccesscontrolexposeheaders \"access-control-expose-headers\" headeraccesscontrolmaxage \"access-control-max-age\" security headerstricttransportsecurity \"strict-transport-security\" headerxcontenttypeoptions \"x-content-type-options\" headerxxssprotection \"x-xss-protection\" headerxframeoptions \"x-frame-options\" headercontentsecuritypolicy \"content-security-policy\" headercontentsecuritypolicyreportonly \"content-security-policy-report-only\" headerxcsrftoken \"x-csrf-token\" #nosec g101 headerreferrerpolicy \"referrer-policy\" headersecfetchsite fetch metadata relationship between initiator's requested https://developer.mozilla.org/en-us/docs/web/http/reference/headers/sec-fetch-site \"sec-fetch-site\" headers notfoundroutename routeinfo returned when did find matching route (404: found). \"echo_route_not_found_name\" methodnotallowedroutename (405: allowed). \"echo_route_method_not_allowed_name\" contextkeyheaderallow getting value `allow` later stages call chain. requests. added context only does \"echo_header_allow\" version \"5.4.7\" errbadrequest var &httperror{http.statusbadrequest} 400 errunauthorized &httperror{http.statusunauthorized} 401 errforbidden &httperror{http.statusforbidden} 403 errnotfound &httperror{http.statusnotfound} 404 errmethodnotallowed &httperror{http.statusmethodnotallowed} errrequesttimeout &httperror{http.statusrequesttimeout} 408 errstatusrequestentitytoolarge &httperror{http.statusrequestentitytoolarge} 413 errunsupportedmediatype &httperror{http.statusunsupportedmediatype} 415 errtoomanyrequests &httperror{http.statustoomanyrequests} 429 errinternalservererror &httperror{http.statusinternalservererror} 500 errbadgateway &httperror{http.statusbadgateway} 502 errserviceunavailable &httperror{http.statusserviceunavailable} 503 following errors produce code implementing httpstatuscoder interface errvalidatornotregistered errors.new(\"validator registered\") errrenderernotregistered errors.new(\"renderer errinvalidredirectcode errors.new(\"invalid redirect code\") errcookienotfound errors.new(\"cookie found\") errinvalidcertorkeytype cert or key type, must string []byte\") errinvalidlistenernetwork listener network\") fall into (internalservererror) category errinvalidjsonpcallback jsonp callback\") wrapped bad context.jsonp context.jsonpblob callback valid function name. context.jsonp. errinvalidkeytype type\") castable expected type. errnonexistentkey errors.new(\"non existent key\") exist bindbody bindbody(c *context, any) (err error) binds body contents bindable nb: then binding forms take note implementation uses library form which parses data from both url non-mimemultipartform: [https://golang.org/pkg/net/http/#request.parseform](https://golang.org/pkg/net/http/#request.parseform) mimemultipartform: [https://golang.org/pkg/net/http/#request.parsemultipartform](https://golang.org/pkg/net/http/#request.parsemultipartform) bindheaders bindheaders(c bindpathvalues bindpathvalues(c path values bindqueryparams bindqueryparams(c params contextget contextget[t any](c string) (t, retrieves store missing. returns t. contextgetor contextgetor[t string, defaultvalue t) default defaulthttperrorhandler defaulthttperrorhandler(exposeerror bool) httperrorhandler creates new implementation. sends response code. `exposeerror` decides message will contain also note: log errors. need logged (separately) case happens call-chain (which error). already sent (ala c.json()) there handler. global received ignored because we \"committed\" client. ### spdx-license-identifier: mit spdx-filecopyrighttext: © 2015 labstack llc contributors run tests external real feel api echo_test \"encoding/json\" \"fmt\" \"net/http/httptest\" exampledefaulthttperrorhandler() e.get(\"/api/endpoint\", func(c &apierror{ code: http.statusbadrequest, body: map[string]any{\"message\": \"custom error\"}, }) req httptest.newrequest(http.methodget, \"/api/endpoint?err=1\", nil) resp httptest.newrecorder() e.servehttp(resp, req) fmt.printf(\"%d %s\", resp.code, resp.body.string()) output: {\"error\":{\"message\":\"custom error\"}} apierror struct int (e *apierror) statuscode() e.code marshaljson() ([]byte, `json:\"error\"` json.marshal(body{error: e.body}) error() http.statustext(e.code) ```text extractipdirect extractipdirect() ipextractor extracts ip address actual address. your faces internet directly (i.e.: proxy). extractipfromrealipheader extractipfromrealipheader(options ...trustoption) `x-real-ip` header. you put proxy extractipfromxffheader extractipfromxffheader(options `x-forwarded-for` nearest untrustable ip. all ips are trustable, furthest xff\\[0]). extractschemedirect extractschemedirect() schemeextractor connection: `https` tls connections `http` otherwise. forwarding ignored. extractschemefromheaders extractschemefromheaders(options `x-forwarded-proto`, `x-forwarded-protocol`, `x-forwarded-ssl` `x-url-scheme` comes trusted (http.request.remoteaddr). requests addresses scheme connection used. default, loopback, link-local private network socket peers trusted. trustoption change this, example trustiprange trust connects public (such cdn cloud load balancer). trustloopback(false) stops trusting peers. `x-forwarded-proto` present, ignored, last therefore (overwrite) rather than pass through strategy echo#schemeextractor set. formfieldbinder formfieldbinder(c *context) *valuebinder binder requests, raw fields post, put, patch reads fields. parameters precedence over r.form. formvalue formvalue[t opts ...any) single key. typed fails. found. empty handling: exists but value, zero t error. example, (0, types. differs behavior where strings treat errors, validate result separately check value. parsevalue formvalueor formvalueor[t t, found fails occur. limit, echo.formvalueor[int](c, \"limit\", 100) \"limit\" missing: (100, \"50\": (50, \"abc\": bindingerror) formvalues formvalues[t ([]t, slice. slice parsevalues formvaluesor formvaluesor[t []t, tags, echo.formvaluesor[string](c, \"tags\", []string{}) \"tags\" ([], fails: (nil, handlername handlername(h handlerfunc) given function. legacyipextractor legacyipextractor() derives client common headers, falling back request's remote resolution order: 1. x-forwarded-for: first comma-separated list. multiple left-most (original client) surrounding brackets (for ipv6) stripped. 2. x-real-ip: x-forwarded-for absent. 3. req.remoteaddr: fallback; host portion extracted via net.splithostport. notes: - validation performed values. trusts as-is safe against spoofing unless application behind configured strip/replace/modify correctly. instead legacyipextractor. legacyschemeextractor legacyschemeextractor() was context.scheme before checked. every passes sets removes headers. mustsubfs mustsubfs(currentfs fs.fs, fsroot fs.fs sub fs current filesystem panic failure. `fsroot` contains invalid according `fs.validpath` rules. helpful dealing `embed.fs` `//go:embed assets/images` embeds files paths including `assets/images` their prefix. \\`fs echo.mustsubfs(fs, \"rootdirectory\") create necessary prefix directory new() *echo echo. newbindingerror newbindingerror(sourceparam []string, newconcurrentrouter newconcurrentrouter(r router) concurrency added/removed safely even after http.server started. newcontext newcontext(r *http.request, w http.responsewriter, *context instance. request,response left echo.servehttp c.reset(req,resp) anyway these arguments creating like that. newdefaultfs newdefaultfs(dir defaultfs allows `fs.fs.open` absolute input dir newhttperror newhttperror(code int, *httperror httperror newresponse newresponse(w logger *slog.logger) (r *response) response. newrouter newrouter(config routerconfig) *defaultrouter newvirtualhosthandler newvirtualhosthandler(vhosts map[string]*echo) virtual hosts map served newwithconfig newwithconfig(config config) configuration. parsevalue[t any](value generic supported: bool float32 float64 int8 int16 int32 int64 uint uint8/byte uint16 uint32 uint64 echo.bindunmarshaler encoding.textunmarshaler json.unmarshaler time.duration time.time echo.timeopts echo.timelayout time configuration parsevalueor parsevalueor[t returned. parsevalues[t any](values same scalar parsevaluesor parsevaluesor[t slice, pathparam pathparam[t paramname \"\" pathparamor pathparamor[t (e.g., \"abc\" type). id, echo.pathparamor[int](c, \"id\", 0) \"id\" \"123\": (123, pathvaluesbinder pathvaluesbinder(c problemdetailshttperrorhandler problemdetailshttperrorhandler(exposeerror converts (problem apis) `application/problem+json` detail underlying \\*httperror do implement problemerrorer. build error: (or it) \\*problemerror, as-is. else problemerrorer, problemerror() \\*problemerror built err's (defaulting 500). \\*httperror, message, further extended error's exposeerror true. error, populated (with err.error()) zero-value title defaulted \"about:blank\", text status, respectively. (separately). queryparam queryparam[t (?key=), \"?count=\" summary: missing (?other=value): (zero, errnonexistentkey) (?key=): (?key=abc int): queryparamor queryparamor[t page, echo.queryparamor[int](c, \"page\", 1) \"page\" (1, \"5\": (5, queryparams queryparams[t queryparamsbinder queryparamsbinder(c queryparamsor queryparamsor[t ids, echo.queryparamsor[int](c, \"ids\", []int{}) \"ids\" \"1&ids=2\": ([1, 2], resolveresponsestatus resolveresponsestatus(rw (resp *response, int) been) rw, optional handlers figure out based occurred what rules: committed, committed wins ignored). otherwise, 200 ok (net/http writeheader never called). non-zero suggested it. 4. nil, overrides status: statuscode(err) otherwise internal staticdirectoryhandler staticdirectoryhandler(filesystem disablepathunescaping handlerfunc serve provided file system unescaped is. disablepathunescaping=false, decodes wildcard param serving. guards (e.g. e.get(\"/admin/\\*\", forbidden)) restrict parts filesystem, separator (%2f) dot-dot (%2e%2e) resolve matched guard route. enabling routerconfig.useescapedpathformatching fix — changes still lets path.clean \"..\" segments guarded directory. rely alone [https://github.com/labstack/echo/security/advisories/ghsa-vfp3-v2gw-7wfq](https://github.com/labstack/echo/security/advisories/ghsa-vfp3-v2gw-7wfq) staticfilehandler staticfilehandler(file fs.fs) system. avoid leading `/` slash most implementations require relative operations. statuscode statuscode(err interface. interface, 0. trustiprange(iprange *net.ipnet) add trustable ranges cidr notation. trustlinklocal trustlinklocal(v configures (default: true). trustloopback trustloopback(v loopback trustprivatenet trustprivatenet(v unwrapresponse unwrapresponse(rw http.responsewriter) (*response, unwraps responsewriter contexts original rw `unwrap() http.responsewriter` wraphandler wraphandler(h http.handler) wraps `http.handler` `echo.handlerfunc`. wrapmiddleware wrapmiddleware(m func(http.handler) middlewarefunc `func(http.handler) http.handler` `echo.middlewarefunc` addrouteerror router.add containing failed. mass (i.e. match() routes) `err: error`: `method: string`: `path: *addrouteerror) unwrap unwrap() bindunmarshaler unmarshalparam assigns param. unmarshalparam(param wrap method. don't `unmarshalparam: func(param bind(c bind `bind: bindingerror failed `json:\"field\"` bind. []string `json:\"-\"` represents while data. serialization handled marshaljson below, tags kept documentation). emits {\"field\",\"message\"}. `field: string` (json:\"field\"): `*httperror: *httperror`: `values: []string` (json:\"-\"): (be *bindingerror) json.marshaler serialized structured {\"field\":\"id\",\"message\":\"...\"}) being flattened message. own encoding. config slog application-wide logging. set, texthandler writing stdout created. *slog.logger centralized processes middleware, converting them appropriate defaulthttperrorhandler(false) responsible urls radix tree-based algorithm. newrouter(routerconfig{}) onaddroute hook executed registered. validation, logging, custom processing. executed. func(route route) serving static files. supports os.dirfs, embed.fs, implementations. defaults working handles automatic structs. json, xml, data, parameters, parameters. defaultbinder validator provides binding. commonly third-party libraries. context.validate() errvalidatornotregistered. renderer template rendering generating html requires integration engine html/template. context.render() errrenderernotregistered. jsonserializer encoding decoding requests/responses. replaced faster alternatives jsoniter sonic. defaultjsonserializer encoding/json extracting particularly important proxies balancers. rate limiting, control, direct peer (http.request.remoteaddr) determining (`http` `https`), balancers terminate tls. https redirect, secure middlewares. such sockets. extractschemefromheaders. formparsemaxmemory memory limit multipart (see (*http.request).parsemultipartform) enablepathunescapingstaticfiles enables (param: *) unescaping methods. false (safe): slashes decoded, preventing acl bypass /admin%2fprivate.txt bypasses /admin/* having decoded admin/private.txt. true whose names url-encoded characters \"hello world.txt\" /hello%20world.txt) relying route-based access. option, make sure understand implications. https://github.com/labstack/echo/security/advisories/ghsa-vfp3-v2gw-7wfq makes irrelevant lead issues exclude some served. e.g. folder structure: public/ public/index.html public/admin/private.txt share `public/` root `e.static(\"/\", \"public\")` naively assume everything under /admin now forbidden e.get(\"/admin/*\", echo.errforbidden `/assets/../admin%2fprivate.txt` match applies methods: echo.static, echo.staticfs, group.static, group.staticfs. nogroupautoregister404routes flag whether echo.group register automatically middlewares group. decide automatically, expected. cors middleware. `logger: *slog.logger`: `httperrorhandler: httperrorhandler`: `router: router`: `onaddroute: `filesystem: fs.fs`: `binder: binder`: `validator: validator`: `renderer: renderer`: `jsonserializer: jsonserializer`: `ipextractor: ipextractor`: `schemeextractor: schemeextractor`: `formparsemaxmemory: int64`: (\\*http.request).parsemultipartform) `enablepathunescapingstaticfiles: bool`: \\*) /admin/\\* \\*context) `nogroupautoregister404routes: filtered unexported holds objects, path, attachment (c attachment(file, attachment, prompting save file. bind(i params, `i`. content-type blob blob(code contenttype b []byte) cookie cookie(name (*http.cookie, named cookies cookies() []*http.cookie echo() `echo` file(file filefs filefs(file serves `fs `assets/images\\` formfile formfile(name (*multipart.fileheader, formvalue(name formvalueor(name, distinguish had formvalues() (url.values, `url.values`. get(key context. any(nil) (eg. \\[]byte(nil)). html(code htmlblob htmlblob(code initializeroute initializeroute(ri *routeinfo, pathvalues *pathvalues) related variables inline inline(file, inline, opening browser. istls istls() false. iswebsocket iswebsocket() websocket json(code i jsonblob jsonblob(code jsonp(code `callback` construct payload. empty, identifier dot-separated identifiers ascii letters, digits, `_` `$`. nothing written wrapping `x-content-type-options: nosniff` website \\<script> tag, user's cookies. authentication; jsonpblob jsonpblob(code validated jsonpretty jsonpretty(code any, indent pretty-print logger() multipartform multipartform() (*multipart.form, form. nocontent nocontent(code param(name paramor paramor(name, notes defaultrouter implementation: could that: \\* `/release-:version/bin` `/release-/bin` `/api/:version/image.jpg` `/api//image.jpg` `/download/file.:ext` `/download/file.` path() pathvalues() queryparam(name queryparamor(name, means `/test?search=` `/test` would `1` `c.queryparamor(\"search\", \"1\")` queryparams() url.values querystring querystring() string. realip realip() extraction strategy. echo#ipextractor incoming (typically x-real-ip). look `ip.go` comments examples. echo#extractipfromxffheader checks echo#extractipfromrealipheader echo#legacyipextractor `v4` compatibility (spoofable, in) extractor configured, falls remoteaddr, portion. enforcement implemented ipextractor. ensure deployed intermediaries spoofing. redirect(code redirects render render(code renders text/html `echo.renderer`. request() *http.request `*http.request`. reset reset(r resets completes. called along `echo#acquirecontext()` `echo#releasecontext()`. `echo#servehttp()` response() http.responsewriter `*response`. routeinfo() information. method, they \"empty\" cases: accessed routing done. inside pre (`e.pre()`) (route allowed) scheme() protocol lowercase: `https`, `ws` `wss` reports them. how determined. (`x-forwarded-proto`, `x-url-scheme`) come socket. set(key val saves setcookie setcookie(cookie *http.cookie) adds `set-cookie` setlogger setlogger(logger setpath setpath(p setpathvalues setpathvalues(pathvalues pathvalues) setrequest setrequest(r *http.request) setresponse setresponse(r `*http.responsewriter`. and/or eventually \\*echo.response stream stream(code r io.reader) streaming string(code s validate(i validates usually `context#bind()`. `echo#validator`. validatectx validatectx(i validatectx(context.context, validate. called. satisfy wrappers embed context-aware preserve request, context.background() cancellation deadlines passed validator; honoring xml xml(code xmlblob xmlblob(code xmlpretty xmlpretty(code struct{} query, header, binding, \\*time.time (not slices) may format tag: \"date-time\" rfc3339 decoding, \"date-time-local\" accepts \"2006-01-02t15:04:05\" fractional seconds, \"date\" \"2006-01-02\", specify layouts. \"date\", \"date-time-local\", layouts without timezone give utc times. tag. datetime-local inputs omit layout \"2006-01-02t15:04\" \"date-time-local\". (b *defaultbinder) `binder#bind` done params; 2) 3) body. each step override previous bound source bindbody, bindqueryparams, bindpathvalues. encoding/json. deserialize (d defaultjsonserializer) deserialize(c read pooled buffer json.unmarshal json.newdecoder. avoids allocating decoder retain reference reuse afterwards. full decoding. parser, untrusted allocate large amounts memory; endpoints middleware.bodylimit http.maxbytesreader), here fail fast once exceeded. serialize serialize(c writes optionally pretty jsons. registry parsing. coroutine-safe. add/remove started *defaultrouter) add(route (routeinfo, registers remove remove(method unregisters route(c looks up loads performance: \\- `context#reset()` routes() (os.getwd()). fs.fs.open() assumes considers os.dirfs(\"/tmp\")` try `fs.open(\"/tmp/file.txt\")` fail, \"file.txt\" succeed. `echo.newdefaultfs(\"/tmp\")` overwrites open top-level framework goroutine safety: mutate accessing handlers/middlewares changing leads data-races. rule action. acquirecontext *echo) acquirecontext() `context` pool. calling `releasecontext()`. add(method, handlerfunc, ...middlewarefunc) route-level addroute addroute(route any(path panics known echo, registering method-specific takes connect connect(path h m delete delete(path file(path, filefs(path, get(path group group(prefix (g *group) group-level concatenated inserting slash. g e.group(\"/v1\") g.get(\"/posts\", handler) /v1/posts. g.get(\"posts\", /v1posts. head head(path match(methods middlewares() []middlewarefunc level servehttp copy. mutate. options(path patch(path post post(path put(path pre(middleware chain tries meaning cases. premiddlewares premiddlewares() query(path releasecontext releasecontext(c `acquirecontext()`. routenotfound(path special-case cases) url. named/any just defined. generally ended wildcard/match-any character (`/*`, `/download/*` etc). `e.routenotfound(\"/*\", c.nocontent(http.statusnotfound) })` router() router. servehttp(w start(address stars shutdown sending os.interrupt signal `ctrl+c`. http.errserverclosed. created examples/demos deliberately simple providing options. customization use: ctx, cancel signal.notifycontext(context.background(), os.interrupt, syscall.sigterm) defer cancel() sc echo.startconfig{address: \":8080\"} sc.start(ctx, e); && !errors.is(err, http.errserverclosed) slog.error(err.error()) `http.server` http.server{addr: \":8080\", handler: e} s.listenandserve(); static(pathprefix, pathprefix trailing slash, \"/assets\", \"/assets\" (redirected \"/assets/\") below \"/assets/\", sibling \"/assetsadmin/file\". staticfs staticfs(pathprefix trace trace(path use(middleware route/request sub-routes specified inner functionality separate parent inheriting `echo#add()` within routable `echo#any()` `echo#connect()` `echo#delete()` `echo#file()` `echo#filefs()` `echo#get()` (sg sub-group sub-group-level group's \"/v1\" \"/admin\" \"/v1/admin\". important! exact `/*` notfound itself. kind needed, ` noautoregisterroutes `echo.newwithconfig(echo.config{nogroupautoregister404routes: true})`. `echo#head()` `echo#match()` `echo#options()` `echo#patch()` `echo#post()` `echo#put()` `echo#query()` `echo#routenotfound()` middlewares, `group#use()` (re)registers catch-all echo-wide `config.nogroupautoregister404routes` `echo#group()` `group#group()` inherited wins, runs with: replace earlier those (by echo), replaces ones keep overwriting panics; router-wide `routerconfig.notfoundhandler` there, yourself `g.routenotfound(\"/*\", `echo#static()` `echo#staticfs()` `echo#trace()` `echo#use()` matched, nested groups. answers itself, middleware.static, protected routes. group#static guards. `json:\"message\"` `code: int` `message: (json:\"message\"): (he *httperror) compatible httperror) wrap(err `statuscode: func() int`: func(*http.request) extract addr http.request. echo#ipextractor. [https://echo.labstack.com/guide/ip-address](https://echo.labstack.com/guide/ip-address) details. encodes interfaces. `serialize: `deserialize: middlewareconfigurator tomiddleware() (middlewarefunc, possibility panicking. `tomiddleware: error)`: func(next process pathvalue tuple pf `name: `value: []pathvalue collections instances various helper (p get(name (string, getor getor(name exist. problemerror uri identifies \"about:blank\" `json:\"type\"` short, human-readable summary empty. `json:\"title\"` occurrence problem. `json:\"status\"` explanation specific `json:\"detail,omitempty\"` `json:\"instance,omitempty\"` \"problem detail\" apis). [https://www.rfc-editor.org/rfc/rfc9457](https://www.rfc-editor.org/rfc/rfc9457) `type: (json:\"type\"): `title: (json:\"title\"): `status: (json:\"status\"): `detail: (json:\"detail,omitempty\"): `instance: (json:\"instance,omitempty\"): (pe *problemerror) `error` response, problemerrorer *problemerror converted problemdetailshttperrorhandler. `problemerror: *problemerror`: render(c io.writer, templatename `render: size [https://golang.org/pkg/net/http/#responsewriter](https://golang.org/pkg/net/http/#responsewriter) `http.responsewriter: http.responsewriter`: `size: `committed: after(fn func()) written. before(fn (status) flush flush() http.flusher buffered [http.flusher](https://pkg.go.dev/net/http#flusher)([https://golang.org/pkg/net/http/#flusher](https://golang.org/pkg/net/http/#flusher)) hijack hijack() (net.conn, *bufio.readwriter, http.hijacker connection. relevant upgrades, proxis, advanced [http.hijacker](https://pkg.go.dev/net/http#hijacker)([https://golang.org/pkg/net/http/#hijacker](https://golang.org/pkg/net/http/#hijacker)) http.responsewriter. responsecontroller \\[[https://go.dev/blog/go1.20](https://go.dev/blog/go1.20)] write write(b (n reply. writeheader(code explicitly, trigger implicit writeheader(http.statusok). thus explicit calls mainly send codes. fallback default/global certain situations. adding/registering method+path pair uniquely provide `handler: handlerfunc`: `middlewares: []middlewarefunc`: torouteinfo torouteinfo(params []string) withprefix withprefix(pathprefix []middlewarefunc) recreates grouped to. `parameters: []string`: clone routeinfo) clone() copy reverse reverse(pathvalues reverses replacing routeinfo. route.path routeinfo.path. generates routeinfo.parameters route.path. routeinfo.name provided. add(routable choose searches (405) (404), 405/404 populate during router.route context.initializeroute() (important! reduce allocations c.pathvalues() returns) additional context.set() contract echo/context router: echo.echo reason: length `echo.contextpathparamallocsize`), enough capacity. handle capacity smaller maximum count created, echo.echo). context.initializeroute context.set `add: func(routable `remove: func(method `routes: routes`: `route: routerconfig notfoundhandler methodnotallowedhandler optionsmethodhandler made. allowoverwritingroute existing false, unescapepathparamvalues unescapes url.rawpath setting already-decoded url.path again. useescapedpathformatching controls matching. despite historical name, selects req.url.path. (false) prefers req.url.rawpath present escaping url.path. autohandlehead corresponding enabled, route, suppressed accordance semantics. content-length, content-type) preserved considerations: fully side effects: state-mutating operations (db writes, audit logs, counters) run. rate-limiting consumes quota, low-cost exhaustion. expensive computations caller, making cheaper abuse dos get. become enumerable probing (200 exists, absent). confidentiality/state-mutation concern, leave disabled expose e.head(\"/public\", handler)). leverage echo.onaddroute explicitly place. (default) `notfoundhandler: `methodnotallowedhandler: `optionsmethodhandler: `allowoverwritingroute: `unescapepathparamvalues: `useescapedpathformatching: `autohandlehead: []routeinfo filterbymethod filterbymethod(method (routes, searched info filterbyname filterbyname(name filterbypath filterbypath(path findbymethodpath findbymethodpath(method reverse(routename determine `https`) echo#schemeextractor. startconfig specifies listening http(s) hidebanner instructs start* print banner starting server. hideport port certfilesystem `certfile` `keyfile` starttls tlsconfig configure listener. *tls.config net.listener listenernetwork use. listeneraddrfunc listen connections. testing situations random `address \":0\"` on. func(addr net.addr) gracefultimeout timeout (defaults 10sec) graceful wait ongoing shutting down onshutdownerror results listeners shut func(err beforeservefunc starts want timeouts/limits/etc func(s *http.server) `address: `hidebanner: start\\* `hideport: `certfilesystem: `tlsconfig: *tls.config`: `listener: net.listener`: `listenernetwork: `listeneraddrfunc: net.addr)`: `gracefultimeout: time.duration`: `onshutdownerror: `beforeservefunc: (sc startconfig) start(ctx stdcontext.context, starttls(ctx http.handler, certfile, keyfile `string` treated paths. `[]byte` certificate templaterenderer executetemplate(wr ease renderers `html/template` `text/template` packages. usage: e.renderer &echo.templaterenderer{ template: template.must(template.parseglob(\"templates/*.html\")), template.must(template.new(\"hello\").parse(\"hello, {{.}}!\")), `template: }`: (t *templaterenderer) timeopts to: echo.timelayout(time.rfc3339nano) convert `echo.timelayout(\"2006-01-02\")` (integer) `echo.timelayoutunixtime` `echo.timelayoutunixtimemilli` `echo.timelayoutunixtimenano` parseinlocation location time.parseinlocation output location. time.utc *time.location toinlocation parsed time.in(toinlocation). `layout: timelayout`: `parseinlocation: *time.location`: `toinlocation: func(*ipchecker) `validate: func(i valuebinder valuefunc (first) func(sourceparam valuesfunc i.e. `/api/search?ids=1&ids=2` errorfunc marshals internalerror utility built-in `valuefunc: `valuesfunc: `errorfunc: binderror *valuebinder) binderror() seen resets/empties valuebinder_binderror failfastroutefunc ids []int64 active int64(50) echo.queryparamsbinder(c) b.int64(\"length\", &length). int64s(\"ids\", &opts.ids). bool(\"active\", &opts.active). berr err.(*echo.bindingerror) fmt.errorf(\"my field: %s values: %v\", berr.field, berr.values) fmt.printf(\"active %v, %v\\n\", opts.active, length, opts.ids) c.json(http.statusok, opts) c e.newcontext( \"/api/endpoint?active=true&length=25&ids=1&ids=2&ids=3\", nil), httptest.newrecorder(), _ failfastroutefunc(c) true, 25, [1 2 3] binderrors binderrors() []error valuebinder_binderrors routefunc errs _, range log.printf(\"in %v failed\", fmt.errorf(\"%v bind\", len(errs)) routefunc(c) bindunmarshaler(sourceparam dest bindunmarshaler) destination bindwithdelimiter bindwithdelimiter(sourceparam delimiter suitable conversion split bool(sourceparam *bool) variable bools bools(sourceparam *[]bool) byte byte(sourceparam *byte) customfunc customfunc(sourceparam func(values []error) func. valuebinder_customfunc binary []byte customfunc(\"base64\", len(values) == 0 base64.urlencoding.decodestring(values[0]) []error{echo.newbindingerror(\"base64\", values[0:1], \"failed decode base64\", err)} }). fmt.printf(\"length base64 binary) \"ok\") \"/api/endpoint?length=25&base64=sgvsbg8gv29ybgq%3d\", hello world duration duration(sourceparam *time.duration) durations durations(sourceparam *[]time.duration) failfast failfast(value indicate early (without binding) modifies behaviour float32(sourceparam *float32) float32s float32s(sourceparam *[]float32) float64(sourceparam *float64) float64s float64s(sourceparam *[]float64) int(sourceparam *int) int16(sourceparam *int16) int16s int16s(sourceparam *[]int16) int32(sourceparam *int32) int32s int32s(sourceparam *[]int32) int64(sourceparam *int64) int64s int64s(sourceparam *[]int64) int8(sourceparam *int8) int8s int8s(sourceparam *[]int8) ints ints(sourceparam *[]int) jsonunmarshaler jsonunmarshaler(sourceparam json.unmarshaler) mustbindunmarshaler mustbindunmarshaler(sourceparam mustbindwithdelimiter mustbindwithdelimiter(sourceparam mustbool mustbool(sourceparam variable. mustbools mustbools(sourceparam variables. mustbyte mustbyte(sourceparam mustcustomfunc mustcustomfunc(sourceparam mustduration mustduration(sourceparam mustdurations mustdurations(sourceparam mustfloat32 mustfloat32(sourceparam mustfloat32s mustfloat32s(sourceparam mustfloat64 mustfloat64(sourceparam mustfloat64s mustfloat64s(sourceparam mustint mustint(sourceparam mustint16 mustint16(sourceparam mustint16s mustint16s(sourceparam mustint32 mustint32(sourceparam mustint32s mustint32s(sourceparam mustint64 mustint64(sourceparam mustint64s mustint64s(sourceparam mustint8 mustint8(sourceparam mustint8s mustint8s(sourceparam mustints mustints(sourceparam mustjsonunmarshaler mustjsonunmarshaler(sourceparam muststring muststring(sourceparam *string) muststrings muststrings(sourceparam *[]string) musttextunmarshaler musttextunmarshaler(sourceparam encoding.textunmarshaler) musttime musttime(sourceparam *time.time, musttimes musttimes(sourceparam *[]time.time, mustuint mustuint(sourceparam *uint) mustuint16 mustuint16(sourceparam *uint16) mustuint16s mustuint16s(sourceparam *[]uint16) mustuint32 mustuint32(sourceparam *uint32) mustuint32s mustuint32s(sourceparam *[]uint32) mustuint64 mustuint64(sourceparam *uint64) mustuint64s mustuint64s(sourceparam *[]uint64) mustuint8 mustuint8(sourceparam *uint8) uint8 mustuint8s mustuint8s(sourceparam *[]uint8) mustuints mustuints(sourceparam *[]uint) mustunixtime mustunixtime(sourceparam *time.time) (in local time). 1609180603 2020-12-28t18:36:43.000000000+00:00 time.time{} (param empty) time.unix(0,0) \"0\") equal mustunixtimemilli mustunixtimemilli(sourceparam millisecond precision). 1647184410140 2022-03-13t15:13:30.140000000+00:00 mustunixtimenano mustunixtimenano(sourceparam nanosecond 1609180603123456789 2020-12-28t18:36:43.123456789+00:00 1000000000 1970-01-01t00:00:01.000000000+00:00 999999999 1970-01-01t00:00:00.999999999+00:00 javascript's number 53 bits precision (number.max\\_safe\\_integer 9007199254740991). compare example. string(sourceparam strings(sourceparam textunmarshaler textunmarshaler(sourceparam time(sourceparam times times(sourceparam uint(sourceparam uint16(sourceparam uint16s uint16s(sourceparam uint32(sourceparam uint32s uint32s(sourceparam uint64(sourceparam uint64s uint64s(sourceparam uint8(sourceparam uint8s uint8s(sourceparam uints uints(sourceparam unixtime unixtime(sourceparam unixtimemilli unixtimemilli(sourceparam unixtimenano unixtimenano(sourceparam",
+      "symbols": [
+        {
+          "name": "const TimeLayoutUnixTime",
+          "kind": "go constant",
+          "anchor": "const-TimeLayoutUnixTime"
+        },
+        {
+          "name": "const TimeLayoutUnixTimeMilli",
+          "kind": "go constant",
+          "anchor": "const-TimeLayoutUnixTimeMilli"
+        },
+        {
+          "name": "const TimeLayoutUnixTimeNano",
+          "kind": "go constant",
+          "anchor": "const-TimeLayoutUnixTimeNano"
+        },
+        {
+          "name": "const MIMEApplicationJSON",
+          "kind": "go constant",
+          "anchor": "const-MIMEApplicationJSON"
+        },
+        {
+          "name": "const MIMEApplicationJSONCharsetUTF8",
+          "kind": "go constant",
+          "anchor": "const-MIMEApplicationJSONCharsetUTF8"
+        },
+        {
+          "name": "const MIMEApplicationJavaScript",
+          "kind": "go constant",
+          "anchor": "const-MIMEApplicationJavaScript"
+        },
+        {
+          "name": "const MIMEApplicationJavaScriptCharsetUTF8",
+          "kind": "go constant",
+          "anchor": "const-MIMEApplicationJavaScriptCharsetUTF8"
+        },
+        {
+          "name": "const MIMEApplicationXML",
+          "kind": "go constant",
+          "anchor": "const-MIMEApplicationXML"
+        },
+        {
+          "name": "const MIMEApplicationXMLCharsetUTF8",
+          "kind": "go constant",
+          "anchor": "const-MIMEApplicationXMLCharsetUTF8"
+        },
+        {
+          "name": "const MIMETextXML",
+          "kind": "go constant",
+          "anchor": "const-MIMETextXML"
+        },
+        {
+          "name": "const MIMETextXMLCharsetUTF8",
+          "kind": "go constant",
+          "anchor": "const-MIMETextXMLCharsetUTF8"
+        },
+        {
+          "name": "const MIMEApplicationForm",
+          "kind": "go constant",
+          "anchor": "const-MIMEApplicationForm"
+        },
+        {
+          "name": "const MIMEApplicationProtobuf",
+          "kind": "go constant",
+          "anchor": "const-MIMEApplicationProtobuf"
+        },
+        {
+          "name": "const MIMEApplicationMsgpack",
+          "kind": "go constant",
+          "anchor": "const-MIMEApplicationMsgpack"
+        },
+        {
+          "name": "const MIMEApplicationProblemJSON",
+          "kind": "go constant",
+          "anchor": "const-MIMEApplicationProblemJSON"
+        },
+        {
+          "name": "const MIMETextHTML",
+          "kind": "go constant",
+          "anchor": "const-MIMETextHTML"
+        },
+        {
+          "name": "const MIMETextHTMLCharsetUTF8",
+          "kind": "go constant",
+          "anchor": "const-MIMETextHTMLCharsetUTF8"
+        },
+        {
+          "name": "const MIMETextPlain",
+          "kind": "go constant",
+          "anchor": "const-MIMETextPlain"
+        },
+        {
+          "name": "const MIMETextPlainCharsetUTF8",
+          "kind": "go constant",
+          "anchor": "const-MIMETextPlainCharsetUTF8"
+        },
+        {
+          "name": "const MIMEMultipartForm",
+          "kind": "go constant",
+          "anchor": "const-MIMEMultipartForm"
+        },
+        {
+          "name": "const MIMEOctetStream",
+          "kind": "go constant",
+          "anchor": "const-MIMEOctetStream"
+        },
+        {
+          "name": "const PROPFIND",
+          "kind": "go constant",
+          "anchor": "const-PROPFIND"
+        },
+        {
+          "name": "const REPORT",
+          "kind": "go constant",
+          "anchor": "const-REPORT"
+        },
+        {
+          "name": "const QUERY",
+          "kind": "go constant",
+          "anchor": "const-QUERY"
+        },
+        {
+          "name": "const RouteNotFound",
+          "kind": "go constant",
+          "anchor": "const-RouteNotFound"
+        },
+        {
+          "name": "const RouteAny",
+          "kind": "go constant",
+          "anchor": "const-RouteAny"
+        },
+        {
+          "name": "const HeaderAccept",
+          "kind": "go constant",
+          "anchor": "const-HeaderAccept"
+        },
+        {
+          "name": "const HeaderAcceptEncoding",
+          "kind": "go constant",
+          "anchor": "const-HeaderAcceptEncoding"
+        },
+        {
+          "name": "const HeaderAllow",
+          "kind": "go constant",
+          "anchor": "const-HeaderAllow"
+        },
+        {
+          "name": "const HeaderAuthorization",
+          "kind": "go constant",
+          "anchor": "const-HeaderAuthorization"
+        },
+        {
+          "name": "const HeaderContentDisposition",
+          "kind": "go constant",
+          "anchor": "const-HeaderContentDisposition"
+        },
+        {
+          "name": "const HeaderContentEncoding",
+          "kind": "go constant",
+          "anchor": "const-HeaderContentEncoding"
+        },
+        {
+          "name": "const HeaderContentLength",
+          "kind": "go constant",
+          "anchor": "const-HeaderContentLength"
+        },
+        {
+          "name": "const HeaderContentType",
+          "kind": "go constant",
+          "anchor": "const-HeaderContentType"
+        },
+        {
+          "name": "const HeaderCookie",
+          "kind": "go constant",
+          "anchor": "const-HeaderCookie"
+        },
+        {
+          "name": "const HeaderSetCookie",
+          "kind": "go constant",
+          "anchor": "const-HeaderSetCookie"
+        },
+        {
+          "name": "const HeaderIfModifiedSince",
+          "kind": "go constant",
+          "anchor": "const-HeaderIfModifiedSince"
+        },
+        {
+          "name": "const HeaderLastModified",
+          "kind": "go constant",
+          "anchor": "const-HeaderLastModified"
+        },
+        {
+          "name": "const HeaderLocation",
+          "kind": "go constant",
+          "anchor": "const-HeaderLocation"
+        },
+        {
+          "name": "const HeaderRetryAfter",
+          "kind": "go constant",
+          "anchor": "const-HeaderRetryAfter"
+        },
+        {
+          "name": "const HeaderUpgrade",
+          "kind": "go constant",
+          "anchor": "const-HeaderUpgrade"
+        },
+        {
+          "name": "const HeaderVary",
+          "kind": "go constant",
+          "anchor": "const-HeaderVary"
+        },
+        {
+          "name": "const HeaderWWWAuthenticate",
+          "kind": "go constant",
+          "anchor": "const-HeaderWWWAuthenticate"
+        },
+        {
+          "name": "const HeaderXForwardedFor",
+          "kind": "go constant",
+          "anchor": "const-HeaderXForwardedFor"
+        },
+        {
+          "name": "const HeaderXForwardedProto",
+          "kind": "go constant",
+          "anchor": "const-HeaderXForwardedProto"
+        },
+        {
+          "name": "const HeaderXForwardedProtocol",
+          "kind": "go constant",
+          "anchor": "const-HeaderXForwardedProtocol"
+        },
+        {
+          "name": "const HeaderXForwardedSsl",
+          "kind": "go constant",
+          "anchor": "const-HeaderXForwardedSsl"
+        },
+        {
+          "name": "const HeaderXUrlScheme",
+          "kind": "go constant",
+          "anchor": "const-HeaderXUrlScheme"
+        },
+        {
+          "name": "const HeaderXHTTPMethodOverride",
+          "kind": "go constant",
+          "anchor": "const-HeaderXHTTPMethodOverride"
+        },
+        {
+          "name": "const HeaderXRealIP",
+          "kind": "go constant",
+          "anchor": "const-HeaderXRealIP"
+        },
+        {
+          "name": "const HeaderXRequestID",
+          "kind": "go constant",
+          "anchor": "const-HeaderXRequestID"
+        },
+        {
+          "name": "const HeaderXCorrelationID",
+          "kind": "go constant",
+          "anchor": "const-HeaderXCorrelationID"
+        },
+        {
+          "name": "const HeaderXRequestedWith",
+          "kind": "go constant",
+          "anchor": "const-HeaderXRequestedWith"
+        },
+        {
+          "name": "const HeaderServer",
+          "kind": "go constant",
+          "anchor": "const-HeaderServer"
+        },
+        {
+          "name": "const HeaderOrigin",
+          "kind": "go constant",
+          "anchor": "const-HeaderOrigin"
+        },
+        {
+          "name": "const HeaderCacheControl",
+          "kind": "go constant",
+          "anchor": "const-HeaderCacheControl"
+        },
+        {
+          "name": "const HeaderConnection",
+          "kind": "go constant",
+          "anchor": "const-HeaderConnection"
+        },
+        {
+          "name": "const HeaderAccessControlRequestMethod",
+          "kind": "go constant",
+          "anchor": "const-HeaderAccessControlRequestMethod"
+        },
+        {
+          "name": "const HeaderAccessControlRequestHeaders",
+          "kind": "go constant",
+          "anchor": "const-HeaderAccessControlRequestHeaders"
+        },
+        {
+          "name": "const HeaderAccessControlAllowOrigin",
+          "kind": "go constant",
+          "anchor": "const-HeaderAccessControlAllowOrigin"
+        },
+        {
+          "name": "const HeaderAccessControlAllowMethods",
+          "kind": "go constant",
+          "anchor": "const-HeaderAccessControlAllowMethods"
+        },
+        {
+          "name": "const HeaderAccessControlAllowHeaders",
+          "kind": "go constant",
+          "anchor": "const-HeaderAccessControlAllowHeaders"
+        },
+        {
+          "name": "const HeaderAccessControlAllowCredentials",
+          "kind": "go constant",
+          "anchor": "const-HeaderAccessControlAllowCredentials"
+        },
+        {
+          "name": "const HeaderAccessControlExposeHeaders",
+          "kind": "go constant",
+          "anchor": "const-HeaderAccessControlExposeHeaders"
+        },
+        {
+          "name": "const HeaderAccessControlMaxAge",
+          "kind": "go constant",
+          "anchor": "const-HeaderAccessControlMaxAge"
+        },
+        {
+          "name": "const HeaderStrictTransportSecurity",
+          "kind": "go constant",
+          "anchor": "const-HeaderStrictTransportSecurity"
+        },
+        {
+          "name": "const HeaderXContentTypeOptions",
+          "kind": "go constant",
+          "anchor": "const-HeaderXContentTypeOptions"
+        },
+        {
+          "name": "const HeaderXXSSProtection",
+          "kind": "go constant",
+          "anchor": "const-HeaderXXSSProtection"
+        },
+        {
+          "name": "const HeaderXFrameOptions",
+          "kind": "go constant",
+          "anchor": "const-HeaderXFrameOptions"
+        },
+        {
+          "name": "const HeaderContentSecurityPolicy",
+          "kind": "go constant",
+          "anchor": "const-HeaderContentSecurityPolicy"
+        },
+        {
+          "name": "const HeaderContentSecurityPolicyReportOnly",
+          "kind": "go constant",
+          "anchor": "const-HeaderContentSecurityPolicyReportOnly"
+        },
+        {
+          "name": "const HeaderXCSRFToken",
+          "kind": "go constant",
+          "anchor": "const-HeaderXCSRFToken"
+        },
+        {
+          "name": "const HeaderReferrerPolicy",
+          "kind": "go constant",
+          "anchor": "const-HeaderReferrerPolicy"
+        },
+        {
+          "name": "const HeaderSecFetchSite",
+          "kind": "go constant",
+          "anchor": "const-HeaderSecFetchSite"
+        },
+        {
+          "name": "const NotFoundRouteName",
+          "kind": "go constant",
+          "anchor": "const-NotFoundRouteName"
+        },
+        {
+          "name": "const MethodNotAllowedRouteName",
+          "kind": "go constant",
+          "anchor": "const-MethodNotAllowedRouteName"
+        },
+        {
+          "name": "const ContextKeyHeaderAllow",
+          "kind": "go constant",
+          "anchor": "const-ContextKeyHeaderAllow"
+        },
+        {
+          "name": "const Version",
+          "kind": "go constant",
+          "anchor": "const-Version"
+        },
+        {
+          "name": "var ErrBadRequest",
+          "kind": "go variable",
+          "anchor": "var-ErrBadRequest"
+        },
+        {
+          "name": "var ErrUnauthorized",
+          "kind": "go variable",
+          "anchor": "var-ErrUnauthorized"
+        },
+        {
+          "name": "var ErrForbidden",
+          "kind": "go variable",
+          "anchor": "var-ErrForbidden"
+        },
+        {
+          "name": "var ErrNotFound",
+          "kind": "go variable",
+          "anchor": "var-ErrNotFound"
+        },
+        {
+          "name": "var ErrMethodNotAllowed",
+          "kind": "go variable",
+          "anchor": "var-ErrMethodNotAllowed"
+        },
+        {
+          "name": "var ErrRequestTimeout",
+          "kind": "go variable",
+          "anchor": "var-ErrRequestTimeout"
+        },
+        {
+          "name": "var ErrStatusRequestEntityTooLarge",
+          "kind": "go variable",
+          "anchor": "var-ErrStatusRequestEntityTooLarge"
+        },
+        {
+          "name": "var ErrUnsupportedMediaType",
+          "kind": "go variable",
+          "anchor": "var-ErrUnsupportedMediaType"
+        },
+        {
+          "name": "var ErrTooManyRequests",
+          "kind": "go variable",
+          "anchor": "var-ErrTooManyRequests"
+        },
+        {
+          "name": "var ErrInternalServerError",
+          "kind": "go variable",
+          "anchor": "var-ErrInternalServerError"
+        },
+        {
+          "name": "var ErrBadGateway",
+          "kind": "go variable",
+          "anchor": "var-ErrBadGateway"
+        },
+        {
+          "name": "var ErrServiceUnavailable",
+          "kind": "go variable",
+          "anchor": "var-ErrServiceUnavailable"
+        },
+        {
+          "name": "var ErrValidatorNotRegistered",
+          "kind": "go variable",
+          "anchor": "var-ErrValidatorNotRegistered"
+        },
+        {
+          "name": "var ErrRendererNotRegistered",
+          "kind": "go variable",
+          "anchor": "var-ErrRendererNotRegistered"
+        },
+        {
+          "name": "var ErrInvalidRedirectCode",
+          "kind": "go variable",
+          "anchor": "var-ErrInvalidRedirectCode"
+        },
+        {
+          "name": "var ErrCookieNotFound",
+          "kind": "go variable",
+          "anchor": "var-ErrCookieNotFound"
+        },
+        {
+          "name": "var ErrInvalidCertOrKeyType",
+          "kind": "go variable",
+          "anchor": "var-ErrInvalidCertOrKeyType"
+        },
+        {
+          "name": "var ErrInvalidListenerNetwork",
+          "kind": "go variable",
+          "anchor": "var-ErrInvalidListenerNetwork"
+        },
+        {
+          "name": "var ErrInvalidJSONPCallback",
+          "kind": "go variable",
+          "anchor": "var-ErrInvalidJSONPCallback"
+        },
+        {
+          "name": "var ErrInvalidKeyType",
+          "kind": "go variable",
+          "anchor": "var-ErrInvalidKeyType"
+        },
+        {
+          "name": "var ErrNonExistentKey",
+          "kind": "go variable",
+          "anchor": "var-ErrNonExistentKey"
+        },
+        {
+          "name": "func BindBody(c *Context, target any) (err error)",
+          "kind": "go function",
+          "anchor": "func-BindBody"
+        },
+        {
+          "name": "func BindHeaders(c *Context, target any) error",
+          "kind": "go function",
+          "anchor": "func-BindHeaders"
+        },
+        {
+          "name": "func BindPathValues(c *Context, target any) error",
+          "kind": "go function",
+          "anchor": "func-BindPathValues"
+        },
+        {
+          "name": "func BindQueryParams(c *Context, target any) error",
+          "kind": "go function",
+          "anchor": "func-BindQueryParams"
+        },
+        {
+          "name": "func ContextGet[T any](c *Context, key string) (T, error)",
+          "kind": "go function",
+          "anchor": "func-ContextGet"
+        },
+        {
+          "name": "func ContextGetOr[T any](c *Context, key string, defaultValue T) (T, error)",
+          "kind": "go function",
+          "anchor": "func-ContextGetOr"
+        },
+        {
+          "name": "func DefaultHTTPErrorHandler(exposeError bool) HTTPErrorHandler",
+          "kind": "go function",
+          "anchor": "func-DefaultHTTPErrorHandler"
+        },
+        {
+          "name": "Example DefaultHTTPErrorHandler",
+          "kind": "go example",
+          "anchor": "func-DefaultHTTPErrorHandler"
+        },
+        {
+          "name": "func ExtractIPDirect() IPExtractor",
+          "kind": "go function",
+          "anchor": "func-ExtractIPDirect"
+        },
+        {
+          "name": "func ExtractIPFromRealIPHeader(options ...TrustOption) IPExtractor",
+          "kind": "go function",
+          "anchor": "func-ExtractIPFromRealIPHeader"
+        },
+        {
+          "name": "func ExtractIPFromXFFHeader(options ...TrustOption) IPExtractor",
+          "kind": "go function",
+          "anchor": "func-ExtractIPFromXFFHeader"
+        },
+        {
+          "name": "func ExtractSchemeDirect() SchemeExtractor",
+          "kind": "go function",
+          "anchor": "func-ExtractSchemeDirect"
+        },
+        {
+          "name": "func ExtractSchemeFromHeaders(options ...TrustOption) SchemeExtractor",
+          "kind": "go function",
+          "anchor": "func-ExtractSchemeFromHeaders"
+        },
+        {
+          "name": "func FormFieldBinder(c *Context) *ValueBinder",
+          "kind": "go function",
+          "anchor": "func-FormFieldBinder"
+        },
+        {
+          "name": "func FormValue[T any](c *Context, key string, opts ...any) (T, error)",
+          "kind": "go function",
+          "anchor": "func-FormValue"
+        },
+        {
+          "name": "func FormValueOr[T any](c *Context, key string, defaultValue T, opts ...any) (T, error)",
+          "kind": "go function",
+          "anchor": "func-FormValueOr"
+        },
+        {
+          "name": "func FormValues[T any](c *Context, key string, opts ...any) ([]T, error)",
+          "kind": "go function",
+          "anchor": "func-FormValues"
+        },
+        {
+          "name": "func FormValuesOr[T any](c *Context, key string, defaultValue []T, opts ...any) ([]T, error)",
+          "kind": "go function",
+          "anchor": "func-FormValuesOr"
+        },
+        {
+          "name": "func HandlerName(h HandlerFunc) string",
+          "kind": "go function",
+          "anchor": "func-HandlerName"
+        },
+        {
+          "name": "func LegacyIPExtractor() IPExtractor",
+          "kind": "go function",
+          "anchor": "func-LegacyIPExtractor"
+        },
+        {
+          "name": "func LegacySchemeExtractor() SchemeExtractor",
+          "kind": "go function",
+          "anchor": "func-LegacySchemeExtractor"
+        },
+        {
+          "name": "func MustSubFS(currentFs fs.FS, fsRoot string) fs.FS",
+          "kind": "go function",
+          "anchor": "func-MustSubFS"
+        },
+        {
+          "name": "func New() *Echo",
+          "kind": "go function",
+          "anchor": "func-New"
+        },
+        {
+          "name": "func NewBindingError(sourceParam string, values []string, message string, err error) error",
+          "kind": "go function",
+          "anchor": "func-NewBindingError"
+        },
+        {
+          "name": "func NewConcurrentRouter(r Router) Router",
+          "kind": "go function",
+          "anchor": "func-NewConcurrentRouter"
+        },
+        {
+          "name": "func NewContext(r *http.Request, w http.ResponseWriter, opts ...any) *Context",
+          "kind": "go function",
+          "anchor": "func-NewContext"
+        },
+        {
+          "name": "func NewDefaultFS(dir string) fs.FS",
+          "kind": "go function",
+          "anchor": "func-NewDefaultFS"
+        },
+        {
+          "name": "func NewHTTPError(code int, message string) *HTTPError",
+          "kind": "go function",
+          "anchor": "func-NewHTTPError"
+        },
+        {
+          "name": "func NewResponse(w http.ResponseWriter, logger *slog.Logger) (r *Response)",
+          "kind": "go function",
+          "anchor": "func-NewResponse"
+        },
+        {
+          "name": "func NewRouter(config RouterConfig) *DefaultRouter",
+          "kind": "go function",
+          "anchor": "func-NewRouter"
+        },
+        {
+          "name": "func NewVirtualHostHandler(vhosts map[string]*Echo) *Echo",
+          "kind": "go function",
+          "anchor": "func-NewVirtualHostHandler"
+        },
+        {
+          "name": "func NewWithConfig(config Config) *Echo",
+          "kind": "go function",
+          "anchor": "func-NewWithConfig"
+        },
+        {
+          "name": "func ParseValue[T any](value string, opts ...any) (T, error)",
+          "kind": "go function",
+          "anchor": "func-ParseValue"
+        },
+        {
+          "name": "func ParseValueOr[T any](value string, defaultValue T, opts ...any) (T, error)",
+          "kind": "go function",
+          "anchor": "func-ParseValueOr"
+        },
+        {
+          "name": "func ParseValues[T any](values []string, opts ...any) ([]T, error)",
+          "kind": "go function",
+          "anchor": "func-ParseValues"
+        },
+        {
+          "name": "func ParseValuesOr[T any](values []string, defaultValue []T, opts ...any) ([]T, error)",
+          "kind": "go function",
+          "anchor": "func-ParseValuesOr"
+        },
+        {
+          "name": "func PathParam[T any](c *Context, paramName string, opts ...any) (T, error)",
+          "kind": "go function",
+          "anchor": "func-PathParam"
+        },
+        {
+          "name": "func PathParamOr[T any](c *Context, paramName string, defaultValue T, opts ...any) (T, error)",
+          "kind": "go function",
+          "anchor": "func-PathParamOr"
+        },
+        {
+          "name": "func PathValuesBinder(c *Context) *ValueBinder",
+          "kind": "go function",
+          "anchor": "func-PathValuesBinder"
+        },
+        {
+          "name": "func ProblemDetailsHTTPErrorHandler(exposeError bool) HTTPErrorHandler",
+          "kind": "go function",
+          "anchor": "func-ProblemDetailsHTTPErrorHandler"
+        },
+        {
+          "name": "func QueryParam[T any](c *Context, key string, opts ...any) (T, error)",
+          "kind": "go function",
+          "anchor": "func-QueryParam"
+        },
+        {
+          "name": "func QueryParamOr[T any](c *Context, key string, defaultValue T, opts ...any) (T, error)",
+          "kind": "go function",
+          "anchor": "func-QueryParamOr"
+        },
+        {
+          "name": "func QueryParams[T any](c *Context, key string, opts ...any) ([]T, error)",
+          "kind": "go function",
+          "anchor": "func-QueryParams"
+        },
+        {
+          "name": "func QueryParamsBinder(c *Context) *ValueBinder",
+          "kind": "go function",
+          "anchor": "func-QueryParamsBinder"
+        },
+        {
+          "name": "func QueryParamsOr[T any](c *Context, key string, defaultValue []T, opts ...any) ([]T, error)",
+          "kind": "go function",
+          "anchor": "func-QueryParamsOr"
+        },
+        {
+          "name": "func ResolveResponseStatus(rw http.ResponseWriter, err error) (resp *Response, status int)",
+          "kind": "go function",
+          "anchor": "func-ResolveResponseStatus"
+        },
+        {
+          "name": "func StaticDirectoryHandler(fileSystem fs.FS, disablePathUnescaping bool) HandlerFunc",
+          "kind": "go function",
+          "anchor": "func-StaticDirectoryHandler"
+        },
+        {
+          "name": "func StaticFileHandler(file string, filesystem fs.FS) HandlerFunc",
+          "kind": "go function",
+          "anchor": "func-StaticFileHandler"
+        },
+        {
+          "name": "func StatusCode(err error) int",
+          "kind": "go function",
+          "anchor": "func-StatusCode"
+        },
+        {
+          "name": "func TrustIPRange(ipRange *net.IPNet) TrustOption",
+          "kind": "go function",
+          "anchor": "func-TrustIPRange"
+        },
+        {
+          "name": "func TrustLinkLocal(v bool) TrustOption",
+          "kind": "go function",
+          "anchor": "func-TrustLinkLocal"
+        },
+        {
+          "name": "func TrustLoopback(v bool) TrustOption",
+          "kind": "go function",
+          "anchor": "func-TrustLoopback"
+        },
+        {
+          "name": "func TrustPrivateNet(v bool) TrustOption",
+          "kind": "go function",
+          "anchor": "func-TrustPrivateNet"
+        },
+        {
+          "name": "func UnwrapResponse(rw http.ResponseWriter) (*Response, error)",
+          "kind": "go function",
+          "anchor": "func-UnwrapResponse"
+        },
+        {
+          "name": "func WrapHandler(h http.Handler) HandlerFunc",
+          "kind": "go function",
+          "anchor": "func-WrapHandler"
+        },
+        {
+          "name": "func WrapMiddleware(m func(http.Handler) http.Handler) MiddlewareFunc",
+          "kind": "go function",
+          "anchor": "func-WrapMiddleware"
+        },
+        {
+          "name": "type AddRouteError",
+          "kind": "go type",
+          "anchor": "type-AddRouteError"
+        },
+        {
+          "name": "AddRouteError.Error",
+          "kind": "go method",
+          "anchor": "method-AddRouteError-Error"
+        },
+        {
+          "name": "AddRouteError.Unwrap",
+          "kind": "go method",
+          "anchor": "method-AddRouteError-Unwrap"
+        },
+        {
+          "name": "type BindUnmarshaler",
+          "kind": "go type",
+          "anchor": "type-BindUnmarshaler"
+        },
+        {
+          "name": "type Binder",
+          "kind": "go type",
+          "anchor": "type-Binder"
+        },
+        {
+          "name": "type BindingError",
+          "kind": "go type",
+          "anchor": "type-BindingError"
+        },
+        {
+          "name": "BindingError.Error",
+          "kind": "go method",
+          "anchor": "method-BindingError-Error"
+        },
+        {
+          "name": "BindingError.MarshalJSON",
+          "kind": "go method",
+          "anchor": "method-BindingError-MarshalJSON"
+        },
+        {
+          "name": "type Config",
+          "kind": "go type",
+          "anchor": "type-Config"
+        },
+        {
+          "name": "type Context",
+          "kind": "go type",
+          "anchor": "type-Context"
+        },
+        {
+          "name": "Context.Attachment",
+          "kind": "go method",
+          "anchor": "method-Context-Attachment"
+        },
+        {
+          "name": "Context.Bind",
+          "kind": "go method",
+          "anchor": "method-Context-Bind"
+        },
+        {
+          "name": "Context.Blob",
+          "kind": "go method",
+          "anchor": "method-Context-Blob"
+        },
+        {
+          "name": "Context.Cookie",
+          "kind": "go method",
+          "anchor": "method-Context-Cookie"
+        },
+        {
+          "name": "Context.Cookies",
+          "kind": "go method",
+          "anchor": "method-Context-Cookies"
+        },
+        {
+          "name": "Context.Echo",
+          "kind": "go method",
+          "anchor": "method-Context-Echo"
+        },
+        {
+          "name": "Context.File",
+          "kind": "go method",
+          "anchor": "method-Context-File"
+        },
+        {
+          "name": "Context.FileFS",
+          "kind": "go method",
+          "anchor": "method-Context-FileFS"
+        },
+        {
+          "name": "Context.FormFile",
+          "kind": "go method",
+          "anchor": "method-Context-FormFile"
+        },
+        {
+          "name": "Context.FormValue",
+          "kind": "go method",
+          "anchor": "method-Context-FormValue"
+        },
+        {
+          "name": "Context.FormValueOr",
+          "kind": "go method",
+          "anchor": "method-Context-FormValueOr"
+        },
+        {
+          "name": "Context.FormValues",
+          "kind": "go method",
+          "anchor": "method-Context-FormValues"
+        },
+        {
+          "name": "Context.Get",
+          "kind": "go method",
+          "anchor": "method-Context-Get"
+        },
+        {
+          "name": "Context.HTML",
+          "kind": "go method",
+          "anchor": "method-Context-HTML"
+        },
+        {
+          "name": "Context.HTMLBlob",
+          "kind": "go method",
+          "anchor": "method-Context-HTMLBlob"
+        },
+        {
+          "name": "Context.InitializeRoute",
+          "kind": "go method",
+          "anchor": "method-Context-InitializeRoute"
+        },
+        {
+          "name": "Context.Inline",
+          "kind": "go method",
+          "anchor": "method-Context-Inline"
+        },
+        {
+          "name": "Context.IsTLS",
+          "kind": "go method",
+          "anchor": "method-Context-IsTLS"
+        },
+        {
+          "name": "Context.IsWebSocket",
+          "kind": "go method",
+          "anchor": "method-Context-IsWebSocket"
+        },
+        {
+          "name": "Context.JSON",
+          "kind": "go method",
+          "anchor": "method-Context-JSON"
+        },
+        {
+          "name": "Context.JSONBlob",
+          "kind": "go method",
+          "anchor": "method-Context-JSONBlob"
+        },
+        {
+          "name": "Context.JSONP",
+          "kind": "go method",
+          "anchor": "method-Context-JSONP"
+        },
+        {
+          "name": "Context.JSONPBlob",
+          "kind": "go method",
+          "anchor": "method-Context-JSONPBlob"
+        },
+        {
+          "name": "Context.JSONPretty",
+          "kind": "go method",
+          "anchor": "method-Context-JSONPretty"
+        },
+        {
+          "name": "Context.Logger",
+          "kind": "go method",
+          "anchor": "method-Context-Logger"
+        },
+        {
+          "name": "Context.MultipartForm",
+          "kind": "go method",
+          "anchor": "method-Context-MultipartForm"
+        },
+        {
+          "name": "Context.NoContent",
+          "kind": "go method",
+          "anchor": "method-Context-NoContent"
+        },
+        {
+          "name": "Context.Param",
+          "kind": "go method",
+          "anchor": "method-Context-Param"
+        },
+        {
+          "name": "Context.ParamOr",
+          "kind": "go method",
+          "anchor": "method-Context-ParamOr"
+        },
+        {
+          "name": "Context.Path",
+          "kind": "go method",
+          "anchor": "method-Context-Path"
+        },
+        {
+          "name": "Context.PathValues",
+          "kind": "go method",
+          "anchor": "method-Context-PathValues"
+        },
+        {
+          "name": "Context.QueryParam",
+          "kind": "go method",
+          "anchor": "method-Context-QueryParam"
+        },
+        {
+          "name": "Context.QueryParamOr",
+          "kind": "go method",
+          "anchor": "method-Context-QueryParamOr"
+        },
+        {
+          "name": "Context.QueryParams",
+          "kind": "go method",
+          "anchor": "method-Context-QueryParams"
+        },
+        {
+          "name": "Context.QueryString",
+          "kind": "go method",
+          "anchor": "method-Context-QueryString"
+        },
+        {
+          "name": "Context.RealIP",
+          "kind": "go method",
+          "anchor": "method-Context-RealIP"
+        },
+        {
+          "name": "Context.Redirect",
+          "kind": "go method",
+          "anchor": "method-Context-Redirect"
+        },
+        {
+          "name": "Context.Render",
+          "kind": "go method",
+          "anchor": "method-Context-Render"
+        },
+        {
+          "name": "Context.Request",
+          "kind": "go method",
+          "anchor": "method-Context-Request"
+        },
+        {
+          "name": "Context.Reset",
+          "kind": "go method",
+          "anchor": "method-Context-Reset"
+        },
+        {
+          "name": "Context.Response",
+          "kind": "go method",
+          "anchor": "method-Context-Response"
+        },
+        {
+          "name": "Context.RouteInfo",
+          "kind": "go method",
+          "anchor": "method-Context-RouteInfo"
+        },
+        {
+          "name": "Context.Scheme",
+          "kind": "go method",
+          "anchor": "method-Context-Scheme"
+        },
+        {
+          "name": "Context.Set",
+          "kind": "go method",
+          "anchor": "method-Context-Set"
+        },
+        {
+          "name": "Context.SetCookie",
+          "kind": "go method",
+          "anchor": "method-Context-SetCookie"
+        },
+        {
+          "name": "Context.SetLogger",
+          "kind": "go method",
+          "anchor": "method-Context-SetLogger"
+        },
+        {
+          "name": "Context.SetPath",
+          "kind": "go method",
+          "anchor": "method-Context-SetPath"
+        },
+        {
+          "name": "Context.SetPathValues",
+          "kind": "go method",
+          "anchor": "method-Context-SetPathValues"
+        },
+        {
+          "name": "Context.SetRequest",
+          "kind": "go method",
+          "anchor": "method-Context-SetRequest"
+        },
+        {
+          "name": "Context.SetResponse",
+          "kind": "go method",
+          "anchor": "method-Context-SetResponse"
+        },
+        {
+          "name": "Context.Stream",
+          "kind": "go method",
+          "anchor": "method-Context-Stream"
+        },
+        {
+          "name": "Context.String",
+          "kind": "go method",
+          "anchor": "method-Context-String"
+        },
+        {
+          "name": "Context.Validate",
+          "kind": "go method",
+          "anchor": "method-Context-Validate"
+        },
+        {
+          "name": "Context.ValidateCtx",
+          "kind": "go method",
+          "anchor": "method-Context-ValidateCtx"
+        },
+        {
+          "name": "Context.XML",
+          "kind": "go method",
+          "anchor": "method-Context-XML"
+        },
+        {
+          "name": "Context.XMLBlob",
+          "kind": "go method",
+          "anchor": "method-Context-XMLBlob"
+        },
+        {
+          "name": "Context.XMLPretty",
+          "kind": "go method",
+          "anchor": "method-Context-XMLPretty"
+        },
+        {
+          "name": "type DefaultBinder",
+          "kind": "go type",
+          "anchor": "type-DefaultBinder"
+        },
+        {
+          "name": "DefaultBinder.Bind",
+          "kind": "go method",
+          "anchor": "method-DefaultBinder-Bind"
+        },
+        {
+          "name": "type DefaultJSONSerializer",
+          "kind": "go type",
+          "anchor": "type-DefaultJSONSerializer"
+        },
+        {
+          "name": "DefaultJSONSerializer.Deserialize",
+          "kind": "go method",
+          "anchor": "method-DefaultJSONSerializer-Deserialize"
+        },
+        {
+          "name": "DefaultJSONSerializer.Serialize",
+          "kind": "go method",
+          "anchor": "method-DefaultJSONSerializer-Serialize"
+        },
+        {
+          "name": "type DefaultRouter",
+          "kind": "go type",
+          "anchor": "type-DefaultRouter"
+        },
+        {
+          "name": "DefaultRouter.Add",
+          "kind": "go method",
+          "anchor": "method-DefaultRouter-Add"
+        },
+        {
+          "name": "DefaultRouter.Remove",
+          "kind": "go method",
+          "anchor": "method-DefaultRouter-Remove"
+        },
+        {
+          "name": "DefaultRouter.Route",
+          "kind": "go method",
+          "anchor": "method-DefaultRouter-Route"
+        },
+        {
+          "name": "DefaultRouter.Routes",
+          "kind": "go method",
+          "anchor": "method-DefaultRouter-Routes"
+        },
+        {
+          "name": "type Echo",
+          "kind": "go type",
+          "anchor": "type-Echo"
+        },
+        {
+          "name": "Echo.AcquireContext",
+          "kind": "go method",
+          "anchor": "method-Echo-AcquireContext"
+        },
+        {
+          "name": "Echo.Add",
+          "kind": "go method",
+          "anchor": "method-Echo-Add"
+        },
+        {
+          "name": "Echo.AddRoute",
+          "kind": "go method",
+          "anchor": "method-Echo-AddRoute"
+        },
+        {
+          "name": "Echo.Any",
+          "kind": "go method",
+          "anchor": "method-Echo-Any"
+        },
+        {
+          "name": "Echo.CONNECT",
+          "kind": "go method",
+          "anchor": "method-Echo-CONNECT"
+        },
+        {
+          "name": "Echo.DELETE",
+          "kind": "go method",
+          "anchor": "method-Echo-DELETE"
+        },
+        {
+          "name": "Echo.File",
+          "kind": "go method",
+          "anchor": "method-Echo-File"
+        },
+        {
+          "name": "Echo.FileFS",
+          "kind": "go method",
+          "anchor": "method-Echo-FileFS"
+        },
+        {
+          "name": "Echo.GET",
+          "kind": "go method",
+          "anchor": "method-Echo-GET"
+        },
+        {
+          "name": "Echo.Group",
+          "kind": "go method",
+          "anchor": "method-Echo-Group"
+        },
+        {
+          "name": "Echo.HEAD",
+          "kind": "go method",
+          "anchor": "method-Echo-HEAD"
+        },
+        {
+          "name": "Echo.Match",
+          "kind": "go method",
+          "anchor": "method-Echo-Match"
+        },
+        {
+          "name": "Echo.Middlewares",
+          "kind": "go method",
+          "anchor": "method-Echo-Middlewares"
+        },
+        {
+          "name": "Echo.NewContext",
+          "kind": "go method",
+          "anchor": "method-Echo-NewContext"
+        },
+        {
+          "name": "Echo.OPTIONS",
+          "kind": "go method",
+          "anchor": "method-Echo-OPTIONS"
+        },
+        {
+          "name": "Echo.PATCH",
+          "kind": "go method",
+          "anchor": "method-Echo-PATCH"
+        },
+        {
+          "name": "Echo.POST",
+          "kind": "go method",
+          "anchor": "method-Echo-POST"
+        },
+        {
+          "name": "Echo.PUT",
+          "kind": "go method",
+          "anchor": "method-Echo-PUT"
+        },
+        {
+          "name": "Echo.Pre",
+          "kind": "go method",
+          "anchor": "method-Echo-Pre"
+        },
+        {
+          "name": "Echo.PreMiddlewares",
+          "kind": "go method",
+          "anchor": "method-Echo-PreMiddlewares"
+        },
+        {
+          "name": "Echo.QUERY",
+          "kind": "go method",
+          "anchor": "method-Echo-QUERY"
+        },
+        {
+          "name": "Echo.ReleaseContext",
+          "kind": "go method",
+          "anchor": "method-Echo-ReleaseContext"
+        },
+        {
+          "name": "Echo.RouteNotFound",
+          "kind": "go method",
+          "anchor": "method-Echo-RouteNotFound"
+        },
+        {
+          "name": "Echo.Router",
+          "kind": "go method",
+          "anchor": "method-Echo-Router"
+        },
+        {
+          "name": "Echo.ServeHTTP",
+          "kind": "go method",
+          "anchor": "method-Echo-ServeHTTP"
+        },
+        {
+          "name": "Echo.Start",
+          "kind": "go method",
+          "anchor": "method-Echo-Start"
+        },
+        {
+          "name": "Echo.Static",
+          "kind": "go method",
+          "anchor": "method-Echo-Static"
+        },
+        {
+          "name": "Echo.StaticFS",
+          "kind": "go method",
+          "anchor": "method-Echo-StaticFS"
+        },
+        {
+          "name": "Echo.TRACE",
+          "kind": "go method",
+          "anchor": "method-Echo-TRACE"
+        },
+        {
+          "name": "Echo.Use",
+          "kind": "go method",
+          "anchor": "method-Echo-Use"
+        },
+        {
+          "name": "type Group",
+          "kind": "go type",
+          "anchor": "type-Group"
+        },
+        {
+          "name": "Group.Add",
+          "kind": "go method",
+          "anchor": "method-Group-Add"
+        },
+        {
+          "name": "Group.AddRoute",
+          "kind": "go method",
+          "anchor": "method-Group-AddRoute"
+        },
+        {
+          "name": "Group.Any",
+          "kind": "go method",
+          "anchor": "method-Group-Any"
+        },
+        {
+          "name": "Group.CONNECT",
+          "kind": "go method",
+          "anchor": "method-Group-CONNECT"
+        },
+        {
+          "name": "Group.DELETE",
+          "kind": "go method",
+          "anchor": "method-Group-DELETE"
+        },
+        {
+          "name": "Group.File",
+          "kind": "go method",
+          "anchor": "method-Group-File"
+        },
+        {
+          "name": "Group.FileFS",
+          "kind": "go method",
+          "anchor": "method-Group-FileFS"
+        },
+        {
+          "name": "Group.GET",
+          "kind": "go method",
+          "anchor": "method-Group-GET"
+        },
+        {
+          "name": "Group.Group",
+          "kind": "go method",
+          "anchor": "method-Group-Group"
+        },
+        {
+          "name": "Group.HEAD",
+          "kind": "go method",
+          "anchor": "method-Group-HEAD"
+        },
+        {
+          "name": "Group.Match",
+          "kind": "go method",
+          "anchor": "method-Group-Match"
+        },
+        {
+          "name": "Group.OPTIONS",
+          "kind": "go method",
+          "anchor": "method-Group-OPTIONS"
+        },
+        {
+          "name": "Group.PATCH",
+          "kind": "go method",
+          "anchor": "method-Group-PATCH"
+        },
+        {
+          "name": "Group.POST",
+          "kind": "go method",
+          "anchor": "method-Group-POST"
+        },
+        {
+          "name": "Group.PUT",
+          "kind": "go method",
+          "anchor": "method-Group-PUT"
+        },
+        {
+          "name": "Group.QUERY",
+          "kind": "go method",
+          "anchor": "method-Group-QUERY"
+        },
+        {
+          "name": "Group.RouteNotFound",
+          "kind": "go method",
+          "anchor": "method-Group-RouteNotFound"
+        },
+        {
+          "name": "Group.Static",
+          "kind": "go method",
+          "anchor": "method-Group-Static"
+        },
+        {
+          "name": "Group.StaticFS",
+          "kind": "go method",
+          "anchor": "method-Group-StaticFS"
+        },
+        {
+          "name": "Group.TRACE",
+          "kind": "go method",
+          "anchor": "method-Group-TRACE"
+        },
+        {
+          "name": "Group.Use",
+          "kind": "go method",
+          "anchor": "method-Group-Use"
+        },
+        {
+          "name": "type HTTPError",
+          "kind": "go type",
+          "anchor": "type-HTTPError"
+        },
+        {
+          "name": "HTTPError.Error",
+          "kind": "go method",
+          "anchor": "method-HTTPError-Error"
+        },
+        {
+          "name": "HTTPError.StatusCode",
+          "kind": "go method",
+          "anchor": "method-HTTPError-StatusCode"
+        },
+        {
+          "name": "HTTPError.Unwrap",
+          "kind": "go method",
+          "anchor": "method-HTTPError-Unwrap"
+        },
+        {
+          "name": "HTTPError.Wrap",
+          "kind": "go method",
+          "anchor": "method-HTTPError-Wrap"
+        },
+        {
+          "name": "type HTTPErrorHandler",
+          "kind": "go type",
+          "anchor": "type-HTTPErrorHandler"
+        },
+        {
+          "name": "type HTTPStatusCoder",
+          "kind": "go type",
+          "anchor": "type-HTTPStatusCoder"
+        },
+        {
+          "name": "type HandlerFunc",
+          "kind": "go type",
+          "anchor": "type-HandlerFunc"
+        },
+        {
+          "name": "type IPExtractor",
+          "kind": "go type",
+          "anchor": "type-IPExtractor"
+        },
+        {
+          "name": "type JSONSerializer",
+          "kind": "go type",
+          "anchor": "type-JSONSerializer"
+        },
+        {
+          "name": "type MiddlewareConfigurator",
+          "kind": "go type",
+          "anchor": "type-MiddlewareConfigurator"
+        },
+        {
+          "name": "type MiddlewareFunc",
+          "kind": "go type",
+          "anchor": "type-MiddlewareFunc"
+        },
+        {
+          "name": "type PathValue",
+          "kind": "go type",
+          "anchor": "type-PathValue"
+        },
+        {
+          "name": "type PathValues",
+          "kind": "go type",
+          "anchor": "type-PathValues"
+        },
+        {
+          "name": "PathValues.Get",
+          "kind": "go method",
+          "anchor": "method-PathValues-Get"
+        },
+        {
+          "name": "PathValues.GetOr",
+          "kind": "go method",
+          "anchor": "method-PathValues-GetOr"
+        },
+        {
+          "name": "type ProblemError",
+          "kind": "go type",
+          "anchor": "type-ProblemError"
+        },
+        {
+          "name": "ProblemError.Error",
+          "kind": "go method",
+          "anchor": "method-ProblemError-Error"
+        },
+        {
+          "name": "ProblemError.StatusCode",
+          "kind": "go method",
+          "anchor": "method-ProblemError-StatusCode"
+        },
+        {
+          "name": "type ProblemErrorer",
+          "kind": "go type",
+          "anchor": "type-ProblemErrorer"
+        },
+        {
+          "name": "type Renderer",
+          "kind": "go type",
+          "anchor": "type-Renderer"
+        },
+        {
+          "name": "type Response",
+          "kind": "go type",
+          "anchor": "type-Response"
+        },
+        {
+          "name": "Response.After",
+          "kind": "go method",
+          "anchor": "method-Response-After"
+        },
+        {
+          "name": "Response.Before",
+          "kind": "go method",
+          "anchor": "method-Response-Before"
+        },
+        {
+          "name": "Response.Flush",
+          "kind": "go method",
+          "anchor": "method-Response-Flush"
+        },
+        {
+          "name": "Response.Hijack",
+          "kind": "go method",
+          "anchor": "method-Response-Hijack"
+        },
+        {
+          "name": "Response.Unwrap",
+          "kind": "go method",
+          "anchor": "method-Response-Unwrap"
+        },
+        {
+          "name": "Response.Write",
+          "kind": "go method",
+          "anchor": "method-Response-Write"
+        },
+        {
+          "name": "Response.WriteHeader",
+          "kind": "go method",
+          "anchor": "method-Response-WriteHeader"
+        },
+        {
+          "name": "type Route",
+          "kind": "go type",
+          "anchor": "type-Route"
+        },
+        {
+          "name": "Route.ToRouteInfo",
+          "kind": "go method",
+          "anchor": "method-Route-ToRouteInfo"
+        },
+        {
+          "name": "Route.WithPrefix",
+          "kind": "go method",
+          "anchor": "method-Route-WithPrefix"
+        },
+        {
+          "name": "type RouteInfo",
+          "kind": "go type",
+          "anchor": "type-RouteInfo"
+        },
+        {
+          "name": "RouteInfo.Clone",
+          "kind": "go method",
+          "anchor": "method-RouteInfo-Clone"
+        },
+        {
+          "name": "RouteInfo.Reverse",
+          "kind": "go method",
+          "anchor": "method-RouteInfo-Reverse"
+        },
+        {
+          "name": "type Router",
+          "kind": "go type",
+          "anchor": "type-Router"
+        },
+        {
+          "name": "type RouterConfig",
+          "kind": "go type",
+          "anchor": "type-RouterConfig"
+        },
+        {
+          "name": "type Routes",
+          "kind": "go type",
+          "anchor": "type-Routes"
+        },
+        {
+          "name": "Routes.Clone",
+          "kind": "go method",
+          "anchor": "method-Routes-Clone"
+        },
+        {
+          "name": "Routes.FilterByMethod",
+          "kind": "go method",
+          "anchor": "method-Routes-FilterByMethod"
+        },
+        {
+          "name": "Routes.FilterByName",
+          "kind": "go method",
+          "anchor": "method-Routes-FilterByName"
+        },
+        {
+          "name": "Routes.FilterByPath",
+          "kind": "go method",
+          "anchor": "method-Routes-FilterByPath"
+        },
+        {
+          "name": "Routes.FindByMethodPath",
+          "kind": "go method",
+          "anchor": "method-Routes-FindByMethodPath"
+        },
+        {
+          "name": "Routes.Reverse",
+          "kind": "go method",
+          "anchor": "method-Routes-Reverse"
+        },
+        {
+          "name": "type SchemeExtractor",
+          "kind": "go type",
+          "anchor": "type-SchemeExtractor"
+        },
+        {
+          "name": "type StartConfig",
+          "kind": "go type",
+          "anchor": "type-StartConfig"
+        },
+        {
+          "name": "StartConfig.Start",
+          "kind": "go method",
+          "anchor": "method-StartConfig-Start"
+        },
+        {
+          "name": "StartConfig.StartTLS",
+          "kind": "go method",
+          "anchor": "method-StartConfig-StartTLS"
+        },
+        {
+          "name": "type TemplateRenderer",
+          "kind": "go type",
+          "anchor": "type-TemplateRenderer"
+        },
+        {
+          "name": "TemplateRenderer.Render",
+          "kind": "go method",
+          "anchor": "method-TemplateRenderer-Render"
+        },
+        {
+          "name": "type TimeLayout",
+          "kind": "go type",
+          "anchor": "type-TimeLayout"
+        },
+        {
+          "name": "type TimeOpts",
+          "kind": "go type",
+          "anchor": "type-TimeOpts"
+        },
+        {
+          "name": "type TrustOption",
+          "kind": "go type",
+          "anchor": "type-TrustOption"
+        },
+        {
+          "name": "type Validator",
+          "kind": "go type",
+          "anchor": "type-Validator"
+        },
+        {
+          "name": "type ValueBinder",
+          "kind": "go type",
+          "anchor": "type-ValueBinder"
+        },
+        {
+          "name": "ValueBinder.BindError",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-BindError"
+        },
+        {
+          "name": "Example ValueBinder.BindError",
+          "kind": "go example",
+          "anchor": "method-ValueBinder-BindError"
+        },
+        {
+          "name": "ValueBinder.BindErrors",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-BindErrors"
+        },
+        {
+          "name": "Example ValueBinder.BindErrors",
+          "kind": "go example",
+          "anchor": "method-ValueBinder-BindErrors"
+        },
+        {
+          "name": "ValueBinder.BindUnmarshaler",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-BindUnmarshaler"
+        },
+        {
+          "name": "ValueBinder.BindWithDelimiter",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-BindWithDelimiter"
+        },
+        {
+          "name": "ValueBinder.Bool",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-Bool"
+        },
+        {
+          "name": "ValueBinder.Bools",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-Bools"
+        },
+        {
+          "name": "ValueBinder.Byte",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-Byte"
+        },
+        {
+          "name": "ValueBinder.CustomFunc",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-CustomFunc"
+        },
+        {
+          "name": "Example ValueBinder.CustomFunc",
+          "kind": "go example",
+          "anchor": "method-ValueBinder-CustomFunc"
+        },
+        {
+          "name": "ValueBinder.Duration",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-Duration"
+        },
+        {
+          "name": "ValueBinder.Durations",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-Durations"
+        },
+        {
+          "name": "ValueBinder.FailFast",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-FailFast"
+        },
+        {
+          "name": "ValueBinder.Float32",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-Float32"
+        },
+        {
+          "name": "ValueBinder.Float32s",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-Float32s"
+        },
+        {
+          "name": "ValueBinder.Float64",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-Float64"
+        },
+        {
+          "name": "ValueBinder.Float64s",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-Float64s"
+        },
+        {
+          "name": "ValueBinder.Int",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-Int"
+        },
+        {
+          "name": "ValueBinder.Int16",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-Int16"
+        },
+        {
+          "name": "ValueBinder.Int16s",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-Int16s"
+        },
+        {
+          "name": "ValueBinder.Int32",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-Int32"
+        },
+        {
+          "name": "ValueBinder.Int32s",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-Int32s"
+        },
+        {
+          "name": "ValueBinder.Int64",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-Int64"
+        },
+        {
+          "name": "ValueBinder.Int64s",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-Int64s"
+        },
+        {
+          "name": "ValueBinder.Int8",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-Int8"
+        },
+        {
+          "name": "ValueBinder.Int8s",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-Int8s"
+        },
+        {
+          "name": "ValueBinder.Ints",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-Ints"
+        },
+        {
+          "name": "ValueBinder.JSONUnmarshaler",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-JSONUnmarshaler"
+        },
+        {
+          "name": "ValueBinder.MustBindUnmarshaler",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-MustBindUnmarshaler"
+        },
+        {
+          "name": "ValueBinder.MustBindWithDelimiter",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-MustBindWithDelimiter"
+        },
+        {
+          "name": "ValueBinder.MustBool",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-MustBool"
+        },
+        {
+          "name": "ValueBinder.MustBools",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-MustBools"
+        },
+        {
+          "name": "ValueBinder.MustByte",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-MustByte"
+        },
+        {
+          "name": "ValueBinder.MustCustomFunc",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-MustCustomFunc"
+        },
+        {
+          "name": "ValueBinder.MustDuration",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-MustDuration"
+        },
+        {
+          "name": "ValueBinder.MustDurations",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-MustDurations"
+        },
+        {
+          "name": "ValueBinder.MustFloat32",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-MustFloat32"
+        },
+        {
+          "name": "ValueBinder.MustFloat32s",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-MustFloat32s"
+        },
+        {
+          "name": "ValueBinder.MustFloat64",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-MustFloat64"
+        },
+        {
+          "name": "ValueBinder.MustFloat64s",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-MustFloat64s"
+        },
+        {
+          "name": "ValueBinder.MustInt",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-MustInt"
+        },
+        {
+          "name": "ValueBinder.MustInt16",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-MustInt16"
+        },
+        {
+          "name": "ValueBinder.MustInt16s",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-MustInt16s"
+        },
+        {
+          "name": "ValueBinder.MustInt32",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-MustInt32"
+        },
+        {
+          "name": "ValueBinder.MustInt32s",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-MustInt32s"
+        },
+        {
+          "name": "ValueBinder.MustInt64",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-MustInt64"
+        },
+        {
+          "name": "ValueBinder.MustInt64s",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-MustInt64s"
+        },
+        {
+          "name": "ValueBinder.MustInt8",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-MustInt8"
+        },
+        {
+          "name": "ValueBinder.MustInt8s",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-MustInt8s"
+        },
+        {
+          "name": "ValueBinder.MustInts",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-MustInts"
+        },
+        {
+          "name": "ValueBinder.MustJSONUnmarshaler",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-MustJSONUnmarshaler"
+        },
+        {
+          "name": "ValueBinder.MustString",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-MustString"
+        },
+        {
+          "name": "ValueBinder.MustStrings",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-MustStrings"
+        },
+        {
+          "name": "ValueBinder.MustTextUnmarshaler",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-MustTextUnmarshaler"
+        },
+        {
+          "name": "ValueBinder.MustTime",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-MustTime"
+        },
+        {
+          "name": "ValueBinder.MustTimes",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-MustTimes"
+        },
+        {
+          "name": "ValueBinder.MustUint",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-MustUint"
+        },
+        {
+          "name": "ValueBinder.MustUint16",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-MustUint16"
+        },
+        {
+          "name": "ValueBinder.MustUint16s",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-MustUint16s"
+        },
+        {
+          "name": "ValueBinder.MustUint32",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-MustUint32"
+        },
+        {
+          "name": "ValueBinder.MustUint32s",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-MustUint32s"
+        },
+        {
+          "name": "ValueBinder.MustUint64",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-MustUint64"
+        },
+        {
+          "name": "ValueBinder.MustUint64s",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-MustUint64s"
+        },
+        {
+          "name": "ValueBinder.MustUint8",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-MustUint8"
+        },
+        {
+          "name": "ValueBinder.MustUint8s",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-MustUint8s"
+        },
+        {
+          "name": "ValueBinder.MustUints",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-MustUints"
+        },
+        {
+          "name": "ValueBinder.MustUnixTime",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-MustUnixTime"
+        },
+        {
+          "name": "ValueBinder.MustUnixTimeMilli",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-MustUnixTimeMilli"
+        },
+        {
+          "name": "ValueBinder.MustUnixTimeNano",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-MustUnixTimeNano"
+        },
+        {
+          "name": "ValueBinder.String",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-String"
+        },
+        {
+          "name": "ValueBinder.Strings",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-Strings"
+        },
+        {
+          "name": "ValueBinder.TextUnmarshaler",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-TextUnmarshaler"
+        },
+        {
+          "name": "ValueBinder.Time",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-Time"
+        },
+        {
+          "name": "ValueBinder.Times",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-Times"
+        },
+        {
+          "name": "ValueBinder.Uint",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-Uint"
+        },
+        {
+          "name": "ValueBinder.Uint16",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-Uint16"
+        },
+        {
+          "name": "ValueBinder.Uint16s",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-Uint16s"
+        },
+        {
+          "name": "ValueBinder.Uint32",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-Uint32"
+        },
+        {
+          "name": "ValueBinder.Uint32s",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-Uint32s"
+        },
+        {
+          "name": "ValueBinder.Uint64",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-Uint64"
+        },
+        {
+          "name": "ValueBinder.Uint64s",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-Uint64s"
+        },
+        {
+          "name": "ValueBinder.Uint8",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-Uint8"
+        },
+        {
+          "name": "ValueBinder.Uint8s",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-Uint8s"
+        },
+        {
+          "name": "ValueBinder.Uints",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-Uints"
+        },
+        {
+          "name": "ValueBinder.UnixTime",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-UnixTime"
+        },
+        {
+          "name": "ValueBinder.UnixTimeMilli",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-UnixTimeMilli"
+        },
+        {
+          "name": "ValueBinder.UnixTimeNano",
+          "kind": "go method",
+          "anchor": "method-ValueBinder-UnixTimeNano"
+        }
+      ],
+      "documentId": "package-root",
+      "locale": "en",
+      "contentLocale": "en",
+      "contentVersion": "current",
+      "versionScope": "site",
+      "alternates": [
+        {
+          "locale": "en",
+          "contentVersion": "current",
+          "url": "https://echo.labstack.com/sourcey/api/package-root.html",
+          "markdown": "https://echo.labstack.com/sourcey/api/package-root.md"
+        }
+      ]
+    },
+    {
+      "id": "api.md",
+      "kind": "page",
+      "title": "Go API",
+      "description": "Go API for github.com/labstack/echo/v5 across 1 package.",
+      "tab": "api",
+      "url": "https://echo.labstack.com/sourcey/api.html",
+      "markdown": "https://echo.labstack.com/sourcey/api.md",
+      "file": "api.md",
+      "searchText": "- [github.com/labstack/echo/v5](/sourcey/api/package-root.html): package echo implements high performance, minimalist go web framework.",
+      "documentId": "index",
+      "locale": "en",
+      "contentLocale": "en",
+      "contentVersion": "current",
+      "versionScope": "site",
+      "alternates": [
+        {
+          "locale": "en",
+          "contentVersion": "current",
+          "url": "https://echo.labstack.com/sourcey/api.html",
+          "markdown": "https://echo.labstack.com/sourcey/api.md"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+# echo
+
+## Docs
+
+- [Echo — High performance, minimalist Go web framework](https://echo.labstack.com/sourcey/index.md): Fast, extensible, minimalist Go web framework built on net/http. Radix-tree router, request binding, centralized error handling, and a concrete Context struct in v5.
+- [Quickstart](https://echo.labstack.com/sourcey/quickstart.md): Install Echo v5, run your first Hello World server, and learn the core concepts — Echo instance, routes, handlers, Start.
+- [Routing and context](https://echo.labstack.com/sourcey/guides/routing-context.md): Route parameters, wildcards, route groups, the v5 Router interface, and reading route info from the context.
+- [Middleware](https://echo.labstack.com/sourcey/guides/middleware.md): The Pre/Use split, RequestLogger with log/slog, Recover, and the official middleware packages.
+- [Binding and error handling](https://echo.labstack.com/sourcey/guides/binding-error-handling.md): Binding JSON, XML, form, query and path data into structs; validation; the HTTPError type and custom error handlers.
+- [Context and responses](https://echo.labstack.com/sourcey/guides/context-responses.md): The v5 Context struct, request accessors, response helpers, and the generic ContextGet helpers.
+- [Migration v4 → v5](https://echo.labstack.com/sourcey/guides/migration-v4-v5.md): The breaking changes from Echo v4 to v5 — Context as a struct, slog logging, the Router interface — and the v4 support dates.
+
+## Go API
+
+- [github.com/labstack/echo/v5](https://echo.labstack.com/sourcey/api/package-root.md): Package echo implements high performance, minimalist Go web framework.
+- [Go API](https://echo.labstack.com/sourcey/api.md): Go API for github.com/labstack/echo/v5 across 1 package.

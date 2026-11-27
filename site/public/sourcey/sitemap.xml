@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://echo.labstack.com/sourcey/</loc></url>
+  <url><loc>https://echo.labstack.com/sourcey/quickstart.html</loc></url>
+  <url><loc>https://echo.labstack.com/sourcey/guides/routing-context.html</loc></url>
+  <url><loc>https://echo.labstack.com/sourcey/guides/middleware.html</loc></url>
+  <url><loc>https://echo.labstack.com/sourcey/guides/binding-error-handling.html</loc></url>
+  <url><loc>https://echo.labstack.com/sourcey/guides/context-responses.html</loc></url>
+  <url><loc>https://echo.labstack.com/sourcey/guides/migration-v4-v5.html</loc></url>
+  <url><loc>https://echo.labstack.com/sourcey/api/package-root.html</loc></url>
+  <url><loc>https://echo.labstack.com/sourcey/api.html</loc></url>
+</urlset>
