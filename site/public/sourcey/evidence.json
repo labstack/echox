@@ -1,0 +1,230 @@
+{
+ "summary": "Sourcey documentation site for the labstack/echo Go package (github.com/labstack/echo/v5), generated from the pinned source commit 59aacddc4a13904b8a80a76f1ec838c495b5feca (20 Nov 2026, release v5.4.7, MIT). Built with Sourcey 3.9.5 using the godoc adapter in snapshot mode: a godoc.json snapshot of the root package (424 public API symbols) plus an overview, a quickstart, and five guides condensed from the project's own README at the pinned commit. The static site (10 pages) is staged for the docs PR to labstack/echox and will publish at https://echo.labstack.com/sourcey/ after merge; the deploy pipeline (deploy.yml + astro.config.mjs site + live robots.txt 200) is verified, but the URL is NOT live yet.",
+ "observations": [
+  {
+   "name": "repo_url",
+   "value": "https://github.com/labstack/echo"
+  },
+  {
+   "name": "pinned_commit",
+   "value": "59aacddc4a13904b8a80a76f1ec838c495b5feca"
+  },
+  {
+   "name": "pinned_commit_date",
+   "value": "2026-11-20T18:11:23Z"
+  },
+  {
+   "name": "pinned_commit_message",
+   "value": "Merge commit from fork: fix(middleware): do not resolve dot segments in proxied paths after routing"
+  },
+  {
+   "name": "license",
+   "value": "MIT"
+  },
+  {
+   "name": "license_spdx",
+   "value": "MIT"
+  },
+  {
+   "name": "adapter",
+   "value": "godoc (snapshot mode)"
+  },
+  {
+   "name": "sourcey_command_snapshot",
+   "value": "sourcey godoc -m ./echo -p . -o ./echo/godoc.json"
+  },
+  {
+   "name": "sourcey_command_build",
+   "value": "sourcey build -c sourcey.config.ts -o dist"
+  },
+  {
+   "name": "sourcey_config",
+   "value": "sourcey.config.ts (defineConfig; Docs tab = markdown guides, Go API tab = godoc({module: ./echo, packages: [\".\"], mode: \"snapshot\", snapshot: ./echo/godoc.json, sourceBasePath: https://github.com/labstack/echo/blob/59aacddc4a13904b8a80a76f1ec838c495b5feca/}); siteUrl https://echo.labstack.com, baseUrl /sourcey/)"
+  },
+  {
+   "name": "sourcey_version",
+   "value": "3.9.5"
+  },
+  {
+   "name": "go_version_for_snapshot",
+   "value": "go1.27.4 linux/amd64"
+  },
+  {
+   "name": "page_count",
+   "value": 10
+  },
+  {
+   "name": "page_list",
+   "value": [
+    "/",
+    "/quickstart",
+    "/guides/routing-context.html",
+    "/guides/middleware.html",
+    "/guides/binding-error-handling.html",
+    "/guides/context-responses.html",
+    "/guides/migration-v4-v5.html",
+    "/api.html",
+    "/api/package-root.html",
+    "/404.html"
+   ]
+  },
+  {
+   "name": "api_coverage",
+   "value": {
+    "constants": 78,
+    "function_names": [
+     "BindBody",
+     "BindHeaders",
+     "BindPathValues",
+     "BindQueryParams",
+     "ContextGet",
+     "ContextGetOr",
+     "DefaultHTTPErrorHandler",
+     "ExtractIPDirect",
+     "ExtractIPFromRealIPHeader",
+     "ExtractIPFromXFFHeader",
+     "ExtractSchemeDirect",
+     "ExtractSchemeFromHeaders",
+     "FormFieldBinder",
+     "FormValue",
+     "FormValueOr",
+     "FormValues",
+     "FormValuesOr",
+     "HandlerName",
+     "LegacyIPExtractor",
+     "LegacySchemeExtractor",
+     "MustSubFS",
+     "New",
+     "NewBindingError",
+     "NewConcurrentRouter",
+     "NewContext",
+     "NewDefaultFS",
+     "NewHTTPError",
+     "NewResponse",
+     "NewRouter",
+     "NewVirtualHostHandler",
+     "NewWithConfig",
+     "ParseValue",
+     "ParseValueOr",
+     "ParseValues",
+     "ParseValuesOr",
+     "PathParam",
+     "PathParamOr",
+     "PathValuesBinder",
+     "ProblemDetailsHTTPErrorHandler",
+     "QueryParam",
+     "QueryParamOr",
+     "QueryParams",
+     "QueryParamsBinder",
+     "QueryParamsOr",
+     "ResolveResponseStatus",
+     "StaticDirectoryHandler",
+     "StaticFileHandler",
+     "StatusCode",
+     "TrustIPRange",
+     "TrustLinkLocal",
+     "TrustLoopback",
+     "TrustPrivateNet",
+     "UnwrapResponse",
+     "WrapHandler",
+     "WrapMiddleware"
+    ],
+    "type_methods": 232,
+    "types": 38,
+    "type_names_sample": [
+     "AddRouteError",
+     "BindUnmarshaler",
+     "Binder",
+     "BindingError",
+     "Config",
+     "Context",
+     "DefaultBinder",
+     "DefaultJSONSerializer",
+     "DefaultRouter",
+     "Echo",
+     "Group",
+     "HTTPError"
+    ],
+    "variables": 21
+   }
+  },
+  {
+   "name": "coverage_notes",
+   "value": "Root package only (github.com/labstack/echo/v5). Subpackages middleware/* and echotest are referenced in the guides but have no API reference pages in this build; documented as a gap in report.md."
+  },
+  {
+   "name": "public_url",
+   "value": "https://echo.labstack.com/sourcey/"
+  },
+  {
+   "name": "public_url_status",
+   "value": "PENDING \u2014 not yet live. The site deploys to this URL only after the docs PR to labstack/echox is merged (deploy.yml: push to master -> Astro build in site/ -> upload-pages-artifact site/dist -> GitHub Pages with CNAME echo.labstack.com). Do not treat as live until verified after merge."
+  },
+  {
+   "name": "report_url",
+   "value": "https://echo.labstack.com/sourcey/report.md (after merge; local copy: report.md)"
+  },
+  {
+   "name": "repo_default_branch",
+   "value": "master"
+  },
+  {
+   "name": "repo_last_push",
+   "value": "2026-11-23T23:25:59Z"
+  },
+  {
+   "name": "repo_stars",
+   "value": 32846
+  },
+  {
+   "name": "runx_version",
+   "value": "runx-cli 0.11.1"
+  },
+  {
+   "name": "verification",
+   "value": {
+    "api_symbols_minimum_required": 20,
+    "api_symbols_total": 424,
+    "asset_prefix": "/sourcey/",
+    "build_exit": 0,
+    "build_pages": 10,
+    "build_time_seconds": 3.1,
+    "deploy_pipeline": "labstack/echox .github/workflows/deploy.yml (push to master -> npm run build in site/ -> upload-pages-artifact site/dist -> deploy-pages, CNAME echo.labstack.com) + site/astro.config.mjs site https://echo.labstack.com + live robots.txt HTTP 200 (proves site/public/ is served verbatim at the site root)",
+    "local_checks": "10/10 pages exist with expected content (text-content checks; syntax highlighting splits raw HTML)"
+   }
+  },
+  {
+   "name": "receipt_ref",
+   "value": "runx:receipt:sha256:d97f2fca166b28608e7427a668e46fbe53799e4f0c0088a225dc1161cc7da678"
+  },
+  {
+   "name": "receipt_id",
+   "value": "sha256:d97f2fca166b28608e7427a668e46fbe53799e4f0c0088a225dc1161cc7da678"
+  },
+  {
+   "name": "receipt_run_id",
+   "value": "run_sourcey-echo-build_01a21b47f7f7c5e0f41a3e2c"
+  },
+  {
+   "name": "receipt_skill",
+   "value": "sourcey-echo-build (runx skill, build runner; sealed, outcome completed)"
+  },
+  {
+   "name": "receipt_file_url",
+   "value": "https://echo.labstack.com/sourcey/receipt.json (after merge; local copy: receipt.json)"
+  },
+  {
+   "name": "receipt_public_url_intended",
+   "value": "https://runx.ai/r/d97f2fca166b28608e7427a668e46fbe53799e4f0c0088a225dc1161cc7da678"
+  },
+  {
+   "name": "receipt_public_url_status",
+   "value": "Not yet published (HTTP 404 expected at check time). Notarization needs a runx public API token via runx login; the runx:receipt:sha256: form is the receipt reference per the brief."
+  },
+  {
+   "name": "receipt_verify",
+   "value": "runx verify (run from work/): tree sha256:d97f2fca166b28608e7427a668e46fbe53799e4f0c0088a225dc1161cc7da678 (2 receipts): ok; verification: ok (signature valid, digest valid, content address valid, findings none, lineage unverified)"
+  }
+ ],
+ "receipt_ref": "runx:receipt:sha256:d97f2fca166b28608e7427a668e46fbe53799e4f0c0088a225dc1161cc7da678"
+}
