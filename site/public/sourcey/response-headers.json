@@ -1,0 +1,77 @@
+{
+  "/sourcey/index.md": {
+    "Content-Type": "text/markdown; charset=utf-8",
+    "Link": "<https://echo.labstack.com/sourcey/>; rel=\"canonical\", <https://echo.labstack.com/sourcey/llms.txt>; rel=\"describedby\""
+  },
+  "/sourcey/quickstart.md": {
+    "Content-Type": "text/markdown; charset=utf-8",
+    "Link": "<https://echo.labstack.com/sourcey/quickstart.html>; rel=\"canonical\", <https://echo.labstack.com/sourcey/llms.txt>; rel=\"describedby\""
+  },
+  "/sourcey/guides/routing-context.md": {
+    "Content-Type": "text/markdown; charset=utf-8",
+    "Link": "<https://echo.labstack.com/sourcey/guides/routing-context.html>; rel=\"canonical\", <https://echo.labstack.com/sourcey/llms.txt>; rel=\"describedby\""
+  },
+  "/sourcey/guides/middleware.md": {
+    "Content-Type": "text/markdown; charset=utf-8",
+    "Link": "<https://echo.labstack.com/sourcey/guides/middleware.html>; rel=\"canonical\", <https://echo.labstack.com/sourcey/llms.txt>; rel=\"describedby\""
+  },
+  "/sourcey/guides/binding-error-handling.md": {
+    "Content-Type": "text/markdown; charset=utf-8",
+    "Link": "<https://echo.labstack.com/sourcey/guides/binding-error-handling.html>; rel=\"canonical\", <https://echo.labstack.com/sourcey/llms.txt>; rel=\"describedby\""
+  },
+  "/sourcey/guides/context-responses.md": {
+    "Content-Type": "text/markdown; charset=utf-8",
+    "Link": "<https://echo.labstack.com/sourcey/guides/context-responses.html>; rel=\"canonical\", <https://echo.labstack.com/sourcey/llms.txt>; rel=\"describedby\""
+  },
+  "/sourcey/guides/migration-v4-v5.md": {
+    "Content-Type": "text/markdown; charset=utf-8",
+    "Link": "<https://echo.labstack.com/sourcey/guides/migration-v4-v5.html>; rel=\"canonical\", <https://echo.labstack.com/sourcey/llms.txt>; rel=\"describedby\""
+  },
+  "/sourcey/api/package-root.md": {
+    "Content-Type": "text/markdown; charset=utf-8",
+    "Link": "<https://echo.labstack.com/sourcey/api/package-root.html>; rel=\"canonical\", <https://echo.labstack.com/sourcey/llms.txt>; rel=\"describedby\""
+  },
+  "/sourcey/api.md": {
+    "Content-Type": "text/markdown; charset=utf-8",
+    "Link": "<https://echo.labstack.com/sourcey/api.html>; rel=\"canonical\", <https://echo.labstack.com/sourcey/llms.txt>; rel=\"describedby\""
+  },
+  "/sourcey/documents.json": {
+    "Content-Type": "application/json; charset=utf-8"
+  },
+  "/sourcey/llms.txt": {
+    "Content-Type": "text/plain; charset=utf-8"
+  },
+  "/sourcey/llms-full.txt": {
+    "Content-Type": "text/plain; charset=utf-8"
+  },
+  "/sourcey/": {
+    "Link": "<https://echo.labstack.com/sourcey/index.md>; rel=\"alternate\"; type=\"text/markdown\", <https://echo.labstack.com/sourcey/llms.txt>; rel=\"describedby\"; type=\"text/plain\""
+  },
+  "/sourcey/quickstart.html": {
+    "Link": "<https://echo.labstack.com/sourcey/quickstart.md>; rel=\"alternate\"; type=\"text/markdown\", <https://echo.labstack.com/sourcey/llms.txt>; rel=\"describedby\"; type=\"text/plain\""
+  },
+  "/sourcey/guides/routing-context.html": {
+    "Link": "<https://echo.labstack.com/sourcey/guides/routing-context.md>; rel=\"alternate\"; type=\"text/markdown\", <https://echo.labstack.com/sourcey/llms.txt>; rel=\"describedby\"; type=\"text/plain\""
+  },
+  "/sourcey/guides/middleware.html": {
+    "Link": "<https://echo.labstack.com/sourcey/guides/middleware.md>; rel=\"alternate\"; type=\"text/markdown\", <https://echo.labstack.com/sourcey/llms.txt>; rel=\"describedby\"; type=\"text/plain\""
+  },
+  "/sourcey/guides/binding-error-handling.html": {
+    "Link": "<https://echo.labstack.com/sourcey/guides/binding-error-handling.md>; rel=\"alternate\"; type=\"text/markdown\", <https://echo.labstack.com/sourcey/llms.txt>; rel=\"describedby\"; type=\"text/plain\""
+  },
+  "/sourcey/guides/context-responses.html": {
+    "Link": "<https://echo.labstack.com/sourcey/guides/context-responses.md>; rel=\"alternate\"; type=\"text/markdown\", <https://echo.labstack.com/sourcey/llms.txt>; rel=\"describedby\"; type=\"text/plain\""
+  },
+  "/sourcey/guides/migration-v4-v5.html": {
+    "Link": "<https://echo.labstack.com/sourcey/guides/migration-v4-v5.md>; rel=\"alternate\"; type=\"text/markdown\", <https://echo.labstack.com/sourcey/llms.txt>; rel=\"describedby\"; type=\"text/plain\""
+  },
+  "/sourcey/api/package-root.html": {
+    "Link": "<https://echo.labstack.com/sourcey/api/package-root.md>; rel=\"alternate\"; type=\"text/markdown\", <https://echo.labstack.com/sourcey/llms.txt>; rel=\"describedby\"; type=\"text/plain\""
+  },
+  "/sourcey/api.html": {
+    "Link": "<https://echo.labstack.com/sourcey/api.md>; rel=\"alternate\"; type=\"text/markdown\", <https://echo.labstack.com/sourcey/llms.txt>; rel=\"describedby\"; type=\"text/plain\""
+  },
+  "/sourcey/404.html": {
+    "Link": "<https://echo.labstack.com/sourcey/llms.txt>; rel=\"describedby\"; type=\"text/plain\""
+  }
+}
